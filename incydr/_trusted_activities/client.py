@@ -6,4 +6,3 @@ class TrustedActivitiesClient:
 
     def __init__(self, session: Session):
         self._session = session
-
