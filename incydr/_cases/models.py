@@ -4,7 +4,7 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
-from incydr.core.models import ResponseModel
+from incydr._core.models import ResponseModel
 
 
 class Status(str, Enum):
@@ -29,17 +29,27 @@ class SortKeys(str, Enum):
 
 class Case(ResponseModel):
     name: str
-    number: int = Field(allow_mutation=False)
     status: Status
     assignee: Optional[str]
-    assignee_username: Optional[str] = Field(alias="assigneeUsername")
-    created_by_user_id: Optional[str] = Field(allow_mutation=False, alias="createdByUserID")
-    created_by_username: Optional[str] = Field(allow_mutation=False, alias="createdByUsername")
+    subject: Optional[str]
     description: Optional[str]
     findings: Optional[str]
-    last_modified_by_user_id: Optional[str] = Field(allow_mutation=False, alias="lastModifiedByUserId")
-    last_modified_by_username: Optional[str] = Field(allow_mutation=False, alias="lastModifiedByUsername")
-    subject: Optional[str]
+    number: int = Field(allow_mutation=False)
+    last_modified_by_user_id: Optional[str] = Field(
+        allow_mutation=False, alias="lastModifiedByUserId"
+    )
+    last_modified_by_username: Optional[str] = Field(
+        allow_mutation=False, alias="lastModifiedByUsername"
+    )
+    assignee_username: Optional[str] = Field(
+        allow_mutation=False, alias="assigneeUsername"
+    )
+    created_by_user_id: Optional[str] = Field(
+        allow_mutation=False, alias="createdByUserID"
+    )
+    created_by_username: Optional[str] = Field(
+        allow_mutation=False, alias="createdByUsername"
+    )
     subject_username: Optional[str] = Field(alias="subjectUsername")
     updated_at: Optional[datetime] = Field(allow_mutation=False, alias="updatedAt")
     created_at: datetime = Field(allow_mutation=False, alias="createdAt")
@@ -54,15 +64,25 @@ class CasesPage(ResponseModel):
 
 
 class QueryCasesRequest(BaseModel):
-    assignee: Optional[str] = None
-    createdAt: Optional[tuple[Optional[datetime], Optional[datetime]]]
-    isAssigned: Optional[bool]
-    lastModifiedBy: Optional[str]
+    """Validator for GET requests to /v1/cases"""
+
+    assignee: Optional[str] = Field(
+        description="The userUid of the user the case is assigned to.", default=None
+    )
+    created_at: Optional[tuple[Optional[datetime], Optional[datetime]]] = Field(
+        alias="createdAt",
+        description="Retrieve cases created within the provided date range (represented as a tuple of datetimes).",
+    )
+    is_assigned: Optional[bool] = Field(alias="isAssigned")
+    last_modified_by: Optional[str] = Field(
+        alias="lastModifiedBy",
+        description="Retrieve cases last modified by the provided userID.",
+    )
     name: Optional[str] = None
-    pgNum: Optional[int]
-    pgSize: Optional[int]
-    srtDir: SortDirection = Field(lias="srtDir", default=SortDirection.ASC)
-    srtKey: SortKeys = Field(alias="srtKey",default=SortKeys.NUMBER)
+    page_num: Optional[int] = Field(alias="pgNum")
+    page_size: Optional[int] = Field(alias="pgSize")
+    sort_dir: SortDirection = Field(alias="srtDir", default=SortDirection.ASC)
+    sort_key: SortKeys = Field(alias="srtKey", default=SortKeys.NUMBER)
     status: Optional[Status] = None
 
 

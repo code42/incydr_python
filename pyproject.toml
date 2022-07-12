@@ -44,6 +44,7 @@ path = "incydr/__about__.py"
 dependencies = [
   "pytest",
   "pytest-cov",
+  "pytest-httpserver",
 ]
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=incydr --cov=tests"

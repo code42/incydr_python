@@ -2,4 +2,4 @@
 #
 # SPDX-License-Identifier: MIT
 
-from incydr.core.client import Client
+from incydr._core.client import Client

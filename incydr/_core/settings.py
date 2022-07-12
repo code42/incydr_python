@@ -6,17 +6,21 @@ import logging
 
 
 def default_logger():
+    logging.basicConfig()
     return logging.getLogger("incydr")
 
 
 class IncydrSettings(BaseSettings):
-    api_client_id: str = Field(env='incydr_api_client_id')
-    api_client_secret: SecretStr = Field(env='incydr_api_client_secret')
-    url: str = Field(env='incydr_url')
+    api_client_id: str = Field(env="incydr_api_client_id")
+    api_client_secret: SecretStr = Field(env="incydr_api_client_secret")
+    url: str = Field(env="incydr_url")
     page_size: int = 100
     max_response_history: int = 5
     logger: logging.Logger = Field(default_factory=default_logger)
-    log_level: int = Field(default=logging.WARNING, env="incydr_log_level", )
+    log_level: int = Field(
+        default=logging.WARNING,
+        env="incydr_log_level",
+    )
 
     def __init__(self, **kwargs):
         """Overload init so we can clear any keys from kwargs that are passed as None, which forces lookup of values
@@ -26,7 +30,7 @@ class IncydrSettings(BaseSettings):
         super().__init__(**kwargs)
 
     class Config:
-        env_file = '.env'
+        env_file = ".env"
         validate_assignment = True
 
     @validator("log_level", pre=True, always=True)
@@ -36,4 +40,3 @@ class IncydrSettings(BaseSettings):
             logger = logging.getLogger("dummy")
         logger.setLevel(v)
         return logger.getEffectiveLevel()
-
