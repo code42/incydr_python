@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "incydr"
-description = "Code42 Incydr SDK"
+description = "Code42's Incydr Python SDK"
 readme = "README.md"
 requires-python = ">=3.7"
 license = "MIT"
 keywords = []
 authors = [
-  { name = "Code42 Software", email = "integrations@code42.com" },
+  { name = "Code42", email = "integrations@code42.com" },
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -22,7 +22,12 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = []
+dependencies = [
+  "requests",
+  "requests-toolbelt",
+  "rich",
+  "pydantic[dotenv]",
+]
 dynamic = ["version"]
 
 [project.urls]
@@ -40,13 +45,14 @@ path = "incydr/__about__.py"
 dependencies = [
   "pytest",
   "pytest-cov",
+  "pytest-httpserver",
 ]
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=incydr --cov=tests"
 no-cov = "cov --no-cov"
 
 [[tool.hatch.envs.test.matrix]]
-python = ["37", "38", "39", "310"]
+python = ["37", "38", "39", "310", "311"]
 
 [tool.coverage.run]
 branch = true
