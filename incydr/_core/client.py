@@ -1,14 +1,19 @@
 import logging
+import sys
 from collections import deque
 
+from requests_toolbelt import user_agent
 from requests_toolbelt.sessions import BaseUrlSession
 from requests_toolbelt.utils.dump import dump_response
 
+from incydr.__about__ import __version__
 from incydr._cases.client import CasesClient
 from incydr._core.auth import APIClientAuth
 from incydr._core.settings import IncydrSettings
 from incydr._file_events.client import FileEventsV1
 from incydr._trusted_activities.client import TrustedActivitiesClient
+
+_base_user_agent = user_agent("incydr", __version__)
 
 
 class Client:
@@ -33,16 +38,32 @@ class Client:
 
     cases: CasesClient
     trusted_activities: TrustedActivitiesClient
-    file_events: FileEventsV1
+    # file_events: FileEventsV1
 
-    def __init__(self, url=None, api_client_id=None, api_client_secret=None):
+    def __init__(
+        self,
+        url=None,
+        api_client_id=None,
+        api_client_secret=None,
+        user_agent_prefix=None,
+    ):
         logging.basicConfig()
         self.settings = IncydrSettings(
             url=url, api_client_id=api_client_id, api_client_secret=api_client_secret
         )
+        if self.settings.use_rich and hasattr(sys, "ps1"):
+            from rich import pretty
+
+            pretty.install()
+
         self._request_history = deque(maxlen=self.settings.max_response_history)
 
         self.session = BaseUrlSession(base_url=self.settings.url)
+        if user_agent_prefix:
+            user_agent = f"{user_agent_prefix} {_base_user_agent}"
+        else:
+            user_agent = _base_user_agent
+        self.session.headers["User-Agent"] = user_agent
         self.session.auth = APIClientAuth(
             session=self.session,
             api_client_id=self.settings.api_client_id,
@@ -51,7 +72,7 @@ class Client:
 
         def response_hook(response, *args, **kwargs):
             self.settings.logger.debug(dump_response(response).decode("utf-8"))
-            self._request_history.append(response)
+            self._request_history.appendleft(response)
             response.raise_for_status()
 
         self.session.hooks["response"] = [response_hook]
@@ -59,6 +80,8 @@ class Client:
         self.cases = CasesClient(self.session)
         self.trusted_activities = TrustedActivitiesClient(self.session)
         self.file_events = FileEventsV1(self.session)
+
+        self.session.auth.refresh()
 
     @property
     def request_history(self):

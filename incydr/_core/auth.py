@@ -1,8 +1,9 @@
+from typing import Optional
+
+from pydantic import SecretStr
 from requests import Session
 from requests.auth import AuthBase
 from requests.auth import HTTPBasicAuth
-from pydantic import SecretStr
-from typing import Optional
 
 from incydr._core.models import AuthResponse
 
@@ -22,6 +23,7 @@ class APIClientAuth(AuthBase):
             password=self.api_client_secret.get_secret_value(),
         )
         r = self.session.post("/v1/oauth", auth=auth)
+        r.raise_for_status()
         self.token_response = AuthResponse(**r.json())
 
     def __call__(self, request):

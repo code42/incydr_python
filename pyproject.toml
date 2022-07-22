@@ -10,7 +10,7 @@ requires-python = ">=3.7"
 license = "MIT"
 keywords = []
 authors = [
-  { name = "tim.abramson", email = "tim.abramson@code42.com" },
+  { name = "Code42", email = "integrations@code42.com" },
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -25,6 +25,7 @@ classifiers = [
 dependencies = [
   "requests",
   "requests-toolbelt",
+  "rich",
   "pydantic[dotenv]",
 ]
 dynamic = ["version"]
@@ -51,7 +52,7 @@ cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=incydr
 no-cov = "cov --no-cov"
 
 [[tool.hatch.envs.test.matrix]]
-python = ["37", "38", "39", "310"]
+python = ["37", "38", "39", "310", "311"]
 
 [tool.coverage.run]
 branch = true

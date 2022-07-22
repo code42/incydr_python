@@ -1,8 +1,9 @@
+import logging
+
 from pydantic import BaseSettings
 from pydantic import Field
 from pydantic import SecretStr
 from pydantic import validator
-import logging
 
 
 def default_logger():
@@ -21,6 +22,8 @@ class IncydrSettings(BaseSettings):
         default=logging.WARNING,
         env="incydr_log_level",
     )
+    user_agent_prefix: str = None
+    use_rich: bool = Field(env="incydr_use_rich", default=True)
 
     def __init__(self, **kwargs):
         """Overload init so we can clear any keys from kwargs that are passed as None, which forces lookup of values

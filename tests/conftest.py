@@ -13,7 +13,12 @@ def httpserver_listen_address():
 
 
 @pytest.fixture
-def httpserver_auth(httpserver: HTTPServer):
+def httpserver_auth(httpserver: HTTPServer, monkeypatch):
+    """Sets up environment variables and auth response from server."""
+    monkeypatch.setenv('incydr_api_client_id', "env_id")
+    monkeypatch.setenv('incydr_api_client_secret', "env_secret")
+    monkeypatch.setenv('incydr_url', TEST_HOST)
+
     auth_response = dict(token_type="bearer", expires_in=900, access_token="test_token")
     httpserver.expect_request("/v1/oauth", method="POST").respond_with_json(auth_response)
     return httpserver

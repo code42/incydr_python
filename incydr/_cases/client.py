@@ -1,7 +1,11 @@
-from functools import singledispatchmethod
 from itertools import count
-from typing import Union
+from pathlib import Path
+from typing import Union, Iterator
 
+from requests import Response
+
+from incydr._core.util import get_filename_from_content_disposition
+from incydr._file_events.models import FileEventV2
 from .models import *
 from .models import CreateCaseRequest, UpdateCaseRequest
 
@@ -30,10 +34,16 @@ class CasesV1:
             findings=findings,
             description=description,
         )
-        response = self._session.post(url="/v1/cases", data=data)
+        response = self._session.post(url="/v1/cases", json=data.dict())
         return Case.parse_response(response)
 
-    def get_by_id(self, case_number: int) -> Case:
+    def delete(self, case_number: Union[int, Case]) -> Response:
+        """Delete a case."""
+        if isinstance(case_number, Case):
+            case_number = case_number.number
+        return self._session.delete(f"/v1/cases/{case_number}")
+
+    def get_case(self, case_number: int) -> Case:
         """Get a single case."""
         response = self._session.get(f"/v1/cases/{case_number}")
         return Case(**response.json())
@@ -41,7 +51,7 @@ class CasesV1:
     def get_page(
         self,
         assignee: str = None,
-        created_at: tuple[datetime, datetime] = None,
+        created_at: Tuple[datetime, datetime] = None,
         is_assigned: bool = None,
         last_modified_by: str = None,
         name: str = None,
@@ -51,51 +61,122 @@ class CasesV1:
         sort_dir: SortDirection = SortDirection.ASC,
         sort_key: SortKeys = SortKeys.NUMBER,
     ) -> CasesPage:
+        """Get a page of cases."""
         data = QueryCasesRequest(
             assignee=assignee,
-            created_at=created_at,
-            is_assigned=is_assigned,
-            last_modified_by=last_modified_by,
+            createdAt=created_at,
+            isAssigned=is_assigned,
+            lastModifiedBy=last_modified_by,
             name=name,
             status=status,
-            page_num=page_num,
-            page_size=page_size,
-            sort_dir=sort_dir,
-            sort_key=sort_key,
+            pgNum=page_num,
+            pgSize=page_size,
+            srtDir=sort_dir,
+            srtKey=sort_key,
         )
-        response = self._session.get("/v1/cases", params=data.dict(by_alias=True))
+        response = self._session.get("/v1/cases", params=data.dict())
         return CasesPage.parse_response(response)
 
-    def iter_all(self, **kwargs):
-        page_size = kwargs.get("page_size") or self.default_page_size
-        for i in count(1):
-            page = self.get_page(**kwargs, page_num=i)
+    def iter_all(
+        self,
+        assignee: str = None,
+        created_at: Tuple[datetime, datetime] = None,
+        is_assigned: bool = None,
+        last_modified_by: str = None,
+        name: str = None,
+        status: Status = None,
+        page_size: int = None,
+        sort_dir: SortDirection = SortDirection.ASC,
+        sort_key: SortKeys = SortKeys.NUMBER,
+    ) -> Iterator[Case]:
+        """Iterate over all cases."""
+        page_size = page_size or self.default_page_size
+        for page_num in count(1):
+            page = self.get_page(
+                assignee=assignee,
+                created_at=created_at,
+                is_assigned=is_assigned,
+                last_modified_by=last_modified_by,
+                name=name,
+                status=status,
+                page_num=page_num,
+                sort_dir=sort_dir,
+                sort_key=sort_key,
+            )
             for case in page.cases:
                 yield case
             if len(page.cases) < page_size:
                 break
 
-    def update(self, case: Union[Case, int], **kwargs):
-        """Updates a case. Accepts a :class:`Case` object or an :class:`int` (representing the case number) as the first argument:
-
-        .. highlight:: python
-        .. code-block:: python
-
-            >>> case = client.cases.get(23)
-            >>> case.name = "updated_name!"
-            >>> client.cases.update(case)
-            Case(name='updated_name!', number=23, status=<Status.OPEN: 'OPEN'>, assignee=None, assignee_username=None, createdByUserUid=None, createdByUsername=None, description=None, findings=None, lastModifiedByU
-            serUid='942564422882759874', lastModifiedByUsername='admin@example.com', subject=None, subjectUsername=None, updatedAt=datetime.datetime(2022, 5, 6, 16, 31, 53, 675133, tzinfo=datetime.tim
-            ezone.utc), createdAt=datetime.datetime(2022, 4, 21, 2, 7, 57, 276392, tzinfo=datetime.timezone.utc))
-
-        :param case: The case to update.
-        :type case: :class:Case
-        """
+    def update(self, case: Case):
+        """Updates a case. Accepts a :class:`Case` object."""
         data = UpdateCaseRequest(**case.dict())
         response = self._session.put(
             f"/v1/cases/{case.number}", json=data.dict(by_alias=True)
         )
         return Case.parse_response(response)
+
+    def download_summary_pdf(self, case_number: int, target_folder: Path) -> Path:
+        """Downloads summary of case in pdf format to specified target folder."""
+        folder = Path(target_folder)  # ensure a Path object if we get passed a string
+        if not folder.is_dir():
+            raise ValueError(
+                f"`target_folder` argument must resolve to a folder: {target_folder}"
+            )
+        response = self._session.get(f"/v1/cases/{case_number}/export")
+        filename = get_filename_from_content_disposition(
+            response, fallback=f"Case-{case_number}.csv"
+        )
+        target = folder / filename
+        target.write_bytes(response.content)
+        return target
+
+    def download_fileevent_csv(self, case_number: int, target_folder: Path) -> Path:
+        """Downloads all file event data for a case in CSV format to specified target folder."""
+        folder = Path(target_folder)  # ensure a Path object if we get passed a string
+        if not folder.is_dir():
+            raise ValueError(
+                f"`target_folder` argument must resolve to a folder: {target_folder}"
+            )
+        response = self._session.get(f"/v1/cases/{case_number}/fileevent/export")
+        filename = get_filename_from_content_disposition(
+            response, fallback=f"Case-{case_number}.csv"
+        )
+        target = folder / filename
+        target.write_bytes(response.content)
+        return target
+
+    def download_full_case_zip(self, case_number) -> None:
+        """Downloads full export of case in zip format to specified target folder."""
+        return self._session.post(f"/v1/cases/{case_number}/export/full/downloadToken")
+
+    def get_file_events(self, case_number: int) -> CaseFileEventsResponse:
+        """Gets file event details attached to a case."""
+        r = self._session.get(f"/v1/cases/{case_number}/fileevent")
+        return CaseFileEventsResponse.parse_response(r)
+
+    def add_file_events_to_case(
+        self, case_number: int, event_ids: Union[str, List[str]]
+    ) -> Response:
+        """Attach file events to a case."""
+        if isinstance(event_ids, str):
+            event_ids = [event_ids]
+        return self._session.post(
+            f"/v1/cases/{case_number}/fileevent", json={"events": event_ids}
+        )
+
+    def delete_file_event_from_case(self, case_number: int, event_id: str):
+        """Remove file events from a case."""
+        return self._session.delete(f"/v1/cases/{case_number}/fileevent/{event_id}")
+
+    def get_file_event_detail(self, case_number: int, event_id: str):
+        """Get the full detail for a given file event."""
+        response = self._session.get(f"/v1/cases/{case_number}/fileevent/{event_id}")
+        return FileEventV2(**response.json())
+
+    def download_file_for_event(self, case_number: int, event_id: str):
+        """Download the source file (if captured) from a file event attached to a case."""
+        return self._session.get(f"/v1/cases/{case_number}/fileevent/{event_id}/file")
 
 
 class CasesClient(CasesV1):
