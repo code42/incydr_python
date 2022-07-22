@@ -11,7 +11,6 @@ from incydr._cases.client import CasesClient
 from incydr._core.auth import APIClientAuth
 from incydr._core.settings import IncydrSettings
 from incydr._file_events.client import FileEventsV1
-from incydr._trusted_activities.client import TrustedActivitiesClient
 
 _base_user_agent = user_agent("incydr", __version__)
 
@@ -37,8 +36,6 @@ class Client:
     """
 
     cases: CasesClient
-    trusted_activities: TrustedActivitiesClient
-    # file_events: FileEventsV1
 
     def __init__(
         self,
@@ -78,7 +75,6 @@ class Client:
         self.session.hooks["response"] = [response_hook]
 
         self.cases = CasesClient(self.session)
-        self.trusted_activities = TrustedActivitiesClient(self.session)
         self.file_events = FileEventsV1(self.session)
 
         self.session.auth.refresh()

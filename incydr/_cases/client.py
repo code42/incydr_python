@@ -179,7 +179,13 @@ class CasesV1:
         return self._session.get(f"/v1/cases/{case_number}/fileevent/{event_id}/file")
 
 
-class CasesClient(CasesV1):
+class CasesClient:
     def __init__(self, session):
-        super().__init__(session)
-        self.v1 = self
+        self._session = session
+        self._v1 = None
+
+    @property
+    def v1(self):
+        if self._v1 is None:
+            self._v1 = CasesV1(self._session)
+        return self._v1
