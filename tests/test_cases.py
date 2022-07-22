@@ -59,7 +59,7 @@ def test_create(httpserver_auth: HTTPServer):
         uri="/v1/cases", method="POST", json=test_data
     ).respond_with_json(test_response)
     c = Client()
-    case = c.cases.create(**test_data)
+    case = c.cases.v1.create(**test_data)
     assert isinstance(case, Case)
     assert case.name == test_data["name"]
     assert case.description == test_data["description"]
@@ -71,21 +71,21 @@ def test_create_raises_validation_error_when_param_constraint_exceeded(
     c = Client()
     # `name` has max of 50 chars
     with pytest.raises(ValidationError):
-        c.cases.create(name="x" * 51)
+        c.cases.v1.create(name="x" * 51)
 
     # `description` has max of 250 chars
     with pytest.raises(ValidationError):
-        c.cases.create(name="x", description="x" * 251)
+        c.cases.v1.create(name="x", description="x" * 251)
 
     # `findings` has max of 30k chars
     with pytest.raises(ValidationError):
-        c.cases.create(name="x", findings="x" * 30_001)
+        c.cases.v1.create(name="x", findings="x" * 30_001)
 
 
-def test_get_by_id(httpserver_auth: HTTPServer):
+def test_get_single_case(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request("/v1/cases/2").respond_with_json(TEST_CASE_2)
     c = Client()
-    case = c.cases.get_by_id(2)
+    case = c.cases.v1.get_case(2)
     assert isinstance(case, Case)
     assert case.number == 2
     assert case.created_at == datetime.datetime.fromisoformat(
@@ -105,7 +105,7 @@ def test_get_page(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request("/v1/cases").respond_with_json(cases_data)
 
     client = Client()
-    page = client.cases.get_page()
+    page = client.cases.v1.get_page()
     assert isinstance(page, CasesPage)
     assert page.cases[0].json() == json.dumps(TEST_CASE_1)
     assert page.cases[1].json() == json.dumps(TEST_CASE_2)
