@@ -36,6 +36,19 @@ path = "incydr/__about__.py"
 [tool.hatch.build.targets.sdist]
 [tool.hatch.build.targets.wheel]
 
+[tool.hatch.envs.style]
+dependencies = [
+    "pre-commit",
+]
+[tool.hatch.envs.style.scripts]
+check = "pre-commit run --all-files --show-diff-on-failure"
+
+[tool.hatch.envs.docs]
+dependencies = [
+]
+[tool.hatch.envs.docs.scripts]
+build = ""
+
 [tool.hatch.envs.default]
 dependencies = [
   "pytest",
