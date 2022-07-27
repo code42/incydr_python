@@ -22,7 +22,10 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = []
+dependencies = [
+    "hatchling>=1.6.0",
+    "pip==22.1.0",
+]
 dynamic = ["version"]
 
 [project.urls]
@@ -56,6 +59,7 @@ dependencies = [
 ]
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=incydr --cov=tests"
+cov-report = "pytest --cov-report=xml:coverage.xml --cov-config=pyproject.toml --cov=incydr --cov=tests"
 no-cov = "cov --no-cov"
 
 [[tool.hatch.envs.test.matrix]]
