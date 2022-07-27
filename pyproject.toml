@@ -24,7 +24,6 @@ classifiers = [
 ]
 dependencies = [
     "hatchling>=1.6.0",
-    "pip==22.1.0",
 ]
 dynamic = ["version"]
 
@@ -47,23 +46,25 @@ dependencies = [
 check = "pre-commit run --all-files --show-diff-on-failure"
 
 [tool.hatch.envs.docs]
-dependencies = [
-]
+dependencies = []
 [tool.hatch.envs.docs.scripts]
 build = ""
 
 [tool.hatch.envs.default]
+dependencies = []
+[tool.hatch.envs.default.scripts]
+
+[[tool.hatch.envs.test.matrix]]
+python = ["37", "38", "39", "310"]
+[tool.hatch.envs.test]
 dependencies = [
   "pytest",
   "pytest-cov",
 ]
-[tool.hatch.envs.default.scripts]
+[tool.hatch.envs.test.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=incydr --cov=tests"
 cov-report = "pytest --cov-report=xml:coverage.xml --cov-config=pyproject.toml --cov=incydr --cov=tests"
 no-cov = "cov --no-cov"
-
-[[tool.hatch.envs.test.matrix]]
-python = ["37", "38", "39", "310"]
 
 [tool.coverage.run]
 branch = true

@@ -30,7 +30,7 @@ jobs:
           pip install .
 
       - name: Run tests
-        run: hatch run cov
+        run: hatch run test:cov
 
       - name: Upload coverage report to Codecov
         uses: codecov/codecov-action@v3
