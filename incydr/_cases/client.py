@@ -1,13 +1,24 @@
+from datetime import datetime
 from itertools import count
 from pathlib import Path
-from typing import Union, Iterator
+from typing import Iterator
+from typing import List
+from typing import Tuple
+from typing import Union
 
 from requests import Response
 
 from incydr._core.util import get_filename_from_content_disposition, SortDirection
+from .models import Case
+from .models import CaseFileEventsResponse
+from .models import CasesPage
+from .models import CreateCaseRequest
+from .models import QueryCasesRequest
+from .models import SortKeys
+from .models import Status
+from .models import UpdateCaseRequest
+from incydr._core.util import get_filename_from_content_disposition
 from incydr._file_events.models import FileEventV2
-from .models import *
-from .models import CreateCaseRequest, UpdateCaseRequest
 
 
 class CasesV1:
@@ -103,8 +114,7 @@ class CasesV1:
                 sort_dir=sort_dir,
                 sort_key=sort_key,
             )
-            for case in page.cases:
-                yield case
+            yield from page.cases
             if len(page.cases) < page_size:
                 break
 
