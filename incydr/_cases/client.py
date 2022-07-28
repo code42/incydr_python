@@ -4,7 +4,7 @@ from typing import Union, Iterator
 
 from requests import Response
 
-from incydr._core.util import get_filename_from_content_disposition
+from incydr._core.util import get_filename_from_content_disposition, SortDirection
 from incydr._file_events.models import FileEventV2
 from .models import *
 from .models import CreateCaseRequest, UpdateCaseRequest

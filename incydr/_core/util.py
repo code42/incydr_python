@@ -1,6 +1,11 @@
 import re
-
+from enum import Enum
 from requests import Response
+
+
+class SortDirection(str, Enum):
+    ASC = "asc"
+    DESC = "desc"
 
 
 def get_filename_from_content_disposition(response: Response, fallback=None) -> str:

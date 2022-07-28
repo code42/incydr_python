@@ -12,11 +12,6 @@ class Status(str, Enum):
     OPEN = "OPEN"
 
 
-class SortDirection(str, Enum):
-    ASC = "asc"
-    DESC = "desc"
-
-
 class SortKeys(str, Enum):
     NAME = "name"
     NUMBER = "number"
