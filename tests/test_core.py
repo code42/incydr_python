@@ -1,7 +1,7 @@
 from pytest_httpserver import HTTPServer
 
-from incydr import Client
 from .conftest import TEST_HOST
+from incydr import Client
 
 
 def test_client_init_reads_environment_vars_when_no_arguments_passed(

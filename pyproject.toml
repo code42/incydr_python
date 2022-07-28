@@ -70,19 +70,12 @@ cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=incydr
 cov-report = "pytest --cov-report=xml:coverage.xml --cov-config=pyproject.toml --cov=incydr --cov=tests"
 no-cov = "cov --no-cov"
 
-<<<<<<< HEAD
-=======
-[[tool.hatch.envs.test.matrix]]
-python = ["37", "38", "39", "310", "311"]
-
->>>>>>> main
 [tool.coverage.run]
 branch = true
 parallel = true
 omit = [
   "incydr/__about__.py",
 ]
-
 [tool.coverage.report]
 exclude_lines = [
   "no cov",

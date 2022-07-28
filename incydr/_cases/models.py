@@ -1,8 +1,11 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional, List, Tuple
+from typing import List
+from typing import Optional
+from typing import Tuple
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+from pydantic import Field
 
 from incydr._core.models import ResponseModel
 
