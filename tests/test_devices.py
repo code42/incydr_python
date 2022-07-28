@@ -37,7 +37,7 @@ TEST_DEVICE_1 = {
     "creationDate": "2022-07-14T16:49:11.166000Z",
     "modificationDate": "2022-07-14T17:05:44.524000Z",
     "loginDate": "2022-07-14T16:53:30.717000Z",
-    "osName": "win64"
+    "osName": "win64",
 }
 
 
@@ -68,7 +68,7 @@ TEST_DEVICE_2 = {
     "creationDate": "2022-07-14T16:49:11.166000Z",
     "modificationDate": "2022-07-14T17:05:44.524000Z",
     "loginDate": "2022-07-14T16:53:30.717000Z",
-    "osName": "win64"
+    "osName": "win64",
 }
 
 TEST_DEVICE_3 = {
@@ -98,12 +98,14 @@ TEST_DEVICE_3 = {
     "creationDate": "2022-07-14T16:49:11.166000Z",
     "modificationDate": "2022-07-14T17:05:44.524000Z",
     "loginDate": "2022-07-14T16:53:30.717000Z",
-    "osName": "win64"
+    "osName": "win64",
 }
 
 
 def test_get_device_returns_expected_data(httpserver_auth: HTTPServer):
-    httpserver_auth.expect_request(uri="/v1/devices/device-1", method="GET").respond_with_json(TEST_DEVICE_1)
+    httpserver_auth.expect_request(
+        uri="/v1/devices/device-1", method="GET"
+    ).respond_with_json(TEST_DEVICE_1)
     client = Client()
     device = client.devices.v1.get_device("device-1")
     assert isinstance(device, Device)
@@ -125,7 +127,9 @@ def test_get_device_returns_expected_data(httpserver_auth: HTTPServer):
     )
 
 
-def test_get_page_when_default_query_params_returns_expected_data(httpserver_auth: HTTPServer):
+def test_get_page_when_default_query_params_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
     query = {
         "pgNum": 1,
         "pgSize": 100,
@@ -133,14 +137,10 @@ def test_get_page_when_default_query_params_returns_expected_data(httpserver_aut
         "srtKey": "name",
     }
 
-    devices_data = {
-        "devices": [
-            TEST_DEVICE_1,
-            TEST_DEVICE_2
-        ],
-        "totalCount": 2
-    }
-    httpserver_auth.expect_request("/v1/devices", method="GET", query_string=urlencode(query)).respond_with_json(devices_data)
+    devices_data = {"devices": [TEST_DEVICE_1, TEST_DEVICE_2], "totalCount": 2}
+    httpserver_auth.expect_request(
+        "/v1/devices", method="GET", query_string=urlencode(query)
+    ).respond_with_json(devices_data)
 
     client = Client()
     page = client.devices.v1.get_page()
@@ -160,14 +160,10 @@ def test_get_page_when_query_params_returns_expected_data(httpserver_auth: HTTPS
         "srtKey": "lastConnected",
     }
 
-    devices_data = {
-        "devices": [
-            TEST_DEVICE_1,
-            TEST_DEVICE_2
-        ],
-        "totalCount": 2
-    }
-    httpserver_auth.expect_request(uri="/v1/devices", method="GET", query_string=urlencode(query)).respond_with_json(devices_data)
+    devices_data = {"devices": [TEST_DEVICE_1, TEST_DEVICE_2], "totalCount": 2}
+    httpserver_auth.expect_request(
+        uri="/v1/devices", method="GET", query_string=urlencode(query)
+    ).respond_with_json(devices_data)
 
     client = Client()
     page = client.devices.v1.get_page(
@@ -176,7 +172,7 @@ def test_get_page_when_query_params_returns_expected_data(httpserver_auth: HTTPS
         page_num=2,
         page_size=10,
         sort_dir=SortDirection.DESC,
-        sort_key=SortKeys.LAST_CONNECTED
+        sort_key=SortKeys.LAST_CONNECTED,
     )
     assert isinstance(page, DevicesPage)
     assert page.devices[0].json() == json.dumps(TEST_DEVICE_1)
@@ -184,7 +180,9 @@ def test_get_page_when_query_params_returns_expected_data(httpserver_auth: HTTPS
     assert page.total_count == len(page.devices) == 2
 
 
-def test_iter_all_when_default_params_returns_expected_data(httpserver_auth: HTTPServer):
+def test_iter_all_when_default_params_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
     query_1 = {
         "pgNum": 1,
         "pgSize": 2,
@@ -198,22 +196,15 @@ def test_iter_all_when_default_params_returns_expected_data(httpserver_auth: HTT
         "srtKey": "name",
     }
 
-    devices_data_1 = {
-        "devices": [
-            TEST_DEVICE_1,
-            TEST_DEVICE_2
-        ],
-        "totalCount": 2
-    }
-    devices_data_2 = {
-        "devices": [
-            TEST_DEVICE_3
-        ],
-        "totalCount": 1
-    }
+    devices_data_1 = {"devices": [TEST_DEVICE_1, TEST_DEVICE_2], "totalCount": 2}
+    devices_data_2 = {"devices": [TEST_DEVICE_3], "totalCount": 1}
 
-    httpserver_auth.expect_ordered_request("/v1/devices", method="GET", query_string=urlencode(query_1)).respond_with_json(devices_data_1)
-    httpserver_auth.expect_ordered_request("/v1/devices", method="GET", query_string=urlencode(query_2)).respond_with_json(devices_data_2)
+    httpserver_auth.expect_ordered_request(
+        "/v1/devices", method="GET", query_string=urlencode(query_1)
+    ).respond_with_json(devices_data_1)
+    httpserver_auth.expect_ordered_request(
+        "/v1/devices", method="GET", query_string=urlencode(query_2)
+    ).respond_with_json(devices_data_2)
 
     client = Client()
     iterator = client.devices.v1.iter_all(page_size=2)

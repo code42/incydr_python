@@ -1,10 +1,11 @@
-from incydr._core.util import SortDirection
-from typing import Iterator
 from itertools import count
+from typing import Iterator
+
 from .models import Device
 from .models import DevicesPage
 from .models import QueryDevicesRequest
 from .models import SortKeys
+from incydr._core.util import SortDirection
 
 
 class DevicesClient:

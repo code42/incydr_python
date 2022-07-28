@@ -1,5 +1,6 @@
 import re
 from enum import Enum
+
 from requests import Response
 
 
