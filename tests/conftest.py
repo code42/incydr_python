@@ -18,7 +18,8 @@ def httpserver_auth(httpserver: HTTPServer, monkeypatch):
     monkeypatch.setenv("incydr_url", TEST_HOST)
 
     auth_response = dict(token_type="bearer", expires_in=900, access_token="test_token")
-    httpserver.expect_request("/v1/oauth", method="POST").respond_with_json(
+    # ordered request will take precedent as first request
+    httpserver.expect_ordered_request("/v1/oauth", method="POST").respond_with_json(
         auth_response
     )
     return httpserver

@@ -1,5 +1,6 @@
+from datetime import datetime
 from enum import Enum
-from typing import Optional, List
+from typing import Optional, List, Literal
 from pydantic import BaseModel, Field
 
 from incydr._core.models import ResponseModel
@@ -69,7 +70,7 @@ class Device(ResponseModel):
         description='Optional external reference information, such as a serial number, asset tag, employee ID, or help desk issue ID.',
     )
     notes: Optional[str] = Field(None, description='Optional descriptive information.')
-    last_connected: Optional[str] = Field(
+    last_connected: Optional[datetime] = Field(
         allow_mutation=False,
         alias="lastConnected",
         description='The last day and time this device was connected to the server.',
@@ -99,20 +100,23 @@ class Device(ResponseModel):
         allow_mutation=False,
         description='Device build version long number, will only be applicable to CP4/SP devices.',
     )
-    creation_date: Optional[str] = Field(
+    creation_date: Optional[datetime] = Field(
         allow_mutation=False, alias="creationDate", description='Date and time this device was created.'
     )
-    modification_date: Optional[str] = Field(
+    modification_date: Optional[datetime] = Field(
         allow_mutation=False, alias="modificationDate", description='Date and time this device was last modified.'
     )
-    login_date: Optional[str] = Field(
+    login_date: Optional[datetime] = Field(
         allow_mutation=False, alias="loginDate", description='Date and time this device was last logged in.'
     )
+
+    class Config:
+        validate_assignment = True
 
 
 class DevicesPage(ResponseModel):
     total_count: Optional[int] = Field(alias="totalCount", description='The total number of devices')
-    devices: Optional[List[Device]] = Field(allow_mutation=False, description='A list of devices')
+    devices: Optional[List[Device]] = Field(description='A list of devices')
 
 
 class QueryDevicesRequest(BaseModel):
@@ -121,4 +125,7 @@ class QueryDevicesRequest(BaseModel):
     pgNum: Optional[int] = 1
     pgSize: Optional[int] = 100
     srtDir: SortDirection = SortDirection.ASC
-    srtKey: SortKeys = SortKeys.NUMBER
+    srtKey: SortKeys = SortKeys.NAME
+
+    class Config:
+        use_enum_values = True

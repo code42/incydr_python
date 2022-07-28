@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from pydantic import Field
 
 from incydr._core.models import ResponseModel
+from incydr._core.util import SortDirection
 
 
 class Status(str, Enum):
