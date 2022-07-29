@@ -41,18 +41,34 @@ path = "incydr/__about__.py"
 [tool.hatch.build.targets.sdist]
 [tool.hatch.build.targets.wheel]
 
+[tool.hatch.envs.style]
+dependencies = [
+    "pre-commit",
+]
+[tool.hatch.envs.style.scripts]
+check = "pre-commit run --all-files --show-diff-on-failure"
+
+[tool.hatch.envs.docs]
+dependencies = []
+[tool.hatch.envs.docs.scripts]
+build = ""
+
 [tool.hatch.envs.default]
+dependencies = []
+[tool.hatch.envs.default.scripts]
+
+[[tool.hatch.envs.test.matrix]]
+python = ["37", "38", "39", "310"]
+[tool.hatch.envs.test]
 dependencies = [
   "pytest",
   "pytest-cov",
   "pytest-httpserver",
 ]
-[tool.hatch.envs.default.scripts]
+[tool.hatch.envs.test.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=incydr --cov=tests"
+cov-report = "pytest --cov-report=xml:coverage.xml --cov-config=pyproject.toml --cov=incydr --cov=tests"
 no-cov = "cov --no-cov"
-
-[[tool.hatch.envs.test.matrix]]
-python = ["37", "38", "39", "310", "311"]
 
 [tool.coverage.run]
 branch = true
@@ -60,7 +76,6 @@ parallel = true
 omit = [
   "incydr/__about__.py",
 ]
-
 [tool.coverage.report]
 exclude_lines = [
   "no cov",

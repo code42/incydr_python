@@ -6,7 +6,8 @@ from pydantic import ValidationError
 from pytest_httpserver import HTTPServer
 
 from incydr import Client
-from incydr._cases.models import Case, CasesPage
+from incydr._cases.models import Case
+from incydr._cases.models import CasesPage
 
 TEST_CASE_1 = {
     "number": 1,
