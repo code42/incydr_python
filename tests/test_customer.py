@@ -8,7 +8,7 @@ from incydr._customer.models import Customer
 TEST_CUSTOMER = {
     "name": "test-customer",
     "registrationKey": "key-42",
-    "tenantId": "424242"
+    "tenantId": "424242",
 }
 
 
