@@ -131,10 +131,10 @@ def test_get_page_when_default_query_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     query = {
-        "pgNum": 1,
-        "pgSize": 100,
-        "srtDir": "asc",
-        "srtKey": "name",
+        "page": 1,
+        "pageSize": 100,
+        "sortDirection": "asc",
+        "sortKey": "name",
     }
 
     devices_data = {"devices": [TEST_DEVICE_1, TEST_DEVICE_2], "totalCount": 2}
@@ -154,10 +154,10 @@ def test_get_page_when_query_params_returns_expected_data(httpserver_auth: HTTPS
     query = {
         "active": True,
         "blocked": False,
-        "pgNum": 2,
-        "pgSize": 10,
-        "srtDir": "desc",
-        "srtKey": "lastConnected",
+        "page": 2,
+        "pageSize": 10,
+        "sortDirection": "desc",
+        "sortKey": "lastConnected",
     }
 
     devices_data = {"devices": [TEST_DEVICE_1, TEST_DEVICE_2], "totalCount": 2}
@@ -184,16 +184,16 @@ def test_iter_all_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     query_1 = {
-        "pgNum": 1,
-        "pgSize": 2,
-        "srtDir": "asc",
-        "srtKey": "name",
+        "page": 1,
+        "pageSize": 2,
+        "sortDirection": "asc",
+        "sortKey": "name",
     }
     query_2 = {
-        "pgNum": 2,
-        "pgSize": 2,
-        "srtDir": "asc",
-        "srtKey": "name",
+        "page": 2,
+        "pageSize": 2,
+        "sortDirection": "asc",
+        "sortKey": "name",
     }
 
     devices_data_1 = {"devices": [TEST_DEVICE_1, TEST_DEVICE_2], "totalCount": 2}

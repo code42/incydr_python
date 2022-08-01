@@ -45,10 +45,10 @@ class DevicesV1:
         """Get a page of devices."""
 
         data = QueryDevicesRequest(
-            pgNum=page_num,
-            pgSize=page_size,
-            srtKey=sort_key,
-            srtDir=sort_dir,
+            page=page_num,
+            pageSize=page_size,
+            sortKey=sort_key,
+            sortDirection=sort_dir,
             active=active,
             blocked=blocked,
         )

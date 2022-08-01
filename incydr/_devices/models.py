@@ -149,10 +149,10 @@ class DevicesPage(ResponseModel):
 class QueryDevicesRequest(BaseModel):
     active: Optional[bool]
     blocked: Optional[bool]
-    pgNum: Optional[int] = 1
-    pgSize: Optional[int] = 100
-    srtDir: SortDirection = SortDirection.ASC
-    srtKey: SortKeys = SortKeys.NAME
+    page: Optional[int] = 1
+    pageSize: Optional[int] = 100
+    sortDirection: SortDirection = SortDirection.ASC
+    sortKey: SortKeys = SortKeys.NAME
 
     class Config:
         use_enum_values = True
