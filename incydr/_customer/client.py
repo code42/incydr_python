@@ -22,4 +22,4 @@ class CustomerV1:
     def get(self) -> Customer:
         """Get customer account information."""
         response = self._session.get("/v1/customer")
-        return Customer(**response.json())
+        return Customer.parse_response(response)
