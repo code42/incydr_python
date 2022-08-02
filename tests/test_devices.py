@@ -150,7 +150,9 @@ def test_get_page_when_default_query_params_returns_expected_data(
     assert page.total_count == len(page.devices) == 2
 
 
-def test_get_page_when_custom_query_params_returns_expected_data(httpserver_auth: HTTPServer):
+def test_get_page_when_custom_query_params_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
     query = {
         "active": True,
         "blocked": False,
