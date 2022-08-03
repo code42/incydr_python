@@ -57,7 +57,7 @@ class CasesV1:
     def get_case(self, case_number: int) -> Case:
         """Get a single case."""
         response = self._session.get(f"/v1/cases/{case_number}")
-        return Case(**response.json())
+        return Case.parse_response(response)
 
     def get_page(
         self,
@@ -182,7 +182,7 @@ class CasesV1:
     def get_file_event_detail(self, case_number: int, event_id: str):
         """Get the full detail for a given file event."""
         response = self._session.get(f"/v1/cases/{case_number}/fileevent/{event_id}")
-        return FileEventV2(**response.json())
+        return FileEventV2.parse_response(response)
 
     def download_file_for_event(self, case_number: int, event_id: str):
         """Download the source file (if captured) from a file event attached to a case."""

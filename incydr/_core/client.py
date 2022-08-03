@@ -10,6 +10,7 @@ from incydr.__about__ import __version__
 from incydr._cases.client import CasesClient
 from incydr._core.auth import APIClientAuth
 from incydr._core.settings import IncydrSettings
+from incydr._customer.client import CustomerClient
 from incydr._file_events.client import FileEventsClient
 
 _base_user_agent = user_agent("incydr", __version__)
@@ -76,6 +77,7 @@ class Client:
 
         self.cases = CasesClient(self.session)
         self.file_events = FileEventsClient(self.session)
+        self.customer = CustomerClient(self.session)
 
         self.session.auth.refresh()
 
