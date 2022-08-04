@@ -1,4 +1,9 @@
+from typing import List, Union
+
 from .models import FileEventResponseV1
+from .models import FileEventResponseV2
+from .._queries.models import FilterGroup, Query
+# from .._queries.queries import create_query
 
 
 class FileEventsV1:
@@ -18,9 +23,16 @@ class FileEventsV2:
     def __init__(self, session):
         self._session = session
 
-    def search(self, query):
+    def search(
+            self,
+            query: Union[Query, FilterGroup, List[FilterGroup]],
+            or_query: bool = False
+    ):
+        if not isinstance(query, Query):
+            query = create_query(query, or_query)
+
         response = self._session.post("/v2/file-events", json=query)
-        return FileEventResponseV1.parse_raw(response.text)
+        return FileEventResponseV2.parse_raw(response.text)
 
 
 class FileEventsClient:
@@ -40,3 +52,4 @@ class FileEventsClient:
         if self._v2 is None:
             self._v2 = FileEventsV2(self._session)
         return self._v2
+
