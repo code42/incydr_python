@@ -27,6 +27,7 @@ dependencies = [
   "requests-toolbelt",
   "rich",
   "pydantic[dotenv]",
+  "isodate",
 ]
 dynamic = ["version"]
 

@@ -1,4 +1,7 @@
-from enum import Enum, EnumMeta
+from enum import Enum
+from enum import EnumMeta
+
+# Create search term enums from list of valid strings.
 
 search_terms = [
     "@timestamp",
@@ -68,7 +71,21 @@ class StrEnum(str, Enum):
 
 search_term_dict = _create_enum_dict(search_terms)
 
-Terms = Enum("Terms", search_term_dict, type=StrEnum)
+EventTerms = Enum("EventTerms", search_term_dict, type=StrEnum)
+
+
+class Operator(str, Enum):
+    # all valid filter operators for querying file events
+    IS = "IS"
+    IS_NOT = "IS_NOT"
+    EXISTS = "EXISTS"
+    DOES_NOT_EXIST = "DOES_NOT_EXIST"
+    GREATER_THAN = "GREATER_THAN"
+    LESS_THAN = "LESS_THAN"
+    ON = "ON"
+    ON_OR_AFTER = "ON_OR_AFTER"
+    ON_OR_BEFORE = "ON_OR_BEFORE"
+    WITHIN_THE_LAST = "WITHIN_THE_LAST"
 
 
 # Overriding the metaclass __contains__() functions lets us test if a string is a valid enum value.
@@ -84,22 +101,7 @@ class MetaEnum(EnumMeta):
 
 
 class FileCategory(str, Enum, metaclass=MetaEnum):
-    """file category enum values.
-
-        - :attr:`file.Category.AUDIO`
-        - :attr:`file.Category.DOCUMENT`
-        - :attr:`file.Category.EXECUTABLE`
-        - :attr:`file.Category.IMAGE`
-        - :attr:`file.Category.PDF`
-        - :attr:`file.Category.PRESENTATION`
-        - :attr:`file.Category.SCRIPT`
-        - :attr:`file.Category.SOURCE_CODE`
-        - :attr:`file.Category.SPREADSHEET`
-        - :attr:`file.Category.VIDEO`
-        - :attr:`file.Category.VIRTUAL_DISK_IMAGE`
-        - :attr:`file.Category.ZIP`
-
-    """
+    """file category enum values."""
 
     AUDIO = "Audio"
     DOCUMENT = "Document"
@@ -113,20 +115,6 @@ class FileCategory(str, Enum, metaclass=MetaEnum):
     VIDEO = "Video"
     VIRTUAL_DISK_IMAGE = "VirtualDiskImage"
     ZIP = "Archive"
-
-
-class TimeRange(str, Enum, metaclass=MetaEnum):
-    """time range enum values.  These should only be used with the `within_the_last` operator."""
-
-    FIFTEEN_MINUTES = "PT15M"
-    ONE_HOUR = "PT1H"
-    THREE_HOURS = "PT3H"
-    TWELVE_HOURS = "PT12H"
-    ONE_DAY = "P1D"
-    THREE_DAYS = "P3D"
-    SEVEN_DAYS = "P7D"
-    FOURTEEN_DAYS = "P14D"
-    THIRTY_DAYS = "P30D"
 
 
 class EventAction(str, Enum, metaclass=MetaEnum):
