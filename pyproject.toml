@@ -51,7 +51,8 @@ check = "pre-commit run --all-files --show-diff-on-failure"
 [tool.hatch.envs.docs]
 dependencies = []
 [tool.hatch.envs.docs.scripts]
-build = ""
+build = "mkdocs build"
+serve = "mkdocs serve"
 
 [tool.hatch.envs.default]
 dependencies = []

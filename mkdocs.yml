@@ -1,0 +1,65 @@
+site_name: Incydr SDK
+site_description: A next-generation python client for Incydr.
+site_url: https://developer.code42.com
+
+theme:
+    name: 'material'
+    favicon: favicon.ico
+    logo: favicon.ico
+    features:
+        - navigation.sections
+        - navigation.tracking
+        - content.code.annotate
+    palette:
+    # Palette toggle for light mode
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+repo_name: code42/incydr_python
+repo_url: https://github.com/code42/incydr_python
+edit_uri: ""
+
+nav:
+  - Introduction: 'index.md'
+  - Client: 'client.md'
+  - Settings: 'settings.md'
+  - Cases: 'cases.md'
+  - Models: 'models.md'
+
+markdown_extensions:
+  - pymdownx.critic
+  - admonition
+  - codehilite:
+      css_class: highlight
+  - mkautodoc
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+extra_css:
+- css/custom.css
+
+plugins:
+  - autorefs
+  - search
+  - swagger
+extra:
+    swagger_url: 'https://petstore.swagger.io/v2/swagger.json'

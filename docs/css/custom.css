@@ -1,0 +1,15 @@
+:root > * {
+  --md-primary-fg-color:        #00284c;
+  --md-typeset-a-color:         #FF5000;
+}
+
+div.autodoc-docstring {
+  padding-left: 20px;
+  margin-bottom: 30px;
+  border-left: 5px solid rgba(230, 230, 230);
+}
+
+div.autodoc-members {
+  padding-left: 20px;
+  margin-bottom: 15px;
+}

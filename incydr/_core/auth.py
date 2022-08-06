@@ -2,8 +2,7 @@ from typing import Optional
 
 from pydantic import SecretStr
 from requests import Session
-from requests.auth import AuthBase
-from requests.auth import HTTPBasicAuth
+from requests.auth import AuthBase, HTTPBasicAuth
 
 from incydr._core.models import AuthResponse
 
