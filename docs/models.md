@@ -14,22 +14,24 @@
 See [Pydantic documentation](https://pydantic-docs.helpmanual.io/usage/models/#model-properties) for full list of
 available model methods.
 
-# Cases
+## Cases
+---
 
-### `Case`
+### `Case` model
 
 ::: incydr.models.Case
     :docstring:
 
-### `CasesPage`
+### `CasesPage` model
 
 ::: incydr.models.CasesPage
     :docstring:
 
 
-# Customer
+## Customer
+---
 
-### `Customer`
+### `Customer` model
 
 ::: incydr.models.Customer
     :docstring:

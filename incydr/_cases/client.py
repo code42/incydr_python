@@ -54,7 +54,7 @@ class CasesV1:
         * **findings**: `str` Markdown formatted text summarizing the findings for a case.
         * **description**: `str` Brief description providing context for a case.
 
-        **Returns**: A [`Case`](../models/#case) object representing the newly created case.
+        **Returns**: A [`Case`][case-model] object representing the newly created case.
         """
         data = CreateCaseRequest(
             name=name,
@@ -97,7 +97,7 @@ class CasesV1:
 
         * **case_number**: `int` Unique numeric identifier for the case.
 
-        **Returns**: A [`Case`](../models/#case) object representing the case.
+        **Returns**: A [`Case`][case-model] object representing the case.
         """
         response = self._parent.session.get(f"/v1/cases/{case_number}")
         return Case.parse_response(response)
@@ -127,13 +127,13 @@ class CasesV1:
         * **is_assigned**: `bool` - Filter cases with an assignee (`True`) or without (`False`).
         * **last_modified_by**: `str` - User UID of the user who most recently modified the case.
         * **name**: str - Name of a case on which to filter; will include partial matches.
-        * **status**: [`CaseStatus`](../enums/#casestatus) - One or more case statuses on which to filter. Available values: `OPEN`, `CLOSED`
+        * **status**: [`CaseStatus`][casestatus-enum] - One or more case statuses on which to filter. Available values: `OPEN`, `CLOSED`
         * **page_num**: `int` - Page number for results, starting at 1.
         * **page_size**: `int` - Max number of results to return for a page.
         * **sort_dir**: `SortDirection` - The direction on which to sort the response, based on the corresponding key.
         * **sort_key**: `SortKeys` - One or more values on which the response will be sorted.
 
-        **Returns**: A [`CasesPage`](../models/#casespage) object.
+        **Returns**: A [`CasesPage`][casespage-model] object.
         """
         data = QueryCasesRequest(
             assignee=assignee,
@@ -167,7 +167,7 @@ class CasesV1:
 
         Accepts the same parameters as `.get_page()` excepting `page_num`.
 
-        **Returns**: A generator yielding individual [`Case`](../models/#case) objects.
+        **Returns**: A generator yielding individual [`Case`][case-model] objects.
         """
         page_size = page_size or self._parent.settings.page_size
         for page_num in count(1):
@@ -188,13 +188,19 @@ class CasesV1:
 
     def update(self, case: Case):
         """
-        Updates a case. Accepts a [`Case`](../models/#case) object.
+        Updates a case.
 
         **Parameters**
 
-        * **case**: [`Case`](../models/#case) The modified case object.
+        * **case**: [`Case`][case-model] The modified case object.
 
-        **Returns**: A [`Case`](../models/#case) object with updated values from server.
+        Usage example:
+
+            >>> case = client.cases.v1.get_case(23)
+            >>> case.name = "Updated name"
+            >>> client.cases.v1.update(case)
+
+        **Returns**: A [`Case`][case-model] object with updated values from server.
         """
         data = UpdateCaseRequest(**case.dict())
         response = self._parent.session.put(
@@ -326,7 +332,7 @@ class CasesV1:
 
         * **case_number**: `int` Unique numeric identifier for the case.
 
-        **Returns**: A `CaseFileEvents` object containing the associated file events.
+        **Returns**: A [`CaseFileEvents`][casefileevents-model] object containing the associated file events.
         """
         r = self._parent.session.get(f"/v1/cases/{case_number}/fileevent")
         return CaseFileEvents.parse_response(r)
@@ -375,7 +381,7 @@ class CasesV1:
         * **case_number**: `int` Unique numeric identifier for the case.
         * **event_id**: `str` Unique identifier for event associated with case.
 
-        **Returns**:  A `FileEventV2` object representing the file event.
+        **Returns**:  A [`FileEventV2`][fileeventv2-model] object representing the file event.
         """
         response = self._parent.session.get(
             f"/v1/cases/{case_number}/fileevent/{event_id}"
