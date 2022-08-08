@@ -61,6 +61,3 @@ extra_css:
 plugins:
   - autorefs
   - search
-  - swagger
-extra:
-    swagger_url: 'https://petstore.swagger.io/v2/swagger.json'

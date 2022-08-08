@@ -49,7 +49,11 @@ dependencies = [
 check = "pre-commit run --all-files --show-diff-on-failure"
 
 [tool.hatch.envs.docs]
-dependencies = []
+dependencies = [
+  "mkdocs-autorefs",
+  "mkdocs-material",
+  "mkautodoc"
+]
 [tool.hatch.envs.docs.scripts]
 build = "mkdocs build"
 serve = "mkdocs serve"
