@@ -54,4 +54,4 @@ The following operators are available for filtering:
 - `greater_than`
 - `less_than`
 
-Pass the event query object to the `file_events.v2.search()` method to get the results. 
+Pass the event query object to the `file_events.v2.search()` method to get the results.

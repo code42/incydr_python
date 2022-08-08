@@ -46,11 +46,11 @@ class EventQuery:
     def dict(self):
         return self._query.dict()
 
-    def is_equal_to(self, term, values: Union[str, List[str]]):
+    def equals(self, term, values: Union[str, List[str]]):
         self._query.groups.append(_create_is_filter_group(term, values))
         return self
 
-    def is_not_equal_to(self, term, values: Union[str, List[str]]):
+    def not_equals(self, term, values: Union[str, List[str]]):
         self._query.groups.append(_create_is_filter_group(term, values, is_not=True))
         return self
 

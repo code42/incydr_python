@@ -73,7 +73,7 @@ def test_event_query_when_start_date_duration_creates_within_the_last_filter_gro
 
 
 def test_event_query_is_when_single_value_creates_expected_filter_group():
-    q = EventQuery(TEST_START_DATE).is_equal_to("file.category", "Document")
+    q = EventQuery(TEST_START_DATE).equals("file.category", "Document")
     expected = FilterGroup(
         filterClause="AND",
         filters=[Filter(term="file.category", operator="IS", value="Document")],
@@ -82,7 +82,7 @@ def test_event_query_is_when_single_value_creates_expected_filter_group():
 
 
 def test_event_query_is_when_multiple_values_creates_expected_filter_group():
-    q = EventQuery(TEST_START_DATE).is_equal_to(
+    q = EventQuery(TEST_START_DATE).equals(
         "file.category", ["Document", "Audio", "Executable"]
     )
     expected = FilterGroup(
@@ -97,7 +97,7 @@ def test_event_query_is_when_multiple_values_creates_expected_filter_group():
 
 
 def test_event_query_is_not_when_single_value_creates_expected_filter_group():
-    q = EventQuery(TEST_START_DATE).is_not_equal_to("file.category", "Document")
+    q = EventQuery(TEST_START_DATE).not_equals("file.category", "Document")
     expected = FilterGroup(
         filterClause="AND",
         filters=[Filter(term="file.category", operator="IS_NOT", value="Document")],
@@ -106,7 +106,7 @@ def test_event_query_is_not_when_single_value_creates_expected_filter_group():
 
 
 def test_event_query_is_not_when_multiple_values_creates_expected_filter_group():
-    q = EventQuery(TEST_START_DATE).is_not_equal_to(
+    q = EventQuery(TEST_START_DATE).not_equals(
         "file.category", ["Document", "Audio", "Executable"]
     )
     expected = FilterGroup(
@@ -122,14 +122,14 @@ def test_event_query_is_not_when_multiple_values_creates_expected_filter_group()
 
 def test_event_query_is_when_no_values_raises_error():
     with pytest.raises(ValueError) as e:
-        EventQuery(TEST_START_DATE).is_equal_to("file.category", [])
+        EventQuery(TEST_START_DATE).equals("file.category", [])
     assert e.value.args[0] == "is_() and is_not() filters require at least one value."
 
 
 def test_event_query_is_when_invalid_value_for_term_raises_type_error():
     with pytest.raises(TypeError) as e:
 
-        EventQuery(TEST_START_DATE).is_equal_to(
+        EventQuery(TEST_START_DATE).equals(
             "file.category", ["Document", "Invalid-term"]
         )
     assert (

@@ -1,9 +1,8 @@
-from typing import List
 from typing import Union
 
+from .._queries._file_events.query import EventQuery
 from .models import FileEventResponseV1
 from .models import FileEventResponseV2
-from incydr._queries._file_events.models import FilterGroup
 from incydr._queries._file_events.models import Query
 
 
@@ -26,8 +25,10 @@ class FileEventsV2:
 
     def search(
         self,
-        query: Union[Query, FilterGroup, List[FilterGroup]],
+        query: Union[Query, EventQuery],
     ):
+        if isinstance(query, EventQuery):
+            query = query.dict()
         response = self._session.post("/v2/file-events", json=query)
         return FileEventResponseV2.parse_raw(response.text)
 
