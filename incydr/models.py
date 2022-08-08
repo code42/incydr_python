@@ -1,4 +1,5 @@
-from incydr._cases.models import Case, CasesPage
+from incydr._cases.models import Case
+from incydr._cases.models import CasesPage
 from incydr._customer.models import Customer
 
 

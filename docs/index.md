@@ -7,7 +7,7 @@ helper clients that model Code42 data and validate requests with the help of [Py
 
 ## Installation
 
---- 
+---
 
 Install using pip:
 
@@ -27,12 +27,12 @@ client = incydr.Client(
 )
 ```
 
-1.  Any arguments that are not provided to the `incydr.Client` will attempt to be loaded from environment variables or 
+1.  Any arguments that are not provided to the `incydr.Client` will attempt to be loaded from environment variables or
    .env files. See [Settings](/settings) for more details
 
 
-The [`incydr.Client`](client.md) provides helper methods that map to each API action described in the 
-[Code42 API Reference](https://developer.code42.com/api). It offers a sub-client for each endpoint namespace and API 
+The [`incydr.Client`](client.md) provides helper methods that map to each API action described in the
+[Code42 API Reference](https://developer.code42.com/api). It offers a sub-client for each endpoint namespace and API
 version. For example, to interact with `/v1/cases` endpoints:
 
 ```pycon
@@ -59,4 +59,4 @@ Case(
 ```
 
 Methods return data wrapped in [Pydantic](https://pydantic-docs.helpmanual.io) model classes, providing great editor
-support like autocomplete and type hinting. 
+support like autocomplete and type hinting.

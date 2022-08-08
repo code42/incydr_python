@@ -11,11 +11,11 @@ from requests import Response
 from incydr._cases.models import Case
 from incydr._cases.models import CaseFileEvents
 from incydr._cases.models import CasesPage
+from incydr._cases.models import CaseStatus
 from incydr._cases.models import CreateCaseRequest
 from incydr._cases.models import QueryCasesRequest
 from incydr._cases.models import SortDirection
 from incydr._cases.models import SortKeys
-from incydr._cases.models import CaseStatus
 from incydr._cases.models import UpdateCaseRequest
 from incydr._core.util import get_filename_from_content_disposition
 from incydr._file_events.models import FileEventV2
