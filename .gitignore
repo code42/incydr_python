@@ -9,6 +9,7 @@ env.bak/
 venv.bak/
 */__pycache__/
 __pycache__/
+_generated_models
 
 # IDE files
 .idea/

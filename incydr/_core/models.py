@@ -92,7 +92,7 @@ class ResponseModel(BaseModel):
                 yield name, field_repr
 
 
-class AuthResponse(BaseModel):
+class AuthResponse(ResponseModel):
     token_type: str
     expires_in: int
     access_token: SecretStr

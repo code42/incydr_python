@@ -1,4 +1,3 @@
-from __future__ import annotations
 from datetime import datetime
 from itertools import count
 from pathlib import Path
@@ -7,7 +6,7 @@ from typing import List
 from typing import Tuple
 from typing import Union
 
-from requests import Response, Session
+from requests import Response
 
 from incydr._cases.models import Case
 from incydr._cases.models import CaseFileEvents
@@ -262,7 +261,7 @@ class CasesV1:
         include_files=True,
         include_summary=True,
         include_file_events=True,
-    ) -> None:
+    ) -> Path:
         """
         Downloads full export of case in ZIP format to specified target folder.
 
@@ -352,7 +351,7 @@ class CasesV1:
             f"/v1/cases/{case_number}/fileevent", json={"events": event_ids}
         )
 
-    def delete_file_event_from_case(self, case_number: int, event_id: str):
+    def delete_file_event_from_case(self, case_number: int, event_id: str) -> Response:
         """
         Remove file events from a case.
 

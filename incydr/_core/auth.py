@@ -23,7 +23,7 @@ class APIClientAuth(AuthBase):
         )
         r = self.session.post("/v1/oauth", auth=auth)
         r.raise_for_status()
-        self.token_response = AuthResponse(**r.json())
+        self.token_response = AuthResponse.parse_response(r)
 
     def __call__(self, request):
         if self.token_response is None or self.token_response.expired:
