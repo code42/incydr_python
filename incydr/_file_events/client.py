@@ -1,4 +1,9 @@
 from .models import FileEventResponseV2
+from typing import Union
+
+from .._queries._file_events.query import EventQuery
+from .models import FileEventResponseV2
+from incydr._queries._file_events.models import Query
 
 
 class FileEventsV2:
@@ -25,6 +30,7 @@ class FileEventsV2:
         response = self._session.get("/v2/file-events/saved-searches")
         return FileEventResponseV2.parse_raw(response.text)
 
+<<<<<<< HEAD
     def get_saved_search_by_id(self, search_id: str):
         response = self._session.get(f"/v2/file-events/saved-searches/{search_id}")
         return FileEventResponseV2.parse_raw(response.text)
@@ -35,6 +41,16 @@ class FileEventsV2:
     def get_saved_search_as_query(self):
         # could this just be an option of the get_by_id?
         pass
+=======
+    def search(
+        self,
+        query: Union[Query, EventQuery],
+    ):
+        if isinstance(query, EventQuery):
+            query = query.dict()
+        response = self._session.post("/v2/file-events", json=query)
+        return FileEventResponseV2.parse_raw(response.text)
+>>>>>>> feature/filter-building
 
 
 class FileEventsClient:
