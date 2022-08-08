@@ -13,11 +13,11 @@ from .models import CaseFileEventsResponse
 from .models import CasesPage
 from .models import CreateCaseRequest
 from .models import QueryCasesRequest
-from .models import SortDirection
 from .models import SortKeys
 from .models import Status
 from .models import UpdateCaseRequest
 from incydr._core.util import get_filename_from_content_disposition
+from incydr._core.util import SortDirection
 from incydr._file_events.models import FileEventV2
 
 

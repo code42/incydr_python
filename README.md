@@ -37,3 +37,10 @@ hatch run test:cov
 ## License
 
 `incydr` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+
+## Getting Started
+
+```python
+from incydr import Client
+client = Client(url="api-gateway-url.code42.com", api_client_id="key-42", api_client_secret="c42")
+```
