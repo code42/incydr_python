@@ -868,7 +868,7 @@ class Risk(BaseModel):
     )
 
 
-class SavedSearchDetailSearchTermV2(BaseModel):
+class SavedSearch(ResponseModel):
     api_version: Optional[int] = Field(
         None,
         alias="apiVersion",
@@ -947,13 +947,13 @@ class SavedSearchDetailSearchTermV2(BaseModel):
     )
 
 
-class SavedSearchResponseSearchTermV2(BaseModel):
-    searches: Optional[List[SavedSearchDetailSearchTermV2]] = Field(
+class SavedSearchesPage(ResponseModel):
+    searches: Optional[List[SavedSearch]] = Field(
         None, description="List of saved searches in the response."
     )
 
 
-class SearchRequestSearchTermV2(BaseModel):
+class SearchRequest(BaseModel):
     group_clause: Optional[GroupClause] = Field(
         None,
         alias="groupClause",
@@ -1080,7 +1080,8 @@ class Event(BaseModel):
         example=["SharedViaLink"],
     )
 
-class ExportRequestSearchTermV2(BaseModel):
+
+class ExportRequest(BaseModel):
     columns: Optional[List[Column1]] = Field(
         None,
         description="Which columns to include in the output. If none is provided, all available columnswill be output in an unspecified, not-guaranteed order.",
@@ -1104,6 +1105,7 @@ class ExportRequestSearchTermV2(BaseModel):
     srt_key: Optional[Column1] = Field(
         None, alias="srtKey", description="Search term for sorting."
     )
+
 
 class FileEventV2(ResponseModel):
     _timestamp: Optional[datetime] = Field(
@@ -1137,7 +1139,8 @@ class FileEventV2(ResponseModel):
         description="Attributes of the the Code42 username signed in to the Code42 app on the device.",
     )
 
-class GroupingResponseSearchTermV2(BaseModel):
+
+class GroupingResponseV2(ResponseModel):
     groups: Optional[List[Group]] = Field(
         None, description="The top groups based on the query and group by term."
     )
