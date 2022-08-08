@@ -31,7 +31,7 @@ class DevicesV1:
     def get_device(self, device_id: str) -> Device:
         """Get a single device."""
         response = self._session.get(f"/v1/devices/{device_id}")
-        return Device(**response.json())
+        return Device.parse_response(response)
 
     def get_page(
         self,
