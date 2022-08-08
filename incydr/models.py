@@ -1,7 +1,8 @@
 from incydr._cases.models import Case, CasesPage
+from incydr._customer.models import Customer
 
 
-__all__ = ["Case", "CasesPage"]
+__all__ = ["Case", "CasesPage", "Customer"]
 
 
 __locals = locals()

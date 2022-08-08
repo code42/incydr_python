@@ -25,3 +25,11 @@ available model methods.
 
 ::: incydr.models.CasesPage
     :docstring:
+
+
+# Customer
+
+### `Customer`
+
+::: incydr.models.Customer
+    :docstring:

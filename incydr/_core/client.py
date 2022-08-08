@@ -25,13 +25,19 @@ class Client:
         to find your API domain based on your console login URL.
     * **api_client_id**: `str` The ID of your [Incydr API Client](https://support.code42.com/Incydr/Admin/Code42_console_reference/API_clients)
     * **api_client_secret**: `str` The Secret for your Incydr API Client.
+
+    Usage example:
+
+        >>> import incydr
+        >>> client = incydr.Client(url="https://api.us.code42.com", api_client_id="<client_id>", api_client_secret="<client_secret>")
+
     """
 
     def __init__(
         self,
-        url=None,
-        api_client_id=None,
-        api_client_secret=None,
+        url: str = None,
+        api_client_id: str = None,
+        api_client_secret: str = None,
     ):
         self._settings = IncydrSettings(
             url=url, api_client_id=api_client_id, api_client_secret=api_client_secret

@@ -25,7 +25,7 @@ class CasesV1:
     """
     Client for `/v1/cases` endpoints.
 
-    Usage:
+    Usage example:
 
         >>> import incydr
         >>> client = incydr.Client(**kwargs)
@@ -74,7 +74,7 @@ class CasesV1:
 
         * **case_number** `int | Case` Unique numeric identifier for the case or a [`Case`](../models/#case) object.
 
-        Usage:
+        Usage example:
 
             >>> client.cases.v1.delete(23)
             <Response [204]>

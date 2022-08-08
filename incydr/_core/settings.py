@@ -15,9 +15,9 @@ class IncydrSettings(BaseSettings):
     """
     Configure settings on the incydr.Client.
 
-    Usage:
+    Usage example:
 
-        >> import incydr
+        >>> import incydr
         >>> client = incydr.Client()
         >>> client.settings.page_size = 10
 

@@ -32,6 +32,7 @@ nav:
   - Client: 'client.md'
   - Settings: 'settings.md'
   - Cases: 'cases.md'
+  - Customer: 'customer.md'
   - Models: 'models.md'
 
 markdown_extensions:
