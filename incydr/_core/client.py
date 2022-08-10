@@ -75,7 +75,7 @@ class Client:
         self.session.hooks["response"] = [response_hook]
 
         self.cases = CasesClient(self.session)
-        self.file_events = FileEventsClient(self.session)
+        self.file_events = FileEventsClient(self)
         self.devices = DevicesClient(self.session)
         self.customer = CustomerClient(self.session)
 
