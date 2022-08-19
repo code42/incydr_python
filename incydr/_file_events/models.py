@@ -10,7 +10,7 @@ from pydantic import Field
 
 from incydr._core.models import ResponseModel
 from incydr.enums import Enum
-from incydr.enums import SrtDir
+from incydr.enums import SortDirection
 from incydr.enums.file_events import EventSearchTerm
 from incydr.enums.file_events import EventType
 from incydr.enums.file_events import FileType
@@ -1211,7 +1211,7 @@ class SavedSearchDetailSearchTermV1(BaseModel):
         description="Optional notes about the search.",
         example="This search returns all events.",
     )
-    srt_dir: Optional[SrtDir] = Field(
+    srt_dir: Optional[SortDirection] = Field(
         None, alias="srtDir", description="Sort direction.", example="asc"
     )
     srt_key: Optional[EventSearchTerm] = Field(
@@ -1290,7 +1290,7 @@ class SavedSearchDetailSearchTermV2(BaseModel):
         description="Optional notes about the search.",
         example="This search returns all events.",
     )
-    srt_dir: Optional[SrtDir] = Field(
+    srt_dir: Optional[SortDirection] = Field(
         None, alias="srtDir", description="Sort direction.", example="asc"
     )
     srt_key: Optional[EventSearchTerm] = Field(
@@ -1338,7 +1338,7 @@ class SearchRequestSearchTermV1(BaseModel):
         description="A token used to indicate the starting point for additional page results. Typically, you obtain the pgToken value from the nextPgToken provided in a previous request. A pgToken is the only way to page past 10,000 results. If pgToken is supplied, pgNum is ignored. Provide empty string to retrieve the 'first page of results and null to use the pgNum value.  Default is null.",
         example="0_147e9445-2f30-4a91-8b2a-9455332e880a_973435567569502913_986467523038446097_163",
     )
-    srt_dir: Optional[SrtDir] = Field(
+    srt_dir: Optional[SortDirection] = Field(
         None,
         alias="srtDir",
         description="Sort direction.  Default is `desc`.",
@@ -1377,7 +1377,7 @@ class SearchRequestSearchTermV2(BaseModel):
         description="A token used to indicate the starting point for additional page results. Typically, you obtain the pgToken value from the nextPgToken provided in a previous request. A pgToken is the only way to page past 10,000 results. If pgToken is supplied, pgNum is ignored. Provide empty string to retrieve the 'first page of results and null to use the pgNum value.  Default is null.",
         example="0_147e9445-2f30-4a91-8b2a-9455332e880a_973435567569502913_986467523038446097_163",
     )
-    srt_dir: Optional[SrtDir] = Field(
+    srt_dir: Optional[SortDirection] = Field(
         None,
         alias="srtDir",
         description="Sort direction.  Default is `desc`.",
@@ -1492,7 +1492,7 @@ class ExportRequestSearchTermV1(BaseModel):
     groups: List[FilterGroupSearchTermV1] = Field(
         ..., description="One or more FilterGroups to be combined in a query."
     )
-    srt_dir: Optional[SrtDir] = Field(
+    srt_dir: Optional[SortDirection] = Field(
         None,
         alias="srtDir",
         description="Sort direction.  Default is `desc`.",
@@ -1518,7 +1518,7 @@ class ExportRequestSearchTermV2(BaseModel):
     groups: List[FilterGroupSearchTermV2] = Field(
         ..., description="One or more FilterGroups to be combined in a query."
     )
-    srt_dir: Optional[SrtDir] = Field(
+    srt_dir: Optional[SortDirection] = Field(
         None,
         alias="srtDir",
         description="Sort direction.  Default is `desc`.",
