@@ -14,7 +14,7 @@ repos:
       hooks:
         - id: black
     - repo: https://gitlab.com/pycqa/flake8
-      rev: 4.0.1
+      rev: 3.9.2
       hooks:
         - id: flake8
           additional_dependencies:
@@ -26,4 +26,5 @@ repos:
         - id: fix-byte-order-marker
         - id: trailing-whitespace
         - id: end-of-file-fixer
-        - id: check-yaml --unsafe
+        - id: check-yaml
+          args: ['--unsafe']
