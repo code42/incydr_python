@@ -3,9 +3,9 @@ from typing import Union
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
-from ._models.response import FileEventsPage
-from ._models.response import SavedSearch
-from ._models.response import SavedSearchesPage
+from .models.response import FileEventsPage
+from .models.response import SavedSearch
+from .models.response import SavedSearchesPage
 from incydr._queries.file_events import EventQuery
 from incydr._queries.file_events import FilterGroup
 from incydr._queries.file_events import Query

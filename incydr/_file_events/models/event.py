@@ -6,8 +6,8 @@ from pydantic import BaseModel
 from pydantic import Field
 
 from incydr._core.models import ResponseModel
-from incydr._file_events._models.enums import ReportType
-from incydr._file_events._models.enums import RiskSeverity
+from incydr.enums.file_events import ReportType
+from incydr.enums.file_events import RiskSeverity
 
 
 class DestinationEmail(BaseModel):

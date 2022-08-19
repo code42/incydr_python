@@ -5,13 +5,13 @@ from typing import Optional
 from pydantic import Field
 
 from incydr._core.models import ResponseModel
-from incydr._file_events._models.enums import EventFields
-from incydr._file_events._models.enums import GroupClause
-from incydr._file_events._models.enums import ProblemType
-from incydr._file_events._models.enums import SrtDir
-from incydr._file_events._models.event import FileEventV2
-from incydr._file_events._models.request import SearchFilter
-from incydr._file_events._models.request import SearchFilterGroup
+from incydr._file_events.models.enums import GroupClause
+from incydr._file_events.models.event import FileEventV2
+from incydr._file_events.models.request import SearchFilter
+from incydr._file_events.models.request import SearchFilterGroup
+from incydr.enums import SrtDir
+from incydr.enums.file_events import EventSearchTerm
+from incydr.enums.file_events import SearchProblemType
 
 
 class QueryProblem(ResponseModel):
@@ -34,7 +34,7 @@ class QueryProblem(ResponseModel):
         description="Additional description of the problem.",
         example="Request timed out.  Refine your filter criteria and try again.",
     )
-    type: ProblemType = Field(
+    type: SearchProblemType = Field(
         description="The type of problem that occured.", example="SEARCH_FAILED"
     )
 
@@ -76,7 +76,7 @@ class SavedSearch(ResponseModel):
     **Fields**:
 
     * **api_version**: `int` - The version of the API used to create the search.
-    * **columns**: `List[EventFields]` - The list of columns to be displayed in the web app for the search.
+    * **columns**: `List[EventSearchTerm]` - The list of columns to be displayed in the web app for the search.
     * **created_by_uid**: `str` - The ID of the user who created the saved search.
     * **created_by_username**: `str` - The username of the user who created the saved search.
     * **creation_timestamp**: `datetime` - The time at which the saved search was created.
@@ -89,7 +89,7 @@ class SavedSearch(ResponseModel):
     * **name**: `str` - The name given to the saved search.
     * **notes**: `str` - Optional notes about the search.
     * **srt_dir**: `SrtDir` - `asc` or `desc`. The direction in which to sort the response based on the corresponding key. Defaults to 'asc'.
-    * **srt_key**: `EventFields` - One or more values on which the response will be sorted. Defaults to event ID.
+    * **srt_key**: `EventSearchTerm` - One or more values on which the response will be sorted. Defaults to event ID.
 
     """
 
@@ -98,7 +98,7 @@ class SavedSearch(ResponseModel):
         description="Version of the API used to create the search.",
         example=1,
     )
-    columns: Optional[List[EventFields]] = Field(
+    columns: Optional[List[EventSearchTerm]] = Field(
         description="List of columns to be displayed in the web app for the search.",
     )
     created_by_uid: Optional[str] = Field(
@@ -154,7 +154,7 @@ class SavedSearch(ResponseModel):
     srt_dir: Optional[SrtDir] = Field(
         alias="srtDir", description="Sort direction.", example="asc"
     )
-    srt_key: Optional[EventFields] = Field(
+    srt_key: Optional[EventSearchTerm] = Field(
         alias="srtKey", description="Search term for sorting.", example="event.id"
     )
 

@@ -5,10 +5,10 @@ from pydantic import BaseModel
 from pydantic import Field
 
 from incydr._core.models import ResponseModel
-from incydr._file_events._models.enums import EventFields
-from incydr._file_events._models.enums import GroupClause
-from incydr._file_events._models.enums import Operator
-from incydr._file_events._models.enums import SrtDir
+from incydr._file_events.models.enums import GroupClause
+from incydr.enums import SrtDir
+from incydr.enums.file_events import EventSearchTerm
+from incydr.enums.file_events import Operator
 
 
 class SearchFilter(ResponseModel):
@@ -16,7 +16,7 @@ class SearchFilter(ResponseModel):
         description="The type of match to perform.  Default value is `IS`.",
         example="IS_NOT",
     )
-    term: Optional[EventFields] = Field(
+    term: Optional[EventSearchTerm] = Field(
         description="The field to match.", example="user.email"
     )
     value: Optional[str] = Field(
@@ -70,7 +70,7 @@ class SearchRequest(BaseModel):
         description="Sort direction.  Default is `desc`.",
         example="asc",
     )
-    srt_key: Optional[EventFields] = Field(
+    srt_key: Optional[EventSearchTerm] = Field(
         alias="srtKey", description="Search term for sorting.", example="event.id"
     )
 

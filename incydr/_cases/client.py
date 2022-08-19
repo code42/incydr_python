@@ -18,7 +18,7 @@ from .models import Status
 from .models import UpdateCaseRequest
 from incydr._core.util import get_filename_from_content_disposition
 from incydr._core.util import SortDirection
-from incydr._file_events._models.event import FileEventV2
+from incydr._file_events.models.event import FileEventV2
 
 
 class CasesV1:
