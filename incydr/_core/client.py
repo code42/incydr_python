@@ -148,6 +148,6 @@ class Client:
         Property returning a [`DevicesClient`](../devices) for interacting with `/v*/devices` API endpoints.
         Usage:
 
-            >>> client.devices.v1.get()
+            >>> client.devices.v1.get_page(active=True)
 
         """
