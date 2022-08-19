@@ -1,7 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
 from typing import List
-from typing import Literal
 from typing import Optional
 from typing import Union
 
@@ -61,12 +60,12 @@ class Filter(BaseModel):
 
 
 class FilterGroup(BaseModel):
-    filterClause: Literal["AND", "OR"] = "AND"
+    filterClause: str = "AND"
     filters: Optional[List[Filter]]
 
 
 class Query(BaseModel):
-    groupClause: Literal["AND", "OR"] = "AND"
+    groupClause: str = "AND"
     groups: Optional[List[FilterGroup]]
     pgNum: int = 1
     pgSize: int = 100
