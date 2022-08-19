@@ -20,7 +20,7 @@ class Model(BaseModel):
     __root__: Any
 
 
-class GroupClause(str, Enum):
+class GroupClause(Enum):
     """
     Grouping clause for any specified groups.  Default is `AND`.
     """
