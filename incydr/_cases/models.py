@@ -8,16 +8,12 @@ from pydantic import BaseModel
 from pydantic import Field
 
 from incydr._core.models import ResponseModel
+from incydr._core.util import SortDirection
 
 
 class Status(str, Enum):
     CLOSED = "CLOSED"
     OPEN = "OPEN"
-
-
-class SortDirection(str, Enum):
-    ASC = "asc"
-    DESC = "desc"
 
 
 class SortKeys(str, Enum):

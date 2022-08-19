@@ -13,11 +13,11 @@ from .models import CaseFileEventsResponse
 from .models import CasesPage
 from .models import CreateCaseRequest
 from .models import QueryCasesRequest
-from .models import SortDirection
 from .models import SortKeys
 from .models import Status
 from .models import UpdateCaseRequest
 from incydr._core.util import get_filename_from_content_disposition
+from incydr._core.util import SortDirection
 from incydr._file_events.models import FileEventV2
 
 
@@ -57,7 +57,7 @@ class CasesV1:
     def get_case(self, case_number: int) -> Case:
         """Get a single case."""
         response = self._session.get(f"/v1/cases/{case_number}")
-        return Case(**response.json())
+        return Case.parse_response(response)
 
     def get_page(
         self,
@@ -182,7 +182,7 @@ class CasesV1:
     def get_file_event_detail(self, case_number: int, event_id: str):
         """Get the full detail for a given file event."""
         response = self._session.get(f"/v1/cases/{case_number}/fileevent/{event_id}")
-        return FileEventV2(**response.json())
+        return FileEventV2.parse_response(response)
 
     def download_file_for_event(self, case_number: int, event_id: str):
         """Download the source file (if captured) from a file event attached to a case."""

@@ -1545,7 +1545,7 @@ class FileEventResponseV1(BaseModel):
     )
 
 
-class FileEventV2(BaseModel):
+class FileEventV2(ResponseModel):
     _timestamp: Optional[datetime] = Field(
         None,
         alias="@timestamp",
