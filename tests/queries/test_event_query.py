@@ -2,10 +2,11 @@ from datetime import datetime
 from datetime import timedelta
 
 import pytest
+from pydantic import ValidationError
 
 from incydr import EventQuery
-from incydr._queries._file_events.models import Filter
-from incydr._queries._file_events.models import FilterGroup
+from incydr._queries.file_events import Filter
+from incydr._queries.file_events import FilterGroup
 
 TEST_START_DATE = "P1D"
 TEST_TIMESTAMP = "2020-09-10 11:12:13"
@@ -123,18 +124,18 @@ def test_event_query_is_not_when_multiple_values_creates_expected_filter_group()
 def test_event_query_is_when_no_values_raises_error():
     with pytest.raises(ValueError) as e:
         EventQuery(TEST_START_DATE).equals("file.category", [])
-    assert e.value.args[0] == "is_() and is_not() filters require at least one value."
+    assert e.value.args[0] == "equals() requires at least one value."
 
 
 def test_event_query_is_when_invalid_value_for_term_raises_type_error():
-    with pytest.raises(TypeError) as e:
+    with pytest.raises(ValueError) as e:
 
         EventQuery(TEST_START_DATE).equals(
             "file.category", ["Document", "Invalid-term"]
         )
     assert (
-        e.value.args[0]
-        == "Values for search term: 'file.category' must be in ['Audio', 'Document', 'Executable', 'Image', 'Pdf', 'Presentation', 'Script', 'SourceCode', 'Spreadsheet', 'Video', 'VirtualDiskImage', 'Archive']"
+        "'Invalid-term' is not a valid incydr.enums.file_events.FileCategory. Expected one of ['Audio', 'Document', 'Executable', 'Image', 'Pdf', 'Presentation', 'Script', 'SourceCode', 'Spreadsheet', 'Video', 'VirtualDiskImage', 'Archive']"
+        in str(e.value)
     )
 
 
@@ -166,9 +167,9 @@ def test_event_query_greater_than_creates_expected_filter_group(input, expected_
 
 
 def test_event_query_greater_than_when_non_numerical_value_raises_error():
-    with pytest.raises(TypeError) as e:
+    with pytest.raises(ValidationError) as e:
         EventQuery(start_date=TEST_START_DATE).greater_than("risk.score", "a string")
-    assert e.value.args[0] == "Value must be a number."
+    assert "value is not a valid integer" in str(e.value)
 
 
 @pytest.mark.parametrize("input,expected_value", [(10, 10), ("10", 10.0), (10.0, 10.0)])
@@ -181,9 +182,9 @@ def test_event_query_less_than_creates_expected_filter_group(input, expected_val
 
 
 def test_event_query_less_than_when_non_numerical_value_raises_error():
-    with pytest.raises(TypeError) as e:
+    with pytest.raises(ValidationError) as e:
         EventQuery(start_date=TEST_START_DATE).less_than("risk.score", "a string")
-    assert e.value.args[0] == "Value must be a number."
+    assert "value is not a valid integer" in str(e.value)
 
 
 def test_event_query_matches_any_sets_query_group_clause_to_or():

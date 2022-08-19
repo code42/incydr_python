@@ -3,12 +3,12 @@ from typing import Union
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
-from .._queries._file_events.query import EventQuery
 from ._models.response import FileEventsPage
 from ._models.response import SavedSearch
 from ._models.response import SavedSearchesPage
-from incydr._queries._file_events.models import FilterGroup
-from incydr._queries._file_events.models import Query
+from incydr._queries.file_events import EventQuery
+from incydr._queries.file_events import FilterGroup
+from incydr._queries.file_events import Query
 
 
 class FileEventsV2:
@@ -31,7 +31,7 @@ class FileEventsV2:
 
     def search(
         self,
-        query: Union[Query, EventQuery, SavedSearch],
+        query: Union[str, Query, EventQuery, SavedSearch],
     ) -> FileEventsPage:
         """
         Search file events.
@@ -47,9 +47,13 @@ class FileEventsV2:
         if isinstance(query, SavedSearch):
             query = _create_query_from_saved_search(query)
 
-        query = query if isinstance(query, dict) else query.dict()
+        if isinstance(query, str):
+            query = Query.parse_raw(query)
 
-        response = self._parent.session.post("/v2/file-events", json=query)
+        if isinstance(query, dict):
+            query = Query(**query)
+
+        response = self._parent.session.post("/v2/file-events", json=query.dict())
         return FileEventsPage.parse_response(response)
 
     def get_all_saved_searches(self) -> SavedSearchesPage:
