@@ -12,11 +12,8 @@ class _Enum(str, _enum.Enum):
         if value in cls.__members__:
             return None
         raise ValueError(
-            f"'{value}' is not a valid {cls.__module__}.{cls.__name__}. Expected one of {list(cls)}"
+            f"'{value}' is not a valid {cls.__module__}.{cls.__name__}. Expected one of {[member.value for member in cls]}"
         )
-
-    def __iter__(self):
-        return iter(self.__members__)
 
 
 class SrtDir(_Enum):
