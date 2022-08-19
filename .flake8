@@ -21,4 +21,6 @@ max-line-length = 80
 per-file-ignores =
     # <file>: <comma-separated-error-codes>
     incydr/__init__.py: F401
+    incydr/_core/enums.py: F401
     incydr/_core/settings.py: B902
+    incydr/_queries/_file_events/enums.py: B902

@@ -10,6 +10,7 @@ from incydr._cases.client import CasesClient
 from incydr._core.auth import APIClientAuth
 from incydr._core.settings import IncydrSettings
 from incydr._customer.client import CustomerClient
+from incydr._devices.client import DevicesClient
 from incydr._file_events.client import FileEventsClient
 
 _base_user_agent = user_agent("incydr", __version__)
@@ -78,6 +79,7 @@ class Client:
         self._cases = CasesClient(self)
         self._customer = CustomerClient(self.session)
         self._file_events = FileEventsClient(self)
+        self._devices = DevicesClient(self.session)
 
         self._session.auth.refresh()
 
@@ -139,3 +141,13 @@ class Client:
 
         """
         return self._customer
+
+    @property
+    def devices(self):
+        """
+        Property returning a [`DevicesClient`](../devices) for interacting with `/v*/devices` API endpoints.
+        Usage:
+
+            >>> client.devices.v1.get()
+
+        """
