@@ -151,3 +151,4 @@ class Client:
             >>> client.devices.v1.get_page(active=True)
 
         """
+        return self._devices
