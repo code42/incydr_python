@@ -1,80 +1,7 @@
-from enum import Enum
-from enum import EnumMeta
-
-# Create search term enums from list of valid strings.
-
-search_terms = [
-    "@timestamp",
-    "event.id",
-    "event.inserted",
-    "event.action",
-    "event.observer",
-    "event.shareType",
-    "event.ingested",
-    "event.relatedEvents",
-    "user.email",
-    "user.id",
-    "user.deviceUid",
-    "file.name",
-    "file.directory",
-    "file.category",
-    "file.mimeTypeByBytes",
-    "file.categoryByBytes",
-    "file.mimeTypeByExtension",
-    "file.categoryByExtension",
-    "file.sizeInBytes",
-    "file.owner",
-    "file.created",
-    "file.modified",
-    "file.hash.md5",
-    "file.hash.sha256",
-    "file.hash.md5Error",
-    "file.hash.sha256Error",
-    "report.id",
-    "report.name",
-    "report.description",
-    "report.headers",
-    "report.count",
-    "report.type",
-    "source.category",
-    "source.name",
-    "source.domain",
-    "source.ip",
-    "source.privateIp",
-    "source.operatingSystem",
-    "source.email.sender",
-    "source.email.from",
-    "destination.category",
-    "destination.name",
-    "destination.user.email",
-    "process.executable",
-    "process.owner",
-    "risk.score",
-    "risk.severity",
-    "risk.indicators",
-    "risk.trusted",
-    "risk.trustReason",
-]
+from incydr.enums import Enum
 
 
-def _create_enum_dict(term_list):
-    d = {}
-    for i in term_list:
-        a = i.replace(".", "_").upper().strip("@")
-        d[a] = i
-    return d
-
-
-class StrEnum(str, Enum):
-    pass
-
-
-search_term_dict = _create_enum_dict(search_terms)
-
-EventTerms = Enum("EventTerms", search_term_dict, type=StrEnum)
-
-
-class Operator(str, Enum):
+class Operator(Enum):
     # all valid filter operators for querying file events
     IS = "IS"
     IS_NOT = "IS_NOT"
@@ -88,19 +15,114 @@ class Operator(str, Enum):
     WITHIN_THE_LAST = "WITHIN_THE_LAST"
 
 
-# Overriding the metaclass __contains__() functions lets us test if a string is a valid enum value.
-class MetaEnum(EnumMeta):
-    # https://stackoverflow.com/questions/10445819/overriding-contains-method-for-a-class/10446010#10446010
-    # https://stackoverflow.com/questions/55220588/how-to-create-python-enum-class-from-existing-dict-with-additional-methods
-    def __contains__(cls, item):
-        try:
-            cls(item)
-        except ValueError:
-            return False
-        return True
+class EventSearchTerm(Enum):
+    TIMESTAMP = "@timestamp"
+    DESTINATION_ACCOUNT_NAME = "destination.accountName"
+    DESTINATION_ACCOUNT_TYPE = "destination.accountType"
+    DESTINATION_CATEGORY = "destination.category"
+    DESTINATION_DOMAINS = "destination.domains"
+    DESTINATION_EMAIL_RECIPIENTS = "destination.email.recipients"
+    DESTINATION_EMAIL_SUBJECT = "destination.email.subject"
+    DESTINATION_IP = "destination.ip"
+    DESTINATION_NAME = "destination.name"
+    DESTINATION_OPERATING_SYSTEM = "destination.operatingSystem"
+    DESTINATION_PRINT_JOB_NAME = "destination.printJobName"
+    DESTINATION_PRINTED_FILES_BACKUP_PATH = "destination.printedFilesBackupPath"
+    DESTINATION_PRINTER_NAME = "destination.printerName"
+    DESTINATION_PRIVATE_IP = "destination.privateIp"
+    DESTINATION_REMOVABLE_MEDIA_BUS_TYPE = "destination.removableMedia.busType"
+    DESTINATION_REMOVABLE_MEDIA_CAPACITY = "destination.removableMedia.capacity"
+    DESTINATION_REMOVABLE_MEDIA_MEDIA_NAME = "destination.removableMedia.mediaName"
+    DESTINATION_REMOVABLE_MEDIA_NAME = "destination.removableMedia.name"
+    DESTINATION_REMOVABLE_MEDIA_PARTITION_ID = "destination.removableMedia.partitionId"
+    DESTINATION_REMOVABLE_MEDIA_SERIAL_NUMBER = (
+        "destination.removableMedia.serialNumber"
+    )
+    DESTINATION_REMOVABLE_MEDIA_VENDOR = "destination.removableMedia.vendor"
+    DESTINATION_REMOVABLE_MEDIA_VOLUME_NAME = "destination.removableMedia.volumeName"
+    DESTINATION_TABS_TITLE = "destination.tabs.title"
+    DESTINATION_TABS_TITLE_ERROR = "destination.tabs.titleError"
+    DESTINATION_TABS_URL = "destination.tabs.url"
+    DESTINATION_TABS_URL_ERROR = "destination.tabs.urlError"
+    DESTINATION_USER_EMAIL = "destination.user.email"
+    EVENT_ACTION = "event.action"
+    EVENT_ID = "event.id"
+    EVENT_INGESTED = "event.ingested"
+    EVENT_INSERTED = "event.inserted"
+    EVENT_OBSERVER = "event.observer"
+    EVENT_RELATED_EVENTS_AGENT_TIMESTAMP = "event.relatedEvents.agentTimestamp"
+    EVENT_RELATED_EVENTS_EVENT_ACTION = "event.relatedEvents.eventAction"
+    EVENT_RELATED_EVENTS_ID = "event.relatedEvents.id"
+    EVENT_RELATED_EVENTS_SOURCE_CATEGORY = "event.relatedEvents.sourceCategory"
+    EVENT_RELATED_EVENTS_SOURCE_NAME = "event.relatedEvents.sourceName"
+    EVENT_RELATED_EVENTS_TABS_TITLE = "event.relatedEvents.tabs.title"
+    EVENT_RELATED_EVENTS_TABS_TITLE_ERROR = "event.relatedEvents.tabs.titleError"
+    EVENT_RELATED_EVENTS_TABS_URL = "event.relatedEvents.tabs.url"
+    EVENT_RELATED_EVENTS_TABS_URL_ERROR = "event.relatedEvents.tabs.urlError"
+    EVENT_RELATED_EVENTS_USER_EMAIL = "event.relatedEvents.userEmail"
+    EVENT_SHARE_TYPE = "event.shareType"
+    FILE_CATEGORY = "file.category"
+    FILE_CATEGORY_BY_BYTES = "file.categoryByBytes"
+    FILE_CATEGORY_BY_EXTENSION = "file.categoryByExtension"
+    FILE_CLASSIFICATIONS_VALUE = "file.classifications.value"
+    FILE_CLASSIFICATIONS_VENDOR = "file.classifications.vendor"
+    FILE_CLOUD_DRIVE_ID = "file.cloudDriveId"
+    FILE_CREATED = "file.created"
+    FILE_DIRECTORY = "file.directory"
+    FILE_DIRECTORY_ID = "file.directoryId"
+    FILE_HASH_MD5 = "file.hash.md5"
+    FILE_HASH_MD5_ERROR = "file.hash.md5Error"
+    FILE_HASH_SHA256 = "file.hash.sha256"
+    FILE_HASH_SHA256_ERROR = "file.hash.sha256Error"
+    FILE_ID = "file.id"
+    FILE_MIME_TYPE_BY_BYTES = "file.mimeTypeByBytes"
+    FILE_MIME_TYPE_BY_EXTENSION = "file.mimeTypeByExtension"
+    FILE_MODIFIED = "file.modified"
+    FILE_NAME = "file.name"
+    FILE_OWNER = "file.owner"
+    FILE_SIZE_IN_BYTES = "file.sizeInBytes"
+    FILE_URL = "file.url"
+    PROCESS_EXECUTABLE = "process.executable"
+    PROCESS_OWNER = "process.owner"
+    REPORT_COUNT = "report.count"
+    REPORT_DESCRIPTION = "report.description"
+    REPORT_HEADERS = "report.headers"
+    REPORT_ID = "report.id"
+    REPORT_NAME = "report.name"
+    REPORT_TYPE = "report.type"
+    RISK_INDICATORS_NAME = "risk.indicators.name"
+    RISK_INDICATORS_WEIGHT = "risk.indicators.weight"
+    RISK_SCORE = "risk.score"
+    RISK_SEVERITY = "risk.severity"
+    RISK_TRUST_REASON = "risk.trustReason"
+    RISK_TRUSTED = "risk.trusted"
+    SOURCE_CATEGORY = "source.category"
+    SOURCE_DOMAIN = "source.domain"
+    SOURCE_DOMAINS = "source.domains"
+    SOURCE_EMAIL_FROM = "source.email.from"
+    SOURCE_EMAIL_SENDER = "source.email.sender"
+    SOURCE_IP = "source.ip"
+    SOURCE_NAME = "source.name"
+    SOURCE_OPERATING_SYSTEM = "source.operatingSystem"
+    SOURCE_PRIVATE_IP = "source.privateIp"
+    SOURCE_REMOVABLE_MEDIA_BUS_TYPE = "source.removableMedia.busType"
+    SOURCE_REMOVABLE_MEDIA_CAPACITY = "source.removableMedia.capacity"
+    SOURCE_REMOVABLE_MEDIA_MEDIA_NAME = "source.removableMedia.mediaName"
+    SOURCE_REMOVABLE_MEDIA_NAME = "source.removableMedia.name"
+    SOURCE_REMOVABLE_MEDIA_PARTITION_ID = "source.removableMedia.partitionId"
+    SOURCE_REMOVABLE_MEDIA_SERIAL_NUMBER = "source.removableMedia.serialNumber"
+    SOURCE_REMOVABLE_MEDIA_VENDOR = "source.removableMedia.vendor"
+    SOURCE_REMOVABLE_MEDIA_VOLUME_NAME = "source.removableMedia.volumeName"
+    SOURCE_TABS_TITLE = "source.tabs.title"
+    SOURCE_TABS_TITLE_ERROR = "source.tabs.titleError"
+    SOURCE_TABS_URL = "source.tabs.url"
+    SOURCE_TABS_URL_ERROR = "source.tabs.urlError"
+    USER_DEVICE_UID = "user.deviceUid"
+    USER_EMAIL = "user.email"
+    USER_ID = "user.id"
 
 
-class FileCategory(str, Enum, metaclass=MetaEnum):
+class FileCategory(Enum):
     """file category enum values."""
 
     AUDIO = "Audio"
@@ -117,7 +139,7 @@ class FileCategory(str, Enum, metaclass=MetaEnum):
     ZIP = "Archive"
 
 
-class EventAction(str, Enum, metaclass=MetaEnum):
+class EventAction(Enum):
     """event action enum values."""
 
     # Exposure Type in v1
@@ -139,7 +161,7 @@ class EventAction(str, Enum, metaclass=MetaEnum):
     APPLICATION_READ = "application-read"
 
 
-class Category(str, Enum, metaclass=MetaEnum):
+class Category(Enum):
     """source and destination category enum values."""
 
     BUSINESS_TOOLS = "Business Tools"
@@ -182,7 +204,7 @@ class Category(str, Enum, metaclass=MetaEnum):
     WEB_HOSTING = "Web Hosting"
 
 
-class ShareType(str, Enum, metaclass=MetaEnum):
+class ShareType(Enum):
     """share type enum values."""
 
     PUBLIC_LINK_SHARE = "Anyone with the link"
@@ -190,14 +212,14 @@ class ShareType(str, Enum, metaclass=MetaEnum):
     DIRECT_USER_SHARE = "Shared with specific people"
 
 
-class ReportType(str, Enum, metaclass=MetaEnum):
+class ReportType(Enum):
     """report type enum values."""
 
     AD_HOC = "REPORT_TYPE_AD_HOC"
     SAVED = "REPORT_TYPE_SAVED"
 
 
-class RiskIndicators(str, Enum, metaclass=MetaEnum):
+class RiskIndicators(Enum):
     """risk indicators enum values."""
 
     # Destinations
@@ -368,7 +390,7 @@ class RiskIndicators(str, Enum, metaclass=MetaEnum):
     ZIP = "Zip"
 
 
-class TrustReason(str, Enum, metaclass=MetaEnum):
+class TrustReason(Enum):
     """trust reason enum values."""
 
     TRUSTED_DOMAIN_BROWSER_URL = "Trusted browser URL"
@@ -384,7 +406,7 @@ class TrustReason(str, Enum, metaclass=MetaEnum):
     SHARED_WITH_TRUSTED_USERS = "Shared with trusted users"
 
 
-class RiskSeverity(str, Enum, metaclass=MetaEnum):
+class RiskSeverity(Enum):
     """risk severity enum values."""
 
     CRITICAL = "CRITICAL"
@@ -392,3 +414,61 @@ class RiskSeverity(str, Enum, metaclass=MetaEnum):
     MODERATE = "MODERATE"
     LOW = "LOW"
     NO_RISK_INDICATED = "NO_RISK_INDICATED"
+
+
+class EventType(Enum):
+    CREATED = "CREATED"
+    DELETED = "DELETED"
+    DOWNLOADED = "DOWNLOADED"
+    EMAILED = "EMAILED"
+    MODIFIED = "MODIFIED"
+    OPEN = "OPEN"
+    PREVIEWED = "PREVIEWED"
+    PRINTED = "PRINTED"
+    READ_BY_APP = "READ_BY_APP"
+    RESTORE = "RESTORE"
+    RULE_MATCH = "RULE_MATCH"
+    UNCHANGED = "UNCHANGED"
+    UNSUPPORTED = "UNSUPPORTED"
+
+
+class FileType(Enum):
+    BLOCK_DEVICE = "BLOCK_DEVICE"
+    BUNDLE = "BUNDLE"
+    CHAR_DEVICE = "CHAR_DEVICE"
+    DIR = "DIR"
+    FIFO = "FIFO"
+    FILE = "FILE"
+    MAC_RSRC = "MAC_RSRC"
+    SYMLINK = "SYMLINK"
+    UNKNOWN = "UNKNOWN"
+    WIN_NDS = "WIN_NDS"
+
+
+class RemoteActivity(Enum):
+    FALSE = "FALSE"
+    TRUE = "TRUE"
+    UNKNOWN = "UNKNOWN"
+
+
+class Shared(Enum):
+    FALSE = "FALSE"
+    TRUE = "TRUE"
+
+
+class SearchProblemType(Enum):
+    ILLEGAL_GROUP = "ILLEGAL_GROUP"
+    ILLEGAL_OPERATOR = "ILLEGAL_OPERATOR"
+    ILLEGAL_SORT = "ILLEGAL_SORT"
+    ILLEGAL_VALUE = "ILLEGAL_VALUE"
+    INVALID_PAGE_NUMBER = "INVALID_PAGE_NUMBER"
+    INVALID_PAGE_SIZE = "INVALID_PAGE_SIZE"
+    INVALID_PAGE_TOKEN = "INVALID_PAGE_TOKEN"
+    MAX_FILTERS_EXCEEDED = "MAX_FILTERS_EXCEEDED"
+    MAX_LENGTH_EXCEEDED = "MAX_LENGTH_EXCEEDED"
+    MISSING_FILTERS = "MISSING_FILTERS"
+    MISSING_GROUPS = "MISSING_GROUPS"
+    MISSING_VALUE = "MISSING_VALUE"
+    QUERY_TIMEOUT = "QUERY_TIMEOUT"
+    SEARCH_FAILED = "SEARCH_FAILED"
+    UNEXPECTED_VALUE = "UNEXPECTED_VALUE"

@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
 from typing import Any
 from typing import List
 from typing import Optional
@@ -13,10 +12,21 @@ from pydantic import BaseModel
 from pydantic import Field
 
 from incydr._core.models import ResponseModel
+from incydr.enums.file_events import *
+from incydr.enums import SrtDir
 
 
 class Model(BaseModel):
     __root__: Any
+
+
+class GroupClause(str, Enum):
+    """
+    Grouping clause for any specified groups.  Default is `AND`.
+    """
+
+    and_ = "AND"
+    or_ = "OR"
 
 
 class DestinationEmail(BaseModel):
@@ -38,214 +48,6 @@ class DestinationUser(BaseModel):
         description="For endpoint events where a file in cloud storage is synced to a device, the email address of the user logged in to the cloud storage provider. For cloud events, the email addresses of users added as sharing recipients. In some case, OneDrive events may return multiple values, but this is often the same username formatted in different ways.",
         example=["first.last@example.com", "first_last_example_com"],
     )
-
-
-class Column(Enum):
-    actor = "actor"
-    cloud_drive_id = "cloudDriveId"
-    create_timestamp = "createTimestamp"
-    destination_category = "destinationCategory"
-    destination_name = "destinationName"
-    detection_source_alias = "detectionSourceAlias"
-    device_uid = "deviceUid"
-    device_user_name = "deviceUserName"
-    directory_id = "directoryId"
-    domain_name = "domainName"
-    email_dlp_policy_names = "emailDlpPolicyNames"
-    email_from = "emailFrom"
-    email_recipients = "emailRecipients"
-    email_sender = "emailSender"
-    email_subject = "emailSubject"
-    event_id = "eventId"
-    event_timestamp = "eventTimestamp"
-    event_type = "eventType"
-    exposure = "exposure"
-    file_category = "fileCategory"
-    file_category_by_bytes = "fileCategoryByBytes"
-    file_category_by_extension = "fileCategoryByExtension"
-    file_classification_values = "fileClassificationValues"
-    file_classification_vendors = "fileClassificationVendors"
-    file_id = "fileId"
-    file_name = "fileName"
-    file_owner = "fileOwner"
-    file_path = "filePath"
-    file_size = "fileSize"
-    file_type = "fileType"
-    insertion_timestamp = "insertionTimestamp"
-    md5_checksum = "md5Checksum"
-    mime_type_by_bytes = "mimeTypeByBytes"
-    mime_type_by_extension = "mimeTypeByExtension"
-    mime_type_mismatch = "mimeTypeMismatch"
-    modify_timestamp = "modifyTimestamp"
-    operating_system_user = "operatingSystemUser"
-    os_host_name = "osHostName"
-    outside_active_hours = "outsideActiveHours"
-    print_job_name = "printJobName"
-    printed_files_backup_path = "printedFilesBackupPath"
-    printer_name = "printerName"
-    private_ip_addresses = "privateIpAddresses"
-    process_name = "processName"
-    process_owner = "processOwner"
-    public_ip_address = "publicIpAddress"
-    remote_activity = "remoteActivity"
-    removable_media_bus_type = "removableMediaBusType"
-    removable_media_capacity = "removableMediaCapacity"
-    removable_media_media_name = "removableMediaMediaName"
-    removable_media_name = "removableMediaName"
-    removable_media_partition_id = "removableMediaPartitionId"
-    removable_media_serial_number = "removableMediaSerialNumber"
-    removable_media_vendor = "removableMediaVendor"
-    removable_media_volume_name = "removableMediaVolumeName"
-    report_column_headers = "reportColumnHeaders"
-    report_description = "reportDescription"
-    report_id = "reportId"
-    report_name = "reportName"
-    report_record_count = "reportRecordCount"
-    report_type = "reportType"
-    risk_indicator_names = "riskIndicatorNames"
-    risk_indicator_weights = "riskIndicatorWeights"
-    risk_score = "riskScore"
-    risk_severity = "riskSeverity"
-    sha256_checksum = "sha256Checksum"
-    shared = "shared"
-    shared_with = "sharedWith"
-    sharing_type_added = "sharingTypeAdded"
-    source = "source"
-    source_category = "sourceCategory"
-    source_name = "sourceName"
-    source_tab_title_errors = "sourceTabTitleErrors"
-    source_tab_titles = "sourceTabTitles"
-    source_tab_url_errors = "sourceTabUrlErrors"
-    source_tab_urls = "sourceTabUrls"
-    sync_destination = "syncDestination"
-    sync_destination_username = "syncDestinationUsername"
-    tab_title_errors = "tabTitleErrors"
-    tab_titles = "tabTitles"
-    tab_url = "tabUrl"
-    tab_url_errors = "tabUrlErrors"
-    tab_urls = "tabUrls"
-    trust_reason = "trustReason"
-    trusted = "trusted"
-    url = "url"
-    user_uid = "userUid"
-    window_title = "windowTitle"
-
-
-class GroupClause(Enum):
-    and_ = "AND"
-    or_ = "OR"
-
-
-class SrtDir(Enum):
-    asc = "asc"
-    desc = "desc"
-
-
-class Column1(Enum):
-    _timestamp = "@timestamp"
-    destination_account_name = "destination.accountName"
-    destination_account_type = "destination.accountType"
-    destination_category = "destination.category"
-    destination_domains = "destination.domains"
-    destination_email_recipients = "destination.email.recipients"
-    destination_email_subject = "destination.email.subject"
-    destination_ip = "destination.ip"
-    destination_name = "destination.name"
-    destination_operating_system = "destination.operatingSystem"
-    destination_print_job_name = "destination.printJobName"
-    destination_printed_files_backup_path = "destination.printedFilesBackupPath"
-    destination_printer_name = "destination.printerName"
-    destination_private_ip = "destination.privateIp"
-    destination_removable_media_bus_type = "destination.removableMedia.busType"
-    destination_removable_media_capacity = "destination.removableMedia.capacity"
-    destination_removable_media_media_name = "destination.removableMedia.mediaName"
-    destination_removable_media_name = "destination.removableMedia.name"
-    destination_removable_media_partition_id = "destination.removableMedia.partitionId"
-    destination_removable_media_serial_number = (
-        "destination.removableMedia.serialNumber"
-    )
-    destination_removable_media_vendor = "destination.removableMedia.vendor"
-    destination_removable_media_volume_name = "destination.removableMedia.volumeName"
-    destination_tabs_title = "destination.tabs.title"
-    destination_tabs_title_error = "destination.tabs.titleError"
-    destination_tabs_url = "destination.tabs.url"
-    destination_tabs_url_error = "destination.tabs.urlError"
-    destination_user_email = "destination.user.email"
-    event_action = "event.action"
-    event_id = "event.id"
-    event_ingested = "event.ingested"
-    event_inserted = "event.inserted"
-    event_observer = "event.observer"
-    event_related_events_agent_timestamp = "event.relatedEvents.agentTimestamp"
-    event_related_events_event_action = "event.relatedEvents.eventAction"
-    event_related_events_id = "event.relatedEvents.id"
-    event_related_events_source_category = "event.relatedEvents.sourceCategory"
-    event_related_events_source_name = "event.relatedEvents.sourceName"
-    event_related_events_tabs_title = "event.relatedEvents.tabs.title"
-    event_related_events_tabs_title_error = "event.relatedEvents.tabs.titleError"
-    event_related_events_tabs_url = "event.relatedEvents.tabs.url"
-    event_related_events_tabs_url_error = "event.relatedEvents.tabs.urlError"
-    event_related_events_user_email = "event.relatedEvents.userEmail"
-    event_share_type = "event.shareType"
-    file_category = "file.category"
-    file_category_by_bytes = "file.categoryByBytes"
-    file_category_by_extension = "file.categoryByExtension"
-    file_classifications_value = "file.classifications.value"
-    file_classifications_vendor = "file.classifications.vendor"
-    file_cloud_drive_id = "file.cloudDriveId"
-    file_created = "file.created"
-    file_directory = "file.directory"
-    file_directory_id = "file.directoryId"
-    file_hash_md5 = "file.hash.md5"
-    file_hash_md5_error = "file.hash.md5Error"
-    file_hash_sha256 = "file.hash.sha256"
-    file_hash_sha256_error = "file.hash.sha256Error"
-    file_id = "file.id"
-    file_mime_type_by_bytes = "file.mimeTypeByBytes"
-    file_mime_type_by_extension = "file.mimeTypeByExtension"
-    file_modified = "file.modified"
-    file_name = "file.name"
-    file_owner = "file.owner"
-    file_size_in_bytes = "file.sizeInBytes"
-    file_url = "file.url"
-    process_executable = "process.executable"
-    process_owner = "process.owner"
-    report_count = "report.count"
-    report_description = "report.description"
-    report_headers = "report.headers"
-    report_id = "report.id"
-    report_name = "report.name"
-    report_type = "report.type"
-    risk_indicators_name = "risk.indicators.name"
-    risk_indicators_weight = "risk.indicators.weight"
-    risk_score = "risk.score"
-    risk_severity = "risk.severity"
-    risk_trust_reason = "risk.trustReason"
-    risk_trusted = "risk.trusted"
-    source_category = "source.category"
-    source_domain = "source.domain"
-    source_domains = "source.domains"
-    source_email_from = "source.email.from"
-    source_email_sender = "source.email.sender"
-    source_ip = "source.ip"
-    source_name = "source.name"
-    source_operating_system = "source.operatingSystem"
-    source_private_ip = "source.privateIp"
-    source_removable_media_bus_type = "source.removableMedia.busType"
-    source_removable_media_capacity = "source.removableMedia.capacity"
-    source_removable_media_media_name = "source.removableMedia.mediaName"
-    source_removable_media_name = "source.removableMedia.name"
-    source_removable_media_partition_id = "source.removableMedia.partitionId"
-    source_removable_media_serial_number = "source.removableMedia.serialNumber"
-    source_removable_media_vendor = "source.removableMedia.vendor"
-    source_removable_media_volume_name = "source.removableMedia.volumeName"
-    source_tabs_title = "source.tabs.title"
-    source_tabs_title_error = "source.tabs.titleError"
-    source_tabs_url = "source.tabs.url"
-    source_tabs_url_error = "source.tabs.urlError"
-    user_device_uid = "user.deviceUid"
-    user_email = "user.email"
-    user_id = "user.id"
 
 
 class FieldError(BaseModel):
@@ -272,59 +74,6 @@ class FileClassification(BaseModel):
         description="The name of the vendor that classified the file.",
         example="MICROSOFT INFORMATION PROTECTION",
     )
-
-
-class EventType(Enum):
-    created = "CREATED"
-    deleted = "DELETED"
-    downloaded = "DOWNLOADED"
-    emailed = "EMAILED"
-    modified = "MODIFIED"
-    open = "OPEN"
-    previewed = "PREVIEWED"
-    printed = "PRINTED"
-    read_by_app = "READ_BY_APP"
-    restore = "RESTORE"
-    rule_match = "RULE_MATCH"
-    unchanged = "UNCHANGED"
-    unsupported = "UNSUPPORTED"
-
-
-class FileType(Enum):
-    block_device = "BLOCK_DEVICE"
-    bundle = "BUNDLE"
-    char_device = "CHAR_DEVICE"
-    dir = "DIR"
-    fifo = "FIFO"
-    file = "FILE"
-    mac_rsrc = "MAC_RSRC"
-    symlink = "SYMLINK"
-    unknown = "UNKNOWN"
-    win_nds = "WIN_NDS"
-
-
-class RemoteActivity(Enum):
-    false = "FALSE"
-    true = "TRUE"
-    unknown = "UNKNOWN"
-
-
-class ReportType(Enum):
-    report_type_ad_hoc = "REPORT_TYPE_AD_HOC"
-    report_type_saved = "REPORT_TYPE_SAVED"
-
-
-class RiskSeverity(Enum):
-    critical = "CRITICAL"
-    high = "HIGH"
-    low = "LOW"
-    moderate = "MODERATE"
-    no_risk_indicated = "NO_RISK_INDICATED"
-
-
-class Shared(Enum):
-    false = "FALSE"
-    true = "TRUE"
 
 
 class Group(BaseModel):
@@ -369,24 +118,6 @@ class Process(BaseModel):
         description="The username of the process owner, as reported by the device’s operating system. Depending on your Code42 product plan, this value may be null for some event types.",
         example="root",
     )
-
-
-class Type(Enum):
-    illegal_group = "ILLEGAL_GROUP"
-    illegal_operator = "ILLEGAL_OPERATOR"
-    illegal_sort = "ILLEGAL_SORT"
-    illegal_value = "ILLEGAL_VALUE"
-    invalid_page_number = "INVALID_PAGE_NUMBER"
-    invalid_page_size = "INVALID_PAGE_SIZE"
-    invalid_page_token = "INVALID_PAGE_TOKEN"
-    max_filters_exceeded = "MAX_FILTERS_EXCEEDED"
-    max_length_exceeded = "MAX_LENGTH_EXCEEDED"
-    missing_filters = "MISSING_FILTERS"
-    missing_groups = "MISSING_GROUPS"
-    missing_value = "MISSING_VALUE"
-    query_timeout = "QUERY_TIMEOUT"
-    search_failed = "SEARCH_FAILED"
-    unexpected_value = "UNEXPECTED_VALUE"
 
 
 class RemovableMedia(BaseModel):
@@ -448,7 +179,7 @@ class Report(BaseModel):
     )
     headers: Optional[List[str]] = Field(
         None,
-        description="The list of column headers that are in the report.",
+        description="The list of EventSearchTerm headers that are in the report.",
         example=[
             "USERNAME",
             "ACCOUNT_NAME",
@@ -486,26 +217,13 @@ class RiskIndicator(BaseModel):
     )
 
 
-class Operator(Enum):
-    does_not_exist = "DOES_NOT_EXIST"
-    exists = "EXISTS"
-    greater_than = "GREATER_THAN"
-    is_ = "IS"
-    is_not = "IS_NOT"
-    less_than = "LESS_THAN"
-    on = "ON"
-    on_or_after = "ON_OR_AFTER"
-    on_or_before = "ON_OR_BEFORE"
-    within_the_last = "WITHIN_THE_LAST"
-
-
 class SearchFilterSearchTermV1(BaseModel):
     operator: Optional[Operator] = Field(
         None,
         description="The type of match to perform.  Default value is `IS`.",
         example="IS_NOT",
     )
-    term: Optional[Column] = Field(
+    term: Optional[EventSearchTerm] = Field(
         None, description="The field to match.", example="eventId"
     )
     value: str = Field(
@@ -519,7 +237,7 @@ class SearchFilterSearchTermV1Res(BaseModel):
         description="The type of match to perform.  Default value is `IS`.",
         example="IS_NOT",
     )
-    term: Optional[Column] = Field(
+    term: Optional[EventSearchTerm] = Field(
         None, description="The field to match.", example="eventId"
     )
     value: str = Field(
@@ -533,7 +251,7 @@ class SearchFilterSearchTermV2(BaseModel):
         description="The type of match to perform.  Default value is `IS`.",
         example="IS_NOT",
     )
-    term: Optional[Column1] = Field(
+    term: Optional[EventSearchTerm] = Field(
         None, description="The field to match.", example="user.email"
     )
     value: str = Field(
@@ -547,7 +265,7 @@ class SearchFilterSearchTermV2Res(BaseModel):
         description="The type of match to perform.  Default value is `IS`.",
         example="IS_NOT",
     )
-    term: Optional[Column1] = Field(
+    term: Optional[EventSearchTerm] = Field(
         None, description="The field to match.", example="user.email"
     )
     value: str = Field(
@@ -1100,10 +818,10 @@ class FileEventV1(BaseModel):
         description='For events detected on removable media, the name assigned to the volume when it was formatted, as reported by the device\'s operating system. This is also frequently called the "partition" name.',
         example=["MY_FILES"],
     )
-    report_column_headers: Optional[List[str]] = Field(
+    report_EventSearchTerm_headers: Optional[List[str]] = Field(
         None,
-        alias="reportColumnHeaders",
-        description="The list of column headers that are in the report.",
+        alias="reportEventSearchTermHeaders",
+        description="The list of EventSearchTerm headers that are in the report.",
         example=[
             "USERNAME",
             "ACCOUNT_NAME",
@@ -1286,7 +1004,7 @@ class GroupingRequestSearchTermV1(BaseModel):
         description="Grouping clause for any specified groups.  Default is `AND`.",
         example="AND",
     )
-    grouping_term: Optional[Column] = Field(
+    grouping_term: Optional[EventSearchTerm] = Field(
         None,
         alias="groupingTerm",
         description="The search term to use to form the groups.",
@@ -1304,7 +1022,7 @@ class GroupingRequestSearchTermV2(BaseModel):
         description="Grouping clause for any specified groups.  Default is `AND`.",
         example="AND",
     )
-    grouping_term: Optional[Column1] = Field(
+    grouping_term: Optional[EventSearchTerm] = Field(
         None,
         alias="groupingTerm",
         description="The search term to use to form the groups.",
@@ -1326,7 +1044,7 @@ class QueryProblemSearchTermV1(BaseModel):
         description="Additional description of the problem.",
         example="Request timed out.  Refine your filter criteria and try again.",
     )
-    type: Type = Field(
+    type: SearchProblemType = Field(
         ..., description="The type of problem that occured.", example="SEARCH_FAILED"
     )
 
@@ -1342,7 +1060,7 @@ class QueryProblemSearchTermV2(BaseModel):
         description="Additional description of the problem.",
         example="Request timed out.  Refine your filter criteria and try again.",
     )
-    type: Type = Field(
+    type: SearchProblemType = Field(
         ..., description="The type of problem that occured.", example="SEARCH_FAILED"
     )
 
@@ -1423,9 +1141,9 @@ class SavedSearchDetailSearchTermV1(BaseModel):
         description="Version of the API used to create the search.",
         example=1,
     )
-    columns: Optional[List[Column]] = Field(
+    EventSearchTerms: Optional[List[EventSearchTerm]] = Field(
         None,
-        description="List of columns to be displayed in the web app for the search.",
+        description="List of EventSearchTerms to be displayed in the web app for the search.",
     )
     created_by_uid: Optional[str] = Field(
         None,
@@ -1490,7 +1208,7 @@ class SavedSearchDetailSearchTermV1(BaseModel):
     srt_dir: Optional[SrtDir] = Field(
         None, alias="srtDir", description="Sort direction.", example="asc"
     )
-    srt_key: Optional[Column] = Field(
+    srt_key: Optional[EventSearchTerm] = Field(
         None, alias="srtKey", description="Search term for sorting.", example="eventId"
     )
 
@@ -1502,9 +1220,9 @@ class SavedSearchDetailSearchTermV2(BaseModel):
         description="Version of the API used to create the search.",
         example=1,
     )
-    columns: Optional[List[Column1]] = Field(
+    EventSearchTerms: Optional[List[EventSearchTerm]] = Field(
         None,
-        description="List of columns to be displayed in the web app for the search.",
+        description="List of EventSearchTerms to be displayed in the web app for the search.",
     )
     created_by_uid: Optional[str] = Field(
         None,
@@ -1569,7 +1287,7 @@ class SavedSearchDetailSearchTermV2(BaseModel):
     srt_dir: Optional[SrtDir] = Field(
         None, alias="srtDir", description="Sort direction.", example="asc"
     )
-    srt_key: Optional[Column1] = Field(
+    srt_key: Optional[EventSearchTerm] = Field(
         None, alias="srtKey", description="Search term for sorting.", example="eventId"
     )
 
@@ -1620,7 +1338,7 @@ class SearchRequestSearchTermV1(BaseModel):
         description="Sort direction.  Default is `desc`.",
         example="asc",
     )
-    srt_key: Optional[Column] = Field(
+    srt_key: Optional[EventSearchTerm] = Field(
         None, alias="srtKey", description="Search term for sorting.", example="eventId"
     )
 
@@ -1659,7 +1377,7 @@ class SearchRequestSearchTermV2(BaseModel):
         description="Sort direction.  Default is `desc`.",
         example="asc",
     )
-    srt_key: Optional[Column1] = Field(
+    srt_key: Optional[EventSearchTerm] = Field(
         None, alias="srtKey", description="Search term for sorting.", example="event.id"
     )
 
@@ -1754,9 +1472,9 @@ class Event(BaseModel):
 
 
 class ExportRequestSearchTermV1(BaseModel):
-    columns: Optional[List[Column]] = Field(
+    EventSearchTerms: Optional[List[EventSearchTerm]] = Field(
         None,
-        description="Which columns to include in the output. If none is provided, all available columnswill be output in an unspecified, not-guaranteed order.",
+        description="Which EventSearchTerms to include in the output. If none is provided, all available EventSearchTermswill be output in an unspecified, not-guaranteed order.",
         example=["eventId", "eventType"],
     )
     group_clause: Optional[GroupClause] = Field(
@@ -1774,15 +1492,15 @@ class ExportRequestSearchTermV1(BaseModel):
         description="Sort direction.  Default is `desc`.",
         example="asc",
     )
-    srt_key: Optional[Column] = Field(
+    srt_key: Optional[EventSearchTerm] = Field(
         None, alias="srtKey", description="Search term for sorting."
     )
 
 
 class ExportRequestSearchTermV2(BaseModel):
-    columns: Optional[List[Column1]] = Field(
+    EventSearchTerms: Optional[List[EventSearchTerm]] = Field(
         None,
-        description="Which columns to include in the output. If none is provided, all available columnswill be output in an unspecified, not-guaranteed order.",
+        description="Which EventSearchTerms to include in the output. If none is provided, all available EventSearchTermswill be output in an unspecified, not-guaranteed order.",
         example=["file.name", "file.directory"],
     )
     group_clause: Optional[GroupClause] = Field(
@@ -1800,7 +1518,7 @@ class ExportRequestSearchTermV2(BaseModel):
         description="Sort direction.  Default is `desc`.",
         example="asc",
     )
-    srt_key: Optional[Column1] = Field(
+    srt_key: Optional[EventSearchTerm] = Field(
         None, alias="srtKey", description="Search term for sorting."
     )
 
