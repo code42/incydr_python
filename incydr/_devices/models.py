@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from pydantic import Field
 
 from incydr._core.models import ResponseModel
-from incydr._core.util import SortDirection
+from incydr.enums import SortDirection
 
 
 class SortKeys(str, Enum):
