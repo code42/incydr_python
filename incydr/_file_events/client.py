@@ -1,8 +1,9 @@
 from typing import Union
 
-from incydr._queries.file_events import EventQuery, Query
 from .models import FileEventResponseV1
 from .models import FileEventResponseV2
+from incydr._queries.file_events import EventQuery
+from incydr._queries.file_events import Query
 
 
 class FileEventsV1:

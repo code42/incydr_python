@@ -12,8 +12,17 @@ from pydantic import BaseModel
 from pydantic import Field
 
 from incydr._core.models import ResponseModel
-from incydr.enums.file_events import *
+from incydr.enums import Enum
 from incydr.enums import SrtDir
+from incydr.enums.file_events import EventSearchTerm
+from incydr.enums.file_events import EventType
+from incydr.enums.file_events import FileType
+from incydr.enums.file_events import Operator
+from incydr.enums.file_events import RemoteActivity
+from incydr.enums.file_events import ReportType
+from incydr.enums.file_events import RiskSeverity
+from incydr.enums.file_events import SearchProblemType
+from incydr.enums.file_events import Shared
 
 
 class Model(BaseModel):

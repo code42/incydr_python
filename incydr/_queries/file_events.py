@@ -6,11 +6,21 @@ from typing import Union
 
 from isodate import duration_isoformat
 from isodate import parse_duration
-from pydantic import BaseModel, root_validator, validate_arguments
+from pydantic import BaseModel
+from pydantic import root_validator
+from pydantic import validate_arguments
 
 from incydr._queries.util import parse_timestamp
-from incydr.enums.file_events import *
+from incydr.enums.file_events import Category
+from incydr.enums.file_events import EventAction
 from incydr.enums.file_events import EventSearchTerm
+from incydr.enums.file_events import FileCategory
+from incydr.enums.file_events import Operator
+from incydr.enums.file_events import ReportType
+from incydr.enums.file_events import RiskIndicators
+from incydr.enums.file_events import RiskSeverity
+from incydr.enums.file_events import ShareType
+from incydr.enums.file_events import TrustReason
 
 _term_enum_map = {
     "file.category": FileCategory,
@@ -34,7 +44,7 @@ class Filter(BaseModel):
         use_enum_values = True
 
     @root_validator(pre=True)
-    def _validate_enums(cls, values: dict):
+    def _validate_enums(cls, values: dict):  # noqa `root_validator` is a classmethod
         term = values.get("term")
         operator = values.get("operator")
         value = values.get("value")
