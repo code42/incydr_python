@@ -8,26 +8,32 @@ from typing import Union
 
 from requests import Response
 
-from .models import Case
-from .models import CaseFileEventsResponse
-from .models import CasesPage
-from .models import CreateCaseRequest
-from .models import QueryCasesRequest
-from .models import SortKeys
-from .models import Status
-from .models import UpdateCaseRequest
+from incydr._cases.models import Case
+from incydr._cases.models import CaseFileEvents
+from incydr._cases.models import CasesPage
+from incydr._cases.models import CaseStatus
+from incydr._cases.models import CreateCaseRequest
+from incydr._cases.models import QueryCasesRequest
+from incydr._cases.models import SortKeys
+from incydr._cases.models import UpdateCaseRequest
 from incydr._core.util import get_filename_from_content_disposition
-from incydr._core.util import SortDirection
 from incydr._file_events.models import FileEventV2
+from incydr.enums import SortDirection
 
 
 class CasesV1:
-    """Cases V1 Client"""
+    """
+    Client for `/v1/cases` endpoints.
 
-    default_page_size = 100
+    Usage example:
 
-    def __init__(self, session):
-        self._session = session
+        >>> import incydr
+        >>> client = incydr.Client(**kwargs)
+        >>> client.cases.v1.get_case(23)
+    """
+
+    def __init__(self, parent):
+        self._parent = parent
 
     def create(
         self,
@@ -37,7 +43,19 @@ class CasesV1:
         description: str = None,
         findings: str = None,
     ) -> Case:
-        """Create a case."""
+        """
+        Create a case.
+
+        **Parameters:**
+
+        * **name**: `str` (required) The unique name given to the case.
+        * **subject**: `str` The user UID of the subject being investigated in this case.
+        * **assignee**: `str` The user UID of the administrator assigned to investigate the case.
+        * **findings**: `str` Markdown formatted text summarizing the findings for a case.
+        * **description**: `str` Brief description providing context for a case.
+
+        **Returns**: A [`Case`][case-model] object representing the newly created case.
+        """
         data = CreateCaseRequest(
             name=name,
             subject=subject,
@@ -45,18 +63,43 @@ class CasesV1:
             findings=findings,
             description=description,
         )
-        response = self._session.post(url="/v1/cases", json=data.dict())
+        response = self._parent.session.post(url="/v1/cases", json=data.dict())
         return Case.parse_response(response)
 
     def delete(self, case_number: Union[int, Case]) -> Response:
-        """Delete a case."""
+        """
+        Delete a case.
+
+        **Parameters**:
+
+        * **case_number** `int | Case` Unique numeric identifier for the case or a [`Case`](../models/#case) object.
+
+        Usage example:
+
+            >>> client.cases.v1.delete(23)
+            <Response [204]>
+
+            # Alternatively:
+            >>> case = client.cases.v1.get_case(23)
+            >>> client.cases.v1.delete(case)
+
+        **Returns**: A `requests.Response` indicating success.
+        """
         if isinstance(case_number, Case):
             case_number = case_number.number
-        return self._session.delete(f"/v1/cases/{case_number}")
+        return self._parent.session.delete(f"/v1/cases/{case_number}")
 
     def get_case(self, case_number: int) -> Case:
-        """Get a single case."""
-        response = self._session.get(f"/v1/cases/{case_number}")
+        """
+        Get a single case.
+
+        **Parameters**:
+
+        * **case_number**: `int` Unique numeric identifier for the case.
+
+        **Returns**: A [`Case`][case-model] object representing the case.
+        """
+        response = self._parent.session.get(f"/v1/cases/{case_number}")
         return Case.parse_response(response)
 
     def get_page(
@@ -66,13 +109,32 @@ class CasesV1:
         is_assigned: bool = None,
         last_modified_by: str = None,
         name: str = None,
-        status: Status = None,
+        status: CaseStatus = None,
         page_num: int = 1,
         page_size: int = None,
         sort_dir: SortDirection = SortDirection.ASC,
         sort_key: SortKeys = SortKeys.NUMBER,
     ) -> CasesPage:
-        """Get a page of cases."""
+        """
+        Get a page of cases.
+
+        Filter results by passing appropriate parameters:
+
+        **Parameters**:
+
+        * **assignee**: `str` - User UID of an assignee of a case on which to filter.
+        * **created_at**: `Tuple[datetime, datetime]` - Filter cases created between the supplied start and end times.
+        * **is_assigned**: `bool` - Filter cases with an assignee (`True`) or without (`False`).
+        * **last_modified_by**: `str` - User UID of the user who most recently modified the case.
+        * **name**: str - Name of a case on which to filter; will include partial matches.
+        * **status**: [`CaseStatus`][casestatus-enum] - One or more case statuses on which to filter. Available values: `OPEN`, `CLOSED`
+        * **page_num**: `int` - Page number for results, starting at 1.
+        * **page_size**: `int` - Max number of results to return for a page.
+        * **sort_dir**: `SortDirection` - The direction on which to sort the response, based on the corresponding key.
+        * **sort_key**: `SortKeys` - One or more values on which the response will be sorted.
+
+        **Returns**: A [`CasesPage`][casespage-model] object.
+        """
         data = QueryCasesRequest(
             assignee=assignee,
             createdAt=created_at,
@@ -85,7 +147,7 @@ class CasesV1:
             srtDir=sort_dir,
             srtKey=sort_key,
         )
-        response = self._session.get("/v1/cases", params=data.dict())
+        response = self._parent.session.get("/v1/cases", params=data.dict())
         return CasesPage.parse_response(response)
 
     def iter_all(
@@ -95,13 +157,19 @@ class CasesV1:
         is_assigned: bool = None,
         last_modified_by: str = None,
         name: str = None,
-        status: Status = None,
+        status: CaseStatus = None,
         page_size: int = None,
         sort_dir: SortDirection = SortDirection.ASC,
         sort_key: SortKeys = SortKeys.NUMBER,
     ) -> Iterator[Case]:
-        """Iterate over all cases."""
-        page_size = page_size or self.default_page_size
+        """
+        Iterate over all cases.
+
+        Accepts the same parameters as `.get_page()` excepting `page_num`.
+
+        **Returns**: A generator yielding individual [`Case`][case-model] objects.
+        """
+        page_size = page_size or self._parent.settings.page_size
         for page_num in count(1):
             page = self.get_page(
                 assignee=assignee,
@@ -119,21 +187,47 @@ class CasesV1:
                 break
 
     def update(self, case: Case):
-        """Updates a case. Accepts a :class:`Case` object."""
+        """
+        Updates a case.
+
+        **Parameters**
+
+        * **case**: [`Case`][case-model] The modified case object.
+
+        Usage example:
+
+            >>> case = client.cases.v1.get_case(23)
+            >>> case.name = "Updated name"
+            >>> client.cases.v1.update(case)
+
+        **Returns**: A [`Case`][case-model] object with updated values from server.
+        """
         data = UpdateCaseRequest(**case.dict())
-        response = self._session.put(
+        response = self._parent.session.put(
             f"/v1/cases/{case.number}", json=data.dict(by_alias=True)
         )
         return Case.parse_response(response)
 
-    def download_summary_pdf(self, case_number: int, target_folder: Path) -> Path:
-        """Downloads summary of case in pdf format to specified target folder."""
+    def download_summary_pdf(
+        self, case_number: int, target_folder: Union[str, Path]
+    ) -> Path:
+        """
+        Downloads a summary of a case in PDF format to specified target folder.
+
+        **Parameters**
+
+        * **case_number**: `int` Unique numeric identifier for the case.
+        * **target_folder**: `Path | str` A string or `pathlib.Path` object that represents the folder which the PDF
+            will be saved to.
+
+        **Returns**: A `pathlib.Path` object representing location of the downloaded PDF.
+        """
         folder = Path(target_folder)  # ensure a Path object if we get passed a string
         if not folder.is_dir():
             raise ValueError(
                 f"`target_folder` argument must resolve to a folder: {target_folder}"
             )
-        response = self._session.get(f"/v1/cases/{case_number}/export")
+        response = self._parent.session.get(f"/v1/cases/{case_number}/export")
         filename = get_filename_from_content_disposition(
             response, fallback=f"Case-{case_number}.csv"
         )
@@ -142,13 +236,23 @@ class CasesV1:
         return target
 
     def download_fileevent_csv(self, case_number: int, target_folder: Path) -> Path:
-        """Downloads all file event data for a case in CSV format to specified target folder."""
+        """
+        Downloads all file event data for a case in CSV format to specified target folder.
+
+        **Parameters**
+
+        * **case_number**: `int` Unique numeric identifier for the case.
+        * **target_folder**: `Path | str` A string or `pathlib.Path` object that represents the folder which the CSV
+            will be saved to.
+
+        **Returns**: A `pathlib.Path` object representing location of the downloaded CSV.
+        """
         folder = Path(target_folder)  # ensure a Path object if we get passed a string
         if not folder.is_dir():
             raise ValueError(
                 f"`target_folder` argument must resolve to a folder: {target_folder}"
             )
-        response = self._session.get(f"/v1/cases/{case_number}/fileevent/export")
+        response = self._parent.session.get(f"/v1/cases/{case_number}/fileevent/export")
         filename = get_filename_from_content_disposition(
             response, fallback=f"Case-{case_number}.csv"
         )
@@ -156,46 +260,142 @@ class CasesV1:
         target.write_bytes(response.content)
         return target
 
-    def download_full_case_zip(self, case_number) -> None:
-        """Downloads full export of case in zip format to specified target folder."""
-        return self._session.post(f"/v1/cases/{case_number}/export/full/downloadToken")
+    def download_full_case_zip(
+        self,
+        case_number,
+        target_folder: Path,
+        include_files=True,
+        include_summary=True,
+        include_file_events=True,
+    ) -> Path:
+        """
+        Downloads full export of case in ZIP format to specified target folder.
 
-    def get_file_events(self, case_number: int) -> CaseFileEventsResponse:
-        """Gets file event details attached to a case."""
-        r = self._session.get(f"/v1/cases/{case_number}/fileevent")
-        return CaseFileEventsResponse.parse_response(r)
+        **Parameters**
+
+        * **case_number**: `int` Unique numeric identifier for the case.
+        * **target_folder**: `Path | str` A string or `pathlib.Path` object that represents the folder which the ZIP
+            will be saved to.
+        * **include_files**: `bool` Include source files (if they are available) in the .zip. default=True
+        * **include_summary**: `bool` Include summary PDF in the .zip. default=True
+        * **include_file_events**: `bool` Include file events .csv in the .zip. default=True
+
+        **Returns**: A `pathlib.Path` object representing location of the downloaded ZIP.
+        """
+        folder = Path(target_folder)  # ensure a Path object if we get passed a string
+        response = self._parent.session.get(
+            f"/v1/cases/{case_number}/export/full",
+            params={
+                "files": include_files,
+                "summary": include_summary,
+                "fileEvents": include_file_events,
+            },
+        )
+        filename = get_filename_from_content_disposition(
+            response, fallback=f"Case-{case_number}.zip"
+        )
+        target = folder / filename
+        target.write_bytes(response.content)
+        return target
+
+    def download_file_for_event(
+        self, case_number: int, event_id: str, target_folder: Path
+    ) -> Path:
+        """
+        Download the source file (if captured) from a file event attached to a case.
+
+        **Parameters**
+
+        * **case_number**: `int` Unique numeric identifier for the case.
+        * **event_id**: `str` Unique identifier for event to download.
+        * **target_folder**: `Path | str` A string or `pathlib.Path` object that represents the folder which the file
+            will be saved to.
+
+        **Returns**: A `pathlib.Path` object representing location of the downloaded file.
+        """
+        folder = Path(target_folder)  # ensure a Path object if we get passed a string
+        response = self._parent.session.get(
+            f"/v1/cases/{case_number}/fileevent/{event_id}/file"
+        )
+        filename = get_filename_from_content_disposition(
+            response, fallback=f"Case-{case_number}-{event_id}-unknown-filename"
+        )
+        target = folder / filename
+        target.write_bytes(response.content)
+        return target
+
+    def get_file_events(self, case_number: int) -> CaseFileEvents:
+        """
+        Gets file event details attached to a case.
+
+        **Parameters**
+
+        * **case_number**: `int` Unique numeric identifier for the case.
+
+        **Returns**: A [`CaseFileEvents`][casefileevents-model] object containing the associated file events.
+        """
+        r = self._parent.session.get(f"/v1/cases/{case_number}/fileevent")
+        return CaseFileEvents.parse_response(r)
 
     def add_file_events_to_case(
         self, case_number: int, event_ids: Union[str, List[str]]
     ) -> Response:
-        """Attach file events to a case."""
+        """
+        Attach file events to a case.
+
+        **Parameters:**
+
+        * **case_number**: `int` Unique numeric identifier for the case.
+        * **event_ids**: `str | List[str]` A string or list of strings representing the eventId(s) to attach to the
+            case.
+
+        **Returns**: A `requests.Response` indicating success.
+        """
         if isinstance(event_ids, str):
             event_ids = [event_ids]
-        return self._session.post(
+        return self._parent.session.post(
             f"/v1/cases/{case_number}/fileevent", json={"events": event_ids}
         )
 
-    def delete_file_event_from_case(self, case_number: int, event_id: str):
-        """Remove file events from a case."""
-        return self._session.delete(f"/v1/cases/{case_number}/fileevent/{event_id}")
+    def delete_file_event_from_case(self, case_number: int, event_id: str) -> Response:
+        """
+        Remove file events from a case.
+
+        **Parameters:**
+
+        * **case_number**: `int` Unique numeric identifier for the case.
+        * **event_id**: `str` Unique identifier of event to remove from the case.
+
+        **Returns**: A `requests.Response` indicating success.
+        """
+        return self._parent.session.delete(
+            f"/v1/cases/{case_number}/fileevent/{event_id}"
+        )
 
     def get_file_event_detail(self, case_number: int, event_id: str):
-        """Get the full detail for a given file event."""
-        response = self._session.get(f"/v1/cases/{case_number}/fileevent/{event_id}")
-        return FileEventV2.parse_response(response)
+        """
+        Get the full detail for a given file event attached to a case.
 
-    def download_file_for_event(self, case_number: int, event_id: str):
-        """Download the source file (if captured) from a file event attached to a case."""
-        return self._session.get(f"/v1/cases/{case_number}/fileevent/{event_id}/file")
+        **Parameters**
+
+        * **case_number**: `int` Unique numeric identifier for the case.
+        * **event_id**: `str` Unique identifier for event associated with case.
+
+        **Returns**:  A [`FileEventV2`][fileeventv2-model] object representing the file event.
+        """
+        response = self._parent.session.get(
+            f"/v1/cases/{case_number}/fileevent/{event_id}"
+        )
+        return FileEventV2.parse_response(response)
 
 
 class CasesClient:
-    def __init__(self, session):
-        self._session = session
+    def __init__(self, parent):
+        self._parent = parent
         self._v1 = None
 
     @property
     def v1(self):
         if self._v1 is None:
-            self._v1 = CasesV1(self._session)
+            self._v1 = CasesV1(self._parent)
         return self._v1
