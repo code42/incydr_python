@@ -17,6 +17,9 @@ _generated_models
 # Distribution / packaging
 dist/
 
+# Documentation builds
+site/
+
 # Unit test / coverage reports
 htmlcov/
 .tox/

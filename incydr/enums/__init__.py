@@ -16,6 +16,6 @@ class _Enum(str, _enum.Enum):
         )
 
 
-class SrtDir(_Enum):
+class SortDirection(Enum):
     ASC = "asc"
     DESC = "desc"

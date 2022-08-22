@@ -51,9 +51,14 @@ check = "pre-commit run --all-files --show-diff-on-failure"
 check-no-diff = "pre-commit run --all-files"
 
 [tool.hatch.envs.docs]
-dependencies = []
+dependencies = [
+  "mkdocs-autorefs",
+  "mkdocs-material",
+  "mkautodoc"
+]
 [tool.hatch.envs.docs.scripts]
-build = ""
+build = "mkdocs build"
+serve = "mkdocs serve"
 
 [tool.hatch.envs.default]
 dependencies = []

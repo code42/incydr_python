@@ -12,6 +12,18 @@ def default_logger():
 
 
 class IncydrSettings(BaseSettings):
+    """
+    Configure settings on the incydr.Client.
+
+    Usage example:
+
+        >>> import incydr
+        >>> client = incydr.Client()
+        >>> client.settings.page_size = 10
+
+    Settings can also be loaded from shell environment variables or .env files. Just prefix a setting's attribute name with `INCYDR_` when configuring via enviroment vars.
+    """
+
     api_client_id: str = Field(env="incydr_api_client_id")
     api_client_secret: SecretStr = Field(env="incydr_api_client_secret")
     url: str = Field(env="incydr_url")
