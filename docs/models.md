@@ -37,6 +37,7 @@ available model methods.
     :docstring:
 
 ## Devices
+---
 
 ### `Device` model
 

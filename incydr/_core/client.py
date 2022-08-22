@@ -79,7 +79,7 @@ class Client:
         self._cases = CasesClient(self)
         self._customer = CustomerClient(self.session)
         self._file_events = FileEventsClient(self)
-        self._devices = DevicesClient(self.session)
+        self._devices = DevicesClient(self)
 
         self._session.auth.refresh()
 

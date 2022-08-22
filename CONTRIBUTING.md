@@ -31,3 +31,5 @@ Examples of all the steps documented  here can be found in the existing clients.
     :docstring:
     :members:
 ```
+
+- Add your `client_name.md` file to the `nav` section of the `mkdocs.yml` config file.
