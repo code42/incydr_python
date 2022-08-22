@@ -1,4 +1,9 @@
+from typing import Union
+
 from .models import FileEventResponseV1
+from .models import FileEventResponseV2
+from incydr._queries.file_events import EventQuery
+from incydr._queries.file_events import Query
 
 
 class FileEventsV1:
@@ -18,9 +23,14 @@ class FileEventsV2:
     def __init__(self, session):
         self._session = session
 
-    def search(self, query):
-        response = self._session.post("/v2/file-events", json=query)
-        return FileEventResponseV1.parse_raw(response.text)
+    def search(
+        self,
+        query: Union[str, Query, EventQuery],
+    ):
+        if isinstance(query, str):
+            query = Query.parse_raw(query)
+        response = self._session.post("/v2/file-events", json=query.dict())
+        return FileEventResponseV2.parse_raw(response.text)
 
 
 class FileEventsClient:

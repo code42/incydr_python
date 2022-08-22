@@ -5,7 +5,7 @@ from .models import Device
 from .models import DevicesPage
 from .models import QueryDevicesRequest
 from .models import SortKeys
-from incydr._core.util import SortDirection
+from incydr.enums import SortDirection
 
 
 class DevicesClient:

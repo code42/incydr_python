@@ -5,10 +5,10 @@ from urllib.parse import urlencode
 from pytest_httpserver import HTTPServer
 
 from incydr import Client
-from incydr._core.util import SortDirection
 from incydr._devices.models import Device
 from incydr._devices.models import DevicesPage
 from incydr._devices.models import SortKeys
+from incydr.enums import SortDirection
 
 TEST_DEVICE_1 = {
     "deviceId": "device-1",
