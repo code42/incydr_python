@@ -25,8 +25,8 @@ class FileEventsV2:
         >>> client.file_events.v2.search(query)
     """
 
-    def __init__(self, session):
-        self._parent = session
+    def __init__(self, parent):
+        self._parent = parent
         self._retry_adapter_mounted = False
 
     def search(
@@ -38,7 +38,7 @@ class FileEventsV2:
 
         **Parameters**:
 
-        * **query**: `EventQuery`, `SavedSearch` (required): The query object to filter file events by different fields.
+        * **query**: `EventQuery`, `SavedSearch` (required) - The query object to filter file events by different fields.
 
         **Returns**: A [`FileEventsPage`][fileeventspage-model] object.
         """
@@ -85,6 +85,17 @@ class FileEventsV2:
         return page.searches[0]
 
     def execute_saved_search(self, search_id: str) -> FileEventsPage:
+        """
+        Search file events using a saved search.  A helper method which behaved the same as retrieving
+        a saved search with the `get_saved_search_by_id()` and then passing the returned response object
+        to the `search()` method.
+
+        **Parameters**:
+
+        * **search_id**: `str` - The unique ID of the saved search.
+
+        **Returns**: A [`FileEventsPage`][fileeventspage-model] object.
+        """
         return self.search(self.get_saved_search_by_id(search_id))
 
     def _mount_retry_adapter(self):

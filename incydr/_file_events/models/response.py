@@ -9,7 +9,7 @@ from incydr._file_events.models.enums import GroupClause
 from incydr._file_events.models.event import FileEventV2
 from incydr._file_events.models.request import SearchFilter
 from incydr._file_events.models.request import SearchFilterGroup
-from incydr.enums import SrtDir
+from incydr.enums import SortDirection
 from incydr.enums.file_events import EventSearchTerm
 from incydr.enums.file_events import SearchProblemType
 
@@ -88,7 +88,7 @@ class SavedSearch(ResponseModel):
     * **modified_timestamp**: `datetime` - The time at which the saved search was last modified.
     * **name**: `str` - The name given to the saved search.
     * **notes**: `str` - Optional notes about the search.
-    * **srt_dir**: `SrtDir` - `asc` or `desc`. The direction in which to sort the response based on the corresponding key. Defaults to 'asc'.
+    * **srt_dir**: `SortDirection` - `asc` or `desc`. The direction in which to sort the response based on the corresponding key. Defaults to 'asc'.
     * **srt_key**: `EventSearchTerm` - One or more values on which the response will be sorted. Defaults to event ID.
 
     """
@@ -151,7 +151,7 @@ class SavedSearch(ResponseModel):
         description="Optional notes about the search.",
         example="This search returns all events.",
     )
-    srt_dir: Optional[SrtDir] = Field(
+    srt_dir: Optional[SortDirection] = Field(
         alias="srtDir", description="Sort direction.", example="asc"
     )
     srt_key: Optional[EventSearchTerm] = Field(

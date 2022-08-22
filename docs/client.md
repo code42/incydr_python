@@ -3,4 +3,4 @@
 
 ::: incydr.Client
     :docstring:
-    :members: settings session request_history cases
+    :members: settings session request_history cases file_events
