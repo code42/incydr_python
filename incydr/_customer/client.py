@@ -14,12 +14,25 @@ class CustomerClient:
 
 
 class CustomerV1:
-    """Customer V1 Client"""
+    """
+    Client for `/v1/customer` endpoints.
+
+    Usage example:
+
+        >>> import incydr
+        >>> client = incydr.Client(**kwargs)
+        >>> client.customer.v1.get()
+    """
 
     def __init__(self, session):
         self._session = session
 
     def get(self) -> Customer:
-        """Get customer account information."""
+        """
+        Get customer account information.
+
+        Returns: A [`Customer`][customer-model] object representing account information.
+
+        """
         response = self._session.get("/v1/customer")
         return Customer.parse_response(response)

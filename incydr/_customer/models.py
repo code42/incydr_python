@@ -6,16 +6,21 @@ from incydr._core.models import ResponseModel
 
 
 class Customer(ResponseModel):
-    name: Optional[str] = Field(
-        allow_mutation=False, description="The customer's name."
+    """
+    A model providing details of an Incydr customer account.
+
+    **Fields**:
+
+    * **name**: `str` The Code42 account name.
+    * **registration_key**: `str` The Code42 registration key (primarily for licensing purposes).
+    * **tenant_id**: `str` The unique identifier for the account within Code42.
+    """
+
+    name: Optional[str] = Field(allow_mutation=False)
+    registration_key: Optional[str] = Field(
+        allow_mutation=False, alias="registrationKey"
     )
-    registrationKey: Optional[str] = Field(
-        allow_mutation=False, description="The customer's Code42 registration key."
-    )
-    tenantId: Optional[str] = Field(
-        allow_mutation=False,
-        description="The customer's unique ID identifying it within Code42.",
-    )
+    tenant_id: Optional[str] = Field(allow_mutation=False, alias="tenantId")
 
     class Config:
         validate_assignment = True

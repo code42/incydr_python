@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from enum import Enum
 from typing import List
@@ -8,16 +10,12 @@ from pydantic import BaseModel
 from pydantic import Field
 
 from incydr._core.models import ResponseModel
+from incydr.enums import SortDirection
 
 
-class Status(str, Enum):
+class CaseStatus(str, Enum):
     CLOSED = "CLOSED"
     OPEN = "OPEN"
-
-
-class SortDirection(str, Enum):
-    ASC = "asc"
-    DESC = "desc"
 
 
 class SortKeys(str, Enum):
@@ -31,7 +29,30 @@ class SortKeys(str, Enum):
 
 
 class Case(ResponseModel):
-    number: int = Field(allow_mutation=False)
+    """A model representing an Incydr Case.
+
+    **Fields**:
+
+    * **number**: `int` Unique numeric identifier for the case.
+    * **name**: `str` Unique name given to the case.
+    * **created_at**: `datetime` Time at which the case was created. json_alias=`createdAt`
+    * **updated_at**: `datetime | None` Time at which the case was last updated. json_alias=`updatedAt`
+    * **description**: `str | None` Brief description providing context for a case.
+    * **findings**: `str | None` Markdown formatted text summarizing the findings for a case.
+    * **subject**: `str | None` The user UID of the subject being investigated in this case.
+    * **subject_username**: `str | None` The username of the subject being investigated in this case. json_alias=`subjectUsername`
+    * **status**: `CaseStatus` Indicates the status of the case. OPEN: The case is active and all aspects of the case are editable. CLOSED: The case is resolved. Closed cases cannot be re-opened or modified. Case data for closed cases is retained indefinitely.
+    * **assignee**: `str | None` The user ID of the administrator assigned to investigate the case.
+    * **assignee_username**: `str | None` The username of the administrator assigned to investigate the case. json_alias=`assigneeUsername`
+    * **created_by_user_id**: `str | None` User UID of the user who created the case. json_alias=`createdByUserUid`
+    * **created_by_username**: `str | None` Username of the user who created the case. json_alias=`createdByUsername`
+    )
+    * **last_modified_by_user_id**: `str | None` User UID of the user who last modified the case. json_alias=`lastModifiedByUserUid`
+    )
+    * **last_modified_by_username**: `str | None` Username of the user who last modified the case. json_alias=`lastModifiedByUsername`
+    """
+
+    number: int = Field(allow_mutation=False, description="The identifier of the case.")
     name: str
     created_at: datetime = Field(allow_mutation=False, alias="createdAt")
     updated_at: Optional[datetime] = Field(allow_mutation=False, alias="updatedAt")
@@ -39,7 +60,7 @@ class Case(ResponseModel):
     findings: Optional[str]
     subject: Optional[str]
     subject_username: Optional[str] = Field(alias="subjectUsername")
-    status: Status
+    status: CaseStatus
     assignee: Optional[str]
     assignee_username: Optional[str] = Field(
         allow_mutation=False, alias="assigneeUsername"
@@ -62,6 +83,15 @@ class Case(ResponseModel):
 
 
 class CasesPage(ResponseModel):
+    """
+    A model representing a page of `Case` objects.
+
+    **Fields**:
+
+    * **cases**: `List[Case]` The list of `n` number of cases retrieved from the query, where `n=page_size`.
+    * **total_count**: `int` Total count of cases found by the query.
+    """
+
     cases: List[Case]
     total_count: int = Field(alias="totalCount")
 
@@ -76,7 +106,7 @@ class QueryCasesRequest(BaseModel):
     pgSize: Optional[int] = 100
     srtDir: SortDirection = SortDirection.ASC
     srtKey: SortKeys = SortKeys.NUMBER
-    status: Optional[Status]
+    status: Optional[CaseStatus]
 
 
 class CreateCaseRequest(BaseModel):
@@ -88,13 +118,12 @@ class CreateCaseRequest(BaseModel):
 
 
 class UpdateCaseRequest(BaseModel):
-    number: Optional[int] = Field(description="The case identifier.", doc_hide=True)
     name: Optional[str] = Field(description="The name of the case.", max_length=50)
     assignee: Optional[str]
     description: Optional[str] = Field(max_length=250)
     findings: Optional[str] = Field(max_length=30_000)
     subject: Optional[str]
-    status: Optional[Status]
+    status: Optional[CaseStatus]
 
 
 class FileAvailability(Enum):
@@ -165,7 +194,7 @@ class FileEvent(BaseModel):
     )
 
 
-class CaseFileEventsResponse(ResponseModel):
+class CaseFileEvents(ResponseModel):
     events: Optional[List[FileEvent]] = Field(
         None, description="List of events in the response."
     )
@@ -174,10 +203,4 @@ class CaseFileEventsResponse(ResponseModel):
         alias="totalCount",
         description="Total number of events associated with the case.",
         example=42,
-    )
-
-
-class EventProblemResponse(BaseModel):
-    problem: Optional[str] = Field(
-        None, description="The type of problem that occured."
     )
