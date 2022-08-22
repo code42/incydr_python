@@ -102,7 +102,10 @@ class EventQuery:
         end_date: Union[datetime, int, float, str] = None,
     ):
         self._query = Query(groups=[])
-        self._query.groups.append(_create_date_range_filter_group(start_date, end_date))
+        if start_date or end_date:
+            self._query.groups.append(
+                _create_date_range_filter_group(start_date, end_date)
+            )
 
     def __str__(self):
         return str(self._query)
@@ -153,8 +156,6 @@ class EventQuery:
 
     @validate_arguments
     def greater_than(self, term: str, value: int):
-        # value = validate_numerical_value(value)
-
         self._query.groups.append(
             FilterGroup(
                 filters=[Filter(term=term, operator=Operator.GREATER_THAN, value=value)]
