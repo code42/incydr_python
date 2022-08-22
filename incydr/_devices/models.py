@@ -22,6 +22,7 @@ class Device(ResponseModel):
     A model representing a device.
 
     **Fields**:
+
     * **device_id**: `str` - The globally unique ID (guid) for this device.
     * **legacy_device_id**: `str` - The device ID to use for older console-based APIs that require a device ID.
     * **name**: `str` - The device name.
@@ -48,7 +49,6 @@ class Device(ResponseModel):
     * **creation_date**: `datetime` - The date and time this device was created.
     * **modification_date**: `datetime` - The date and time this device was last modified.
     * **login_date**: `datetime` - The date and time this device was last logged in.
-
     """
 
     device_id: Optional[str] = Field(

@@ -9,14 +9,14 @@ from incydr.enums import SortDirection
 
 
 class DevicesClient:
-    def __init__(self, session):
-        self._session = session
+    def __init__(self, parent):
+        self._parent = parent
         self._v1 = None
 
     @property
     def v1(self):
         if self._v1 is None:
-            self._v1 = DevicesV1(self._session)
+            self._v1 = DevicesV1(self._parent)
         return self._v1
 
 
@@ -30,10 +30,8 @@ class DevicesV1:
         >>> client.devices.v1.get_page()
     """
 
-    default_page_size = 100
-
-    def __init__(self, session):
-        self._session = session
+    def __init__(self, parent):
+        self._parent = parent
 
     def get_device(self, device_id: str) -> Device:
         """Get a single device.
@@ -45,7 +43,7 @@ class DevicesV1:
         **Returns**: A [`Device`][device-model] object representing the device.
 
         """
-        response = self._session.get(f"/v1/devices/{device_id}")
+        response = self._parent.session.get(f"/v1/devices/{device_id}")
         return Device.parse_response(response)
 
     def get_page(
@@ -53,7 +51,7 @@ class DevicesV1:
         active: bool = None,
         blocked: bool = None,
         page_num: int = 1,
-        page_size: int = default_page_size,
+        page_size: int = None,
         sort_dir: SortDirection = SortDirection.ASC,
         sort_key: SortKeys = SortKeys.NAME,
     ) -> DevicesPage:
@@ -63,16 +61,17 @@ class DevicesV1:
         Filter results by passing the appropriate parameters:
 
         **Parameters**:
-        * **active**: `bool` -
-        * **blocked**: `bool` -
-        * **page_num**: `int` -
-        * **page_size**: `int` -
+
+        * **active**: `bool` - Whether or not the device is active. If true, the device will show up on reports, etc.
+        * **blocked**: `bool` - Whether or not the device is blocked.  If true, restores and logins are disabled.
+        * **page_num**: `int` - Page number for results, starting at 1.
+        * **page_size**: `int` - Max number of results to return per page.
         * **sort_dir**: `SortDirection` - 'asc' or 'desc'. The direction in which to sort the response based on the corresponding key. Defaults to 'asc'.
         * **sort_key**: `SortKeys` - One or more values on which the response will be sorted. Defaults to device name.
 
         **Returns**: A ['DevicesPage'][devicespage-model] object.
         """
-
+        page_size = page_size or self._parent.settings.page_size
         data = QueryDevicesRequest(
             page=page_num,
             pageSize=page_size,
@@ -81,14 +80,14 @@ class DevicesV1:
             active=active,
             blocked=blocked,
         )
-        response = self._session.get("/v1/devices", params=data.dict())
+        response = self._parent.session.get("/v1/devices", params=data.dict())
         return DevicesPage.parse_response(response)
 
     def iter_all(
         self,
         active: bool = None,
         blocked: bool = None,
-        page_size: int = default_page_size,
+        page_size: int = None,
         sort_dir: SortDirection = SortDirection.ASC,
         sort_key: SortKeys = SortKeys.NAME,
     ) -> Iterator[Device]:
@@ -99,6 +98,7 @@ class DevicesV1:
 
         **Returns**: A generator yielding individual [`Device`][device-model] objects.
         """
+        page_size = page_size or self._parent.settings.page_size
         for page_num in count(1):
             page = self.get_page(
                 active=active,
