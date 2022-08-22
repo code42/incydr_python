@@ -73,6 +73,11 @@ def test_event_query_when_start_date_duration_creates_within_the_last_filter_gro
     assert q._query.groups.pop() == expected
 
 
+def test_event_query_when_with_no_date_args_appends_no_groups():
+    q = EventQuery()
+    assert len(q._query.groups) == 0
+
+
 def test_event_query_is_when_single_value_creates_expected_filter_group():
     q = EventQuery(TEST_START_DATE).equals("file.category", "Document")
     expected = FilterGroup(
