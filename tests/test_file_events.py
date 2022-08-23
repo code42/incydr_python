@@ -283,10 +283,7 @@ TEST_SAVED_SEARCH_1 = SavedSearch(
     columns=None,
     created_by_uid="884180379747227785",
     created_by_username="test@code42.com",
-    creation_timestamp=datetime(
-        2019, 6, 27, 18, 15, 26, 191726, tzinfo=timezone.utc
-    ).strftime(MICROSECOND_FORMAT)[:-4]
-    + "Z",
+    creation_timestamp=datetime(2019, 6, 27, 18, 15, 26, 191726, tzinfo=timezone.utc),
     group_clause="AND",
     groups=[
         SearchFilterGroup(
@@ -316,10 +313,7 @@ TEST_SAVED_SEARCH_1 = SavedSearch(
     id="saved-search-1",
     modified_by_uid="884180379747227785",
     modified_by_username="test@code42.com",
-    modified_timestamp=datetime(
-        2019, 6, 27, 18, 15, 26, 191726, tzinfo=timezone.utc
-    ).strftime(MICROSECOND_FORMAT)[:-4]
-    + "Z",
+    modified_timestamp=datetime(2019, 6, 27, 18, 15, 26, 191726, tzinfo=timezone.utc),
     name="Departing Employee Source Code",
     notes=None,
     srt_dir="asc",
@@ -331,10 +325,7 @@ TEST_SAVED_SEARCH_2 = SavedSearch(
     columns=None,
     created_by_uid="884180379747227785",
     created_by_username="john.doe@code42.com",
-    creation_timestamp=datetime(
-        2019, 6, 26, 12, 24, 45, 117610, tzinfo=timezone.utc
-    ).strftime(MICROSECOND_FORMAT)[:-4]
-    + "Z",
+    creation_timestamp=datetime(2019, 6, 26, 12, 24, 45, 117610, tzinfo=timezone.utc),
     group_clause="AND",
     groups=[
         SearchFilterGroup(
@@ -369,10 +360,7 @@ TEST_SAVED_SEARCH_2 = SavedSearch(
     id="saved-search-2",
     modified_by_uid="884180379747227785",
     modified_by_username="john.doe@code42.com",
-    modified_timestamp=datetime(
-        2019, 6, 26, 12, 24, 45, 117610, tzinfo=timezone.utc
-    ).strftime(MICROSECOND_FORMAT)[:-4]
-    + "Z",
+    modified_timestamp=datetime(2019, 6, 26, 12, 24, 45, 117610, tzinfo=timezone.utc),
     name="Departing Employee Deleted Files",
     notes=None,
     srt_dir="asc",
@@ -455,13 +443,12 @@ def test_search_returns_expected_data(httpserver_auth: HTTPServer):
 
 
 def test_get_all_saved_searches_returns_expected_data(httpserver_auth: HTTPServer):
-    search_data = {
-        "searches": [TEST_SAVED_SEARCH_1.dict(), TEST_SAVED_SEARCH_2.dict()],
-        "problems": None,
-    }
+    search_data = SavedSearchesPage(
+        searches=[TEST_SAVED_SEARCH_1, TEST_SAVED_SEARCH_2]
+    ).json()
     httpserver_auth.expect_request(
         "/v2/file-events/saved-searches", method="GET"
-    ).respond_with_json(search_data)
+    ).respond_with_data(search_data)
 
     client = Client()
     page = client.file_events.v2.get_all_saved_searches()
@@ -472,11 +459,10 @@ def test_get_all_saved_searches_returns_expected_data(httpserver_auth: HTTPServe
 
 def test_get_saved_search_by_id_returns_expected_data(httpserver_auth: HTTPServer):
     search_id = "saved-search-1"
-    search_data = {"searches": [TEST_SAVED_SEARCH_1.dict()], "problems": None}
-
+    search_data = SavedSearchesPage(searches=[TEST_SAVED_SEARCH_1]).json()
     httpserver_auth.expect_request(
         f"/v2/file-events/saved-searches/{search_id}", method="GET"
-    ).respond_with_json(search_data)
+    ).respond_with_data(search_data)
 
     client = Client()
     search = client.file_events.v2.get_saved_search_by_id(search_id)
@@ -486,17 +472,17 @@ def test_get_saved_search_by_id_returns_expected_data(httpserver_auth: HTTPServe
 
 def test_execute_saved_search_makes_expected_calls(httpserver_auth: HTTPServer):
     search_id = "saved-search-1"
-    search_data = {"searches": [TEST_SAVED_SEARCH_1.dict()], "problems": None}
+    search_data = SavedSearchesPage(searches=[TEST_SAVED_SEARCH_1]).json()
     event_data = {
         "fileEvents": [TEST_EVENT_1, TEST_EVENT_2],
         "nextPgToken": None,
         "problems": None,
         "totalCount": 2,
     }
-
+    print(search_data)
     httpserver_auth.expect_ordered_request(
         f"/v2/file-events/saved-searches/{search_id}", method="GET"
-    ).respond_with_json(search_data)
+    ).respond_with_data(search_data)
     httpserver_auth.expect_ordered_request(
         "/v2/file-events", method="POST", json=TEST_DICT_QUERY
     ).respond_with_json(event_data)
