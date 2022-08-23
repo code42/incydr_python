@@ -2,14 +2,14 @@ from .models import Customer
 
 
 class CustomerClient:
-    def __init__(self, session):
-        self._session = session
+    def __init__(self, parent):
+        self._parent = parent
         self._v1 = None
 
     @property
     def v1(self):
         if self._v1 is None:
-            self._v1 = CustomerV1(self._session)
+            self._v1 = CustomerV1(self._parent)
         return self._v1
 
 
@@ -24,8 +24,8 @@ class CustomerV1:
         >>> client.customer.v1.get()
     """
 
-    def __init__(self, session):
-        self._session = session
+    def __init__(self, parent):
+        self._parent = parent
 
     def get(self) -> Customer:
         """
@@ -34,5 +34,5 @@ class CustomerV1:
         Returns: A [`Customer`][customer-model] object representing account information.
 
         """
-        response = self._session.get("/v1/customer")
+        response = self._parent.session.get("/v1/customer")
         return Customer.parse_response(response)
