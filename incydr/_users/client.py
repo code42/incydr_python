@@ -1,8 +1,12 @@
 from itertools import count
 from typing import Iterator
 
-from incydr._devices.models import DevicesPage, QueryDevicesRequest, SortKeys
-from incydr._users.models import User, UsersPage, QueryUsersRequest
+from incydr._devices.models import DevicesPage
+from incydr._devices.models import QueryDevicesRequest
+from incydr._devices.models import SortKeys
+from incydr._users.models import QueryUsersRequest
+from incydr._users.models import User
+from incydr._users.models import UsersPage
 from incydr.enums import SortDirection
 
 
@@ -20,12 +24,12 @@ class UsersV1:
         return User.parse_response(response)
 
     def get_page(
-            self,
-            active: bool = None,
-            blocked: bool = None,
-            username: str = None,
-            page_num: int = 1,
-            page_size: int = default_page_size,
+        self,
+        active: bool = None,
+        blocked: bool = None,
+        username: str = None,
+        page_num: int = 1,
+        page_size: int = default_page_size,
     ) -> UsersPage:
         """Get a page of users."""
 
@@ -39,14 +43,16 @@ class UsersV1:
         response = self._session.get("/v1/users", params=data.dict())
         return UsersPage.parse_response(response)
 
-    def get_devices(self,
-                    user_id: str,
-                    active: bool = None,
-                    blocked: bool = None,
-                    page_num: int = 1,
-                    page_size: int = default_page_size,
-                    sort_dir: SortDirection = SortDirection.ASC,
-                    sort_key: SortKeys = SortKeys.NAME, ) -> User:
+    def get_devices(
+        self,
+        user_id: str,
+        active: bool = None,
+        blocked: bool = None,
+        page_num: int = 1,
+        page_size: int = default_page_size,
+        sort_dir: SortDirection = SortDirection.ASC,
+        sort_key: SortKeys = SortKeys.NAME,
+    ) -> User:
         """Get a page of devices for a specific user."""
 
         data = QueryDevicesRequest(
@@ -61,11 +67,11 @@ class UsersV1:
         return DevicesPage.parse_response(response)
 
     def iter_all(
-            self,
-            active: bool = None,
-            blocked: bool = None,
-            username: str = None,
-            page_size: int = default_page_size,
+        self,
+        active: bool = None,
+        blocked: bool = None,
+        username: str = None,
+        page_size: int = default_page_size,
     ) -> Iterator[User]:
         """Iterate over all users"""
 

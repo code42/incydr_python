@@ -5,8 +5,10 @@ from urllib.parse import urlencode
 from pytest_httpserver import HTTPServer
 
 from incydr import Client
-from incydr._devices.models import DevicesPage, SortKeys
-from incydr._users.models import User, UsersPage
+from incydr._devices.models import DevicesPage
+from incydr._devices.models import SortKeys
+from incydr._users.models import User
+from incydr._users.models import UsersPage
 from incydr.enums import SortDirection
 
 TEST_USER_1 = {
@@ -138,7 +140,7 @@ def test_get_user_returns_expected_data(httpserver_auth: HTTPServer):
 
 
 def test_get_page_when_default_query_params_returns_expected_data(
-        httpserver_auth: HTTPServer,
+    httpserver_auth: HTTPServer,
 ):
     query = {
         "page": 1,
@@ -159,14 +161,9 @@ def test_get_page_when_default_query_params_returns_expected_data(
 
 
 def test_get_page_when_custom_query_params_returns_expected_data(
-        httpserver_auth: HTTPServer,
+    httpserver_auth: HTTPServer,
 ):
-    query = {
-        "active": True,
-        "blocked": False,
-        "page": 2,
-        "pageSize": 10
-    }
+    query = {"active": True, "blocked": False, "page": 2, "pageSize": 10}
 
     users_data = {"users": [TEST_USER_1, TEST_USER_2], "totalCount": 2}
     httpserver_auth.expect_request(
@@ -175,10 +172,7 @@ def test_get_page_when_custom_query_params_returns_expected_data(
 
     client = Client()
     page = client.users.v1.get_page(
-        active=True,
-        blocked=False,
-        page_num=2,
-        page_size=10
+        active=True, blocked=False, page_num=2, page_size=10
     )
     assert isinstance(page, UsersPage)
     assert page.users[0].json() == json.dumps(TEST_USER_1)
@@ -187,13 +181,9 @@ def test_get_page_when_custom_query_params_returns_expected_data(
 
 
 def test_get_page_when_custom_username_query_param_returns_expected_data(
-        httpserver_auth: HTTPServer,
+    httpserver_auth: HTTPServer,
 ):
-    query = {
-        "username": "username-1",
-        "page": 1,
-        "pageSize": 100
-    }
+    query = {"username": "username-1", "page": 1, "pageSize": 100}
 
     users_data = {"users": [TEST_USER_1], "totalCount": 1}
     httpserver_auth.expect_request(
@@ -201,25 +191,20 @@ def test_get_page_when_custom_username_query_param_returns_expected_data(
     ).respond_with_json(users_data)
 
     client = Client()
-    page = client.users.v1.get_page(
-        username="username-1"
-    )
+    page = client.users.v1.get_page(username="username-1")
     assert isinstance(page, UsersPage)
     assert page.users[0].json() == json.dumps(TEST_USER_1)
     assert page.total_count == len(page.users) == 1
 
 
 def test_iter_all_when_default_params_returns_expected_data(
-        httpserver_auth: HTTPServer,
+    httpserver_auth: HTTPServer,
 ):
     query_1 = {
         "page": 1,
         "pageSize": 2,
     }
-    query_2 = {
-        "page": 2,
-        "pageSize": 2
-    }
+    query_2 = {"page": 2, "pageSize": 2}
 
     users_data_1 = {"users": [TEST_USER_1, TEST_USER_2], "totalCount": 2}
     users_data_2 = {"users": [TEST_USER_3], "totalCount": 1}
@@ -241,8 +226,9 @@ def test_iter_all_when_default_params_returns_expected_data(
         assert item.json() == json.dumps(expected_users.pop(0))
     assert total_users == 3
 
+
 def test_get_devices_when_default_query_params_returns_expected_data(
-        httpserver_auth: HTTPServer,
+    httpserver_auth: HTTPServer,
 ):
     query = {
         "page": 1,
@@ -251,7 +237,10 @@ def test_get_devices_when_default_query_params_returns_expected_data(
         "sortKey": "name",
     }
 
-    devices_data = {"devices": [TEST_USER_1_DEVICE_1, TEST_USER_1_DEVICE_2], "totalCount": 2}
+    devices_data = {
+        "devices": [TEST_USER_1_DEVICE_1, TEST_USER_1_DEVICE_2],
+        "totalCount": 2,
+    }
     httpserver_auth.expect_request(
         "/v1/users/user-1/devices", method="GET", query_string=urlencode(query)
     ).respond_with_json(devices_data)
@@ -265,7 +254,7 @@ def test_get_devices_when_default_query_params_returns_expected_data(
 
 
 def test_get_devices_when_custom_query_params_returns_expected_data(
-        httpserver_auth: HTTPServer,
+    httpserver_auth: HTTPServer,
 ):
     query = {
         "active": True,
@@ -276,7 +265,10 @@ def test_get_devices_when_custom_query_params_returns_expected_data(
         "sortKey": "lastConnected",
     }
 
-    devices_data = {"devices": [TEST_USER_1_DEVICE_1, TEST_USER_1_DEVICE_2], "totalCount": 2}
+    devices_data = {
+        "devices": [TEST_USER_1_DEVICE_1, TEST_USER_1_DEVICE_2],
+        "totalCount": 2,
+    }
     httpserver_auth.expect_request(
         uri="/v1/users/user-1/devices", method="GET", query_string=urlencode(query)
     ).respond_with_json(devices_data)
