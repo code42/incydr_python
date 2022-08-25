@@ -33,6 +33,7 @@ nav:
   - Settings: 'settings.md'
   - Cases: 'cases.md'
   - Customer: 'customer.md'
+  - Devices: 'devices.md'
   - Models: 'models.md'
 
 markdown_extensions:

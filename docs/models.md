@@ -35,3 +35,16 @@ available model methods.
 
 ::: incydr.models.Customer
     :docstring:
+
+## Devices
+---
+
+### `Device` model
+
+::: incydr.models.Device
+    :docstring:
+
+### `DevicesPage` model
+
+::: incydr.models.DevicesPage
+    :docstring:
