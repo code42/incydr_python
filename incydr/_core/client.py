@@ -12,6 +12,7 @@ from incydr._core.settings import IncydrSettings
 from incydr._customer.client import CustomerClient
 from incydr._devices.client import DevicesClient
 from incydr._file_events.client import FileEventsClient
+from incydr._watchlists.client import WatchlistsClient
 
 _base_user_agent = user_agent("incydr", __version__)
 
@@ -80,6 +81,7 @@ class Client:
         self._customer = CustomerClient(self.session)
         self._file_events = FileEventsClient(self)
         self._devices = DevicesClient(self)
+        self._watchlists = WatchlistsClient(self)
 
         self._session.auth.refresh()
 
@@ -152,3 +154,13 @@ class Client:
 
         """
         return self._devices
+
+    @property
+    def watchlists(self):
+        """
+        Property returning a ['WatchlistsClient'](../watchlists) for interacting with `/v*/watchlists` API endpoints.
+        Usage:
+
+            >>> client.watchlists.v1.get_page()
+        """
+        return self._watchlists
