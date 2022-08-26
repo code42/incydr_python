@@ -1,26 +1,47 @@
 from itertools import count
 from typing import Iterator
+from typing import List
+
+from requests import Response
 
 from incydr._devices.models import DevicesPage
 from incydr._devices.models import QueryDevicesRequest
 from incydr._devices.models import SortKeys
+from incydr._users.models import MoveUserRequest
 from incydr._users.models import QueryUsersRequest
+from incydr._users.models import RolesPage
+from incydr._users.models import UpdateRolesRequest
+from incydr._users.models import UpdateRolesResponse
 from incydr._users.models import User
 from incydr._users.models import UsersPage
 from incydr.enums import SortDirection
 
 
 class UsersV1:
-    """Users V1 Client"""
+    """Client for `/v1/users` endpoints.
 
-    default_page_size = 100
-    endpoint_prefix = "/v1/users"
+    Usage example:
 
-    def __init__(self, session):
-        self._session = session
+        >>> import incydr
+        >>> client = incydr.Client(**kwargs)
+        >>> client.users.v1.get_page()
+    """
+
+    def __init__(self, parent):
+        self._parent = parent
 
     def get_user(self, user_id: str) -> User:
-        response = self._session.get(f"/v1/users/{user_id}")
+        """
+        Get a single user.
+
+        **Parameters:**
+
+        * **user_id**: `str` (required) - The unique ID for the user.
+
+        **Returns**: A [`User`][user-model] object representing the user.
+
+        """
+        response = self._parent.session.get(f"/v1/users/{user_id}")
         return User.parse_response(response)
 
     def get_page(
@@ -29,10 +50,24 @@ class UsersV1:
         blocked: bool = None,
         username: str = None,
         page_num: int = 1,
-        page_size: int = default_page_size,
+        page_size: int = None,
     ) -> UsersPage:
-        """Get a page of users."""
+        """
+        Get a page of users.
 
+        Filter results by passing the appropriate parameters:
+
+        **Parameters**:
+
+        * **active**: `bool` - When true, return only active users. When false, return only inactive users. Defaults to returning both.
+        * **blocked**: `bool` - When true, return only blocked users. When false, return only unblocked users. Defaults to returning both.
+        * **username**: `str` - The username of a user to search for.
+        * **page_num**: `int` - Page number for results, starting at 1.
+        * **page_size**: `int` - Max number of results to return per page.
+
+        **Returns**: A ['UsersPage'][userspage-model] object.
+        """
+        page_size = page_size or self._parent.settings.page_size
         data = QueryUsersRequest(
             active=active,
             blocked=blocked,
@@ -40,7 +75,7 @@ class UsersV1:
             page=page_num,
             pageSize=page_size,
         )
-        response = self._session.get("/v1/users", params=data.dict())
+        response = self._parent.session.get("/v1/users", params=data.dict())
         return UsersPage.parse_response(response)
 
     def get_devices(
@@ -49,12 +84,28 @@ class UsersV1:
         active: bool = None,
         blocked: bool = None,
         page_num: int = 1,
-        page_size: int = default_page_size,
+        page_size: int = None,
         sort_dir: SortDirection = SortDirection.ASC,
         sort_key: SortKeys = SortKeys.NAME,
     ) -> User:
-        """Get a page of devices for a specific user."""
+        """
+        Get a page of devices associated with a specific user.
 
+        Filter results by passing the appropriate parameters:
+
+        **Parameters**:
+
+        * **user_id**: `str` (required) - The unique ID for the user.
+        * **active**: `bool` - Whether or not the device is active. If true, the device will show up on reports, etc.
+        * **blocked**: `bool` - Whether or not the device is blocked.  If true, restores and logins are disabled.
+        * **page_num**: `int` - Page number for results, starting at 1.
+        * **page_size**: `int` - Max number of results to return per page.
+        * **sort_dir**: `SortDirection` - 'asc' or 'desc'. The direction in which to sort the response based on the corresponding key. Defaults to 'asc'.
+        * **sort_key**: `SortKeys` - One or more values on which the response will be sorted. Defaults to device name.
+
+        **Returns**: A ['DevicesPage'][devicespage-model] object.
+        """
+        page_size = page_size or self._parent.settings.page_size
         data = QueryDevicesRequest(
             page=page_num,
             pageSize=page_size,
@@ -63,7 +114,9 @@ class UsersV1:
             active=active,
             blocked=blocked,
         )
-        response = self._session.get(f"/v1/users/{user_id}/devices", params=data.dict())
+        response = self._parent.session.get(
+            f"/v1/users/{user_id}/devices", params=data.dict()
+        )
         return DevicesPage.parse_response(response)
 
     def iter_all(
@@ -71,10 +124,16 @@ class UsersV1:
         active: bool = None,
         blocked: bool = None,
         username: str = None,
-        page_size: int = default_page_size,
+        page_size: int = None,
     ) -> Iterator[User]:
-        """Iterate over all users"""
+        """
+        Iterate over all users.
 
+        Accepts the same parameters as `.get_page()` excepting `page_num`.
+
+        **Returns**: A generator yielding individual [`User`][user-model] objects.
+        """
+        page_size = page_size or self._parent.settings.page_size
         for page_num in count(1):
             page = self.get_page(
                 active=active,
@@ -87,14 +146,88 @@ class UsersV1:
             if len(page.users) < page_size:
                 break
 
+    def get_roles(
+        self,
+        user_id: str,
+    ) -> RolesPage:
+        """
+        Get a page of roles associated with a specific user.
+
+        **Parameters**:
+
+        * **user_id**: `str` (required) - The unique ID for the user.
+
+        **Returns**: A ['RolesPage'][rolespage-model] object.
+        """
+        response = self._parent.session.get(f"/v1/users/{user_id}/roles")
+        return RolesPage.parse_response(response)
+
+    def update_roles(self, user_id: str, role_ids: List[str]) -> UpdateRolesResponse:
+        """
+        Update the roles associated with a user.
+
+        **Parameters**:
+
+        * **user_id**: `str` (required) - The unique ID for the user.
+        * **roles_ids**: `List[str]` The new role IDs to assign the user (ex: desktop-user). These will replace the existing roles assigned to the user."
+
+        **Returns**: A ['UpdateRolesResponse'][updaterolesresponse-model] object.
+        """
+        data = UpdateRolesRequest(roleIds=role_ids)
+        response = self._parent.session.put(
+            f"/v1/users/{user_id}/roles", json=data.dict()
+        )
+        return UpdateRolesResponse.parse_response(response)
+
+    def move(self, user_id: str, org_id: str) -> Response:
+        """
+        Move a user to a specified organization
+
+        **Parameters**:
+
+        * **user_id**: `str` - The unique ID for the user.
+        * **org_id**: `str` The orgID of the org to move the user to."
+
+        **Returns**: A `requests.Response` indicating success.
+        """
+        data = MoveUserRequest(orgId=org_id)
+
+        return self._parent.session.post(f"/v1/users/{user_id}/move", json=data.dict())
+
+    def activate(self, user_id: str) -> Response:
+        """
+        Activate a user.
+
+        **Parameters:**
+
+        * **user_id**: `str` (required) - The unique ID for the user.
+
+        **Returns**: A `requests.Response` indicating success.
+
+        """
+        return self._parent.session.post(f"/v1/users/{user_id}/activate")
+
+    def deactivate(self, user_id: str) -> Response:
+        """
+        Deactivate a user.
+
+        **Parameters:**
+
+        * **user_id**: `str` (required) - The unique ID for the user.
+
+        **Returns**: A `requests.Response` indicating success.
+
+        """
+        return self._parent.session.post(f"/v1/users/{user_id}/deactivate")
+
 
 class UsersClient:
-    def __init__(self, session):
-        self._session = session
+    def __init__(self, parent):
+        self._parent = parent
         self._v1 = None
 
     @property
     def v1(self):
         if self._v1 is None:
-            self._v1 = UsersV1(self._session)
+            self._v1 = UsersV1(self._parent)
         return self._v1

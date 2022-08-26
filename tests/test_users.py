@@ -7,6 +7,8 @@ from pytest_httpserver import HTTPServer
 from incydr import Client
 from incydr._devices.models import DevicesPage
 from incydr._devices.models import SortKeys
+from incydr._users.models import RolesPage
+from incydr._users.models import UpdateRolesResponse
 from incydr._users.models import User
 from incydr._users.models import UsersPage
 from incydr.enums import SortDirection
@@ -19,6 +21,7 @@ TEST_USER_1 = {
     "lastName": "lastName-1",
     "legacyOrgId": "legacyOrgId-1",
     "orgId": "orgId-1",
+    "orgGuid": "orgGuid-1",
     "orgName": "orgName-1",
     "notes": "notes-1",
     "active": True,
@@ -35,6 +38,7 @@ TEST_USER_2 = {
     "lastName": "lastName-2",
     "legacyOrgId": "legacyOrgId-2",
     "orgId": "orgId-2",
+    "orgGuid": "orgGuid-2",
     "orgName": "orgName-2",
     "notes": "notes-2",
     "active": True,
@@ -44,15 +48,16 @@ TEST_USER_2 = {
 }
 
 TEST_USER_3 = {
-    "legacyUserId": "legacyUserId-2",
-    "userId": "user-2",
-    "username": "username-2",
-    "firstName": "firstName-2",
-    "lastName": "lastName-2",
-    "legacyOrgId": "legacyOrgId-2",
-    "orgId": "orgId-2",
-    "orgName": "orgName-2",
-    "notes": "notes-2",
+    "legacyUserId": "legacyUserId-3",
+    "userId": "user-3",
+    "username": "username-3",
+    "firstName": "firstName-3",
+    "lastName": "lastName-3",
+    "legacyOrgId": "legacyOrgId-3",
+    "orgId": "orgId-3",
+    "orgGuid": "orgGuid-3",
+    "orgName": "orgName-3",
+    "notes": "notes-3",
     "active": True,
     "blocked": True,
     "creationDate": "2022-07-14T16:49:11.166000Z",
@@ -117,6 +122,29 @@ TEST_USER_1_DEVICE_2 = {
     "modificationDate": "2022-07-14T17:05:44.524000Z",
     "loginDate": "2022-07-14T16:53:30.717000Z",
     "osName": "win64",
+}
+
+TEST_USER_1_ROLE_1 = {
+    "roleId": "role-1",
+    "roleName": "rolename-1",
+    "creationDate": "2022-07-14T16:49:11.166000Z",
+    "modificationDate": "2022-07-14T17:05:44.524000Z",
+    "permissionIds": ["permission-1", "permission-2", "permission-3"],
+}
+
+TEST_USER_1_ROLE_2 = {
+    "roleId": "role-2",
+    "roleName": "rolename-2",
+    "creationDate": "2022-07-14T16:49:11.166000Z",
+    "modificationDate": "2022-07-14T17:05:44.524000Z",
+    "permissionIds": ["permission-1", "permission-2", "permission-3"],
+}
+
+TEST_USER_ROLE_UPDATE = {
+    "processedRoles": ["processedRole-1", "processedRole-2"],
+    "newlyAssignedRoles": ["newlyAssignedRoles-1", "newlyAssignedRoles-2"],
+    "unassignedRoles": ["unassignedRoles-1", "unassignedRoles-2"],
+    "ignoredRoles": ["ignoredRoles-1", "ignoredRoles-2"],
 }
 
 
@@ -287,3 +315,37 @@ def test_get_devices_when_custom_query_params_returns_expected_data(
     assert page.devices[0].json() == json.dumps(TEST_USER_1_DEVICE_1)
     assert page.devices[1].json() == json.dumps(TEST_USER_1_DEVICE_2)
     assert page.total_count == len(page.devices) == 2
+
+
+def test_get_roles_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
+    roles_data = {
+        "roles": [TEST_USER_1_ROLE_1, TEST_USER_1_ROLE_2],
+    }
+    httpserver_auth.expect_request(
+        "/v1/users/user-1/roles", method="GET"
+    ).respond_with_json(roles_data)
+
+    client = Client()
+    page = client.users.v1.get_roles(user_id="user-1")
+    assert isinstance(page, RolesPage)
+    assert page.roles[0].json() == json.dumps(TEST_USER_1_ROLE_1)
+    assert page.roles[1].json() == json.dumps(TEST_USER_1_ROLE_2)
+
+
+def test_update_roles_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
+    roles_data = TEST_USER_ROLE_UPDATE
+
+    httpserver_auth.expect_request(
+        "/v1/users/user-1/roles", method="PUT"
+    ).respond_with_json(roles_data)
+
+    client = Client()
+    response = client.users.v1.update_roles(
+        user_id="user-1", role_ids=["newlyAssignedRoles-1", "newlyAssignedRoles-2"]
+    )
+    assert isinstance(response, UpdateRolesResponse)
+    assert response.json() == json.dumps(TEST_USER_ROLE_UPDATE)
