@@ -151,13 +151,13 @@ class UsersV1:
         user_id: str,
     ) -> RolesPage:
         """
-        Get a page of roles associated with a specific user.
+        Get a list of roles associated with a specific user.
 
         **Parameters**:
 
         * **user_id**: `str` (required) - The unique ID for the user.
 
-        **Returns**: A ['RolesPage'][rolespage-model] object.
+        **Returns**: A ['RolesPage'][roleslist-model] object.
         """
         response = self._parent.session.get(f"/v1/users/{user_id}/roles")
         return RolesPage.parse_response(response)

@@ -176,11 +176,11 @@ class Role(ResponseModel):
 
 class RolesPage(ResponseModel):
     """
-    A model representing a page of `Role` objects.
+    A model representing a list of `Role` objects.
 
     **Fields**:
 
-    * **roles**: `List[Role]` - The list of `n` number of roles retrieved from the query, where `n=page_size`.
+    * **roles**: `List[Role]` - The list of roles retrieved from the query.
     """
 
     roles: Optional[List[Role]] = Field(description="A list of a user's current roles.")
