@@ -1,5 +1,7 @@
 import logging
+import re
 from collections import deque
+from textwrap import indent
 
 from requests_toolbelt import user_agent
 from requests_toolbelt.sessions import BaseUrlSession
@@ -14,6 +16,7 @@ from incydr._devices.client import DevicesClient
 from incydr._file_events.client import FileEventsClient
 
 _base_user_agent = user_agent("incydr", __version__)
+_auth_header_regex = re.compile(r"Authorization: (Bearer|Basic) \S+")
 
 
 class Client:
@@ -63,7 +66,16 @@ class Client:
         def response_hook(response, *args, **kwargs):
             if self._settings.log_level < logging.INFO:
                 try:
-                    dumped = dump_response(response).decode("utf-8")
+                    dumped = dump_response(
+                        response, request_prefix=b"", response_prefix=b""
+                    ).decode("utf-8")
+                    dumped = re.sub(
+                        _auth_header_regex,
+                        "Authorization: <token_redacted>",
+                        dumped,
+                    )
+                    if not self._settings.use_rich:
+                        dumped = indent(dumped, prefix="\t")
                     self._settings.logger.debug(dumped)
                 except Exception as err:
                     self._settings.logger.debug(
