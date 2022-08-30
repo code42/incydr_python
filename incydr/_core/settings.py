@@ -1,26 +1,21 @@
 import logging
 from pathlib import Path
+from io import IOBase
 
 from pydantic import BaseSettings
 from pydantic import Field
 from pydantic import SecretStr
 from pydantic import validator
+from rich.logging import RichHandler
+from rich.console import Console
+from typing import Union
+from typing import Literal
 
-
-def default_logger(filename=None):
-    logger = logging.getLogger("incydr")
-    if filename is None:
-        handler = logging.StreamHandler()
-    else:
-        handler = logging.FileHandler(filename=filename, encoding="utf-8")
-    formatter = logging.Formatter(
-        fmt="%(asctime)s - %(name)s:%(levelname)s - %(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%S%z",
-    )
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    logger.setLevel(logging.WARNING)
-    return logger
+_std_log_formatter = logging.Formatter(
+    fmt="%(asctime)s - %(name)s:%(levelname)s - %(message)s", datefmt="[%x %X]"
+)
+_rich_log_formatter = logging.Formatter(fmt="%(message)s", datefmt="[%x %X]")
+_log_level_map = {"ERROR": 40, "WARNING": 30, "WARN": 30, "INFO": 20, "DEBUG": 10}
 
 
 class IncydrSettings(BaseSettings):
@@ -54,10 +49,10 @@ class IncydrSettings(BaseSettings):
     * **page_size**: `int` The default page size for all paginated requests. Defaults to 100. env_var=`INCYDR_PAGE_SIZE`
     * **max_response_history**: `int` The maximum number of responses the `incydr.Client.response_history` list will
         store. Defaults to 5. env_var=`INCYDR_MAX_RESPONSE_HISTORY`
-    * **logger**: `logging.Logger` The logger used for client logging. Can be replaced with a custom `logging.Logger` or
-        a `str` indicating the file to write log output to. Default logging goes to `sys.stderr`.
-        env_var=`INCYDR_LOGGER`
+    * **log_file**: `str` The file path or file-liek object to write log output to. Defaults to None.
     * **log_level**: `int` The level for logging messages. Defaults to `logging.WARNING`. env_var=`INCYDR_LOG_LEVEL`
+    * **logger**: `logging.Logger` The logger used for client logging. Can be replaced with a custom `logging.Logger`.
+        Default logging goes to `sys.stderr`.
     * **user_agent_prefix**: `str` Prefixes all `User-Agent` headers with the supplied string.
     * **use_rich**: `bool` Enables [rich](https://rich.readthedocs.io/en/stable/introduction.html) support in logging
         and the Python repl. Defaults to True. env_var=`INCYDR_USE_RICH`
@@ -66,15 +61,17 @@ class IncydrSettings(BaseSettings):
     api_client_id: str = Field(env="incydr_api_client_id")
     api_client_secret: SecretStr = Field(env="incydr_api_client_secret")
     url: str = Field(env="incydr_url")
-    page_size: int = Field(env="incydr_page_size", default=100)
-    max_response_history: int = Field(env="incydr_max_response_history", default=5)
-    logger: logging.Logger = Field(default=None, env="incydr_logger")
-    log_level: int = Field(
+    page_size: int = Field(default=100, env="incydr_page_size")
+    max_response_history: int = Field(default=5, env="incydr_max_response_history")
+    use_rich: bool = Field(default=True, env="incydr_use_rich")
+    log_stderr: bool = Field(default=True, env="incydr_log_stderr")
+    log_file: Union[str, IOBase] = Field(default=None, env="incydr_log_file")
+    log_level: Union[int, Literal["ERROR", "WARNING", "WARN", "INFO", "DEBUG"]] = Field(
         default=logging.WARNING,
         env="incydr_log_level",
     )
+    logger: logging.Logger = None
     user_agent_prefix: str = Field(default=None, env="incydr_user_agent_prefix")
-    use_rich: bool = Field(env="incydr_use_rich", default=True)
 
     def __init__(self, **kwargs):
         # clear any keys from kwargs that are passed as None, which forces lookup of values
@@ -89,18 +86,68 @@ class IncydrSettings(BaseSettings):
         env_file = str(Path.home() / ".config" / "incydr" / ".env")
         validate_assignment = True
 
-    @validator("logger", pre=True, always=True)
-    def validate_logger(cls, value, values, **kwargs):
-        if isinstance(value, str) or value is None:
-            return default_logger(filename=value)
-        assert isinstance(value, logging.Logger), f"{value} is not a logging.Logger"
+    @validator("log_level", "log_file", "use_rich", "log_stderr")
+    def validate_log_setting_changes(cls, value, values, field, **kwargs):
+        """whenever a log setting changes, reconfigure the logger for it to take effect"""
+
+        # translate string log_level > int
+        if field.name == "log_level" and not isinstance(value, int):
+            value = _log_level_map[value]
+
+        # if logger is None we haven't finished first initialization yet
+        if values.get("logger") is None:
+            return value
+        all_values = {field.name: value, **values}
+        values["logger"] = configure_logger(**all_values)
         return value
 
-    @validator("log_level", always=True)
-    def validate_log_level(cls, value, values, **kwargs):
-        logger = values.get("logger")
-        assert isinstance(
-            logger, logging.Logger
-        ), f"settings.logger is not a logging.Logger"
-        logger.setLevel(value)
-        return logger.getEffectiveLevel()
+    @validator("logger")
+    def validate_logger(cls, value, values, **kwargs):
+        if value is None:
+            return configure_logger(**values)
+        if not isinstance(value, logging.Logger):
+            raise ValueError(f"{value} is not a logging.Logger")
+        return value
+
+
+def configure_logger(
+    log_file: str,
+    use_rich: bool,
+    log_level: int,
+    log_stderr: bool,
+    **kwargs,
+):
+    logger = logging.getLogger("incydr")
+    logger.handlers.clear()
+
+    if log_stderr and use_rich:
+        console = Console(stderr=True)
+        rich_handler = RichHandler(console=console, rich_tracebacks=True)
+        rich_handler.setFormatter(_rich_log_formatter)
+        logger.addHandler(rich_handler)
+
+    if log_stderr and not use_rich:
+        std_handler = logging.StreamHandler()
+        std_handler.setFormatter(_std_log_formatter)
+        logger.addHandler(std_handler)
+
+    if log_file and use_rich:
+        if isinstance(log_file, str):
+            file = open(log_file, "a", encoding="utf-8")
+        else:
+            file = log_file
+        console = Console(file=file, no_color=True, width=200)
+        rich_file_handler = RichHandler(console=console, rich_tracebacks=True)
+        rich_file_handler.setFormatter(_rich_log_formatter)
+        logger.addHandler(rich_file_handler)
+
+    if log_file and not use_rich:
+        if isinstance(log_file, str):
+            std_file_handler = logging.FileHandler(filename=log_file, encoding="utf-8")
+        else:
+            std_file_handler = logging.StreamHandler(stream=log_file)
+        std_file_handler.setFormatter(_std_log_formatter)
+        logger.addHandler(std_file_handler)
+
+    logger.setLevel(log_level)
+    return logger
