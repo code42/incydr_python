@@ -1,16 +1,19 @@
 import logging
-from pathlib import Path
+import sys
 from io import IOBase
+from pathlib import Path
+from typing import Literal
+from typing import Union
 
+import rich
 from pydantic import BaseSettings
 from pydantic import Field
 from pydantic import SecretStr
 from pydantic import validator
-from rich.logging import RichHandler
 from rich.console import Console
-from typing import Union
-from typing import Literal
+from rich.logging import RichHandler
 
+_sys_displayhook = sys.displayhook
 _std_log_formatter = logging.Formatter(
     fmt="%(asctime)s - %(name)s:%(levelname)s - %(message)s", datefmt="[%x %X]"
 )
@@ -93,6 +96,12 @@ class IncydrSettings(BaseSettings):
         # translate string log_level > int
         if field.name == "log_level" and not isinstance(value, int):
             value = _log_level_map[value]
+
+        if field.name == "use_rich":
+            if value:
+                rich.pretty.install(max_length=2)
+            else:
+                sys.displayhook = _sys_displayhook
 
         # if logger is None we haven't finished first initialization yet
         if values.get("logger") is None:

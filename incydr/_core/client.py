@@ -46,11 +46,6 @@ class Client:
         self._settings = IncydrSettings(
             url=url, api_client_id=api_client_id, api_client_secret=api_client_secret
         )
-        if self._settings.use_rich:
-            from rich import pretty
-
-            pretty.install()
-
         self._request_history = deque(maxlen=self._settings.max_response_history)
 
         self._session = BaseUrlSession(base_url=self._settings.url)
