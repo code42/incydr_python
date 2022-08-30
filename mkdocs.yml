@@ -34,6 +34,7 @@ nav:
   - Cases: 'cases.md'
   - Customer: 'customer.md'
   - Devices: 'devices.md'
+  - Users: 'users.md'
   - Models: 'models.md'
 
 markdown_extensions:
