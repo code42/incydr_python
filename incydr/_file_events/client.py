@@ -38,7 +38,8 @@ class FileEventsV2:
 
         **Parameters**:
 
-        * **query**: `EventQuery`, `SavedSearch` (required) - The query object to filter file events by different fields.
+        * **query**: `EventQuery | SavedSearch | str` (required) - The query object to filter file events by
+        different fields.
 
         **Returns**: A [`FileEventsPage`][fileeventspage-model] object.
         """
@@ -60,7 +61,7 @@ class FileEventsV2:
         """
         Get all saved searches.
 
-        **Returns**: A [`SavedSearchesPage`] object.
+        **Returns**: A [`SavedSearchesPage`][savedsearchespage-model] object.
         """
         response = self._parent.session.get("/v2/file-events/saved-searches")
         return SavedSearchesPage.parse_response(response)
@@ -73,7 +74,7 @@ class FileEventsV2:
 
         * **search_id**: `str` - The unique ID of the saved search.
 
-        **Returns**: A [`SavedSearch`] object.
+        **Returns**: A [`SavedSearch`][savedsearch-model] object.
         """
         response = self._parent.session.get(
             f"/v2/file-events/saved-searches/{search_id}"
@@ -86,7 +87,7 @@ class FileEventsV2:
 
     def execute_saved_search(self, search_id: str) -> FileEventsPage:
         """
-        Search file events using a saved search.  A helper method which behaved the same as retrieving
+        Search file events using a saved search. A helper method which behaves the same as retrieving
         a saved search with the `get_saved_search_by_id()` and then passing the returned response object
         to the `search()` method.
 
