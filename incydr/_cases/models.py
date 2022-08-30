@@ -46,9 +46,7 @@ class Case(ResponseModel):
     * **assignee_username**: `str | None` The username of the administrator assigned to investigate the case. json_alias=`assigneeUsername`
     * **created_by_user_id**: `str | None` User UID of the user who created the case. json_alias=`createdByUserUid`
     * **created_by_username**: `str | None` Username of the user who created the case. json_alias=`createdByUsername`
-    )
     * **last_modified_by_user_id**: `str | None` User UID of the user who last modified the case. json_alias=`lastModifiedByUserUid`
-    )
     * **last_modified_by_username**: `str | None` Username of the user who last modified the case. json_alias=`lastModifiedByUsername`
     """
 

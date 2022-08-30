@@ -89,9 +89,9 @@ class Client:
         self._session.hooks["response"] = [response_hook]
 
         self._cases = CasesClient(self)
-        self._customer = CustomerClient(self.session)
+        self._customer = CustomerClient(self)
         self._file_events = FileEventsClient(self)
-        self._devices = DevicesClient(self.session)
+        self._devices = DevicesClient(self)
 
         self._session.auth.refresh()
 
