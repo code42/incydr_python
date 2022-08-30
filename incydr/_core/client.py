@@ -164,3 +164,17 @@ class Client:
 
         """
         return self._devices
+
+    @property
+    def file_events(self):
+        """
+        Property returning a [`FileEventsClient`](../file_events) for interacting with `/v*/file-events` API endpoints.
+        Usage:
+
+            >>> from incydr import EventQuery
+            >>> query = EventQuery(start_date='P30D').equals('file.category', 'Document')
+
+            >>> client.file_events.v2.search(query)
+
+        """
+        return self._file_events

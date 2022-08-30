@@ -33,6 +33,8 @@ nav:
   - Settings: 'settings.md'
   - Cases: 'cases.md'
   - Customer: 'customer.md'
+  - File Events: 'file_events.md'
+  - File Event Queries: 'file_event_queries.md'
   - Devices: 'devices.md'
   - Models: 'models.md'
 

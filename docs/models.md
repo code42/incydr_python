@@ -36,6 +36,29 @@ available model methods.
 ::: incydr.models.Customer
     :docstring:
 
+## File Events
+---
+
+### `FileEvent` model
+
+::: incydr.models.FileEventV2
+    :docstring:
+
+### `FileEventsPage` model
+
+::: incydr.models.FileEventsPage
+    :docstring:
+
+### `SavedSearch` model
+
+::: incydr.models.SavedSearch
+    :docstring:
+
+### `SavedSearchesPage` model
+
+::: incydr.models.SavedSearchesPage
+    :docstring:
+
 ## Devices
 ---
 
