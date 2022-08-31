@@ -12,6 +12,7 @@ from incydr._core.settings import IncydrSettings
 from incydr._customer.client import CustomerClient
 from incydr._devices.client import DevicesClient
 from incydr._file_events.client import FileEventsClient
+from incydr._users.client import UsersClient
 
 _base_user_agent = user_agent("incydr", __version__)
 
@@ -80,6 +81,7 @@ class Client:
         self._customer = CustomerClient(self)
         self._file_events = FileEventsClient(self)
         self._devices = DevicesClient(self)
+        self._users = UsersClient(self)
 
         self._session.auth.refresh()
 
@@ -152,3 +154,14 @@ class Client:
 
         """
         return self._devices
+
+    @property
+    def users(self):
+        """
+        Property returning a [`UsersClient`](../users) for interacting with `/v*/users` API endpoints.
+        Usage:
+
+            >>> client.users.v1.get_page(active=True)
+
+        """
+        return self._users
