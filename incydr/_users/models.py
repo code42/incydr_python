@@ -191,8 +191,8 @@ class UpdateRolesRequest(BaseModel):
 
 
 class UpdateRolesResponse(ResponseModel):
-    processed_roles: Optional[List[str]] = Field(
-        alias="processedRoles",
+    processed_replacement_role_ids: Optional[List[str]] = Field(
+        alias="processedReplacementRoleIds",
         description="The role IDs processed.",
         allow_mutation=False,
     )

@@ -141,7 +141,10 @@ TEST_USER_1_ROLE_2 = {
 }
 
 TEST_USER_ROLE_UPDATE = {
-    "processedRoles": ["processedRole-1", "processedRole-2"],
+    "processedReplacementRoleIds": [
+        "processedReplacementRoleIds-1",
+        "processedReplacementRoleIds-2",
+    ],
     "newlyAssignedRoles": ["newlyAssignedRoles-1", "newlyAssignedRoles-2"],
     "unassignedRoles": ["unassignedRoles-1", "unassignedRoles-2"],
     "ignoredRoles": ["ignoredRoles-1", "ignoredRoles-2"],

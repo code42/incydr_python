@@ -179,18 +179,18 @@ class UsersV1:
         )
         return UpdateRolesResponse.parse_response(response)
 
-    def move(self, user_id: str, org_id: str) -> Response:
+    def move(self, user_id: str, org_guid: str) -> Response:
         """
         Move a user to a specified organization
 
         **Parameters**:
 
         * **user_id**: `str` - The unique ID for the user.
-        * **org_id**: `str` The orgID of the org to move the user to."
+        * **org_guid**: `str` The orgGuid of the org to move the user to."
 
         **Returns**: A `requests.Response` indicating success.
         """
-        data = MoveUserRequest(orgId=org_id)
+        data = MoveUserRequest(orgGuid=org_guid)
 
         return self._parent.session.post(f"/v1/users/{user_id}/move", json=data.dict())
 
