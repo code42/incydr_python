@@ -22,7 +22,7 @@ class User(ResponseModel):
     * **first_name**: `str` - The first (given) name of the user.
     * **last_name**: `str` - The last (family) name of the user.
     * **legacy_org_id**: `str` - The org ID to use for older console-based APIs that require an org Id. If your endpoint domain starts with "console" instead of "api", use this Id for endpoints that require an orgId.
-    * **org_id**: `str` - The globally unique ID of the Code42 organization this user belongs to.
+    * **org_id**: `str` - The ID of the Code42 organization this user belongs to.
     * **org_guid**: `str` - The unique org ID of the Code42 organization this user belongs to. This value should be used for actions conducted through the org APIs.
     * **org_name**: `str` - The name of the Code42 organization this user belongs to.
     * **notes**: `str` - Descriptive information about the user.
@@ -68,7 +68,7 @@ class User(ResponseModel):
     )
     org_id: Optional[str] = Field(
         alias="orgId",
-        description="The globally unique ID of the Code42 organization this user belongs to.",
+        description="The ID of the Code42 organization this user belongs to.",
         allow_mutation=False,
     )
     org_guid: Optional[str] = Field(
