@@ -13,7 +13,10 @@ from pydantic import validator
 from rich.console import Console
 from rich.logging import RichHandler
 
+# capture default displayhook so we can "uninstall" rich
 _sys_displayhook = sys.displayhook
+
+
 _std_log_formatter = logging.Formatter(
     fmt="%(asctime)s - %(name)s:%(levelname)s - %(message)s", datefmt="[%x %X]"
 )
