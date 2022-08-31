@@ -1,4 +1,6 @@
 import logging
+import re
+import sys
 
 import pytest
 from incydr import Client
@@ -59,10 +61,48 @@ class TestRich:
             assert not isinstance(handler, RichHandler)
 
     def test_modifying_use_rich_setting_affects_logging(
-        self, httpserver_auth: HTTPServer, capsys, caplog
+        self, httpserver_auth: HTTPServer, capsys
     ):
         client = Client()
+
         client.settings.use_rich = False
-        client.settings.logger.warning("Should not match Rich format.")
+        client.settings.logger.warning("Log should not match Rich format.")
         captured = capsys.readouterr()
-        assert captured.err == ""  #
+        match = re.search(
+            r"]\s+-\s+incydr:WARNING\s+-\s+Log should not match Rich format.$",
+            captured.err,
+        )
+        assert match is not None
+
+        client.settings.use_rich = True
+        client.settings.logger.warning("Log should match Rich format.")
+        captured = capsys.readouterr()
+        current_file = __file__.split('/')[-1]
+        match = re.search(
+            rf"]\s+WARNING\s+Log should match Rich format.\s+{current_file}:\d+$",
+            captured.err,
+        )
+        assert match is not None
+
+    def test_modifying_use_rich_setting_affects_console_repr(
+        self, httpserver_auth: HTTPServer, capsys
+    ):
+        # the rich.pretty.install() function replaces sys.displayhook, which is used to print objects in a python
+        # console. The rich version looks for __rich_repr__ method on objects to help with pretty printing, so we can
+        # check to see if that output is printed to determine if rich is active or not
+        class TestRepr:
+            def __rich_repr__(self):
+                yield "<rich>"
+
+        class_with_rich_repr = TestRepr()
+        client = Client()
+
+        client.settings.use_rich = False
+        sys.displayhook(class_with_rich_repr)
+        captured = capsys.readouterr()
+        assert ".TestRepr object at" in captured.out
+
+        client.settings.use_rich = True
+        sys.displayhook(class_with_rich_repr)
+        captured = capsys.readouterr()
+        assert "TestRepr('<rich>')" in captured.out
