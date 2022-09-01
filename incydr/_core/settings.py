@@ -16,6 +16,8 @@ from rich.logging import RichHandler
 
 from incydr.enums import _Enum
 
+_incydr_console = Console(stderr=True)
+
 
 class LogLevel(_Enum):
     ERROR = "ERROR"
@@ -70,8 +72,9 @@ class IncydrSettings(BaseSettings):
         store. Defaults to 5. env_var=`INCYDR_MAX_RESPONSE_HISTORY`
     * **log_file**: `str` The file path or file-liek object to write log output to. Defaults to None.
     * **log_level**: `int` The level for logging messages. Defaults to `logging.WARNING`. env_var=`INCYDR_LOG_LEVEL`
-    * **logger**: `logging.Logger` The logger used for client logging. Can be replaced with a custom `logging.Logger`.
-        Default logging goes to `sys.stderr`.
+    * **logger**: `logging.Logger` The logger used for client logging. Cannot be defined via environment variable. Can
+        be replaced with a custom `logging.Logger`. If a custom `Logger` is supplied, the other log settings will have
+        no effect and must be configured manually on the custom logger.
     * **user_agent_prefix**: `str` Prefixes all `User-Agent` headers with the supplied string.
     * **use_rich**: `bool` Enables [rich](https://rich.readthedocs.io/en/stable/introduction.html) support in logging
         and the Python repl. Defaults to True. env_var=`INCYDR_USE_RICH`
@@ -166,8 +169,7 @@ class IncydrSettings(BaseSettings):
         logger.handlers.clear()
 
         if log_stderr and use_rich:
-            console = Console(stderr=True)
-            rich_handler = RichHandler(console=console, rich_tracebacks=True)
+            rich_handler = RichHandler(console=_incydr_console, rich_tracebacks=True)
             rich_handler.setFormatter(_rich_log_formatter)
             logger.addHandler(rich_handler)
 

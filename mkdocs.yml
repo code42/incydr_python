@@ -30,7 +30,9 @@ edit_uri: ""
 nav:
   - Introduction: 'index.md'
   - Client: 'client.md'
-  - Settings: 'settings.md'
+  - Settings:
+    - Configuration: 'settings.md'
+    - Logging: 'logging.md'
   - Cases: 'cases.md'
   - Customer: 'customer.md'
   - File Events: 'file_events.md'

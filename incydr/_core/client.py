@@ -64,24 +64,11 @@ class Client:
         )
 
         def response_hook(response, *args, **kwargs):
-            if self._settings.log_level < logging.INFO:
-                try:
-                    dumped = dump_response(
-                        response, request_prefix=b"", response_prefix=b""
-                    ).decode("utf-8")
-                    dumped = re.sub(
-                        _auth_header_regex,
-                        "Authorization: <token_redacted>",
-                        dumped,
-                    )
-                    if not self._settings.use_rich:
-                        dumped = indent(dumped, prefix="\t")
-                    self._settings.logger.debug(dumped)
-                except Exception as err:
-                    self._settings.logger.debug(
-                        f"Error dumping request/response info: {err}"
-                    )
-                    self._settings.logger.debug(response)
+            level = self._settings.log_level
+            if level == logging.INFO:
+                self._log_response_info(response)
+            if level == logging.DEBUG:
+                self._log_response_debug(response)
 
             self._request_history.appendleft(response)
             response.raise_for_status()
@@ -190,3 +177,25 @@ class Client:
 
         """
         return self._users
+
+    def _log_response_info(self, response):
+        self._settings.logger.info(
+            f"{response.request.method} {response.request.url} status_code={response.status_code}"
+        )
+
+    def _log_response_debug(self, response):
+        try:
+            dumped = dump_response(
+                response, request_prefix=b"", response_prefix=b""
+            ).decode("utf-8")
+            dumped = re.sub(
+                _auth_header_regex,
+                "Authorization: <token_redacted>",
+                dumped,
+            )
+            if not self._settings.use_rich:
+                dumped = indent(dumped, prefix="\t")
+            self._settings.logger.debug(dumped)
+        except Exception as err:
+            self._settings.logger.debug(f"Error dumping request/response info: {err}")
+            self._settings.logger.debug(response)
