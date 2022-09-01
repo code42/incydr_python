@@ -4,12 +4,13 @@ from io import IOBase
 from pathlib import Path
 from typing import Literal
 from typing import Union
+from warnings import warn
 
-import rich
 from pydantic import BaseSettings
 from pydantic import Field
 from pydantic import SecretStr
 from pydantic import validator
+from rich import pretty
 from rich.console import Console
 from rich.logging import RichHandler
 
@@ -21,7 +22,8 @@ _std_log_formatter = logging.Formatter(
     fmt="%(asctime)s - %(name)s:%(levelname)s - %(message)s", datefmt="[%x %X]"
 )
 _rich_log_formatter = logging.Formatter(fmt="%(message)s", datefmt="[%x %X]")
-_log_level_map = {"ERROR": 40, "WARNING": 30, "WARN": 30, "INFO": 20, "DEBUG": 10}
+
+_custom_log_warning = "Custom logger detected, '{}' setting on `incydr.Client` will not apply to custom logger."
 
 
 class IncydrSettings(BaseSettings):
@@ -71,7 +73,7 @@ class IncydrSettings(BaseSettings):
     max_response_history: int = Field(default=5, env="incydr_max_response_history")
     use_rich: bool = Field(default=True, env="incydr_use_rich")
     log_stderr: bool = Field(default=True, env="incydr_log_stderr")
-    log_file: Union[str, IOBase] = Field(default=None, env="incydr_log_file")
+    log_file: Union[str, Path, IOBase] = Field(default=None, env="incydr_log_file")
     log_level: Union[int, Literal["ERROR", "WARNING", "WARN", "INFO", "DEBUG"]] = Field(
         default=logging.WARNING,
         env="incydr_log_level",
@@ -91,39 +93,79 @@ class IncydrSettings(BaseSettings):
     class Config:
         env_file = str(Path.home() / ".config" / "incydr" / ".env")
         validate_assignment = True
+        custom_logger = False
 
-    @validator("log_level", "log_file", "use_rich", "log_stderr")
-    def validate_log_setting_changes(cls, value, values, field, **kwargs):
-        """whenever a log setting changes, reconfigure the logger for it to take effect"""
-
-        # translate string log_level > int
-        if field.name == "log_level" and not isinstance(value, int):
-            value = _log_level_map[value]
-
-        if field.name == "use_rich":
-            if value:
-                rich.pretty.install(max_length=2)
-            else:
-                sys.displayhook = _sys_displayhook
-
-        # if logger is None we haven't finished first initialization yet
+    @validator("log_level")
+    def _validate_log_level(cls, value, values, config, **kwargs):
         if values.get("logger") is None:
             return value
-        all_values = {field.name: value, **values}
-        values["logger"] = configure_logger(**all_values)
+        if config.custom_logger:
+            warn(_custom_log_warning.format("log_level"))
+            return value
+        else:
+            cls.logger = configure_logger(log_level=value, **values)
+            return cls.logger.getEffectiveLevel()
+
+    @validator("log_file")
+    def _validate_log_file(cls, value, values, config, **kwargs):
+        if isinstance(value, (str, Path)):
+            p = Path(value)
+            # existing file OK
+            if p.exists() and p.is_file():
+                value = str(p.absolute())
+            # new file in existing dir OK
+            elif not p.exists() and p.parent.is_dir():
+                value = str(p.absolute())
+            else:
+                raise ValueError(f"{value} is not a valid file path for logging.")
+        if values.get("logger") is None:
+            return value
+        if config.custom_logger:
+            warn(_custom_log_warning.format("log_file"))
+            return value
+        else:
+            cls.logger = configure_logger(log_file=value, **values)
+            return value
+
+    @validator("use_rich")
+    def _validate_use_rich(cls, value, values, config, **kwargs):
+        if value:
+            pretty.install(max_length=2)
+        else:
+            sys.displayhook = _sys_displayhook
+        if values.get("logger") is None:
+            return value
+        if config.custom_logger:
+            warn(_custom_log_warning.format("use_rich"))
+            return value
+        else:
+            cls.logger = configure_logger(use_rich=value, **values)
+            return value
+
+    @validator("log_stderr")
+    def _validate_log_stderr(cls, value, values, config, **kwargs):
+        if values.get("logger") is None:
+            return value
+        if config.custom_logger:
+            warn(_custom_log_warning.format("log_stderr"))
+            return value
+        else:
+            cls.logger = configure_logger(log_stderr=value, **values)
         return value
 
     @validator("logger")
-    def validate_logger(cls, value, values, **kwargs):
+    def _validate_logger(cls, value, values, **kwargs):
         if value is None:
             return configure_logger(**values)
+        if isinstance(value, logging.Logger):
+            cls.Config.custom_logger = True
         if not isinstance(value, logging.Logger):
             raise ValueError(f"{value} is not a logging.Logger")
         return value
 
 
 def configure_logger(
-    log_file: str,
+    log_file: Union[str, IOBase],
     use_rich: bool,
     log_level: int,
     log_stderr: bool,
