@@ -53,7 +53,7 @@ class TestLogLevels:
 class TestRich:
     @pytest.mark.parametrize("false_value", ["false", "False", "0"])
     def test_env_var_disables_rich(
-        httpserver_auth: HTTPServer, monkeypatch, capsys, false_value
+        self, httpserver_auth: HTTPServer, monkeypatch, capsys, false_value
     ):
         monkeypatch.setenv("incydr_use_rich", false_value)
         client = Client()

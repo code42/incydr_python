@@ -3,7 +3,6 @@ import sys
 import warnings
 from io import IOBase
 from pathlib import Path
-from typing import Literal
 from typing import Union
 
 from pydantic import BaseSettings
@@ -14,6 +13,17 @@ from pydantic import validator
 from rich import pretty
 from rich.console import Console
 from rich.logging import RichHandler
+
+from incydr.enums import _Enum
+
+
+class LogLevel(_Enum):
+    ERROR = "ERROR"
+    WARNING = "WARNING"
+    WARN = "WARN"
+    INFO = "INFO"
+    DEBUG = "DEBUG"
+
 
 # capture default displayhook so we can "uninstall" rich
 _sys_displayhook = sys.displayhook
@@ -75,7 +85,7 @@ class IncydrSettings(BaseSettings):
     use_rich: bool = Field(default=True, env="incydr_use_rich")
     log_stderr: bool = Field(default=True, env="incydr_log_stderr")
     log_file: Union[str, Path, IOBase] = Field(default=None, env="incydr_log_file")
-    log_level: Union[int, Literal["ERROR", "WARNING", "WARN", "INFO", "DEBUG"]] = Field(
+    log_level: Union[int, str] = Field(
         default=logging.WARNING,
         env="incydr_log_level",
     )
@@ -96,11 +106,13 @@ class IncydrSettings(BaseSettings):
         validate_assignment = True
         custom_logger = False
 
-    @validator("log_level")
+    @validator("log_level", pre=True, always=True)
     def _validate_log_level(cls, value, **kwargs):
         try:
             return int(value)
         except ValueError:
+            value = value.upper()
+            LogLevel(value)
             return _log_level_map[value]
 
     @validator("log_file")
@@ -137,7 +149,7 @@ class IncydrSettings(BaseSettings):
         else:
             raise ValueError(f"{value} is not a `logging.Logger`.")
 
-    @root_validator
+    @root_validator(skip_on_failure=True)
     def configure_logging(cls, values):
         use_rich = values["use_rich"]
         log_file = values["log_file"]
