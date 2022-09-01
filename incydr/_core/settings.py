@@ -96,18 +96,15 @@ class IncydrSettings(BaseSettings):
         custom_logger = False
 
     @validator("log_level")
-    def _validate_log_level(cls, value, values, config, **kwargs):
+    def _validate_log_level(cls, value, values, **kwargs):
         if values.get("logger") is None:
             return value
-        if config.custom_logger:
-            warn(_custom_log_warning.format("log_level"))
-            return value
         else:
-            cls.logger = configure_logger(log_level=value, **values)
+            cls.logger.setLevel(value)
             return cls.logger.getEffectiveLevel()
 
     @validator("log_file")
-    def _validate_log_file(cls, value, values, config, **kwargs):
+    def _validate_log_file(cls, value, values, **kwargs):
         if isinstance(value, (str, Path)):
             p = Path(value)
             # existing file OK
@@ -119,9 +116,6 @@ class IncydrSettings(BaseSettings):
             else:
                 raise ValueError(f"{value} is not a valid file path for logging.")
         if values.get("logger") is None:
-            return value
-        if config.custom_logger:
-            warn(_custom_log_warning.format("log_file"))
             return value
         else:
             cls.logger = configure_logger(log_file=value, **values)
