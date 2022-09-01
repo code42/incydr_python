@@ -27,19 +27,23 @@ The output from the above code snippets would look like this:
 ![Rich INFO Logging](./rich_logging.svg)
 
 
+### Disable logging to stderr
+
 To disable logging to stderr, you can:
 
 - Set `INCYDR_LOG_STDERR=false` in your environment
 - Initialize client with `log_stderr` argument set to False: `client = incydr.Client(log_stderr=False)`
 - Change the setting property after instantiation: `client.settings.log_stderr = False`
 
+
+### Disable Rich formatting
 To disable Rich formatting in your log output:
 
 - Set `INCYDR_USE_RICH=false` in your environment
 - Initialize client with `use_rich` argument set to False: `client = incydr.Client(use_rich=False)`
 - Change the setting property after instantiation: `client.settings.use_rich = False`
 
-## Log to a file
+### Log to a file
 
 To output logs to a file, set the `client.settings.log_file` property to any of the following:
     
