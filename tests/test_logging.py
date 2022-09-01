@@ -3,9 +3,10 @@ import re
 import sys
 
 import pytest
-from incydr import Client
-from rich.logging import RichHandler
 from pytest_httpserver import HTTPServer
+from rich.logging import RichHandler
+
+from incydr import Client
 
 
 class TestLogLevels:
@@ -50,7 +51,7 @@ class TestLogLevels:
 
 
 class TestRich:
-    @pytest.mark.parametrize("false_value", ["false", "False", 0])
+    @pytest.mark.parametrize("false_value", ["false", "False", "0"])
     def test_env_var_disables_rich(
         httpserver_auth: HTTPServer, monkeypatch, capsys, false_value
     ):
@@ -77,7 +78,7 @@ class TestRich:
         client.settings.use_rich = True
         client.settings.logger.warning("Log should match Rich format.")
         captured = capsys.readouterr()
-        current_file = __file__.split('/')[-1]
+        current_file = __file__.split("/")[-1]
         match = re.search(
             rf"]\s+WARNING\s+Log should match Rich format.\s+{current_file}:\d+$",
             captured.err,
@@ -106,3 +107,59 @@ class TestRich:
         sys.displayhook(class_with_rich_repr)
         captured = capsys.readouterr()
         assert "TestRepr('<rich>')" in captured.out
+
+
+class TestLoggers:
+    def test_setting_file_logger(self, tmp_path):
+        log_file_1 = tmp_path / "incydr_test.log"
+        log_file_2 = tmp_path / "incydr_test2.log"
+
+        client = Client(log_file=log_file_1)
+        client.settings.log_level = "INFO"
+        client.settings.logger.info("Should log to file 1.")
+        assert "Should log to file 1." in log_file_1.read_text()
+
+        client.settings.log_file = log_file_2
+        client.settings.logger.info("Should log to file 2.")
+        assert "Should log to file 2." not in log_file_1.read_text()
+        assert "Should log to file 2." in log_file_2.read_text()
+
+    def test_setting_log_file_and_stderr_env_vars(self, tmp_path, monkeypatch, capsys):
+        log_file = tmp_path / "test.log"
+        monkeypatch.setenv("incydr_log_file", str(log_file))
+        monkeypatch.setenv("incydr_log_stderr", "false")
+
+        client = Client()
+        client.settings.log_level = "INFO"
+        client.settings.logger.info("Should log to file.")
+        captured = capsys.readouterr()
+        assert captured.err == ""
+        assert "Should log to file." in log_file.read_text()
+
+    @pytest.mark.filterwarnings("ignore::UserWarning")
+    def test_setting_custom_logger(self, tmp_path):
+        test_logger = logging.getLogger("test_logger_1")
+        log_file = tmp_path / "log1.log"
+        handler = logging.FileHandler(filename=str(log_file.absolute()))
+        test_logger.addHandler(handler)
+
+        client = Client(logger=test_logger)
+        assert len(client.settings.logger.handlers) == 1
+        client.settings.logger.warning("Should go to log file.")
+        assert "Should go to log file." in log_file.read_text()
+        with pytest.warns(UserWarning):
+            client.settings.log_stderr = False
+        with pytest.warns(UserWarning):
+            client.settings.use_rich = False
+        with pytest.warns(UserWarning):
+            client.settings.log_file = "test"
+
+    def test_setting_stderr_logger(self, capsys):
+        client = Client(log_stderr=True, log_level="INFO")
+        client.settings.logger.info("Should log to stderr.")
+        captured = capsys.readouterr()
+        assert "Should log to stderr." in captured.err
+        client.settings.log_stderr = False
+        client.settings.logger.info("Should not log to stderr.")
+        captured = capsys.readouterr()
+        assert "Should not log to stderr." not in captured.err

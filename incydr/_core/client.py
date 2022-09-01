@@ -45,7 +45,10 @@ class Client:
         **settings_kwargs,
     ):
         self._settings = IncydrSettings(
-            url=url, api_client_id=api_client_id, api_client_secret=api_client_secret, **settings_kwargs
+            url=url,
+            api_client_id=api_client_id,
+            api_client_secret=api_client_secret,
+            **settings_kwargs,
         )
         self._request_history = deque(maxlen=self._settings.max_response_history)
 
