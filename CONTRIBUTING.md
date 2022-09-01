@@ -18,6 +18,7 @@ Examples of all the steps documented  here can be found in the existing clients.
 - Tests for the client should be added into the tests package within `/tests/test_client_name.py`.
   - Run tests with `hatch run test:cov`
 - Run the style linter with `hatch run style:check`
+- Serve docs locally with `hatch run docs:serve` 
 
 ## Documenting a client
 

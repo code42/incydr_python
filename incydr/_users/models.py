@@ -174,40 +174,41 @@ class Role(ResponseModel):
         validate_assignment = True
 
 
-class RolesPage(ResponseModel):
-    """
-    A model representing a list of `Role` objects.
-
-    **Fields**:
-
-    * **roles**: `List[Role]` - The list of roles retrieved from the query.
-    """
-
-    roles: Optional[List[Role]] = Field(description="A list of a user's current roles.")
-
-
 class UpdateRolesRequest(BaseModel):
     roleIds: Optional[List[str]]
 
 
 class UpdateRolesResponse(ResponseModel):
+    """
+    A model representing a user role.
+
+    **Fields**:
+
+    * **processed_replacement_role_ids**: `List[str]` - The role IDs processed.
+    * **newly_assigned_roles_ids**: `List[str]` - The role IDs newly assigned to the user.
+    * **unassigned_roles_ids**: `List[str]` - The role IDs unassigned from the user.
+    * **ignored_roles_ids**: `List[str]` - The role IDs ignored.
+    """
+
     processed_replacement_role_ids: Optional[List[str]] = Field(
         alias="processedReplacementRoleIds",
         description="The role IDs processed.",
         allow_mutation=False,
     )
-    newly_assigned_roles: Optional[List[str]] = Field(
-        alias="newlyAssignedRoles",
+    newly_assigned_roles_ids: Optional[List[str]] = Field(
+        alias="newlyAssignedRolesIds",
         description="The role IDs newly assigned to the user.",
         allow_mutation=False,
     )
-    unassigned_roles: Optional[List[str]] = Field(
-        alias="unassignedRoles",
+    unassigned_roles_ids: Optional[List[str]] = Field(
+        alias="unassignedRolesIds",
         description="The role IDs unassigned from the user.",
         allow_mutation=False,
     )
-    ignored_roles: Optional[List[str]] = Field(
-        alias="ignoredRoles", description="The role IDs ignored.", allow_mutation=False
+    ignored_roles_ids: Optional[List[str]] = Field(
+        alias="ignoredRolesIds",
+        description="The role IDs ignored.",
+        allow_mutation=False,
     )
 
     class Config:

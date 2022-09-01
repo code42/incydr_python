@@ -2,6 +2,7 @@ from itertools import count
 from typing import Iterator
 from typing import List
 
+from pydantic import parse_obj_as
 from requests import Response
 
 from incydr._devices.models import DevicesPage
@@ -9,7 +10,7 @@ from incydr._devices.models import QueryDevicesRequest
 from incydr._devices.models import SortKeys
 from incydr._users.models import MoveUserRequest
 from incydr._users.models import QueryUsersRequest
-from incydr._users.models import RolesPage
+from incydr._users.models import Role
 from incydr._users.models import UpdateRolesRequest
 from incydr._users.models import UpdateRolesResponse
 from incydr._users.models import User
@@ -149,7 +150,7 @@ class UsersV1:
     def get_roles(
         self,
         user_id: str,
-    ) -> RolesPage:
+    ) -> List[Role]:
         """
         Get a list of roles associated with a specific user.
 
@@ -157,10 +158,10 @@ class UsersV1:
 
         * **user_id**: `str` (required) - The unique ID for the user.
 
-        **Returns**: A ['RolesPage'][roleslist-model] object.
+        **Returns**: A list of ['Role'][role-model] objects.
         """
         response = self._parent.session.get(f"/v1/users/{user_id}/roles")
-        return RolesPage.parse_response(response)
+        return parse_obj_as(List[Role], response.json()["roles"])
 
     def update_roles(self, user_id: str, role_ids: List[str]) -> UpdateRolesResponse:
         """

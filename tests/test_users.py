@@ -7,7 +7,7 @@ from pytest_httpserver import HTTPServer
 from incydr import Client
 from incydr._devices.models import DevicesPage
 from incydr._devices.models import SortKeys
-from incydr._users.models import RolesPage
+from incydr._users.models import Role
 from incydr._users.models import UpdateRolesResponse
 from incydr._users.models import User
 from incydr._users.models import UsersPage
@@ -145,9 +145,9 @@ TEST_USER_ROLE_UPDATE = {
         "processedReplacementRoleIds-1",
         "processedReplacementRoleIds-2",
     ],
-    "newlyAssignedRoles": ["newlyAssignedRoles-1", "newlyAssignedRoles-2"],
-    "unassignedRoles": ["unassignedRoles-1", "unassignedRoles-2"],
-    "ignoredRoles": ["ignoredRoles-1", "ignoredRoles-2"],
+    "newlyAssignedRolesIds": ["newlyAssignedRolesIds-1", "newlyAssignedRolesIds-2"],
+    "unassignedRolesIds": ["unassignedRolesIds-1", "unassignedRolesIds-2"],
+    "ignoredRolesIds": ["ignoredRolesIds-1", "ignoredRolesIds-2"],
 }
 
 
@@ -331,10 +331,12 @@ def test_get_roles_returns_expected_data(
     ).respond_with_json(roles_data)
 
     client = Client()
-    page = client.users.v1.get_roles(user_id="user-1")
-    assert isinstance(page, RolesPage)
-    assert page.roles[0].json() == json.dumps(TEST_USER_1_ROLE_1)
-    assert page.roles[1].json() == json.dumps(TEST_USER_1_ROLE_2)
+    listOfRoles = client.users.v1.get_roles(user_id="user-1")
+    assert isinstance(listOfRoles, list)
+    assert isinstance(listOfRoles[0], Role)
+    assert isinstance(listOfRoles[1], Role)
+    assert listOfRoles[0].json() == json.dumps(TEST_USER_1_ROLE_1)
+    assert listOfRoles[1].json() == json.dumps(TEST_USER_1_ROLE_2)
 
 
 def test_update_roles_returns_expected_data(
@@ -348,7 +350,8 @@ def test_update_roles_returns_expected_data(
 
     client = Client()
     response = client.users.v1.update_roles(
-        user_id="user-1", role_ids=["newlyAssignedRoles-1", "newlyAssignedRoles-2"]
+        user_id="user-1",
+        role_ids=["newlyAssignedRolesIds-1", "newlyAssignedRolesIds-2"],
     )
     assert isinstance(response, UpdateRolesResponse)
     assert response.json() == json.dumps(TEST_USER_ROLE_UPDATE)
