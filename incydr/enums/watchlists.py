@@ -1,7 +1,7 @@
-from incydr.enums import Enum
+from incydr.enums import _Enum
 
 
-class WatchlistType(Enum):
+class WatchlistType(_Enum):
     WATCHLIST_TYPE_UNSPECIFIED = "WATCHLIST_TYPE_UNSPECIFIED"
     CONTRACT_EMPLOYEE = "CONTRACT_EMPLOYEE"
     DEPARTING_EMPLOYEE = "DEPARTING_EMPLOYEE"

@@ -10,7 +10,9 @@ from incydr._cases.client import CasesClient
 from incydr._core.auth import APIClientAuth
 from incydr._core.settings import IncydrSettings
 from incydr._customer.client import CustomerClient
+from incydr._departments.client import DepartmentsClient
 from incydr._devices.client import DevicesClient
+from incydr._directory_groups.client import DirectoryGroupsClient
 from incydr._file_events.client import FileEventsClient
 from incydr._users.client import UsersClient
 from incydr._watchlists.client import WatchlistsClient
@@ -80,10 +82,12 @@ class Client:
 
         self._cases = CasesClient(self)
         self._customer = CustomerClient(self)
-        self._file_events = FileEventsClient(self)
+        self._departments = DepartmentsClient(self)
         self._devices = DevicesClient(self)
-        self._watchlists = WatchlistsClient(self)
+        self._directory_groups = DirectoryGroupsClient(self)
+        self._file_events = FileEventsClient(self)
         self._users = UsersClient(self)
+        self._watchlists = WatchlistsClient(self)
 
         self._session.auth.refresh()
 
@@ -147,6 +151,17 @@ class Client:
         return self._customer
 
     @property
+    def departments(self):
+        """
+        Property returning a [`DepartmentsClient`](../departments) for interacting with `/v*/departments` API endpoints.
+        Usage:
+
+            >>> client.departments.v1.get_page()
+
+        """
+        return self._departments
+
+    @property
     def devices(self):
         """
         Property returning a [`DevicesClient`](../devices) for interacting with `/v*/devices` API endpoints.
@@ -156,6 +171,17 @@ class Client:
 
         """
         return self._devices
+
+    @property
+    def directory_groups(self):
+        """
+        Property returning a [`DirectoryGroupsClient`](../directory_groups) for interacting with `/v*/directory-groups` API endpoints.
+        Usage:
+
+            >>> client.directory_groups.v1.get_page()
+
+        """
+        return self._directory_groups
 
     @property
     def file_events(self):

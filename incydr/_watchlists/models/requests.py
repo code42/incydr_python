@@ -69,9 +69,3 @@ class UpdateWatchlistRequest(BaseModel):
         description="The updated title for a custom watchlist.",
         example="My Custom List",
     )
-
-
-class GetPageRequest(BaseModel):
-    page: int = (1,)
-    page_size: int = (None,)
-    name: str = None

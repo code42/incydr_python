@@ -2,15 +2,12 @@ from typing import List
 from typing import Union
 
 from incydr._watchlists.models.requests import CreateWatchlistRequest
-from incydr._watchlists.models.requests import GetPageRequest
 from incydr._watchlists.models.requests import ListWatchlistsRequest
 from incydr._watchlists.models.requests import UpdateExcludedUsersRequest
 from incydr._watchlists.models.requests import UpdateIncludedDepartmentsRequest
 from incydr._watchlists.models.requests import UpdateIncludedDirectoryGroupsRequest
 from incydr._watchlists.models.requests import UpdateIncludedUsersRequest
 from incydr._watchlists.models.requests import UpdateWatchlistRequest
-from incydr._watchlists.models.responses import DepartmentsPage
-from incydr._watchlists.models.responses import DirectoryGroupsPage
 from incydr._watchlists.models.responses import ExcludedUser
 from incydr._watchlists.models.responses import ExcludedUsersList
 from incydr._watchlists.models.responses import IncludedDepartment
@@ -486,55 +483,6 @@ class WatchlistsV1:
             f"{self._uri}/{watchlist_id}/included-departments/{department}"
         )
         return IncludedDepartment.parse_response(response)
-
-    # TODO: do we want departments page and directory-groups page methods in the watchlists client?
-
-    def get_departments_page(
-        self, page_num: int = 1, page_size=None, name=None
-    ) -> DepartmentsPage:
-        """
-        Get a page of departments.  Retrieves department information that has been pushed to Code42 from SCIM or User Directory Sync.
-        The resulting department names can be used to include departments on watchlists.
-
-        **Parameters**:
-
-        * **page_num**: `int` - Page number for results, starting at 1.
-        * **page_size**: `int` - Max number of results to return for a page.
-        * **user_id**: `str` - Matches departments whose name is like the given value.
-
-        **Returns**: A [`DepartmentsPage`] object.
-        """
-        data = GetPageRequest(
-            page=page_num,
-            page_size=page_size or self._parent.settings.page_size,
-            name=name,
-        )
-        response = self._parent.session.get("/v1/departments", params=data.dict())
-        return DepartmentsPage.parse_response(response)
-
-    def get_directory_groups_page(
-        self, page_num: int = 1, page_size=None, name=None
-    ) -> DirectoryGroupsPage:
-        """
-        Get a page of directory groups. Retrieves directory group information that has been pushed to Code42 from SCIM or User Directory Sync.
-        The resulting group IDs can be used to include directory groups on watchlists.
-
-        **Parameters**:
-
-        * **page_num**: `int` - Page number for results, starting at 1.
-        * **page_size**: `int` - Max number of results to return for a page.
-        * **user_id**: `str` - Matches directory groups whose name is like the given value.
-
-        **Returns**: A [`DirectoryGroupsPage`] object.
-        """
-
-        data = GetPageRequest(
-            page=page_num,
-            page_size=page_size or self._parent.settings.page_size,
-            name=name,
-        )
-        response = self._parent.session.get("/v1/directory-groups", params=data.dict())
-        return DirectoryGroupsPage.parse_response(response)
 
     # TODO: Do we want to allow people to pass watchlist types instead of IDs? If yes - in what cases?
 

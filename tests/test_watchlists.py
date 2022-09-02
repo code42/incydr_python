@@ -6,8 +6,6 @@ import pytest
 from pytest_httpserver import HTTPServer
 
 from incydr._core.client import Client
-from incydr._watchlists.models.responses import DepartmentsPage
-from incydr._watchlists.models.responses import DirectoryGroupsPage
 from incydr._watchlists.models.responses import ExcludedUser
 from incydr._watchlists.models.responses import ExcludedUsersList
 from incydr._watchlists.models.responses import IncludedDepartment
@@ -510,90 +508,3 @@ def test_get_included_department_returns_expected_data(httpserver_auth: HTTPServ
 #     ).respond_with_json(TEST_WATCHLIST_1)
 #     c = Client()
 #     assert c.watchlists.v1._check_watchlist_id(watchlist_type) == "1-watchlist-42"
-
-
-def test_get_departments_page_when_default_params_returns_expected_data(
-    httpserver_auth: HTTPServer,
-):
-    data = {"departments": ["Engineering", "Marketing"], "totalCount": 2}
-    httpserver_auth.expect_request(
-        "/v1/departments", query_string=urlencode({"page": 1, "page_size": 100})
-    ).respond_with_json(data)
-
-    c = Client()
-    page = c.watchlists.v1.get_departments_page()
-    assert isinstance(page, DepartmentsPage)
-    assert page.departments[0] == "Engineering"
-    assert page.departments[1] == "Marketing"
-    assert page.total_count == len(page.departments) == 2
-
-
-def test_get_departments_page_when_custom_params_returns_expected_data(
-    httpserver_auth: HTTPServer,
-):
-    data = {"departments": ["Marketing"], "totalCount": 1}
-    query = {"page": 1, "page_size": 2, "name": "Marketing"}
-    httpserver_auth.expect_request(
-        "/v1/departments", query_string=urlencode(query)
-    ).respond_with_json(data)
-
-    c = Client()
-    page = c.watchlists.v1.get_departments_page(
-        page_num=1, page_size=2, name="Marketing"
-    )
-    assert isinstance(page, DepartmentsPage)
-    assert page.departments[0] == "Marketing"
-    assert page.total_count == len(page.departments) == 1
-
-
-def test_get_directory_groups_page_when_default_params_returns_expected_data(
-    httpserver_auth: HTTPServer,
-):
-    data = {
-        "directory_groups": [
-            {"groupId": "group-42", "name": "Sales"},
-            {"groupId": "group-43", "name": "Research and Development"},
-        ],
-        "totalCount": 2,
-    }
-    httpserver_auth.expect_request(
-        "/v1/directory-groups", query_string=urlencode({"page": 1, "page_size": 100})
-    ).respond_with_json(data)
-
-    c = Client()
-    page = c.watchlists.v1.get_directory_groups_page()
-    assert isinstance(page, DirectoryGroupsPage)
-    assert page.directory_groups[0].json() == json.dumps(
-        {"groupId": "group-42", "name": "Sales"}
-    )
-    assert page.directory_groups[1].json() == json.dumps(
-        {"groupId": "group-43", "name": "Research and Development"}
-    )
-    assert page.total_count == len(page.directory_groups) == 2
-
-
-def test_get_directory_groups_page_when_custom_params_returns_expected_data(
-    httpserver_auth: HTTPServer,
-):
-    data = {
-        "directory_groups": [
-            {"groupId": "group-42", "name": "Sales"},
-        ],
-        "totalCount": 1,
-    }
-
-    query = {"page": 1, "page_size": 2, "name": "Sales"}
-
-    httpserver_auth.expect_request(
-        "/v1/directory-groups", query_string=urlencode(query)
-    ).respond_with_json(data)
-
-    c = Client()
-    page = c.watchlists.v1.get_directory_groups_page(
-        page_num=1, page_size=2, name="Sales"
-    )
-    assert isinstance(page, DirectoryGroupsPage)
-    assert page.directory_groups[0].json() == json.dumps(
-        {"groupId": "group-42", "name": "Sales"}
-    )
-    assert page.total_count == len(page.directory_groups) == 1
