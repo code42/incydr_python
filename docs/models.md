@@ -71,3 +71,28 @@ available model methods.
 ### `SavedSearchesPage` model
 
 ::: incydr.models.SavedSearchesPage
+## Roles
+---
+
+### `Role` model
+
+::: incydr.models.Role
+    :docstring:
+
+### `UpdateRolesResponse` model
+
+::: incydr.models.UpdateRolesResponse
+    :docstring:
+
+## Users
+---
+
+### `User` model
+
+::: incydr.models.User
+    :docstring:
+
+### `UsersPage` model
+
+::: incydr.models.UsersPage
+    :docstring:

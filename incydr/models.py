@@ -7,6 +7,10 @@ from incydr._file_events.models.event import FileEventV2
 from incydr._file_events.models.response import FileEventsPage
 from incydr._file_events.models.response import SavedSearch
 from incydr._file_events.models.response import SavedSearchesPage
+from incydr._users.models import Role
+from incydr._users.models import UpdateRolesResponse
+from incydr._users.models import User
+from incydr._users.models import UsersPage
 
 __all__ = [
     "Case",
@@ -18,6 +22,10 @@ __all__ = [
     "SavedSearch",
     "FileEventsPage",
     "FileEventV2",
+    "User",
+    "UsersPage",
+    "Role",
+    "UpdateRolesResponse",
 ]
 
 
