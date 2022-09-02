@@ -16,7 +16,12 @@ from rich.logging import RichHandler
 
 from incydr.enums import _Enum
 
+# capture default displayhook so we can "uninstall" rich
+_sys_displayhook = sys.displayhook
 _incydr_console = Console(stderr=True)
+
+
+_log_level_map = {"ERROR": 40, "WARNING": 30, "WARN": 30, "INFO": 20, "DEBUG": 10}
 
 
 class LogLevel(_Enum):
@@ -27,16 +32,10 @@ class LogLevel(_Enum):
     DEBUG = "DEBUG"
 
 
-# capture default displayhook so we can "uninstall" rich
-_sys_displayhook = sys.displayhook
-
-
 _std_log_formatter = logging.Formatter(
     fmt="%(asctime)s - %(name)s:%(levelname)s - %(message)s", datefmt="[%x %X]"
 )
 _rich_log_formatter = logging.Formatter(fmt="%(message)s", datefmt="[%x %X]")
-_log_level_map = {"ERROR": 40, "WARNING": 30, "WARN": 30, "INFO": 20, "DEBUG": 10}
-_custom_log_warning = "Custom logger detected, '{}' setting on `incydr.Client` will not apply to custom logger."
 
 
 class IncydrSettings(BaseSettings):
