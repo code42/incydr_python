@@ -306,7 +306,7 @@ TEST_SAVED_SEARCH_1 = SavedSearch(
         SearchFilterGroup(
             filterClause="AND",
             filters=[
-                SearchFilter(operator="IS", term="file.category", value="SourceCode")
+                SearchFilter(operator="IS", term="file.category", value="SOURCE_CODE")
             ],
         ),
     ],
@@ -403,11 +403,52 @@ TEST_DICT_QUERY = {
     "srtKey": "event.id",
 }
 
+TEST_SAVED_SEARCH_QUERY = {
+    "groupClause": "AND",
+    "groups": [
+        {
+            "filterClause": "AND",
+            "filters": [
+                {"term": "@timestamp", "operator": "WITHIN_THE_LAST", "value": "P14D"}
+            ],
+        },
+        {
+            "filterClause": "OR",
+            "filters": [
+                {"term": "user.email", "operator": "IS", "value": "test@code42.com"},
+                {
+                    "term": "user.email",
+                    "operator": "IS",
+                    "value": "john.doe@code42.com",
+                },
+            ],
+        },
+        {
+            "filterClause": "AND",
+            "filters": [
+                {"term": "file.category", "operator": "IS", "value": "SOURCE_CODE"}
+            ],
+        },
+    ],
+    "pgNum": 1,
+    "pgSize": 100,
+    "pgToken": None,
+    "srtDir": "asc",
+    "srtKey": "event.id",
+}
+
 
 @pytest.mark.parametrize(
-    "query", [TEST_EVENT_QUERY, TEST_SAVED_SEARCH_1, TEST_DICT_QUERY]
+    ("query, expected_query"),
+    [
+        (TEST_EVENT_QUERY, TEST_DICT_QUERY),
+        (TEST_SAVED_SEARCH_1, TEST_SAVED_SEARCH_QUERY),
+        (TEST_DICT_QUERY, TEST_DICT_QUERY),
+    ],
 )
-def test_search_sends_expected_query(httpserver_auth: HTTPServer, query):
+def test_search_sends_expected_query(
+    httpserver_auth: HTTPServer, query, expected_query
+):
     event_data = {
         "fileEvents": [TEST_EVENT_1, TEST_EVENT_2],
         "nextPgToken": None,
@@ -415,7 +456,7 @@ def test_search_sends_expected_query(httpserver_auth: HTTPServer, query):
         "totalCount": 2,
     }
     httpserver_auth.expect_request(
-        "/v2/file-events", method="POST", json=TEST_DICT_QUERY
+        "/v2/file-events", method="POST", json=expected_query
     ).respond_with_json(event_data)
 
     client = Client()
@@ -479,12 +520,11 @@ def test_execute_saved_search_makes_expected_calls(httpserver_auth: HTTPServer):
         "problems": None,
         "totalCount": 2,
     }
-    print(search_data)
     httpserver_auth.expect_ordered_request(
         f"/v2/file-events/saved-searches/{search_id}", method="GET"
     ).respond_with_data(search_data)
     httpserver_auth.expect_ordered_request(
-        "/v2/file-events", method="POST", json=TEST_DICT_QUERY
+        "/v2/file-events", method="POST", json=TEST_SAVED_SEARCH_QUERY
     ).respond_with_json(event_data)
 
     client = Client()

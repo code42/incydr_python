@@ -34,6 +34,23 @@ _term_enum_map = {
     "risk.trustReason": TrustReason,
 }
 
+file_category_extension_map = {
+    "AUDIO": FileCategory.AUDIO,
+    "DOCUMENT": FileCategory.DOCUMENT,
+    "EXECUTABLE": FileCategory.EXECUTABLE,
+    "IMAGE": FileCategory.IMAGE,
+    "PDF": FileCategory.PDF,
+    "PRESENTATION": FileCategory.PRESENTATION,
+    "SCRIPT": FileCategory.SCRIPT,
+    "SOURCE_CODE": FileCategory.SOURCE_CODE,
+    "SPREADSHEET": FileCategory.SPREADSHEET,
+    "VIDEO": FileCategory.VIDEO,
+    "VIRTUAL_DISK_IMAGE": FileCategory.VIRTUAL_DISK_IMAGE,
+    "ARCHIVE": FileCategory.ZIP,
+    "ZIP": FileCategory.ZIP,
+    "Zip": FileCategory.ZIP,
+}
+
 
 class Filter(BaseModel):
     term: EventSearchTerm
@@ -62,6 +79,14 @@ class Filter(BaseModel):
                     f"`IS` and `IS_NOT` filters require a `str | int` value, got term={term}, operator={operator}, value={value}."
                 )
 
+        # catch additional enum terms
+        try:
+            value = file_category_extension_map[value]
+            values.update({"value": value})
+        except KeyError:
+            pass
+
+        # check that value is a valid enum for that search term
         enum = _term_enum_map.get(term)
         if enum:
             enum(value)
@@ -85,6 +110,7 @@ class Query(BaseModel):
 
     class Config:
         use_enum_values = True
+        json_encoders = {datetime: lambda dt: dt.isoformat().replace("+00:00", "Z")}
 
 
 class EventQuery:
