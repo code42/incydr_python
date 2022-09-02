@@ -31,10 +31,16 @@ dependencies = [
 ]
 dynamic = ["version"]
 
+[project.optional-dependencies]
+cli = ["typer"]
+
 [project.urls]
 Documentation = "https://github.com/unknown/incydr#readme"
 Issues = "https://github.com/code42/incydr_python/issues"
 Source = "https://github.com/code42/incydr_python/incydr"
+
+[project.scripts]
+incydr = "incydr.cli.main:app"
 
 [tool.hatch.version]
 path = "incydr/__about__.py"
