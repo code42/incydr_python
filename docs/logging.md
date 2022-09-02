@@ -46,7 +46,7 @@ To disable Rich formatting in your log output:
 ### Log to a file
 
 To output logs to a file, set the `client.settings.log_file` property to any of the following:
-    
+
 - A string representing a valid file path
 - A [`pathlib.Path`](https://docs.python.org/3/library/pathlib.html) object represting a valid file path
 - A file object inheriting from [`io.IOBase`](https://docs.python.org/3/library/io.html?highlight=io#io.IOBase)
