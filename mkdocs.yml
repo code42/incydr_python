@@ -34,6 +34,8 @@ nav:
   - Cases: 'cases.md'
   - Customer: 'customer.md'
   - Devices: 'devices.md'
+  - File Events: 'file_events.md'
+  - File Event Queries: 'file_event_queries.md'
   - Users: 'users.md'
   - Models: 'models.md'
 

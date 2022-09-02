@@ -35,3 +35,6 @@ coverage.xml
 
 # .orig files
 *.orig
+
+# docs build files
+site/

@@ -158,14 +158,18 @@ class Client:
         return self._devices
 
     @property
-    def watchlists(self):
+    def file_events(self):
         """
-        Property returning a ['WatchlistsClient'](../watchlists) for interacting with `/v*/watchlists` API endpoints.
+        Property returning a [`FileEventsClient`](../file_events) for interacting with `/v*/file-events` API endpoints.
         Usage:
 
-            >>> client.watchlists.v1.get_page()
+            >>> from incydr import EventQuery
+            >>> query = EventQuery(start_date='P30D').equals('file.category', 'Document')
+
+            >>> client.file_events.v2.search(query)
+
         """
-        return self._watchlists
+        return self._file_events
 
     @property
     def users(self):
@@ -177,3 +181,13 @@ class Client:
 
         """
         return self._users
+
+    @property
+    def watchlists(self):
+        """
+        Property returning a ['WatchlistsClient'](../watchlists) for interacting with `/v*/watchlists` API endpoints.
+        Usage:
+
+            >>> client.watchlists.v1.get_page()
+        """
+        return self._watchlists

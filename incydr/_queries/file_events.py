@@ -34,6 +34,23 @@ _term_enum_map = {
     "risk.trustReason": TrustReason,
 }
 
+file_category_extension_map = {
+    "AUDIO": FileCategory.AUDIO,
+    "DOCUMENT": FileCategory.DOCUMENT,
+    "EXECUTABLE": FileCategory.EXECUTABLE,
+    "IMAGE": FileCategory.IMAGE,
+    "PDF": FileCategory.PDF,
+    "PRESENTATION": FileCategory.PRESENTATION,
+    "SCRIPT": FileCategory.SCRIPT,
+    "SOURCE_CODE": FileCategory.SOURCE_CODE,
+    "SPREADSHEET": FileCategory.SPREADSHEET,
+    "VIDEO": FileCategory.VIDEO,
+    "VIRTUAL_DISK_IMAGE": FileCategory.VIRTUAL_DISK_IMAGE,
+    "ARCHIVE": FileCategory.ZIP,
+    "ZIP": FileCategory.ZIP,
+    "Zip": FileCategory.ZIP,
+}
+
 
 class Filter(BaseModel):
     term: EventSearchTerm
@@ -62,6 +79,14 @@ class Filter(BaseModel):
                     f"`IS` and `IS_NOT` filters require a `str | int` value, got term={term}, operator={operator}, value={value}."
                 )
 
+        # catch additional enum terms
+        try:
+            value = file_category_extension_map[value]
+            values.update({"value": value})
+        except KeyError:
+            pass
+
+        # check that value is a valid enum for that search term
         enum = _term_enum_map.get(term)
         if enum:
             enum(value)
@@ -85,15 +110,17 @@ class Query(BaseModel):
 
     class Config:
         use_enum_values = True
+        json_encoders = {datetime: lambda dt: dt.isoformat().replace("+00:00", "Z")}
 
 
 class EventQuery:
     """
-    Class to build a file event query.
+    Class to build a file event query. Use the class methods to attach additional filter operators.
 
-    Args:
-        start_date (int, float, str, datetime, timedelta): Start of the date range to query for events. Defaults to None.
-        end_date (int, float, str, datetime): End of the date range to query for events.  Defaults to None.
+    **Parameters**:
+
+         * **start_date**: `int`, `float`, `str`, `datetime`, `timedelta` -  Start of the date range to query for events. Defaults to None.
+         * **end_date**: `int`, `float`, `str`, `datetime` - End of the date range to query for events.  Defaults to None.
     """
 
     def __init__(
@@ -111,10 +138,25 @@ class EventQuery:
         return str(self._query)
 
     def dict(self):
+        """
+        Returns the query object as a dictionary.
+        """
         return self._query.dict()
 
-    @validate_arguments
     def equals(self, term: str, values: Union[str, List[str]]):
+        """
+        Adds an `equals` filter to the query. The opposite of the `not_equals` filter.
+
+        When passed as part of a query, returns events when the field corresponding to the filter term equals the indicated value(s).
+
+        Example:
+            `EventQuery(**kwargs).equals('file.category', 'Document')` creates a query which will return file events where the `file.category` field is equal to `Document`.
+
+        **Parameters**:
+
+        * **term**: `str` - The term which corresponds to a file event field.
+        * **values**: `str`, `List[str]` - The value(s) for the term to match.
+        """
         if isinstance(values, str):
             values = [values]
         if len(values) < 1:
@@ -128,6 +170,20 @@ class EventQuery:
         return self
 
     def not_equals(self, term, values: Union[str, List[str]]):
+        """
+        Adds an `not_equals` filter to the query. The opposite of the `equals` filter.
+
+        When passed as part of a query, returns events when the field corresponding to the filter term does not equal the indicated value(s).
+
+        Example:
+            `EventQuery(**kwargs).not_equals('file.category', 'Document')` creates a query which will return file events where the `file.category` field is NOT equal to `Document`.
+
+        **Parameters**:
+
+        * **term**: `str` - The term which corresponds to a file event field.
+        * **values**: `str`, `List[str]` - The value(s) for the term to not match.
+        """
+
         if isinstance(values, str):
             values = [values]
         if len(values) < 1:
@@ -143,12 +199,36 @@ class EventQuery:
         return self
 
     def exists(self, term: str):
+        """
+        Adds an `exists` filter to the query. The opposite of the `does_not_exist` filter.
+
+        When passed as part of a query, returns events when the field corresponding to the filter term is not `null`.
+
+        Example:
+            `EventQuery(**kwargs).exists('risk.trustReason')` creates a query which will return file events where the `risk.trustReason` field is populated with any not null value.
+
+        **Parameters**:
+
+        * **term**: `str` - The term which corresponds to a file event field.
+        """
         self._query.groups.append(
             FilterGroup(filters=[Filter(term=term, operator=Operator.EXISTS)])
         )
         return self
 
     def does_not_exist(self, term: str):
+        """
+        Adds a `does_not_exist` filter to the query. The opposite of the `exists` filter.
+
+        When passed as part of a query, returns events when the field corresponding to the filter term is `null`.
+
+        Example:
+            `EventQuery(**kwargs).does_not_exist('risk.TrustReason')` creates a query which will return file events where the `risk.trustReason` field is null.
+
+        **Parameters**:
+
+        * **term**: `str` - The term which corresponds to a file event field.
+        """
         self._query.groups.append(
             FilterGroup(filters=[Filter(term=term, operator=Operator.DOES_NOT_EXIST)])
         )
@@ -156,6 +236,20 @@ class EventQuery:
 
     @validate_arguments
     def greater_than(self, term: str, value: int):
+        """
+        Adds a `greater_than` filter to the query. The opposite of the `less_than` filter.
+
+        When passed as part of a query, returns events when the field corresponding to the filter term is greater than the indicated value.
+
+        Example:
+            `EventQuery(**kwargs).greater_than('risk.score', 10)` creates a query which will return file events where the `risk.score` field is greater than `10`.
+
+        **Parameters**:
+
+        * **term**: `str` - The term which corresponds to a file event field.
+        * **values**: `int` - The value for the term to be greater than.
+        """
+
         self._query.groups.append(
             FilterGroup(
                 filters=[Filter(term=term, operator=Operator.GREATER_THAN, value=value)]
@@ -165,6 +259,19 @@ class EventQuery:
 
     @validate_arguments
     def less_than(self, term: str, value: int):
+        """
+        Adds a `less_thn` filter to the query. The opposite of the `greater_than` filter.
+
+        When passed as part of a query, returns events when the field corresponding to the filter term is less than the indicated value.
+
+        Example:
+            `EventQuery(**kwargs).less_than('risk.score', 10)` creates a query which will return file events where the `risk.score` field is less than `10`.
+
+        **Parameters**:
+
+        * **term**: `str` - The term which corresponds to a file event field.
+        * **values**: `int` - The value for the term to be less than.
+        """
         self._query.groups.append(
             FilterGroup(
                 filters=[Filter(term=term, operator=Operator.LESS_THAN, value=value)]
