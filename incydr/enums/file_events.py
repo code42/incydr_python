@@ -1,7 +1,7 @@
-from incydr.enums import Enum
+from incydr.enums import _Enum
 
 
-class Operator(Enum):
+class Operator(_Enum):
     # all valid filter operators for querying file events
     IS = "IS"
     IS_NOT = "IS_NOT"
@@ -15,7 +15,7 @@ class Operator(Enum):
     WITHIN_THE_LAST = "WITHIN_THE_LAST"
 
 
-class EventSearchTerm(Enum):
+class EventSearchTerm(_Enum):
     TIMESTAMP = "@timestamp"
     DESTINATION_ACCOUNT_NAME = "destination.accountName"
     DESTINATION_ACCOUNT_TYPE = "destination.accountType"
@@ -122,8 +122,8 @@ class EventSearchTerm(Enum):
     USER_ID = "user.id"
 
 
-class FileCategory(Enum):
-    """file category enum values."""
+class FileCategory(_Enum):
+    """file category _Enum values."""
 
     AUDIO = "Audio"
     DOCUMENT = "Document"
@@ -139,8 +139,8 @@ class FileCategory(Enum):
     ZIP = "Archive"
 
 
-class EventAction(Enum):
-    """event action enum values."""
+class EventAction(_Enum):
+    """event action _Enum values."""
 
     # Exposure Type in v1
     REMOVABLE_MEDIA_CREATED = "removable-media-created"
@@ -161,8 +161,8 @@ class EventAction(Enum):
     APPLICATION_READ = "application-read"
 
 
-class Category(Enum):
-    """source and destination category enum values."""
+class Category(_Enum):
+    """source and destination category _Enum values."""
 
     BUSINESS_TOOLS = "Business Tools"
     CLOUD_STORAGE = "Cloud Storage"
@@ -204,23 +204,23 @@ class Category(Enum):
     WEB_HOSTING = "Web Hosting"
 
 
-class ShareType(Enum):
-    """share type enum values."""
+class ShareType(_Enum):
+    """share type _Enum values."""
 
     PUBLIC_LINK_SHARE = "Anyone with the link"
     DOMAIN_SHARE = "Anyone in your organization"
     DIRECT_USER_SHARE = "Shared with specific people"
 
 
-class ReportType(Enum):
-    """report type enum values."""
+class ReportType(_Enum):
+    """report type _Enum values."""
 
     AD_HOC = "REPORT_TYPE_AD_HOC"
     SAVED = "REPORT_TYPE_SAVED"
 
 
-class RiskIndicators(Enum):
-    """risk indicators enum values."""
+class RiskIndicators(_Enum):
+    """risk indicators _Enum values."""
 
     # Destinations
     ADOBE_UPLOAD = "Adobe upload"
@@ -390,8 +390,8 @@ class RiskIndicators(Enum):
     ZIP = "Zip"
 
 
-class TrustReason(Enum):
-    """trust reason enum values."""
+class TrustReason(_Enum):
+    """trust reason _Enum values."""
 
     TRUSTED_DOMAIN_BROWSER_URL = "Trusted browser URL"
     TRUSTED_BROWSER_URL_PATH = "Trusted specific URL path"
@@ -406,8 +406,8 @@ class TrustReason(Enum):
     SHARED_WITH_TRUSTED_USERS = "Shared with trusted users"
 
 
-class RiskSeverity(Enum):
-    """risk severity enum values."""
+class RiskSeverity(_Enum):
+    """risk severity _Enum values."""
 
     CRITICAL = "CRITICAL"
     HIGH = "HIGH"
@@ -416,7 +416,7 @@ class RiskSeverity(Enum):
     NO_RISK_INDICATED = "NO_RISK_INDICATED"
 
 
-class EventType(Enum):
+class EventType(_Enum):
     CREATED = "CREATED"
     DELETED = "DELETED"
     DOWNLOADED = "DOWNLOADED"
@@ -432,7 +432,7 @@ class EventType(Enum):
     UNSUPPORTED = "UNSUPPORTED"
 
 
-class FileType(Enum):
+class FileType(_Enum):
     BLOCK_DEVICE = "BLOCK_DEVICE"
     BUNDLE = "BUNDLE"
     CHAR_DEVICE = "CHAR_DEVICE"
@@ -445,18 +445,18 @@ class FileType(Enum):
     WIN_NDS = "WIN_NDS"
 
 
-class RemoteActivity(Enum):
+class RemoteActivity(_Enum):
     FALSE = "FALSE"
     TRUE = "TRUE"
     UNKNOWN = "UNKNOWN"
 
 
-class Shared(Enum):
+class Shared(_Enum):
     FALSE = "FALSE"
     TRUE = "TRUE"
 
 
-class SearchProblemType(Enum):
+class SearchProblemType(_Enum):
     ILLEGAL_GROUP = "ILLEGAL_GROUP"
     ILLEGAL_OPERATOR = "ILLEGAL_OPERATOR"
     ILLEGAL_SORT = "ILLEGAL_SORT"
