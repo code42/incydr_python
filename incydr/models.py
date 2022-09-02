@@ -8,7 +8,7 @@ from incydr._file_events.models.response import FileEventsPage
 from incydr._file_events.models.response import SavedSearch
 from incydr._file_events.models.response import SavedSearchesPage
 from incydr._users.models import Role
-from incydr._users.models import RolesPage
+from incydr._users.models import UpdateRolesResponse
 from incydr._users.models import User
 from incydr._users.models import UsersPage
 
@@ -21,7 +21,7 @@ __all__ = [
     "User",
     "UsersPage",
     "Role",
-    "RolesPage",
+    "UpdateRolesResponse",
     "SavedSearchesPage",
     "SavedSearch",
     "FileEventsPage",

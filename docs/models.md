@@ -72,6 +72,19 @@ available model methods.
 ::: incydr.models.DevicesPage
     :docstring:
 
+## Roles
+---
+
+### `Role` model
+
+::: incydr.models.Role
+    :docstring:
+
+### `UpdateRolesResponse` model
+
+::: incydr.models.UpdateRolesResponse
+    :docstring:
+
 ## Users
 ---
 
@@ -83,17 +96,4 @@ available model methods.
 ### `UsersPage` model
 
 ::: incydr.models.UsersPage
-    :docstring:
-
-## Roles
----
-
-### `Role` model
-
-::: incydr.models.Role
-    :docstring:
-
-### `RolesPage` model
-
-::: incydr.models.RolesPage
     :docstring:
