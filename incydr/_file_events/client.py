@@ -7,6 +7,7 @@ from .models.response import FileEventsPage
 from .models.response import SavedSearch
 from .models.response import SavedSearchesPage
 from incydr._queries.file_events import EventQuery
+from incydr._queries.file_events import Filter
 from incydr._queries.file_events import FilterGroup
 from incydr._queries.file_events import Query
 
@@ -47,6 +48,7 @@ class FileEventsV2:
 
         if isinstance(query, SavedSearch):
             query = _create_query_from_saved_search(query)
+            print(query.dict())
 
         if isinstance(query, str):
             query = Query.parse_raw(query)
@@ -140,8 +142,12 @@ def _create_query_from_saved_search(saved_search: SavedSearch) -> Query:
         query.groupClause = saved_search.group_clause
     if saved_search.groups:
         for i in saved_search.groups:
+            filters = [
+                Filter.construct(value=f.value, operator=f.operator, term=f.term)
+                for f in i.filters
+            ]
             query.groups.append(
-                FilterGroup(filterClause=i.filter_clause, filters=i.filters)
+                FilterGroup.construct(filterClause=i.filter_clause, filters=filters)
             )
     if saved_search.srt_dir:
         query.srtDir = saved_search.srt_dir
