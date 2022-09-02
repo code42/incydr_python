@@ -12,6 +12,7 @@ from incydr._core.settings import IncydrSettings
 from incydr._customer.client import CustomerClient
 from incydr._devices.client import DevicesClient
 from incydr._file_events.client import FileEventsClient
+from incydr._users.client import UsersClient
 from incydr._watchlists.client import WatchlistsClient
 
 _base_user_agent = user_agent("incydr", __version__)
@@ -78,10 +79,11 @@ class Client:
         self._session.hooks["response"] = [response_hook]
 
         self._cases = CasesClient(self)
-        self._customer = CustomerClient(self.session)
+        self._customer = CustomerClient(self)
         self._file_events = FileEventsClient(self)
         self._devices = DevicesClient(self)
         self._watchlists = WatchlistsClient(self)
+        self._users = UsersClient(self)
 
         self._session.auth.refresh()
 
@@ -164,3 +166,14 @@ class Client:
             >>> client.watchlists.v1.get_page()
         """
         return self._watchlists
+
+    @property
+    def users(self):
+        """
+        Property returning a [`UsersClient`](../users) for interacting with `/v*/users` API endpoints.
+        Usage:
+
+            >>> client.users.v1.get_page(active=True)
+
+        """
+        return self._users
