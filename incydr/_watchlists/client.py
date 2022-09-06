@@ -8,19 +8,18 @@ from incydr._watchlists.models.requests import UpdateIncludedDepartmentsRequest
 from incydr._watchlists.models.requests import UpdateIncludedDirectoryGroupsRequest
 from incydr._watchlists.models.requests import UpdateIncludedUsersRequest
 from incydr._watchlists.models.requests import UpdateWatchlistRequest
-from incydr._watchlists.models.responses import ExcludedUser
 from incydr._watchlists.models.responses import ExcludedUsersList
 from incydr._watchlists.models.responses import IncludedDepartment
 from incydr._watchlists.models.responses import IncludedDepartmentsList
 from incydr._watchlists.models.responses import IncludedDirectoryGroup
 from incydr._watchlists.models.responses import IncludedDirectoryGroupsList
-from incydr._watchlists.models.responses import IncludedUser
 from incydr._watchlists.models.responses import IncludedUsersList
 from incydr._watchlists.models.responses import Watchlist
-from incydr._watchlists.models.responses import WatchlistMember
 from incydr._watchlists.models.responses import WatchlistMembersList
 from incydr._watchlists.models.responses import WatchlistsPage
+from incydr._watchlists.models.responses import WatchlistUser
 from incydr.enums.watchlists import WatchlistType
+from incydr.exceptions import WatchlistNotFoundError
 
 
 class WatchlistsClient:
@@ -58,9 +57,11 @@ class WatchlistsV1:
             self._watchlist_type_id_map = {}
             watchlists = self.get_page(page_size=100).watchlists
             for item in watchlists:
-                # We will need to custom handle CUSTOM types when they come around
-                if item.list_type == "CUSTOM":
-                    pass
+                if (
+                    item.list_type == "CUSTOM"
+                ):  # store title for custom lists instead of list_type
+                    # store titles in all caps to prevent casing mismatches
+                    self._watchlist_type_id_map[item.title] = item.watchlist_id
 
                 self._watchlist_type_id_map[item.list_type] = item.watchlist_id
         return self._watchlist_type_id_map
@@ -94,7 +95,7 @@ class WatchlistsV1:
 
         * **watchlist_id**: `str` (required) - Watchlist ID.
 
-        **Returns**: A [`Watchlist`] object.
+        **Returns**: A [`Watchlist`][watchlist-model] object.
         """
         response = self._parent.session.get(f"{self._uri}/{watchlist_id}")
         return Watchlist.parse_response(response)
@@ -111,7 +112,7 @@ class WatchlistsV1:
         * **title**: The required title for a custom watchlist.
         * **description**: The optional description for a custom watchlist.
 
-        **Returns**: A ['Watchlist`] object.
+        **Returns**: A ['Watchlist`][watchlist-model] object.
         """
         if watchlist_type == "CUSTOM":
             if title is None:
@@ -132,6 +133,8 @@ class WatchlistsV1:
         **Parameters**:
 
         * **watchlist_id**: `str` (required) - Watchlist ID.
+
+        **Returns**: A `requests.Response` indicating success.
         """
         return self._parent.session.delete(f"{self._uri}/{watchlist_id}")
 
@@ -147,7 +150,7 @@ class WatchlistsV1:
         * **title**: `str` - Updated title for a custom watchlist.  Defaults to None.
         * **description: `str` - Updated description for a custom watchlist.  Pass an empty string to clear this field.  Defaults to None.
 
-        **Returns**: A [`Watchlist`] object.
+        **Returns**: A [`Watchlist`][watchlist-model] object.
         """
         paths = []
         if title:
@@ -161,7 +164,7 @@ class WatchlistsV1:
         )
         return Watchlist.parse_response(response)
 
-    def get_member(self, watchlist_id: str, user_id: str) -> WatchlistMember:
+    def get_member(self, watchlist_id: str, user_id: str) -> WatchlistUser:
         """
         Get a single member of a watchlist.
 
@@ -170,12 +173,12 @@ class WatchlistsV1:
          * **watchlist_id**: `str` (required) - Watchlist ID.
         * **user_id**: `str` (required) - Unique user ID.
 
-        **Returns**: A [`WatchlistMember`] object.
+        **Returns**: A [`WatchlistUser`][watchlistuser-model] object.
         """
         response = self._parent.session.get(
             f"{self._uri}/{watchlist_id}/members/{user_id}"
         )
-        return WatchlistMember.parse_response(response)
+        return WatchlistUser.parse_response(response)
 
     def list_members(
         self, watchlist_id: Union[str, WatchlistType]
@@ -187,54 +190,51 @@ class WatchlistsV1:
 
         * **watchlist_id**: `str`(required) - Watchlist ID.
 
-        **Returns**: A [`WatchlistMembersList`] object.
+        **Returns**: A [`WatchlistMembersList`][watchlistmemberslist-model] object.
         """
         response = self._parent.session.get(f"{self._uri}/{watchlist_id}/members")
         return WatchlistMembersList.parse_response(response)
 
-    def add_included_users(
-        self, watchlist: Union[str, WatchlistType], user_ids: Union[str, List[str]]
-    ):
+    def add_included_users(self, watchlist_id: str, user_ids: Union[str, List[str]]):
         """
         Include individual users on a watchlist.
 
         **Parameters**:
 
-        * **watchlist**: `str`, `WatchlistType` (required) - Watchlist ID or a watchlist type.   An ID must be provided for custom watchlists.
+        * **watchlist**: `str` (required) - Watchlist ID.
         * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to include on the watchlist.
-        """
-        watchlist = self._check_watchlist_id(watchlist)
 
+        **Returns**: A `requests.Response` indicating success.
+        """
         data = UpdateIncludedUsersRequest(
             userIds=user_ids if isinstance(user_ids, List) else [user_ids],
-            watchlistId=watchlist,
+            watchlistId=watchlist_id,
         )
         return self._parent.session.post(
-            url=f"{self._uri}/{watchlist}/included-users/add", json=data.dict()
+            url=f"{self._uri}/{watchlist_id}/included-users/add", json=data.dict()
         )
 
-    def remove_included_users(
-        self, watchlist: Union[str, WatchlistType], user_ids: Union[str, List[str]]
-    ):
+    def remove_included_users(self, watchlist_id: str, user_ids: Union[str, List[str]]):
         """
         Remove included users from a watchlist.
 
         **Parameters**:
 
-        * **watchlist**: `str`, `WatchlistType` (required) - Watchlist ID or a watchlist type.  An ID must be provided for custom watchlists.
+        * **watchlist**: `str` (required) - Watchlist ID.
         * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to remove from the watchlist.
+
+        **Returns**: A `requests.Response` indicating success.
         """
-        watchlist = self._check_watchlist_id(watchlist)
 
         data = UpdateIncludedUsersRequest(
             userIds=user_ids if isinstance(user_ids, List) else [user_ids],
-            watchlistId=watchlist,
+            watchlistId=watchlist_id,
         )
         return self._parent.session.post(
-            url=f"{self._uri}/{watchlist}/included-users/delete", json=data.dict()
+            url=f"{self._uri}/{watchlist_id}/included-users/delete", json=data.dict()
         )
 
-    def get_included_user(self, watchlist_id: str, user_id: str) -> IncludedUser:
+    def get_included_user(self, watchlist_id: str, user_id: str) -> WatchlistUser:
         """
         Get an included user from a watchlist.
 
@@ -243,12 +243,12 @@ class WatchlistsV1:
         * **watchlist_id**: `str` (required) - Watchlist ID.
         * **user_id**: `str` (required) - Unique user ID.
 
-        **Returns**: An [`IncludedUser`] object.
+        **Returns**: A [`WatchlistUser`][watchlistuser-model] object.
         """
         response = self._parent.session.get(
             url=f"{self._uri}/{watchlist_id}/included-users/{user_id}"
         )
-        return IncludedUser.parse_response(response)
+        return WatchlistUser.parse_response(response)
 
     def list_included_users(self, watchlist_id: str) -> IncludedUsersList:
         """
@@ -258,7 +258,7 @@ class WatchlistsV1:
 
         * **watchlist_id**: `str` (required) - Watchlist ID.
 
-        **Returns**: An [`IncludedUsersList`] object.
+        **Returns**: An [`IncludedUsersList`][includeduserslist-model] object.
         """
 
         response = self._parent.session.get(
@@ -266,40 +266,40 @@ class WatchlistsV1:
         )
         return IncludedUsersList.parse_response(response)
 
-    def add_excluded_users(
-        self, watchlist: Union[str, WatchlistType], user_ids: Union[str, List[str]]
-    ):
+    def add_excluded_users(self, watchlist_id: str, user_ids: Union[str, List[str]]):
         """
         Exclude individual users from a watchlist.
 
         **Parameters**:
 
-        * **watchlist**: `str`, `WatchlistType` (required) - Watchlist ID or a watchlist type.  An ID must be provided for custom watchlists.
+        * **watchlist**: `str` (required) - Watchlist ID.
         * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to exclude from the watchlist.
+
+        **Returns**: A `requests.Response` indicating success.
         """
         data = UpdateExcludedUsersRequest(
             userIds=user_ids if isinstance(user_ids, List) else [user_ids],
         )
         return self._parent.session.post(
-            url=f"{self._uri}/{watchlist}/excluded-users/add", json=data.dict()
+            url=f"{self._uri}/{watchlist_id}/excluded-users/add", json=data.dict()
         )
 
-    def remove_excluded_users(
-        self, watchlist: Union[str, WatchlistType], user_ids: Union[str, List[str]]
-    ):
+    def remove_excluded_users(self, watchlist_id: str, user_ids: Union[str, List[str]]):
         """
         Remove excluded users from a watchlist.
 
         **Parameters**:
 
-        * **watchlist**: `str`, `WatchlistType` (required) - Watchlist ID or a watchlist type.  An ID must be provided for custom watchlists.
+        * **watchlist**: `str` (required) - Watchlist ID.
         * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to remove from the exclusion list.
+
+        **Returns**: A `requests.Response` indicating success.
         """
         data = UpdateExcludedUsersRequest(
             userIds=user_ids if isinstance(user_ids, List) else [user_ids],
         )
         return self._parent.session.post(
-            url=f"{self._uri}/{watchlist}/excluded-users/delete", json=data.dict()
+            url=f"{self._uri}/{watchlist_id}/excluded-users/delete", json=data.dict()
         )
 
     def list_excluded_users(self, watchlist_id: str) -> ExcludedUsersList:
@@ -307,13 +307,15 @@ class WatchlistsV1:
         List individual users excluded from a watchlist.
 
         * **watchlist_id**: `str` (required) - Watchlist ID.
+
+        **Returns**: An [`ExcludedUsersList`][excludeduserslist-model] object.
         """
         response = self._parent.session.get(
             f"{self._uri}/{watchlist_id}/excluded-users"
         )
         return ExcludedUsersList.parse_response(response)
 
-    def get_excluded_user(self, watchlist_id: str, user_id: str) -> ExcludedUser:
+    def get_excluded_user(self, watchlist_id: str, user_id: str) -> WatchlistUser:
         """
         Get an excluded user from a watchlist.
 
@@ -321,51 +323,51 @@ class WatchlistsV1:
 
         * **watchlist_id**: `str` (required) - Watchlist ID.
         * **user_id**: `str` (required) - Unique user ID.
+
+        **Returns**: A [`WatchlistUser`][watchlistuser-model] object.
         """
         response = self._parent.session.get(
             f"{self._uri}/{watchlist_id}/excluded-users/{user_id}"
         )
-        return ExcludedUser.parse_response(response)
+        return WatchlistUser.parse_response(response)
 
-    def add_directory_groups(
-        self, watchlist: Union[str, WatchlistType], group_ids: Union[str, List[str]]
-    ):
+    def add_directory_groups(self, watchlist_id: str, group_ids: Union[str, List[str]]):
         """
         Include directory groups on a watchlist. Use the `directory_groups` client to see available directory groups.
 
         **Parameters**:
 
-        * **watchlist**: `str`, `WatchlistType` (required) - Watchlist ID or a watchlist type.  An ID must be provided for custom watchlists.
+        * **watchlist**: `str` (required) - Watchlist ID.
         * **group_ids**: `str`, `List[str]` (required) - List of directory group IDs to include on the watchlist.
-        """
-        watchlist = self._check_watchlist_id(watchlist)
 
+        **Returns**: A `requests.Response` indicating success.
+        """
         data = UpdateIncludedDirectoryGroupsRequest(
             groupIds=group_ids if isinstance(group_ids, List) else [group_ids]
         )
         return self._parent.session.post(
-            url=f"{self._uri}/{watchlist}/included-directory-groups/add",
+            url=f"{self._uri}/{watchlist_id}/included-directory-groups/add",
             json=data.dict(),
         )
 
     def remove_directory_groups(
-        self, watchlist: Union[str, WatchlistType], group_ids: Union[str, List[str]]
+        self, watchlist_id: str, group_ids: Union[str, List[str]]
     ):
         """
         Remove included directory groups from a watchlist.
 
         **Parameters**:
 
-        * **watchlist**: `str`, `WatchlistType` (required) - Watchlist ID or a watchlist type.  An ID must be provided for custom watchlists.
+        * **watchlist**: `str` (required) - Watchlist ID.
         * **group_ids**: `str`, `List[str]` (required) - List of directory group IDs to remove from the watchlist.
-        """
-        watchlist = self._check_watchlist_id(watchlist, create_if_not_found=False)
 
+        **Returns**: A `requests.Response` indicating success.
+        """
         data = UpdateIncludedDirectoryGroupsRequest(
             groupIds=group_ids if isinstance(group_ids, List) else [group_ids]
         )
         return self._parent.session.post(
-            url=f"{self._uri}/{watchlist}/included-directory-groups/delete",
+            url=f"{self._uri}/{watchlist_id}/included-directory-groups/delete",
             json=data.dict(),
         )
 
@@ -377,7 +379,7 @@ class WatchlistsV1:
 
         * **watchlist_id**: `str` (required) - Watchlist ID.
 
-        **Returns**: An [`IncludedUsersList`] object.
+        **Returns**: An [`IncludedUsersList`][includeduserslist-model] object.
         """
 
         response = self._parent.session.get(
@@ -396,7 +398,7 @@ class WatchlistsV1:
         * **watchlist_id**: `str` (required) - Watchlist ID.
         * **group_id**: `str` (required) - Directory group ID.
 
-        **Returns**: An [`IncludedDirectoryGroup`] object.
+        **Returns**: An [`IncludedDirectoryGroup`][includeddirectorygroup-model] object.
         """
 
         response = self._parent.session.get(
@@ -406,7 +408,7 @@ class WatchlistsV1:
 
     def add_departments(
         self,
-        watchlist_id: Union[str, WatchlistType],
+        watchlist_id: str,
         departments: Union[str, List[str]],
     ):
         """
@@ -414,11 +416,11 @@ class WatchlistsV1:
 
         **Parameters**:
 
-        * **watchlist**: `str`, `WatchlistType` (required) - Watchlist ID or a watchlist type.  An ID must be provided for custom watchlists.
+        * **watchlist**: `str` (required) - Watchlist ID.
         * **departments**: `str`, `List[str]` (required) - List of departments to include on the watchlist.
-        """
-        watchlist_id = self._check_watchlist_id(watchlist_id)
 
+        **Returns**: A `requests.Response` indicating success.
+        """
         data = UpdateIncludedDepartmentsRequest(
             departments=departments if isinstance(departments, List) else [departments]
         )
@@ -428,7 +430,7 @@ class WatchlistsV1:
 
     def remove_departments(
         self,
-        watchlist_id: Union[str, WatchlistType],
+        watchlist_id: str,
         departments: Union[str, List[str]],
     ):
         """
@@ -436,11 +438,11 @@ class WatchlistsV1:
 
         **Parameters**:
 
-        * **watchlist**: `str`, `WatchlistType` (required) - Watchlist ID or a watchlist type.  An ID must be provided for custom watchlists.
+        * **watchlist**: `str` - Watchlist ID or a watchlist type.  An ID must be provided for custom watchlists.
         * **departments**: `str`, `List[str]` (required) - List of departments to remove from the watchlist.
-        """
-        watchlist_id = self._check_watchlist_id(watchlist_id, create_if_not_found=False)
 
+        **Returns**: A `requests.Response` indicating success.
+        """
         data = UpdateIncludedDepartmentsRequest(
             departments=departments if isinstance(departments, List) else [departments]
         )
@@ -457,7 +459,7 @@ class WatchlistsV1:
 
         * **watchlist_id**: `str` (required) - Watchlist ID.
 
-        **Returns**: An [`IncludedDepartmentsList`] object.
+        **Returns**: An [`IncludedDepartmentsList`][includeddepartmentslist-model] object.
         """
         response = self._parent.session.get(
             f"{self._uri}/{watchlist_id}/included-departments"
@@ -468,40 +470,29 @@ class WatchlistsV1:
         """
         Get an included department from a watchlist.
 
+        **Parameters**:
+
         * **watchlist_id**: `str` (required) - Watchlist ID.
         * **department**: `str` (required) - A included department.
 
-        **Returns**: An [`IncludedDepartment`] object.
+        **Returns**: An [`IncludedDepartment`][includeddepartment-model] object.
         """
         response = self._parent.session.get(
             f"{self._uri}/{watchlist_id}/included-departments/{department}"
         )
         return IncludedDepartment.parse_response(response)
 
-    # TODO: Do we want to allow people to pass watchlist types instead of IDs? If yes - in what cases?
-
-    def _check_watchlist_id(
-        self, watchlist: Union[str, WatchlistType], create_if_not_found=True
-    ):
+    def get_id_by_name(self, name: Union[str, WatchlistType]):
         """
-        Check if the watchlist identifier is an ID or a type enum.
-        Default to creating the watchlist of the specified type if it doesn't exist.
+        Get a watchlist ID by either its type (ex: `DEPARTING_EMPLOYEE`) or its title in the case of `CUSTOM` watchlists.
+
+        **Parameters**:
+
+        * **name**: `str`, `WatchlistType` (required) - A `WatchlistType` or in the case of `CUSTOM` watchlists, the watchlist `title`.
+
+        **Returns**: A watchlist ID (`str`).
         """
-
-        # if not watchlist type enum, then its an ID
-        try:
-            WatchlistType(watchlist)
-        except ValueError:
-            return watchlist
-
-        if watchlist == "CUSTOM":
-            raise ValueError(
-                "The Watchlist ID is required to update custom watchlists."
-            )
-
-        watchlist_id = self.watchlist_type_id_map.get(watchlist)
+        watchlist_id = self.watchlist_type_id_map.get(name)
         if not watchlist_id:
-            if create_if_not_found:
-                return self.create(watchlist).watchlist_id
-            else:
-                raise ValueError(f"Watchlist of type `{watchlist}` not found.")
+            raise WatchlistNotFoundError(name)
+        return watchlist_id

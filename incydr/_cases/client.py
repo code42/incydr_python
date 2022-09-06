@@ -127,7 +127,7 @@ class CasesV1:
         * **is_assigned**: `bool` - Filter cases with an assignee (`True`) or without (`False`).
         * **last_modified_by**: `str` - User UID of the user who most recently modified the case.
         * **name**: str - Name of a case on which to filter; will include partial matches.
-        * **status**: [`CaseStatus`][casestatus-enum] - One or more case statuses on which to filter. Available values: `OPEN`, `CLOSED`
+        * **status**: [`CaseStatus`] - One or more case statuses on which to filter. Available values: `OPEN`, `CLOSED`
         * **page_num**: `int` - Page number for results, starting at 1.
         * **page_size**: `int` - Max number of results to return for a page.
         * **sort_dir**: `SortDirection` - The direction on which to sort the response, based on the corresponding key.
@@ -381,7 +381,7 @@ class CasesV1:
         * **case_number**: `int` Unique numeric identifier for the case.
         * **event_id**: `str` Unique identifier for event associated with case.
 
-        **Returns**:  A [`FileEventV2`][fileeventv2-model] object representing the file event.
+        **Returns**:  A [`FileEventV2`][fileevent-model] object representing the file event.
         """
         response = self._parent.session.get(
             f"/v1/cases/{case_number}/fileevent/{event_id}"

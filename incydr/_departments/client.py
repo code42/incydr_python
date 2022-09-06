@@ -41,7 +41,7 @@ class DepartmentsV1:
         * **page_size**: `int` - Max number of results to return for a page.
         * **user_id**: `str` - Matches departments whose name is like the given value.
 
-        **Returns**: A [`DepartmentsPage`] object.
+        **Returns**: A [`DepartmentsPage`][departmentspage-model] object.
         """
         data = GetPageRequest(
             page=page_num,

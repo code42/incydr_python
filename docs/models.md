@@ -27,6 +27,10 @@ available model methods.
 ::: incydr.models.CasesPage
     :docstring:
 
+### `CaseFileEvents` model
+
+::: incydr.models.CaseFileEvents
+    :docstring:
 
 ## Customer
 ---
@@ -34,6 +38,14 @@ available model methods.
 ### `Customer` model
 
 ::: incydr.models.Customer
+    :docstring:
+
+## Departments
+---
+
+### `DepartmentsPage` model
+
+::: incydr.models.DepartmentsPage
     :docstring:
 
 ## Devices
@@ -49,6 +61,18 @@ available model methods.
 ::: incydr.models.DevicesPage
     :docstring:
 
+## Directory Groups
+---
+
+### `DirectoryGroup` model
+
+::: incydr.models.DirectoryGroup
+    :docstring:
+
+### `DirectoryGroupsPage` model
+
+::: incydr.models.DirectoryGroupsPage
+    :docstring:
 
 ## File Events
 ---
@@ -95,4 +119,57 @@ available model methods.
 ### `UsersPage` model
 
 ::: incydr.models.UsersPage
+    :docstring:
+
+## Watchlists
+---
+
+### `Watchlist` model
+
+::: incydr.models.Watchlist
+    :docstring:
+
+### `WatchlistsPage` model
+
+::: incydr.models.WatchlistsPage
+    :docstring:
+
+### `WatchlistUser` model
+
+::: incydr.models.WatchlistUser
+    :docstring:
+
+### `WatchlistMembersList` model
+
+::: incydr.models.WatchlistMembersList
+    :docstring:
+
+### `IncludedUsersList` model
+
+::: incydr.models.IncludedUsersList
+    :docstring:
+
+### `ExcludedUsersList` model
+
+::: incydr.models.ExcludedUsersList
+    :docstring:
+
+### `IncludedDepartmentsList` model
+
+::: incydr.models.IncludedDepartmentsList
+    :docstring:
+
+### `IncludedDepartment` model
+
+::: incydr.models.IncludedDepartment
+    :docstring:
+
+### `IncludedDirectoryGroupsList` model
+
+::: incydr.models.IncludedDirectoryGroupsList
+    :docstring:
+
+### `IncludedDirectoryGroup` model
+
+::: incydr.models.IncludedDirectoryGroup
     :docstring:

@@ -6,19 +6,18 @@ import pytest
 from pytest_httpserver import HTTPServer
 
 from incydr._core.client import Client
-from incydr._watchlists.models.responses import ExcludedUser
 from incydr._watchlists.models.responses import ExcludedUsersList
 from incydr._watchlists.models.responses import IncludedDepartment
 from incydr._watchlists.models.responses import IncludedDepartmentsList
 from incydr._watchlists.models.responses import IncludedDirectoryGroup
 from incydr._watchlists.models.responses import IncludedDirectoryGroupsList
-from incydr._watchlists.models.responses import IncludedUser
 from incydr._watchlists.models.responses import IncludedUsersList
 from incydr._watchlists.models.responses import Watchlist
-from incydr._watchlists.models.responses import WatchlistMember
 from incydr._watchlists.models.responses import WatchlistMembersList
 from incydr._watchlists.models.responses import WatchlistsPage
+from incydr._watchlists.models.responses import WatchlistUser
 from incydr.enums.watchlists import WatchlistType
+from incydr.exceptions import WatchlistNotFoundError
 
 TEST_WATCHLIST_ID = "1-watchlist-42"
 
@@ -226,7 +225,7 @@ def test_get_member_returns_expected_data(httpserver_auth: HTTPServer):
     ).respond_with_json(TEST_USER_1)
     c = Client()
     member = c.watchlists.v1.get_member(TEST_WATCHLIST_ID, "user-42")
-    assert isinstance(member, WatchlistMember)
+    assert isinstance(member, WatchlistUser)
     assert member.user_id == "user-42"
     assert member.username == "foo@bar.com"
     assert member.added_time == datetime.datetime.fromisoformat(
@@ -283,7 +282,7 @@ def test_get_included_user_returns_expected_data(httpserver_auth: HTTPServer):
     ).respond_with_json(TEST_USER_1)
     c = Client()
     user = c.watchlists.v1.get_included_user(TEST_WATCHLIST_ID, "user-42")
-    assert isinstance(user, IncludedUser)
+    assert isinstance(user, WatchlistUser)
     assert user.user_id == "user-42"
     assert user.username == "foo@bar.com"
     assert user.added_time == datetime.datetime.fromisoformat(
@@ -340,7 +339,7 @@ def test_get_excluded_user_returns_expected_data(httpserver_auth: HTTPServer):
     ).respond_with_json(TEST_USER_1)
     c = Client()
     user = c.watchlists.v1.get_excluded_user(TEST_WATCHLIST_ID, "user-42")
-    assert isinstance(user, ExcludedUser)
+    assert isinstance(user, WatchlistUser)
     assert user.user_id == "user-42"
     assert user.username == "foo@bar.com"
     assert user.added_time == datetime.datetime.fromisoformat(
@@ -480,29 +479,36 @@ def test_get_department_returns_expected_data(httpserver_auth: HTTPServer):
     assert department.json() == json.dumps(TEST_DEPARTMENT_1)
 
 
-# def test_check_watchlist_id_when_id_returns_id():
-#     watchlist_id = '4422c2244-44c22o44d22e44'
-#     c=Client()
-#     assert c.watchlists.v1._check_watchlist_id(watchlist_id) == watchlist_id
-#
-#
-# @watchlist_type_param
-# def test_check_watchlist_id_when_type_retrieves_id_from_map_property(httpserver_auth: HTTPServer, watchlist_type):
-#     data = {"watchlists": [TEST_WATCHLIST_1, TEST_WATCHLIST_2], "totalCount": 2}
-#     httpserver_auth.expect_request(
-#         "/v1/watchlists", method="GET"
-#     ).respond_with_json(data)
-#     c = Client()
-#     assert c.watchlists.v1._check_watchlist_id(watchlist_type) == "1-watchlist-42"
-#
-#
-# @watchlist_type_param
-# def test_check_watchlist_id_when_type_not_in_map_creates_watchlist(httpserver_auth: HTTPServer, watchlist_type):
-#     httpserver_auth.expect_ordered_request(
-#         "/v1/watchlists", method="GET"
-#     ).respond_with_json({"watchlists": [], "totalCount": 0})
-#     httpserver_auth.expect_ordered_request(
-#         "/v1/watchlists", method="POST"
-#     ).respond_with_json(TEST_WATCHLIST_1)
-#     c = Client()
-#     assert c.watchlists.v1._check_watchlist_id(watchlist_type) == "1-watchlist-42"
+@pytest.mark.parametrize(
+    ("name", "expected"),
+    [
+        ("DEPARTING_EMPLOYEE", "1-watchlist-42"),
+        (WatchlistType.DEPARTING_EMPLOYEE, "1-watchlist-42"),
+        ("test", "1-watchlist-43"),
+    ],
+)
+def test_get_id_by_name_returns_id(httpserver_auth: HTTPServer, name, expected):
+    data = {"watchlists": [TEST_WATCHLIST_1, TEST_WATCHLIST_2], "totalCount": 2}
+    query = {"page": 1, "pageSize": 100}
+    httpserver_auth.expect_request(
+        "/v1/watchlists", method="GET", query_string=urlencode(query)
+    ).respond_with_json(data)
+
+    c = Client()
+    actual = c.watchlists.v1.get_id_by_name(name)
+    assert expected == actual
+
+
+def test_get_id_by_name_when_no_id_raises_error(httpserver_auth: HTTPServer):
+    data = {"watchlists": [], "totalCount": 0}
+    query = {"page": 1, "pageSize": 100}
+    httpserver_auth.expect_request(
+        "/v1/watchlists", method="GET", query_string=urlencode(query)
+    ).respond_with_json(data)
+
+    c = Client()
+    with pytest.raises(WatchlistNotFoundError) as err:
+        c.watchlists.v1.get_id_by_name("name")
+    assert (
+        err.value.args[0] == "No watchlist matching the type or title 'name' was found."
+    )

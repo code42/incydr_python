@@ -25,24 +25,6 @@ class Date(ResponseModel):
     )
 
 
-class ExcludedUser(ResponseModel):
-    """
-    A model representing a user excluded from a watchlist.
-
-    **Fields**:
-
-    * **added_time**: `datetime` - The time the user was excluded from the watchlist.
-    * **user_id**: `str` - Unique user ID.
-    * **username**: `str - The username of the excluded user.
-    """
-
-    added_time: datetime = Field(None, alias="addedTime")
-    user_id: Optional[str] = Field(
-        None, description="A unique user ID.", example="23", alias="userId"
-    )
-    username: Optional[str] = Field(None, example="foo@bar.com")
-
-
 class IncludedDepartment(ResponseModel):
     """
     A model representing a department included on a watchlist.
@@ -80,15 +62,15 @@ class IncludedDirectoryGroup(ResponseModel):
     name: Optional[str] = Field(None, example="Research and development")
 
 
-class IncludedUser(ResponseModel):
+class WatchlistUser(ResponseModel):
     """
-    A model representing a user included on a watchlist.
+    A model representing a user whose associated with a watchlist.
 
     **Fields**:
 
-    * **added_time**: `datetime` - The time the user was included on the watchlist.
+    * **added_time**: `datetime` - The time the user was associated with the watchlist.
     * **user_id**: `str` - Unique user ID.
-    * **username**: `str - The username of the excluded user.
+    * **username**: `str - Username.
     """
 
     added_time: datetime = Field(None, alias="addedTime")
@@ -99,9 +81,10 @@ class IncludedUser(ResponseModel):
 
 
 class ExcludedUsersList(ResponseModel):
-    """A model representing a list of users excluded from a watchlist."""
+    """A model representing a list of users excluded from a watchlist.
+    Excluded users are those that have been individually excluded from that list."""
 
-    excluded_users: Optional[List[ExcludedUser]] = Field(None, alias="excludedUsers")
+    excluded_users: Optional[List[WatchlistUser]] = Field(None, alias="excludedUsers")
     total_count: Optional[int] = Field(
         None,
         description="The total count of all excluded users.",
@@ -139,33 +122,16 @@ class IncludedDirectoryGroupsList(ResponseModel):
 
 
 class IncludedUsersList(ResponseModel):
-    """A model representing a list of users included on a watchlist."""
+    """A model representing a list of users included on a watchlist.
+    Included users are those that have been individually included on that list."""
 
-    included_users: Optional[List[IncludedUser]] = Field(None, alias="includedUsers")
+    included_users: Optional[List[WatchlistUser]] = Field(None, alias="includedUsers")
     total_count: Optional[int] = Field(
         None,
         description="The total count of all included users.",
         example=10,
         alias="totalCount",
     )
-
-
-class WatchlistMember(ResponseModel):
-    """
-    A model representing an Incydr Watchlist member.
-
-    **Fields**:
-
-    * **added_time**: `datetime` - The time the user was added to the watchlist.
-    * **user_id**: `str` - Unique user ID.
-    * **username** `str` - Username for the user.
-    """
-
-    added_time: datetime = Field(None, alias="addedTime")
-    user_id: Optional[str] = Field(
-        None, description="A unique user ID.", example="23", alias="userId"
-    )
-    username: Optional[str] = Field(None, example="foo@bar.com")
 
 
 class WatchlistStats(ResponseModel):
@@ -204,7 +170,10 @@ class WatchlistStats(ResponseModel):
 
 class WatchlistMembersList(ResponseModel):
     """
-    A model representing a list of `WatchlistMember` objects.
+    A model representing a list of watchlist members.
+    Watchlist members are users who are on a list, whether it is because they are individually included,
+    or because they are part of a department or directory group that is included.
+
 
     **Fields**:
 
@@ -217,7 +186,7 @@ class WatchlistMembersList(ResponseModel):
         example=10,
         alias="totalCount",
     )
-    watchlist_members: Optional[List[WatchlistMember]] = Field(
+    watchlist_members: Optional[List[WatchlistUser]] = Field(
         None, alias="watchlistMembers"
     )
 
@@ -230,7 +199,7 @@ class Watchlist(ResponseModel):
 
     * **description**: `str` - Optional description for a custom watchlist.
     * **list_type**: `WatchlistType` - The watchlist type.
-    * **stats**: `WatchlistStats` - Watchlist membership information.  Includes `included_user_count`, `included_department_count`, etc.
+    * **stats**: `WatchlistStats` - Watchlist membership information.  Includes `included_user_count`, `included_department_count`, `included_directory_groups_count`, and `excluded_users_count`.
     * **tenant_id**: `str` - A unique tenant ID.
     * **title**: `str` - Title for a custom watchlist.
     * **watchlist_id**: `str` - A unique watchlist ID.
