@@ -40,7 +40,7 @@ Issues = "https://github.com/code42/incydr_python/issues"
 Source = "https://github.com/code42/incydr_python/incydr"
 
 [project.scripts]
-incydr = "incydr.cli.main:app"
+incydr = "incydr.cli.main:incydr"
 
 [tool.hatch.version]
 path = "incydr/__about__.py"

@@ -37,8 +37,6 @@ class Case(ResponseModel):
     * **name**: `str` Unique name given to the case.
     * **created_at**: `datetime` Time at which the case was created. json_alias=`createdAt`
     * **updated_at**: `datetime | None` Time at which the case was last updated. json_alias=`updatedAt`
-    * **description**: `str | None` Brief description providing context for a case.
-    * **findings**: `str | None` Markdown formatted text summarizing the findings for a case.
     * **subject**: `str | None` The user UID of the subject being investigated in this case.
     * **subject_username**: `str | None` The username of the subject being investigated in this case. json_alias=`subjectUsername`
     * **status**: `CaseStatus` Indicates the status of the case. OPEN: The case is active and all aspects of the case are editable. CLOSED: The case is resolved. Closed cases cannot be re-opened or modified. Case data for closed cases is retained indefinitely.
@@ -48,14 +46,13 @@ class Case(ResponseModel):
     * **created_by_username**: `str | None` Username of the user who created the case. json_alias=`createdByUsername`
     * **last_modified_by_user_id**: `str | None` User UID of the user who last modified the case. json_alias=`lastModifiedByUserUid`
     * **last_modified_by_username**: `str | None` Username of the user who last modified the case. json_alias=`lastModifiedByUsername`
+    * **archival_time**: `datetime` Date on which the case will be archived.
     """
 
     number: int = Field(allow_mutation=False, description="The identifier of the case.")
     name: str
     created_at: datetime = Field(allow_mutation=False, alias="createdAt")
     updated_at: Optional[datetime] = Field(allow_mutation=False, alias="updatedAt")
-    description: Optional[str]
-    findings: Optional[str]
     subject: Optional[str]
     subject_username: Optional[str] = Field(alias="subjectUsername")
     status: CaseStatus
@@ -75,9 +72,27 @@ class Case(ResponseModel):
     last_modified_by_username: Optional[str] = Field(
         allow_mutation=False, alias="lastModifiedByUsername"
     )
+    archival_time: Optional[datetime] = Field(
+        allow_mutation=False, alias="archivalTime"
+    )
 
     class Config:
         validate_assignment = True
+
+
+class CaseDetail(Case):
+    """A model representing the full details of Incydr Case.
+
+    **Fields**:
+
+    * **description**: `str | None` Brief description providing context for a case.
+    * **findings**: `str | None` Markdown formatted text summarizing the findings for a case.
+    """
+
+    created_at: datetime = Field(allow_mutation=False, alias="createdAt")
+    updated_at: Optional[datetime] = Field(allow_mutation=False, alias="updatedAt")
+    description: Optional[str]
+    findings: Optional[str]
 
 
 class CasesPage(ResponseModel):

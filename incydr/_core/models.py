@@ -83,14 +83,6 @@ class ResponseModel(BaseModel):
         json_encoders = {datetime: lambda dt: dt.isoformat().replace("+00:00", "Z")}
         extra = "allow"
 
-    def __rich_repr__(self):
-        """Get fields for Rich library"""
-        for name, field_repr in self.__repr_args__():
-            if name is None:
-                yield field_repr
-            else:
-                yield name, field_repr
-
 
 class AuthResponse(ResponseModel):
     token_type: str
