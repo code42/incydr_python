@@ -110,7 +110,7 @@ class TestRich:
 
 
 class TestLoggers:
-    def test_setting_file_logger(self, tmp_path):
+    def test_setting_file_logger(self, httpserver_auth: HTTPServer, tmp_path):
         log_file_1 = tmp_path / "incydr_test.log"
         log_file_2 = tmp_path / "incydr_test2.log"
 
@@ -124,7 +124,9 @@ class TestLoggers:
         assert "Should log to file 2." not in log_file_1.read_text()
         assert "Should log to file 2." in log_file_2.read_text()
 
-    def test_setting_log_file_and_stderr_env_vars(self, tmp_path, monkeypatch, capsys):
+    def test_setting_log_file_and_stderr_env_vars(
+        self, httpserver_auth: HTTPServer, tmp_path, monkeypatch, capsys
+    ):
         log_file = tmp_path / "test.log"
         monkeypatch.setenv("incydr_log_file", str(log_file))
         monkeypatch.setenv("incydr_log_stderr", "false")
@@ -137,7 +139,7 @@ class TestLoggers:
         assert "Should log to file." in log_file.read_text()
 
     @pytest.mark.filterwarnings("ignore::UserWarning")
-    def test_setting_custom_logger(self, tmp_path):
+    def test_setting_custom_logger(self, httpserver_auth: HTTPServer, tmp_path):
         test_logger = logging.getLogger("test_logger_1")
         log_file = tmp_path / "log1.log"
         handler = logging.FileHandler(filename=str(log_file.absolute()))
@@ -154,7 +156,7 @@ class TestLoggers:
         with pytest.warns(UserWarning):
             client.settings.log_file = "test"
 
-    def test_setting_stderr_logger(self, capsys):
+    def test_setting_stderr_logger(self, httpserver_auth: HTTPServer, capsys):
         client = Client(log_stderr=True, log_level="INFO")
         client.settings.logger.info("Should log to stderr.")
         captured = capsys.readouterr()
