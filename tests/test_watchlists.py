@@ -400,21 +400,21 @@ def test_list_included_directory_groups_returns_expected_data(
         f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-directory-groups"
     ).respond_with_json(data)
     c = Client()
-    groups = c.watchlists.v1.list_included_directory_groups(TEST_WATCHLIST_ID)
+    groups = c.watchlists.v1.list_directory_groups(TEST_WATCHLIST_ID)
     assert isinstance(groups, IncludedDirectoryGroupsList)
     assert groups.included_directory_groups[0].json() == json.dumps(TEST_GROUP_1)
     assert groups.included_directory_groups[1].json() == json.dumps(TEST_GROUP_2)
     assert groups.total_count == len(groups.included_directory_groups) == 2
 
 
-def test_get_included_directory_group_returns_expected_data(
+def test_get_directory_group_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     httpserver_auth.expect_request(
         f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-directory-groups/group-42"
     ).respond_with_json(TEST_GROUP_1)
     c = Client()
-    group = c.watchlists.v1.get_included_directory_group(TEST_WATCHLIST_ID, "group-42")
+    group = c.watchlists.v1.get_directory_group(TEST_WATCHLIST_ID, "group-42")
     assert isinstance(group, IncludedDirectoryGroup)
     assert group.group_id == "group-42"
     assert group.name == "Sales"
@@ -459,21 +459,19 @@ def test_list_included_departments_returns_expected_data(httpserver_auth: HTTPSe
         f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-departments"
     ).respond_with_json(data)
     c = Client()
-    departments = c.watchlists.v1.list_included_departments(TEST_WATCHLIST_ID)
+    departments = c.watchlists.v1.list_departments(TEST_WATCHLIST_ID)
     assert isinstance(departments, IncludedDepartmentsList)
     assert departments.included_departments[0].json() == json.dumps(TEST_DEPARTMENT_1)
     assert departments.included_departments[1].json() == json.dumps(TEST_DEPARTMENT_2)
     assert departments.total_count == len(departments.included_departments) == 2
 
 
-def test_get_included_department_returns_expected_data(httpserver_auth: HTTPServer):
+def test_get_department_returns_expected_data(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request(
         f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-departments/Engineering"
     ).respond_with_json(TEST_DEPARTMENT_1)
     c = Client()
-    department = c.watchlists.v1.get_included_department(
-        TEST_WATCHLIST_ID, "Engineering"
-    )
+    department = c.watchlists.v1.get_department(TEST_WATCHLIST_ID, "Engineering")
     assert isinstance(department, IncludedDepartment)
     assert department.name == "Engineering"
     assert department.added_time == datetime.datetime.fromisoformat(

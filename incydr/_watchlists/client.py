@@ -201,7 +201,7 @@ class WatchlistsV1:
         **Parameters**:
 
         * **watchlist**: `str`, `WatchlistType` (required) - Watchlist ID or a watchlist type.   An ID must be provided for custom watchlists.
-        * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to add.
+        * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to include on the watchlist.
         """
         watchlist = self._check_watchlist_id(watchlist)
 
@@ -217,12 +217,12 @@ class WatchlistsV1:
         self, watchlist: Union[str, WatchlistType], user_ids: Union[str, List[str]]
     ):
         """
-        Remove users from a watchlist.
+        Remove included users from a watchlist.
 
         **Parameters**:
 
         * **watchlist**: `str`, `WatchlistType` (required) - Watchlist ID or a watchlist type.  An ID must be provided for custom watchlists.
-        * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to remove.
+        * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to remove from the watchlist.
         """
         watchlist = self._check_watchlist_id(watchlist)
 
@@ -275,7 +275,7 @@ class WatchlistsV1:
         **Parameters**:
 
         * **watchlist**: `str`, `WatchlistType` (required) - Watchlist ID or a watchlist type.  An ID must be provided for custom watchlists.
-        * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to exclude.
+        * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to exclude from the watchlist.
         """
         data = UpdateExcludedUsersRequest(
             userIds=user_ids if isinstance(user_ids, List) else [user_ids],
@@ -327,18 +327,16 @@ class WatchlistsV1:
         )
         return ExcludedUser.parse_response(response)
 
-    # TODO: should these be called add_included_directory_groups/remove_included_directory_groups and add_included_departments/remove_departments
-
     def add_directory_groups(
         self, watchlist: Union[str, WatchlistType], group_ids: Union[str, List[str]]
     ):
         """
-        Include directory group on a watchlist.
+        Include directory groups on a watchlist. Use the `directory_groups` client to see available directory groups.
 
         **Parameters**:
 
         * **watchlist**: `str`, `WatchlistType` (required) - Watchlist ID or a watchlist type.  An ID must be provided for custom watchlists.
-        * **group_ids**: `str`, `List[str]` (required) - List of directory group IDs to add to the watchlist.
+        * **group_ids**: `str`, `List[str]` (required) - List of directory group IDs to include on the watchlist.
         """
         watchlist = self._check_watchlist_id(watchlist)
 
@@ -354,7 +352,7 @@ class WatchlistsV1:
         self, watchlist: Union[str, WatchlistType], group_ids: Union[str, List[str]]
     ):
         """
-        Remove an included directory group from a watchlist.
+        Remove included directory groups from a watchlist.
 
         **Parameters**:
 
@@ -371,9 +369,7 @@ class WatchlistsV1:
             json=data.dict(),
         )
 
-    def list_included_directory_groups(
-        self, watchlist_id: str
-    ) -> IncludedDirectoryGroupsList:
+    def list_directory_groups(self, watchlist_id: str) -> IncludedDirectoryGroupsList:
         """
         List directory groups included on a watchlist.
 
@@ -389,7 +385,7 @@ class WatchlistsV1:
         )
         return IncludedDirectoryGroupsList.parse_response(response)
 
-    def get_included_directory_group(
+    def get_directory_group(
         self, watchlist_id: str, group_id: str
     ) -> IncludedDirectoryGroup:
         """
@@ -414,12 +410,12 @@ class WatchlistsV1:
         departments: Union[str, List[str]],
     ):
         """
-        Include a department on a watchlist.
+        Include departments on a watchlist. Use the `departments` client to see available departments.
 
         **Parameters**:
 
         * **watchlist**: `str`, `WatchlistType` (required) - Watchlist ID or a watchlist type.  An ID must be provided for custom watchlists.
-        * **departments**: `str`, `List[str]` (required) - List of departments to add to the watchlist.
+        * **departments**: `str`, `List[str]` (required) - List of departments to include on the watchlist.
         """
         watchlist_id = self._check_watchlist_id(watchlist_id)
 
@@ -436,7 +432,7 @@ class WatchlistsV1:
         departments: Union[str, List[str]],
     ):
         """
-        Remove an included department from a watchlist.
+        Remove included departments from a watchlist.
 
         **Parameters**:
 
@@ -453,7 +449,7 @@ class WatchlistsV1:
             json=data.dict(),
         )
 
-    def list_included_departments(self, watchlist_id: str) -> IncludedDepartmentsList:
+    def list_departments(self, watchlist_id: str) -> IncludedDepartmentsList:
         """
         List departments included on a watchlist.
 
@@ -468,9 +464,7 @@ class WatchlistsV1:
         )
         return IncludedDepartmentsList.parse_response(response)
 
-    def get_included_department(
-        self, watchlist_id: str, department: str
-    ) -> IncludedDepartment:
+    def get_department(self, watchlist_id: str, department: str) -> IncludedDepartment:
         """
         Get an included department from a watchlist.
 
