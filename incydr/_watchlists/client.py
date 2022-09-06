@@ -57,10 +57,8 @@ class WatchlistsV1:
             self._watchlist_type_id_map = {}
             watchlists = self.get_page(page_size=100).watchlists
             for item in watchlists:
-                if (
-                    item.list_type == "CUSTOM"
-                ):  # store title for custom lists instead of list_type
-                    # store titles in all caps to prevent casing mismatches
+                if item.list_type == "CUSTOM":
+                    # store title for custom lists instead of list_type
                     self._watchlist_type_id_map[item.title] = item.watchlist_id
 
                 self._watchlist_type_id_map[item.list_type] = item.watchlist_id
@@ -494,5 +492,9 @@ class WatchlistsV1:
         """
         watchlist_id = self.watchlist_type_id_map.get(name)
         if not watchlist_id:
-            raise WatchlistNotFoundError(name)
+            # if not found, reset ID cache
+            self._watchlist_type_id_map = None
+            watchlist_id = self.watchlist_type_id_map.get(name)
+            if not watchlist_id:
+                raise WatchlistNotFoundError(name)
         return watchlist_id

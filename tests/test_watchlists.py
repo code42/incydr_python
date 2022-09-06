@@ -512,3 +512,19 @@ def test_get_id_by_name_when_no_id_raises_error(httpserver_auth: HTTPServer):
     assert (
         err.value.args[0] == "No watchlist matching the type or title 'name' was found."
     )
+
+
+def test_get_id_by_name_when_no_id_calls_get_page_and_finds_match_returns_id(
+    httpserver_auth: HTTPServer,
+):
+    query = {"page": 1, "pageSize": 100}
+    httpserver_auth.expect_ordered_request(
+        "/v1/watchlists", method="GET", query_string=urlencode(query)
+    ).respond_with_json({"watchlists": [], "totalCount": 0})
+    httpserver_auth.expect_ordered_request(
+        "/v1/watchlists", method="GET", query_string=urlencode(query)
+    ).respond_with_json({"watchlists": [TEST_WATCHLIST_1], "totalCount": 1})
+
+    c = Client()
+    watchlist_id = c.watchlists.v1.get_id_by_name("DEPARTING_EMPLOYEE")
+    assert watchlist_id == "1-watchlist-42"
