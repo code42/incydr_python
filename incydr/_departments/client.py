@@ -28,9 +28,7 @@ class DepartmentsV1:
     def __init__(self, parent):
         self._parent = parent
 
-    def get_departments_page(
-        self, page_num: int = 1, page_size=None, name=None
-    ) -> DepartmentsPage:
+    def get_page(self, page_num: int = 1, page_size=None, name=None) -> DepartmentsPage:
         """
         Get a page of departments.  Retrieves department information that has been pushed to Code42 from SCIM or User Directory Sync.
         The resulting department names can be used to include departments on watchlists.

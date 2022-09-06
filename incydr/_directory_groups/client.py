@@ -28,7 +28,7 @@ class DirectoryGroupsV1:
     def __init__(self, parent):
         self._parent = parent
 
-    def get_directory_groups_page(
+    def get_page(
         self, page_num: int = 1, page_size=None, name=None
     ) -> DirectoryGroupsPage:
         """

@@ -7,7 +7,7 @@ from incydr._core.client import Client
 from incydr._directory_groups.models import DirectoryGroupsPage
 
 
-def test_get_directory_groups_page_when_default_params_returns_expected_data(
+def test_get_page_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     data = {
@@ -22,7 +22,7 @@ def test_get_directory_groups_page_when_default_params_returns_expected_data(
     ).respond_with_json(data)
 
     c = Client()
-    page = c.directory_groups.v1.get_directory_groups_page()
+    page = c.directory_groups.v1.get_page()
     assert isinstance(page, DirectoryGroupsPage)
     assert page.directory_groups[0].json() == json.dumps(
         {"groupId": "group-42", "name": "Sales"}
@@ -33,7 +33,7 @@ def test_get_directory_groups_page_when_default_params_returns_expected_data(
     assert page.total_count == len(page.directory_groups) == 2
 
 
-def test_get_directory_groups_page_when_custom_params_returns_expected_data(
+def test_get_page_when_custom_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     data = {
@@ -50,9 +50,7 @@ def test_get_directory_groups_page_when_custom_params_returns_expected_data(
     ).respond_with_json(data)
 
     c = Client()
-    page = c.directory_groups.v1.get_directory_groups_page(
-        page_num=1, page_size=2, name="Sales"
-    )
+    page = c.directory_groups.v1.get_page(page_num=1, page_size=2, name="Sales")
     assert isinstance(page, DirectoryGroupsPage)
     assert page.directory_groups[0].json() == json.dumps(
         {"groupId": "group-42", "name": "Sales"}
