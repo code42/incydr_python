@@ -1,21 +1,44 @@
-import typing
+from typing import Optional
+
 from requests.exceptions import HTTPError
+from rich.markdown import Markdown
+from rich.panel import Panel
+from rich.table import Table
 from typer import Context
 from typer import Option
 from typer import Typer
 from typer import echo
-from incydr.cli import init_incydr_client, console
-from incydr.cli.options import format_option
-from incydr.cli.options import Format
+
+import incydr.cli.render as render
+from incydr._cases.models import CaseDetail
+from incydr.cli import console
+from incydr.cli import init_incydr_client
+from incydr.cli.options import SingleFormat
+from incydr.cli.options import TableFormat
 from incydr.cli.options import columns_option
-from incydr.models import Case
-from rich.table import Table
-from rich.markdown import Markdown
-from rich import print
-from csv import DictWriter
-import sys
+from incydr.cli.options import single_format_option
+from incydr.cli.options import table_format_option
 
 app = Typer()
+
+
+def render_case(case: CaseDetail):
+    field_table = Table.grid(padding=(0, 1), expand=False)
+    field_table.title = f"Case {case.number}"
+    for name, field in case.__fields__.items():
+        if name == "number":
+            continue
+        if name == "findings" and case.findings is not None:
+            field_table.add_row(
+                Panel(
+                    Markdown(case.findings, justify="left"),
+                    title="Findings",
+                    width=80,
+                )
+            )
+        else:
+            field_table.add_row(f"{name} = {getattr(case, name)}")
+    console.print(Panel.fit(field_table))
 
 
 @app.command()
@@ -29,54 +52,60 @@ def create(
         help="Markdown formatted details of case notes.", default=None
     ),
 ):
+    client = ctx.obj()
     try:
-        case = ctx.obj().cases.v1.create(
+        case = client.cases.v1.create(
             name,
             subject=subject,
             assignee=assignee,
             findings=findings,
             description=description,
         )
-        print(case)
+        if client.settings.use_rich:
+            render_case(case)
+        else:
+            echo(case.json())
     except HTTPError as err:
-        print(err.response.text)
+        console.print(f"[red]Error:[/red] {err.response.text}")
 
 
 @app.command("list")
 def list_(
     ctx: Context,
-    format_: Format = format_option,
-    columns: str = columns_option,
+    format_: TableFormat = table_format_option,
+    columns: Optional[str] = columns_option,
 ):
-    if columns:
-        columns = columns.split(",")
+    client = ctx.obj()
+    cases = client.cases.v1.iter_all()
 
-    with console.status("Working..."):
-        cases = ctx.obj().cases.v1.iter_all()
-        if format_ == Format.table:
-            table = Table(*Case.__table_header__(columns=columns), title="Cases")
-            for case in cases:
-                table.add_row(*case.__table_row__(columns=columns))
-            console.print(table)
-        if format_ == Format.csv:
-            writer = DictWriter(sys.stdout, fieldnames=Case.__fields__)
-            for case in cases:
-                writer.writerow(case.dict(by_alias=False))
+    if format_ == TableFormat.table and client.settings.use_rich:
+        with console.pager():
+            render.table(cases, columns=columns, title="Cases")
 
-        if format_ == Format.json:
-            for case in cases:
-                console.print_json(case.json(include=set(columns)))
-        if format_ == Format.raw_json:
-            for case in cases:
-                echo(case.json())
+    if format_ == TableFormat.csv:
+        render.csv(cases, columns=columns)
+
+    if format_ == TableFormat.json:
+        for case in cases:
+            console.print_json(case.json(include=columns))
+
+    else:
+        for case in cases:
+            echo(case.json(include=columns))
 
 
 @app.command()
-def show(ctx: Context, case_number: int):
-    case = ctx.obj().cases.v1.get_case(case_number)
-    from rich.panel import Panel
+def show(ctx: Context, case_number: int, format_: SingleFormat = single_format_option):
+    client = ctx.obj()
+    case = client.cases.v1.get_case(case_number)
+    if format_ == SingleFormat.rich and client.settings.use_rich:
+        render_case(case)
 
-    print(Panel(Markdown(case.findings), expand=False))
+    elif format_ == SingleFormat.json:
+        console.print_json(case.json())
+
+    else:
+        echo(case.json())
 
 
 if __name__ == "__main__":

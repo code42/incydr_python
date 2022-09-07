@@ -6,7 +6,7 @@ from rich.console import Console
 from incydr import Client
 from incydr._core.settings import LogLevel
 
-console = Console(width=1000)
+console = Console()
 
 
 def init_incydr_client(
