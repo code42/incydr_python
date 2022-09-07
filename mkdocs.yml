@@ -31,6 +31,7 @@ nav:
   - Introduction: 'index.md'
   - Client: 'client.md'
   - Settings: 'settings.md'
+  - Alert Rules: 'alert_rules.md'
   - Cases: 'cases.md'
   - Customer: 'customer.md'
   - Devices: 'devices.md'

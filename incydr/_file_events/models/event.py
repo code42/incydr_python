@@ -79,7 +79,7 @@ class RemovableMedia(BaseModel):
     )
     media_name: Optional[str] = Field(
         alias="mediaName",
-        description="For events detected on removable media, the media name of the device, as reported by the vendor/device. This is usually very similar to the productName, but can vary based on the type of device. For example, if the device is a hard drive in a USB enclosure, this may be the combination of the drive model and the enclosure model.\nThis value is not provided by all devices, so it may be null in some cases.",
+        description="For events detected on removable media, the media name of the device, as reported by the vendor/device. This is usually very similar to the productName, but can vary based on the rule_type of device. For example, if the device is a hard drive in a USB enclosure, this may be the combination of the drive model and the enclosure model.\nThis value is not provided by all devices, so it may be null in some cases.",
         example="Cruzer Blade",
     )
     name: Optional[str] = Field(
@@ -208,7 +208,7 @@ class Destination(BaseModel):
     )
     account_type: Optional[str] = Field(
         alias="accountType",
-        description="For cloud sync apps installed on user devices, the type of account where the event was observed. For example, 'BUSINESS' or 'PERSONAL'.",
+        description="For cloud sync apps installed on user devices, the rule_type of account where the event was observed. For example, 'BUSINESS' or 'PERSONAL'.",
         example="BUSINESS",
     )
     category: Optional[str] = Field(
@@ -266,7 +266,7 @@ class Destination(BaseModel):
 
 class File(BaseModel):
     category: Optional[str] = Field(
-        description="A categorization of the file that is inferred from MIME type.",
+        description="A categorization of the file that is inferred from MIME rule_type.",
         example="Audio",
     )
     category_by_bytes: Optional[str] = Field(
@@ -307,12 +307,12 @@ class File(BaseModel):
     )
     mime_type_by_bytes: Optional[str] = Field(
         alias="mimeTypeByBytes",
-        description="The MIME type of the file based on its contents.",
+        description="The MIME rule_type of the file based on its contents.",
         example="text/csv",
     )
     mime_type_by_extension: Optional[str] = Field(
         alias="mimeTypeByExtension",
-        description="The MIME type of the file based on its extension.",
+        description="The MIME rule_type of the file based on its extension.",
         example="audio/vorbis",
     )
     modified: Optional[datetime] = Field(
@@ -410,7 +410,7 @@ class RelatedEvent(BaseModel):
     )
     event_action: Optional[str] = Field(
         alias="eventAction",
-        description="The type of file event observed. For example: file-modified, application-read, removable-media-created.",
+        description="The rule_type of file event observed. For example: file-modified, application-read, removable-media-created.",
         example="file-downloaded",
     )
     id: Optional[str] = Field(
@@ -439,7 +439,7 @@ class RelatedEvent(BaseModel):
 
 class Event(BaseModel):
     action: Optional[str] = Field(
-        description="The type of file event observed. For example: file-modified, application-read, removable-media-created.",
+        description="The rule_type of file event observed. For example: file-modified, application-read, removable-media-created.",
         example="file-downloaded",
     )
     id: Optional[str] = Field(

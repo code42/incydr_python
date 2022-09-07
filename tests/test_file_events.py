@@ -60,7 +60,7 @@ TEST_EVENT_1 = {
         "description": None,
         "headers": [],
         "count": None,
-        "type": None,
+        "rule_type": None,
     },
     "source": {
         "category": "Device",
@@ -193,7 +193,7 @@ TEST_EVENT_2 = {
         "headers": [],
         "id": None,
         "name": None,
-        "type": None,
+        "rule_type": None,
     },
     "source": {
         "category": None,

@@ -14,6 +14,61 @@
 See [Pydantic documentation](https://pydantic-docs.helpmanual.io/usage/models/#model-properties) for full list of
 available model methods.
 
+
+## Alert Rules
+---
+
+### `AssignedUsersList` model
+
+::: incydr.models.AssignedUsersList
+    :docstring:
+
+### `AssignedUser` model
+
+::: incydr.models.AssignedUser
+    :docstring:
+
+### `CloudSharePermissionsRuleDetailsList` model
+
+::: incydr.models.CloudSharePermissionsRuleDetailsList
+    :docstring:
+
+### `CloudSharePermissionsRuleDetails` model
+
+::: incydr.models.CloudSharePermissionsRuleDetails
+    :docstring:
+
+### `FileNameRuleDetailsList` model
+
+::: incydr.models.FileNameRuleDetailsList
+    :docstring:
+
+### `FileNameRuleDetails` model
+
+::: incydr.models.FileNameRuleDetails
+    :docstring:
+
+### `FileTypeMismatchRuleDetailsList` model
+
+::: incydr.models.FileTypeMismatchRuleDetailsList
+    :docstring:
+
+### `FileTypeMismatchRuleDetails` model
+
+::: incydr.models.FileTypeMismatchRuleDetails
+    :docstring:
+
+### `EndpointExfiltrationRuleDetailsList` model
+
+::: incydr.models.EndpointExfiltrationRuleDetailsList
+    :docstring:
+
+### `EndpointExfiltrationRuleDetails` model
+
+::: incydr.models.EndpointExfiltrationRuleDetails
+    :docstring:
+
+
 ## Cases
 ---
 

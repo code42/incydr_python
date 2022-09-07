@@ -13,7 +13,7 @@ from incydr.enums.file_events import Operator
 
 class SearchFilter(ResponseModel):
     operator: Optional[Operator] = Field(
-        description="The type of match to perform.  Default value is `IS`.",
+        description="The rule_type of match to perform.  Default value is `IS`.",
         example="IS_NOT",
     )
     term: Optional[EventSearchTerm] = Field(

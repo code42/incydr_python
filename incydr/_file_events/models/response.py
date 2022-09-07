@@ -22,7 +22,7 @@ class QueryProblem(ResponseModel):
 
     * **bad_filter**: `SearchFilter` - The search filter that caused the problem.
     * **description**: `str` - Additional description of the problem.
-    * **type**: 'ProblemType' - The type of problem that occurred. Ex: `SEARCH_FAILED`
+    * **rule_type**: 'ProblemType' - The rule_type of problem that occurred. Ex: `SEARCH_FAILED`
 
     """
 
@@ -35,7 +35,7 @@ class QueryProblem(ResponseModel):
         example="Request timed out.  Refine your filter criteria and try again.",
     )
     type: SearchProblemType = Field(
-        description="The type of problem that occured.", example="SEARCH_FAILED"
+        description="The rule_type of problem that occured.", example="SEARCH_FAILED"
     )
 
 
