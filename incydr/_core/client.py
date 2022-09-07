@@ -12,6 +12,7 @@ from incydr._core.settings import IncydrSettings
 from incydr._customer.client import CustomerClient
 from incydr._devices.client import DevicesClient
 from incydr._file_events.client import FileEventsClient
+from incydr._user_risk_profiles.client import UserRiskProfiles
 
 _base_user_agent = user_agent("incydr", __version__)
 
@@ -80,6 +81,7 @@ class Client:
         self._customer = CustomerClient(self)
         self._file_events = FileEventsClient(self)
         self._devices = DevicesClient(self)
+        self._user_risk_profiles = UserRiskProfiles(self)
 
         self._session.auth.refresh()
 
@@ -152,3 +154,16 @@ class Client:
 
         """
         return self._devices
+
+    @property
+    def user_risk_profiles(self):
+        """
+        Property returning a [`UserRiskProfilesClient`](../userRiskProfiles) for interacting with
+        `/v*/user_risk_profiles` API endpoints.
+
+        Usage:
+
+            >>> client.user_risk_profiles.v1.get_user_risk_profile("23")
+
+        """
+        return self._user_risk_profiles
