@@ -36,6 +36,7 @@ available model methods.
 ::: incydr.models.Customer
     :docstring:
 
+
 ## Devices
 ---
 
@@ -71,6 +72,9 @@ available model methods.
 ### `SavedSearchesPage` model
 
 ::: incydr.models.SavedSearchesPage
+    :docstring:
+
+
 ## Roles
 ---
 
@@ -83,6 +87,7 @@ available model methods.
 
 ::: incydr.models.UpdateRolesResponse
     :docstring:
+
 
 ## Users
 ---
