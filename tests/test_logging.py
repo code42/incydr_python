@@ -1,3 +1,4 @@
+import io
 import logging
 import re
 import sys
@@ -30,6 +31,22 @@ class TestLogLevels:
         assert client.settings.logger.getEffectiveLevel() == expected
         if expected < logging.INFO:
             assert "DEBUG    POST /v1/oauth HTTP/1.1" in captured.err
+
+    @pytest.mark.parametrize(
+        ["env_level", "init_level", "expected"],
+        [
+            ("INFO", "DEBUG", logging.DEBUG),
+            ("INFO", "ERROR", logging.ERROR),
+            ("INFO", "WARNING", logging.WARNING),
+            ("WARNING", "INFO", logging.INFO),
+        ],
+    )
+    def test_init_param_overrides_env_var(
+        self, httpserver_auth: HTTPServer, monkeypatch, env_level, init_level, expected
+    ):
+        monkeypatch.setenv("incydr_log_level", env_level)
+        client = Client(log_level=init_level, log_stderr=False)
+        assert client.settings.log_level == expected
 
     def test_modifying_log_level_setting_affects_logging(
         self, httpserver_auth: HTTPServer, capsys
