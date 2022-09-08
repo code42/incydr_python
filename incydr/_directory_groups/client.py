@@ -1,3 +1,5 @@
+from itertools import count
+
 from incydr._departments.models import GetPageRequest
 from incydr._directory_groups.models import DirectoryGroupsPage
 
@@ -52,6 +54,17 @@ class DirectoryGroupsV1:
         response = self._parent.session.get("/v1/directory-groups", params=data.dict())
         return DirectoryGroupsPage.parse_response(response)
 
-    def iter_all(self):
-        # TODO
-        pass
+    def iter_all(self, page_size=None, name=None):
+        """
+        Iterate over all directory groups.
+
+        Accepts the same parameters as `.get_page()` excepting `page_num`.
+
+        **Returns**: A generator yielding individual [`DirectoryGroup`][directorygroup-model] objects.
+        """
+        page_size = page_size or self._parent.settings.page_size
+        for page_num in count(1):
+            page = self.get_page(page_num=page_num, page_size=page_size, name=name)
+            yield from page.directory_groups
+            if len(page.directory_groups) < page_size:
+                break

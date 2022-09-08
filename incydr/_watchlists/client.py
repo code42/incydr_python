@@ -1,3 +1,5 @@
+from itertools import count
+from typing import Iterator
 from typing import List
 from typing import Union
 
@@ -83,6 +85,25 @@ class WatchlistsV1:
         data = ListWatchlistsRequest(page=page_num, pageSize=page_size, userId=user_id)
         response = self._parent.session.get(self._uri, params=data.dict())
         return WatchlistsPage.parse_response(response)
+
+    def iter_all(
+        self, page_size: int = None, user_id: str = None
+    ) -> Iterator[Watchlist]:
+        """
+        Iterate over all watchlists.
+
+        Accepts the same parameters as `.get_page()` excepting `page_num`.
+
+        **Returns**: A generator yielding individual [`Watchlist`][watchlist-model] objects.
+        """
+        page_size = page_size or self._parent.settings.page_size
+        for page_num in count(1):
+            page = self.get_page(
+                page_num=page_num, page_size=page_size, user_id=user_id
+            )
+            yield from page.watchlists
+            if len(page.watchlists) < page_size:
+                break
 
     def get(self, watchlist_id: str) -> Watchlist:
         """
@@ -489,6 +510,7 @@ class WatchlistsV1:
 
         **Returns**: A watchlist ID (`str`).
         """
+
         def _lookup_ids(self):
             """Map watchlist types to IDs, if they exist."""
             self._watchlist_type_id_map = {}

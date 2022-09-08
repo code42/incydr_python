@@ -43,9 +43,23 @@ TEST_WATCHLIST_2 = {
         "includedDirectoryGroupsCount": 10,
         "includedUsersCount": 43,
     },
-    "tenantId": "code-43",
+    "tenantId": "code-42",
     "title": "test",
     "watchlistId": "1-watchlist-43",
+}
+
+TEST_WATCHLIST_3 = {
+    "description": None,
+    "listType": "NEW_EMPLOYEE",
+    "stats": {
+        "excludedUsersCount": 1,
+        "includedDepartmentsCount": 0,
+        "includedDirectoryGroupsCount": 1,
+        "includedUsersCount": 10,
+    },
+    "tenantId": "code-42",
+    "title": None,
+    "watchlistId": "1-watchlist-44",
 }
 
 TEST_USER_1 = {
@@ -120,6 +134,39 @@ def test_get_page_when_custom_params_returns_expected_data(httpserver_auth: HTTP
     assert page.watchlists[0].json() == json.dumps(TEST_WATCHLIST_1)
     assert page.watchlists[1].json() == json.dumps(TEST_WATCHLIST_2)
     assert page.total_count == len(page.watchlists) == 2
+
+
+def test_iter_all_when_default_params_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
+    query_1 = {
+        "page": 1,
+        "pageSize": 2,
+    }
+    query_2 = {
+        "page": 2,
+        "pageSize": 2,
+    }
+
+    data_1 = {"watchlists": [TEST_WATCHLIST_1, TEST_WATCHLIST_2], "totalCount": 2}
+    data_2 = {"watchlists": [TEST_WATCHLIST_3], "totalCount": 1}
+
+    httpserver_auth.expect_ordered_request(
+        "/v1/watchlists", method="GET", query_string=urlencode(query_1)
+    ).respond_with_json(data_1)
+    httpserver_auth.expect_ordered_request(
+        "/v1/watchlists", method="GET", query_string=urlencode(query_2)
+    ).respond_with_json(data_2)
+
+    client = Client()
+    iterator = client.watchlists.v1.iter_all(page_size=2)
+    total = 0
+    expected = [TEST_WATCHLIST_1, TEST_WATCHLIST_2, TEST_WATCHLIST_3]
+    for item in iterator:
+        total += 1
+        assert isinstance(item, Watchlist)
+        assert item.json() == json.dumps(expected.pop(0))
+    assert total == 3
 
 
 def test_get_returns_expected_data(httpserver_auth: HTTPServer):
