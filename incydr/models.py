@@ -16,16 +16,16 @@ __all__ = [
     "Case",
     "CasesPage",
     "Customer",
-    "DevicesPage",
     "Device",
-    "User",
-    "UsersPage",
-    "Role",
-    "UpdateRolesResponse",
+    "DevicesPage",
     "SavedSearchesPage",
     "SavedSearch",
     "FileEventsPage",
     "FileEventV2",
+    "User",
+    "UsersPage",
+    "Role",
+    "UpdateRolesResponse",
 ]
 
 

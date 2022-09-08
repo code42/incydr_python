@@ -36,6 +36,21 @@ available model methods.
 ::: incydr.models.Customer
     :docstring:
 
+
+## Devices
+---
+
+### `Device` model
+
+::: incydr.models.Device
+    :docstring:
+
+### `DevicesPage` model
+
+::: incydr.models.DevicesPage
+    :docstring:
+
+
 ## File Events
 ---
 
@@ -59,18 +74,6 @@ available model methods.
 ::: incydr.models.SavedSearchesPage
     :docstring:
 
-## Devices
----
-
-### `Device` model
-
-::: incydr.models.Device
-    :docstring:
-
-### `DevicesPage` model
-
-::: incydr.models.DevicesPage
-    :docstring:
 
 ## Roles
 ---
@@ -84,6 +87,7 @@ available model methods.
 
 ::: incydr.models.UpdateRolesResponse
     :docstring:
+
 
 ## Users
 ---

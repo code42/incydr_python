@@ -16,7 +16,12 @@ from rich.logging import RichHandler
 
 from incydr.enums import _Enum
 
+# capture default displayhook so we can "uninstall" rich
+_sys_displayhook = sys.displayhook
 _incydr_console = Console(stderr=True)
+
+
+_log_level_map = {"ERROR": 40, "WARNING": 30, "WARN": 30, "INFO": 20, "DEBUG": 10}
 
 
 class LogLevel(_Enum):
@@ -27,16 +32,10 @@ class LogLevel(_Enum):
     DEBUG = "DEBUG"
 
 
-# capture default displayhook so we can "uninstall" rich
-_sys_displayhook = sys.displayhook
-
-
 _std_log_formatter = logging.Formatter(
     fmt="%(asctime)s - %(name)s:%(levelname)s - %(message)s", datefmt="[%x %X]"
 )
 _rich_log_formatter = logging.Formatter(fmt="%(message)s", datefmt="[%x %X]")
-_log_level_map = {"ERROR": 40, "WARNING": 30, "WARN": 30, "INFO": 20, "DEBUG": 10}
-_custom_log_warning = "Custom logger detected, '{}' setting on `incydr.Client` will not apply to custom logger."
 
 
 class IncydrSettings(BaseSettings):
@@ -199,58 +198,3 @@ class IncydrSettings(BaseSettings):
         logger.setLevel(log_level)
         values["logger"] = logger
         return values
-
-    # @validator("logger")
-    # def _validate_logger(cls, value, values, config, **kwargs):
-    #     if value is None:
-    #         return configure_logger(**values)
-    #     if isinstance(value, logging.Logger):
-    #         config.custom_logger = True
-    #     if not isinstance(value, logging.Logger):
-    #         raise ValueError(f"{value} is not a logging.Logger")
-    #     return value
-
-
-def configure_logger(
-    logger: logging.Logger = None,
-    log_file: Union[str, IOBase] = None,
-    use_rich: bool = True,
-    log_level: int = 40,
-    log_stderr: bool = True,
-    **kwargs,
-):
-    if logger is None:
-        logger = logging.getLogger("incydr")
-    logger.handlers.clear()
-
-    if log_stderr and use_rich:
-        console = Console(stderr=True)
-        rich_handler = RichHandler(console=console, rich_tracebacks=True)
-        rich_handler.setFormatter(_rich_log_formatter)
-        logger.addHandler(rich_handler)
-
-    if log_stderr and not use_rich:
-        std_handler = logging.StreamHandler()
-        std_handler.setFormatter(_std_log_formatter)
-        logger.addHandler(std_handler)
-
-    if log_file and use_rich:
-        if isinstance(log_file, str):
-            file = open(log_file, "a", encoding="utf-8")
-        else:
-            file = log_file
-        console = Console(file=file, no_color=True, width=200)
-        rich_file_handler = RichHandler(console=console, rich_tracebacks=True)
-        rich_file_handler.setFormatter(_rich_log_formatter)
-        logger.addHandler(rich_file_handler)
-
-    if log_file and not use_rich:
-        if isinstance(log_file, str):
-            std_file_handler = logging.FileHandler(filename=log_file, encoding="utf-8")
-        else:
-            std_file_handler = logging.StreamHandler(stream=log_file)
-        std_file_handler.setFormatter(_std_log_formatter)
-        logger.addHandler(std_file_handler)
-
-    logger.setLevel(log_level)
-    return logger

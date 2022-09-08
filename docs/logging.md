@@ -29,7 +29,7 @@ The output from the above code snippets would look like this:
 
 ### Disable logging to stderr
 
-To disable logging to stderr, you can:
+To disable logging to stderr, you can do any of the following:
 
 - Set `INCYDR_LOG_STDERR=false` in your environment
 - Initialize client with `log_stderr` argument set to False: `client = incydr.Client(log_stderr=False)`
@@ -37,7 +37,7 @@ To disable logging to stderr, you can:
 
 
 ### Disable Rich formatting
-To disable Rich formatting in your log output:
+To disable Rich formatting in your log output, you can do any of the following:
 
 - Set `INCYDR_USE_RICH=false` in your environment
 - Initialize client with `use_rich` argument set to False: `client = incydr.Client(use_rich=False)`
@@ -46,7 +46,7 @@ To disable Rich formatting in your log output:
 ### Log to a file
 
 To output logs to a file, set the `client.settings.log_file` property to any of the following:
-    
+
 - A string representing a valid file path
 - A [`pathlib.Path`](https://docs.python.org/3/library/pathlib.html) object represting a valid file path
 - A file object inheriting from [`io.IOBase`](https://docs.python.org/3/library/io.html?highlight=io#io.IOBase)
