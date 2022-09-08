@@ -29,7 +29,7 @@ The output from the above code snippets would look like this:
 
 ### Disable logging to stderr
 
-To disable logging to stderr, you can:
+To disable logging to stderr, you can do any of the following:
 
 - Set `INCYDR_LOG_STDERR=false` in your environment
 - Initialize client with `log_stderr` argument set to False: `client = incydr.Client(log_stderr=False)`
@@ -37,7 +37,7 @@ To disable logging to stderr, you can:
 
 
 ### Disable Rich formatting
-To disable Rich formatting in your log output:
+To disable Rich formatting in your log output, you can do any of the following:
 
 - Set `INCYDR_USE_RICH=false` in your environment
 - Initialize client with `use_rich` argument set to False: `client = incydr.Client(use_rich=False)`
