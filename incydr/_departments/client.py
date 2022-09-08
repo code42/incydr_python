@@ -48,3 +48,7 @@ class DepartmentsV1:
         )
         response = self._parent.session.get("/v1/departments", params=data.dict())
         return DepartmentsPage.parse_response(response)
+
+    def iter_all(self):
+        # TODO
+        pass

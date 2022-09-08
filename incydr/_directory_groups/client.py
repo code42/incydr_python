@@ -51,3 +51,7 @@ class DirectoryGroupsV1:
         )
         response = self._parent.session.get("/v1/directory-groups", params=data.dict())
         return DirectoryGroupsPage.parse_response(response)
+
+    def iter_all(self):
+        # TODO
+        pass
