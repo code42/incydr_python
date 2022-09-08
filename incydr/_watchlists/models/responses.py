@@ -44,6 +44,7 @@ class IncludedDirectoryGroup(ResponseModel):
     A model representing a directory group included on a watchlist.
 
     **Fields**:
+
     * **added_time**: `datetime` - The time the directory group was included on the watchlist.
     * **group_id**: `str` - A unique group ID for the directory group.
     * **is_deleted**: `bool` - Whether the included group was deleted by the directory provider but still referenced by the watchlist
@@ -81,8 +82,15 @@ class WatchlistUser(ResponseModel):
 
 
 class ExcludedUsersList(ResponseModel):
-    """A model representing a list of users excluded from a watchlist.
-    Excluded users are those that have been individually excluded from that list."""
+    """
+    A model representing a list of users excluded from a watchlist.
+    Excluded users are those that have been individually excluded from that list.
+
+    **Fields**:
+
+    * **excluded_users**: `List[WatchlistUser]` - The list of excluded users.
+    * **total_count**: `int`
+    """
 
     excluded_users: Optional[List[WatchlistUser]] = Field(None, alias="excludedUsers")
     total_count: Optional[int] = Field(
@@ -94,7 +102,14 @@ class ExcludedUsersList(ResponseModel):
 
 
 class IncludedDepartmentsList(ResponseModel):
-    """A model representing a list of departments included on a watchlist."""
+    """
+    A model representing a list of departments included on a watchlist.
+
+    **Fields**:
+
+    * **included_departments**: `List[IncludedDepartment]` - The list of included departments.
+    * **total_count**: `int` - The total count of all included departments.
+    """
 
     included_departments: Optional[List[IncludedDepartment]] = Field(
         None, alias="includedDepartments"
@@ -108,7 +123,14 @@ class IncludedDepartmentsList(ResponseModel):
 
 
 class IncludedDirectoryGroupsList(ResponseModel):
-    """A model representing a list of directory groups included on a watchlist."""
+    """
+    A model representing a list of directory groups included on a watchlist.
+
+    **Fields**:
+
+    * **included_directory_groups**: `List[IncludedDirectoryGroup]` - The list of included directory groups.
+    * **total_count**: `int` - The total count of all included directory groups.
+    """
 
     included_directory_groups: Optional[List[IncludedDirectoryGroup]] = Field(
         None, alias="includedDirectoryGroups"
@@ -122,8 +144,13 @@ class IncludedDirectoryGroupsList(ResponseModel):
 
 
 class IncludedUsersList(ResponseModel):
-    """A model representing a list of users included on a watchlist.
-    Included users are those that have been individually included on that list."""
+    """
+    A model representing a list of users included on a watchlist.
+    Included users are those that have been individually included on that list.
+
+    * **included_users**: `List[WatchlistUser]` - The list of included users.
+    * **total_count**: `int` - The total count of all included users.
+    """
 
     included_users: Optional[List[WatchlistUser]] = Field(None, alias="includedUsers")
     total_count: Optional[int] = Field(
@@ -140,10 +167,10 @@ class WatchlistStats(ResponseModel):
 
     **Fields**:
 
-    * **excluded_users_count**: The number of users explicitly excluded from the watchlist.
-    * **included_departments_count**: The number of departments explicitly included on the watchlist.
-    * **included_directory_groups_count**: The number of directory groups explicitly included on the watchlist.
-    * **included_users_count**: The number of users explicitly included on the watchlist.
+    * **excluded_users_count**: `int` - The number of users explicitly excluded from the watchlist.
+    * **included_departments_count**: `int` - The number of departments explicitly included on the watchlist.
+    * **included_directory_groups_count**: `int` - The number of directory groups explicitly included on the watchlist.
+    * **included_users_count**: `int` - The number of users explicitly included on the watchlist.
     """
 
     excluded_users_count: Optional[int] = Field(
@@ -177,7 +204,8 @@ class WatchlistMembersList(ResponseModel):
 
     **Fields**:
 
-    * **total_count**: `int` - Total count of members o.
+    * **watchlist_members**: `List[WatchlistUser]` - The list of watchlist members.
+    * **total_count**: `int` - Total count of members on the watchlist.
     """
 
     total_count: Optional[int] = Field(
