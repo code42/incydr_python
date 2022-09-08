@@ -1,3 +1,5 @@
+import sys
+from pathlib import Path
 from typing import Optional
 
 from requests.exceptions import HTTPError
@@ -18,6 +20,8 @@ from incydr.cli.options import TableFormat
 from incydr.cli.options import columns_option
 from incydr.cli.options import single_format_option
 from incydr.cli.options import table_format_option
+from incydr.utils import read_models_from_csv
+from incydr.utils import write_models_to_csv
 
 app = Typer()
 
@@ -83,7 +87,7 @@ def list_(
             render.table(cases, columns=columns, title="Cases")
 
     if format_ == TableFormat.csv:
-        render.csv(cases, columns=columns)
+        write_models_to_csv(cases, sys.stdout, columns=columns)
 
     if format_ == TableFormat.json:
         for case in cases:
@@ -106,6 +110,17 @@ def show(ctx: Context, case_number: int, format_: SingleFormat = single_format_o
 
     else:
         echo(case.json())
+
+
+@app.command()
+def bulk_update(ctx: Context, csv: Path):
+    client = ctx.obj()
+    for case in read_models_from_csv(CaseDetail, csv):
+        try:
+            c = client.cases.v1.update(case)
+            console.print(c)
+        except Exception as err:
+            console.print(f"[red]Error:[/red] {err.response.text}")
 
 
 if __name__ == "__main__":

@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: MIT
 from incydr._core.client import Client
 from incydr._queries.file_events import EventQuery
+from incydr.models import *
+from incydr import utils
 
 __all__ = ["Client"]
 

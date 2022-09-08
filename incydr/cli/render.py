@@ -38,13 +38,3 @@ def table(models: Iterator[BaseModel], columns: Set[str] = None, title=None):
     for model in chain([first], models):
         tbl.add_row(*model_as_row(model, columns=columns))
     console.print(tbl)
-
-
-def csv(models: Iterator[BaseModel], columns: Set[str] = None):
-    models = iter(models)
-    first = next(models)
-    header = first.dict(by_alias=False, include=columns).keys()
-    writer = DictWriter(stdout, fieldnames=header)
-    writer.writeheader()
-    for model in chain([first], models):
-        writer.writerow(model.dict(by_alias=False, include=columns))
