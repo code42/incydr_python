@@ -1,6 +1,7 @@
 import typer
-from incydr.cli import init_incydr_client
+
 from incydr.cli import cases
+from incydr.cli import init_incydr_client
 
 incydr = typer.Typer()
 incydr.callback()(init_incydr_client)

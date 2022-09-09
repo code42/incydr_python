@@ -8,22 +8,22 @@ from rich.panel import Panel
 from rich.progress import track
 from rich.table import Table
 from typer import Context
+from typer import echo
 from typer import Option
 from typer import Typer
-from typer import echo
 
 import incydr.cli.render as render
 from incydr._cases.models import CaseDetail
 from incydr.cli import console
 from incydr.cli import init_incydr_client
-from incydr.cli.options import SingleFormat
-from incydr.cli.options import TableFormat
 from incydr.cli.options import columns_option
 from incydr.cli.options import single_format_option
+from incydr.cli.options import SingleFormat
 from incydr.cli.options import table_format_option
+from incydr.cli.options import TableFormat
+from incydr.utils import CSVValidationError
 from incydr.utils import read_models_from_csv
 from incydr.utils import write_models_to_csv
-from incydr.utils import CSVValidationError
 
 app = Typer()
 
@@ -31,7 +31,7 @@ app = Typer()
 def render_case(case: CaseDetail):
     field_table = Table.grid(padding=(0, 1), expand=False)
     field_table.title = f"Case {case.number}"
-    for name, field in case.__fields__.items():
+    for name, _field in case.__fields__.items():
         if name == "number":
             continue
         if name == "findings" and case.findings is not None:
@@ -123,7 +123,7 @@ def bulk_update(ctx: Context, csv: Path):
             description="Updating cases...",
             transient=True,
         ):
-            c = client.cases.v1.update(case)
+            client.cases.v1.update(case)
     except CSVValidationError as err:
         console.print(f"[red]Error:[/red] {err.msg}")
     except HTTPError as err:

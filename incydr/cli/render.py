@@ -1,8 +1,7 @@
-from csv import DictWriter
 from datetime import datetime
 from itertools import chain
-from sys import stdout
-from typing import Set, Iterator
+from typing import Iterator
+from typing import Set
 
 from pydantic import BaseModel
 from rich.table import Table

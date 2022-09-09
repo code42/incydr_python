@@ -1,17 +1,19 @@
 from __future__ import annotations
-from csv import DictWriter
+
 from csv import DictReader
+from csv import DictWriter
 from io import IOBase
+from itertools import chain
 from pathlib import Path
-from typing import Union
 from typing import Generator
 from typing import Iterable
 from typing import List
-from typing import TypeVar
 from typing import Type
+from typing import TypeVar
+from typing import Union
+
 from pydantic import BaseModel
 from pydantic import ValidationError
-from itertools import chain
 
 Model = TypeVar("Model", bound=BaseModel)
 
