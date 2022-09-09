@@ -85,12 +85,12 @@ class CaseDetail(Case):
 
     **Fields**:
 
+    **All the same fields as Case model, plus**:
+
     * **description**: `str | None` Brief description providing context for a case.
     * **findings**: `str | None` Markdown formatted text summarizing the findings for a case.
     """
 
-    created_at: datetime = Field(allow_mutation=False, alias="createdAt")
-    updated_at: Optional[datetime] = Field(allow_mutation=False, alias="updatedAt")
     description: Optional[str]
     findings: Optional[str]
 

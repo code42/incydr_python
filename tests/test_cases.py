@@ -1,5 +1,6 @@
 import datetime
 import json
+from copy import copy
 
 import pytest
 from pydantic import ValidationError
@@ -7,6 +8,7 @@ from pytest_httpserver import HTTPServer
 
 from incydr import Client
 from incydr._cases.models import Case
+from incydr._cases.models import CaseDetail
 from incydr._cases.models import CasesPage
 
 TEST_CASE_1 = {
@@ -14,8 +16,6 @@ TEST_CASE_1 = {
     "name": "test_1",
     "createdAt": "2022-07-18T16:39:51.356082Z",
     "updatedAt": "2022-07-18T16:40:53.335018Z",
-    "description": "description_1",
-    "findings": None,
     "subject": None,
     "subjectUsername": None,
     "status": "OPEN",
@@ -25,6 +25,9 @@ TEST_CASE_1 = {
     "createdByUsername": None,
     "lastModifiedByUserUid": None,
     "lastModifiedByUsername": None,
+    "archivalTime": "2023-07-18T00:00:00Z",
+    "description": "description_1",
+    "findings": None,
 }
 
 TEST_CASE_2 = {
@@ -32,8 +35,6 @@ TEST_CASE_2 = {
     "name": "test_2",
     "createdAt": "2022-07-01T16:39:51.356082Z",
     "updatedAt": "2022-07-01T17:04:16.454497Z",
-    "description": "description_2",
-    "findings": "## Title\n\n- item a\n- item b\n\n**Bolded**\n_Italicized_",
     "subject": "945056771151950748",
     "subjectUsername": "subject@example.com",
     "status": "OPEN",
@@ -43,6 +44,9 @@ TEST_CASE_2 = {
     "createdByUsername": None,
     "lastModifiedByUserUid": "942564422882759874",
     "lastModifiedByUsername": "admin@example.com",
+    "archivalTime": "2023-07-18T00:00:00Z",
+    "description": "description_2",
+    "findings": "## Title\n\n- item a\n- item b\n\n**Bolded**\n_Italicized_",
 }
 
 
@@ -87,7 +91,7 @@ def test_get_single_case(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request("/v1/cases/2").respond_with_json(TEST_CASE_2)
     c = Client()
     case = c.cases.v1.get_case(2)
-    assert isinstance(case, Case)
+    assert isinstance(case, CaseDetail)
     assert case.number == 2
     assert case.created_at == datetime.datetime.fromisoformat(
         TEST_CASE_2["createdAt"].replace("Z", "+00:00")
@@ -96,10 +100,16 @@ def test_get_single_case(httpserver_auth: HTTPServer):
 
 
 def test_get_page(httpserver_auth: HTTPServer):
+    slim_1 = copy(TEST_CASE_1)
+    del slim_1["description"]
+    del slim_1["findings"]
+    slim_2 = copy(TEST_CASE_2)
+    del slim_2["description"]
+    del slim_2["findings"]
     cases_data = {
         "cases": [
-            TEST_CASE_1,
-            TEST_CASE_2,
+            slim_1,
+            slim_2,
         ],
         "totalCount": 2,
     }
@@ -108,6 +118,6 @@ def test_get_page(httpserver_auth: HTTPServer):
     client = Client()
     page = client.cases.v1.get_page()
     assert isinstance(page, CasesPage)
-    assert page.cases[0].json() == json.dumps(TEST_CASE_1)
-    assert page.cases[1].json() == json.dumps(TEST_CASE_2)
+    assert page.cases[0].json() == json.dumps(slim_1)
+    assert page.cases[1].json() == json.dumps(slim_2)
     assert page.total_count == len(page.cases)
