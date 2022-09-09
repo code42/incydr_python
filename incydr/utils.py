@@ -44,7 +44,7 @@ def read_models_from_csv(
             yield model(**row)  # noqa
         except ValidationError as err:
             error = CSVValidationError(
-                f"Bad data in row {i} of csv {path}\n{str(err)}", row=i
+                f"Bad data in row {i} of {path}\n{str(err)}", row=i
             )
     if error:
         raise error

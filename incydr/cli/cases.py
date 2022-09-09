@@ -5,6 +5,7 @@ from typing import Optional
 from requests.exceptions import HTTPError
 from rich.markdown import Markdown
 from rich.panel import Panel
+from rich.progress import track
 from rich.table import Table
 from typer import Context
 from typer import Option
@@ -22,6 +23,7 @@ from incydr.cli.options import single_format_option
 from incydr.cli.options import table_format_option
 from incydr.utils import read_models_from_csv
 from incydr.utils import write_models_to_csv
+from incydr.utils import CSVValidationError
 
 app = Typer()
 
@@ -115,12 +117,17 @@ def show(ctx: Context, case_number: int, format_: SingleFormat = single_format_o
 @app.command()
 def bulk_update(ctx: Context, csv: Path):
     client = ctx.obj()
-    for case in read_models_from_csv(CaseDetail, csv):
-        try:
+    try:
+        for case in track(
+            read_models_from_csv(CaseDetail, csv),
+            description="Updating cases...",
+            transient=True,
+        ):
             c = client.cases.v1.update(case)
-            console.print(c)
-        except Exception as err:
-            console.print(f"[red]Error:[/red] {err.response.text}")
+    except CSVValidationError as err:
+        console.print(f"[red]Error:[/red] {err.msg}")
+    except HTTPError as err:
+        console.print(f"[red]Error:[/red] {err.response.text}")
 
 
 if __name__ == "__main__":
