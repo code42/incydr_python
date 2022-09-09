@@ -6,7 +6,9 @@ from incydr._alert_rules.models.request import GetRulesRequest
 from incydr._alert_rules.models.request import UpdateRulesRequest
 from incydr._alert_rules.models.request import UpdateUserIdsRequest
 from incydr._alert_rules.models.request import UpdateUsersRequest
-from incydr._alert_rules.models.response import AssignedUsersList, AssignedUser
+from incydr._alert_rules.models.request import UserRequest
+from incydr._alert_rules.models.response import AssignedUser
+from incydr._alert_rules.models.response import AssignedUsersList
 from incydr._alert_rules.models.response import CloudSharePermissionsRuleDetailsList
 from incydr._alert_rules.models.response import EndpointExfiltrationRuleDetailsList
 from incydr._alert_rules.models.response import FileNameRuleDetailsList
@@ -43,12 +45,9 @@ class AlertRulesV1:
     def __init__(self, parent):
         self._parent = parent
 
+    # TODO - complete with the alerts client?
     def get_page(
         self,
-        page_num: int = 0,
-        page_size: int = None,
-        sort_dir: SortDirection = SortDirection.ASC,
-        sort_key: str = "CreatedAt",
         rule_type: str = None,
         name: str = None,
         description: str = None,
@@ -57,16 +56,45 @@ class AlertRulesV1:
         modified_by: str = None,
         created_at: datetime = None,
         created_by: str = None,
+        page_num: int = 0,
+        page_size: int = None,
+        sort_dir: SortDirection = SortDirection.ASC,
+        sort_key: str = "CreatedAt",
     ):
+        """
+        Get a page of alert rules.
+
+        Filter results by passing appropriate parameters:
+
+        **Parameters**:
+
+        * rule_type**:
+        * **rule_type**: `str` -
+        * **name**: `str` -
+        * **description**: `str` -
+        * **is_enabled**: `bool` -
+        * **modified_at**: `datetime` -
+        * **modified_by**: `str` -
+        * **created_at**: `datetime` -
+        * **created_by**: `str` -
+        * **page_num**: `int` - Page number for results, starting at 0.
+        * **page_size**: `int` - Max number of results to return for a page.
+        * **sort_dir**: `SortDirection` - The direction on which to sort the response, based on the corresponding key.
+        * **sort_key**: `str` - One or more values on which the response will be sorted. Defaults to `'CreatedAt'`
+
+        **Returns**:
+        """
         query = Query(
+            tenantId=self._parent.tenant_id,
             pgNum=page_num,
-            page_size=page_size or self._parent.settings.page_size,
-            srtDir=sort_dir,
+            pgSize=page_size or self._parent.settings.page_size,
+            srtDirection=sort_dir,
             srtKey=sort_key,
+            groups=[],
         )
 
         # create filters
-        group = FilterGroup()
+        group = FilterGroup(filters=[])
         if rule_type:
             group.filters.append(Filter(term="Type", operator="IS", value=rule_type))
         if name:
@@ -98,11 +126,11 @@ class AlertRulesV1:
 
         query.groups.append(group)
 
-        # TODO - this should return a model once alert models are generated
         return self._parent.session.post(
             url="/v1/alerts/rules/query-rule-metadata", json=query.dict()
         )
 
+    # TODO - complete with the alerts client?
     def get_rule(self, rule_id: str):
         """
         Get a single rule.
@@ -111,18 +139,20 @@ class AlertRulesV1:
 
         * **rule_id**: `str` (required) - A rule ID.
 
-         **Returns**: TODO
+         **Returns**:
         """
 
         # create filter
-        query = Query()
-        group = FilterGroup()
+        query = Query(
+            tenantId=self._parent.tenant_id,
+            groups=[],
+        )
+        group = FilterGroup(filters=[])
         group.filters.append(
             Filter(term="RuleMetadataId", operator="IS", value=rule_id)
         )
         query.groups.append(group)
 
-        # TODO - this should return a model once alert models are generated
         return self._parent.session.post(
             url="/v1/alerts/rules/query-rule-metadata", json=query.dict()
         )
@@ -150,7 +180,7 @@ class AlertRulesV1:
     def add_users(
         self,
         rule_id: str,
-        users: Union[str, List[str], List[List[str]], List[AssignedUser]],
+        users: Union[str, List[str], List[List[str]]],
     ):
         """
         Add users to a rule. Note that added users could become either included included or excluded from the rule, depending on the rule's configuration.
@@ -165,18 +195,17 @@ class AlertRulesV1:
         data = UpdateUsersRequest(
             tenantId=self._parent.tenant_id, ruleId=rule_id, userList=[]
         )
-
         if not isinstance(users, List):  # handle users passing a single ID
             users = [users]
 
         for user in users:
             if isinstance(user, str):
                 data.userList.append(
-                    RuleUser(userIdFromAuthority=user, userAliasList=[])
+                    UserRequest(userIdFromAuthority=user, userAliasList=[])
                 )
             else:
                 data.userList.append(
-                    RuleUser(userIdFromAuthority=user[0], userAliasList=user[1:])
+                    UserRequest(userIdFromAuthority=user[0], userAliasList=user[1:])
                 )
 
         return self._parent.session.post(
@@ -226,7 +255,7 @@ class AlertRulesV1:
                     "Each user list element should contain the user ID followed by the desired user aliases to remove from the rule."
                 )
             data.userList.append(
-                RuleUser(userIdFromAuthority=user[0], userAliasList=user[1:])
+                UserRequest(userIdFromAuthority=user[0], userAliasList=user[1:])
             )
 
         return self._parent.session.post(

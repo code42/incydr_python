@@ -23,12 +23,13 @@ class FilterGroup(BaseModel):
 
 
 class Query(BaseModel):
+    tenantId: str
     groupClause: str = "AND"
     groups: Optional[List[FilterGroup]]
-    pgNum: int = 1
+    pgNum: int = 0
     pgSize: int = 100
     pgToken: Optional[str]
-    srtDir: str = "asc"
+    srtDirection: str = "asc"
     srtKey: str = "CreatedAt"
 
     class Config:

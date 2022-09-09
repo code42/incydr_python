@@ -92,25 +92,7 @@ class SyncedToCloudServiceAlertRules(ResponseModel):
     )
 
 
-class AssignedUsersList(ResponseModel):
-    """
-    A model representing a list of users assigned to a rule.
-
-    **Fields**:
-
-    * **users**: `List[AssignedUser]` - List of users to being watched in the rule.
-    * **users_to_alert_on**: `UsersToAlertOn` - Indicates the setting for how the rule will interact with user list. Values include: "ALL_USERS",  "ALL_USERS_NOT_SPECIFIED", and "SPECIFIED_USERS"
-    """
-
-    users: Optional[List[AssignedUser]] = Field(
-        None,
-        description='List of users to being watched in the rule.\nNote that a userIdFromAuthority value of "Null UserIdFromAuthority.  These usernames must be edited in the web app."indicates that the user alias must be edited via the Code42 console or the Code42 CLI.',
-    )
-    users_to_alert_on: UsersToAlertOn = Field(None, alias="usersToAlertOn")
-
-
 # TODO - suggestions for what to call this model
-
 class AssignedUser(ResponseModel):
     """
     A model representing a user assigned to a rule.
@@ -133,6 +115,23 @@ class AssignedUser(ResponseModel):
         example=["userAlias1", "userAlias2"],
         alias="userAliasList",
     )
+
+
+class AssignedUsersList(ResponseModel):
+    """
+    A model representing a list of users assigned to a rule.
+
+    **Fields**:
+
+    * **users**: `List[AssignedUser]` - List of users to being watched in the rule.
+    * **users_to_alert_on**: `UsersToAlertOn` - Indicates the setting for how the rule will interact with user list. Values include: "ALL_USERS",  "ALL_USERS_NOT_SPECIFIED", and "SPECIFIED_USERS"
+    """
+
+    users: Optional[List[AssignedUser]] = Field(
+        None,
+        description='List of users to being watched in the rule.\nNote that a userIdFromAuthority value of "Null UserIdFromAuthority.  These usernames must be edited in the web app."indicates that the user alias must be edited via the Code42 console or the Code42 CLI.',
+    )
+    users_to_alert_on: UsersToAlertOn = Field(None, alias="usersToAlertOn")
 
 
 class NotificationInfo(ResponseModel):
@@ -282,12 +281,13 @@ class RuleDetails(ResponseModel):
         alias="ruleSource",
     )
 
+
 class FileTypeMismatchRuleDetails(RuleDetails):
     """
     A model representing the details of any exfiltration rule.
 
     **Fields**:
-    '
+
     * **id**: `id` - Unique ID of the rule.
     * **created_at**: `datetime` - Timestamp of when the rule was created.
     * **created_by**: `datetime` - Username of the individual who created the rule.
@@ -304,7 +304,9 @@ class FileTypeMismatchRuleDetails(RuleDetails):
     * **file_category_watch**: `FileCategoryWatch` - File category watch configuration.
     * **rule_source**: `str` - Indicates source of rule creation.  Either alerting or lens application name.
     """
+
     pass
+
 
 class EndpointExfiltrationRuleDetails(RuleDetails):
     """
