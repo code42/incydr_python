@@ -216,4 +216,4 @@ class UpdateRolesResponse(ResponseModel):
 
 
 class MoveUserRequest(BaseModel):
-    orgId: Optional[str]
+    orgGuid: Optional[str]
