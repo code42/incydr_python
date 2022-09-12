@@ -163,6 +163,7 @@ class FileInfo(ResponseModel):
         None,
         description="Number of files exfiltrated within time window for alert to trigger.",
         example="15",
+        alias="fileCountGreaterThan",
     )
     total_size_greater_than_in_bytes: Optional[int] = Field(
         None,
@@ -209,39 +210,6 @@ class NotificationConfig(ResponseModel):
 
 
 class RuleDetails(ResponseModel):
-    id: Optional[str] = Field(
-        None, description="Unique ID of the rule.", example="RuleId"
-    )
-    created_at: datetime = Field(
-        None,
-        description="The timestamp when the rule was created.",
-        example="2020-02-18T01:00:45.006683Z",
-        alias="createdAt",
-    )
-    created_by: Optional[str] = Field(
-        None,
-        description="Username of the individual who created the rule.",
-        example="UserWhoCreatedTheRule",
-        alias="createdBy",
-    )
-    modified_at: datetime = Field(
-        None,
-        description="Timestamp of when the rule was last modified.",
-        example="2020-02-19T01:57:45.006683Z",
-        alias="modifiedAt",
-    )
-    modified_by: Optional[str] = Field(
-        None,
-        description="Username of the individual who last modified the rule.",
-        example="UserWhoMostRecentlyModifiedTheRule",
-        alias="modifiedBy",
-    )
-    is_system: bool = Field(
-        None,
-        description="Boolean indicator of if the rule is a system rule.",
-        example="FALSE",
-        alias="isSystem",
-    )
     tenant_id: constr(max_length=100) = Field(
         None,
         description="The unique identifier representing the tenant.",
@@ -280,6 +248,39 @@ class RuleDetails(ResponseModel):
         example="alerting",
         alias="ruleSource",
     )
+    id: Optional[str] = Field(
+        None, description="Unique ID of the rule.", example="RuleId"
+    )
+    created_at: datetime = Field(
+        None,
+        description="The timestamp when the rule was created.",
+        example="2020-02-18T01:00:45.006683Z",
+        alias="createdAt",
+    )
+    created_by: Optional[str] = Field(
+        None,
+        description="Username of the individual who created the rule.",
+        example="UserWhoCreatedTheRule",
+        alias="createdBy",
+    )
+    modified_at: datetime = Field(
+        None,
+        description="Timestamp of when the rule was last modified.",
+        example="2020-02-19T01:57:45.006683Z",
+        alias="modifiedAt",
+    )
+    modified_by: Optional[str] = Field(
+        None,
+        description="Username of the individual who last modified the rule.",
+        example="UserWhoMostRecentlyModifiedTheRule",
+        alias="modifiedBy",
+    )
+    is_system: bool = Field(
+        None,
+        description="Boolean indicator of if the rule is a system rule.",
+        example="FALSE",
+        alias="isSystem",
+    )
 
 
 class FileTypeMismatchRuleDetails(RuleDetails):
@@ -288,12 +289,6 @@ class FileTypeMismatchRuleDetails(RuleDetails):
 
     **Fields**:
 
-    * **id**: `id` - Unique ID of the rule.
-    * **created_at**: `datetime` - Timestamp of when the rule was created.
-    * **created_by**: `datetime` - Username of the individual who created the rule.
-    * **modified_at**: `datetime` - Timestamp of when the rule was last modified.
-    * **modified_by**: `str` - Username of the individual who last modified the rule.
-    * **is_system**: `bool` - Boolean indicator of if the rule is a system rule.
     * **tenant_id**: `str` - Tenant ID.
     * **name**: `str` - Name of the rule.
     * **description**: `str` - Description of the rule.
@@ -303,6 +298,12 @@ class FileTypeMismatchRuleDetails(RuleDetails):
     * **notification_config**: `NotificationConfig` - Notification configuration.
     * **file_category_watch**: `FileCategoryWatch` - File category watch configuration.
     * **rule_source**: `str` - Indicates source of rule creation.  Either alerting or lens application name.
+    * **id**: `id` - Unique ID of the rule.
+    * **created_at**: `datetime` - Timestamp of when the rule was created.
+    * **created_by**: `datetime` - Username of the individual who created the rule.
+    * **modified_at**: `datetime` - Timestamp of when the rule was last modified.
+    * **modified_by**: `str` - Username of the individual who last modified the rule.
+    * **is_system**: `bool` - Boolean indicator of if the rule is a system rule.
     """
 
     pass
@@ -314,12 +315,6 @@ class EndpointExfiltrationRuleDetails(RuleDetails):
 
     **Fields**:
 
-    * **id**: `id` - Unique ID of the rule.
-    * **created_at**: `datetime` - Timestamp of when the rule was created.
-    * **created_by**: `datetime` - Username of the individual who created the rule.
-    * **modified_at**: `datetime` - Timestamp of when the rule was last modified.
-    * **modified_by**: `str` - Username of the individual who last modified the rule.
-    * **is_system**: `bool` - Boolean indicator of if the rule is a system rule.
     * **tenant_id**: `str` - Tenant ID.
     * **name**: `str` - Name of the rule.
     * **description**: `str` - Description of the rule.
@@ -329,6 +324,12 @@ class EndpointExfiltrationRuleDetails(RuleDetails):
     * **notification_config**: `NotificationConfig` - Notification configuration.
     * **file_category_watch**: `FileCategoryWatch` - File category watch configuration.
     * **rule_source**: `str` - Indicates source of rule creation.  Either alerting or lens application name.
+    * **id**: `id` - Unique ID of the rule.
+    * **created_at**: `datetime` - Timestamp of when the rule was created.
+    * **created_by**: `datetime` - Username of the individual who created the rule.
+    * **modified_at**: `datetime` - Timestamp of when the rule was last modified.
+    * **modified_by**: `str` - Username of the individual who last modified the rule.
+    * **is_system**: `bool` - Boolean indicator of if the rule is a system rule.
     * **file_size_and_count**: `FileInfo` - File size and count watch configuration.
     * **file_activity_is**: `FileActivity` - Type of file activity the rule is watching.
     * **time_window**: `int` - Length of the period for the activity to aggregate to hit the specified file size and count thresholds.
@@ -358,12 +359,6 @@ class FileNameRuleDetails(RuleDetails):
 
     **Fields**:
 
-    * **id**: `id` - Unique ID of the rule.
-    * **created_at**: `datetime` - Timestamp of when the rule was created.
-    * **created_by**: `datetime` - Username of the individual who created the rule.
-    * **modified_at**: `datetime` - Timestamp of when the rule was last modified.
-    * **modified_by**: `str` - Username of the individual who last modified the rule.
-    * **is_system**: `bool` - Boolean indicator of if the rule is a system rule.
     * **tenant_id**: `str` - Tenant ID.
     * **name**: `str` - Name of the rule.
     * **description**: `str` - Description of the rule.
@@ -373,6 +368,12 @@ class FileNameRuleDetails(RuleDetails):
     * **notification_config**: `NotificationConfig` - Notification configuration.
     * **file_category_watch**: `FileCategoryWatch` - File category watch configuration.
     * **rule_source**: `str` - Indicates source of rule creation.  Either alerting or lens application name.
+    * **id**: `id` - Unique ID of the rule.
+    * **created_at**: `datetime` - Timestamp of when the rule was created.
+    * **created_by**: `datetime` - Username of the individual who created the rule.
+    * **modified_at**: `datetime` - Timestamp of when the rule was last modified.
+    * **modified_by**: `str` - Username of the individual who last modified the rule.
+    * **is_system**: `bool` - Boolean indicator of if the rule is a system rule.
     * **file_name_patterns**: `List[str]` - List of file name patterns being watched by the rule.
     """
 
@@ -390,12 +391,6 @@ class CloudSharePermissionsRuleDetails(RuleDetails):
 
     **Fields**:
 
-    * **id**: `id` - Unique ID of the rule.
-    * **created_at**: `datetime` - Timestamp of when the rule was created.
-    * **created_by**: `datetime` - Username of the individual who created the rule.
-    * **modified_at**: `datetime` - Timestamp of when the rule was last modified.
-    * **modified_by**: `str` - Username of the individual who last modified the rule.
-    * **is_system**: `bool` - Boolean indicator of if the rule is a system rule.
     * **tenant_id**: `str` - Tenant ID.
     * **name**: `str` - Name of the rule.
     * **description**: `str` - Description of the rule.
@@ -405,6 +400,12 @@ class CloudSharePermissionsRuleDetails(RuleDetails):
     * **notification_config**: `NotificationConfig` - Notification configuration.
     * **file_category_watch**: `FileCategoryWatch` - File category watch configuration.
     * **rule_source**: `str` - Indicates source of rule creation.  Either alerting or lens application name.
+    * **id**: `id` - Unique ID of the rule.
+    * **created_at**: `datetime` - Timestamp of when the rule was created.
+    * **created_by**: `datetime` - Username of the individual who created the rule.
+    * **modified_at**: `datetime` - Timestamp of when the rule was last modified.
+    * **modified_by**: `str` - Username of the individual who last modified the rule.
+    * **is_system**: `bool` - Boolean indicator of if the rule is a system rule.
     * **watch_google_drive**: `WatchConfigGoogleDrive` - Watch configuration for Google Drive.
     * **watch_microsoft_one_drive**: `WatchConfig` - Watch configuration for Microsoft OneDrive.
     * **watch_box**: `WatchConfig` - Watch configuration for Box.

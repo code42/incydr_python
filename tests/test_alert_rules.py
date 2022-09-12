@@ -30,10 +30,10 @@ TEST_CLOUD_SHARE_PERMS_RULE = {
     "name": "Removable Media Exfiltration Rule",
     "description": "Alert me on all removable media exfiltration.",
     "severity": "LOW",
-    "isEnabled": "TRUE",
+    "isEnabled": True,
     "fileBelongsTo": {"usersToAlertOn": "ALL_USERS", "userList": ["user1", "user2"]},
     "notificationConfig": {
-        "enabled": "TRUE",
+        "enabled": True,
         "notificationInfo": [
             {
                 "notificationType": "EMAIL",
@@ -41,24 +41,24 @@ TEST_CLOUD_SHARE_PERMS_RULE = {
             }
         ],
     },
-    "fileCategoryWatch": {"watchAllFiles": "FALSE", "fileCategoryList": ["ARCHIVE"]},
+    "fileCategoryWatch": {"watchAllFiles": False, "fileCategoryList": ["ARCHIVE"]},
     "ruleSource": "Departing Employee",
     "watchGoogleDrive": {
-        "publicOnTheWeb": "TRUE",
-        "publicViaLink": "FALSE",
-        "outsideTrustedDomains": "TRUE",
+        "publicOnTheWeb": True,
+        "publicViaLink": False,
+        "outsideTrustedDomains": True,
     },
     "watchMicrosoftOneDrive": {
-        "publicViaLink": "FALSE",
-        "outsideTrustedDomains": "TRUE",
+        "publicViaLink": False,
+        "outsideTrustedDomains": True,
     },
-    "watchBox": {"publicViaLink": "FALSE", "outsideTrustedDomains": "TRUE"},
+    "watchBox": {"publicViaLink": False, "outsideTrustedDomains": True},
     "id": "RuleId",
     "createdAt": "2020-02-18T01:00:45.006683Z",
     "createdBy": "UserWhoCreatedTheRule",
     "modifiedAt": "2020-02-19T01:57:45.006683Z",
     "modifiedBy": "UserWhoMostRecentlyModifiedTheRule",
-    "isSystem": "FALSE",
+    "isSystem": False,
 }
 
 TEST_ENDPOINT_EXFIL_RULE = {
@@ -66,10 +66,10 @@ TEST_ENDPOINT_EXFIL_RULE = {
     "name": "Removable Media Exfiltration Rule",
     "description": "Alert me on all removable media exfiltration.",
     "severity": "LOW",
-    "isEnabled": "TRUE",
+    "isEnabled": True,
     "fileBelongsTo": {"usersToAlertOn": "ALL_USERS", "userList": ["user1", "user2"]},
     "notificationConfig": {
-        "enabled": "TRUE",
+        "enabled": True,
         "notificationInfo": [
             {
                 "notificationType": "EMAIL",
@@ -77,32 +77,32 @@ TEST_ENDPOINT_EXFIL_RULE = {
             }
         ],
     },
-    "fileCategoryWatch": {"watchAllFiles": "FALSE", "fileCategoryList": ["ARCHIVE"]},
+    "fileCategoryWatch": {"watchAllFiles": False, "fileCategoryList": ["ARCHIVE"]},
     "ruleSource": "Departing Employee",
     "fileSizeAndCount": {
-        "fileCountGreaterThan": "15",
-        "totalSizeGreaterThanInBytes": "5000",
+        "fileCountGreaterThan": 15,
+        "totalSizeGreaterThanInBytes": 5000,
         "operator": "AND",
     },
     "fileActivityIs": {
         "syncedToCloudService": {
-            "watchBox": "TRUE",
-            "watchBoxDrive": "FALSE",
-            "watchDropBox": "TRUE",
-            "watchGoogleBackupAndSync": "FALSE",
-            "watchAppleIcLoud": "TRUE",
-            "watchMicrosoftOneDrive": "TRUE",
+            "watchBox": True,
+            "watchBoxDrive": False,
+            "watchDropBox": True,
+            "watchGoogleBackupAndSync": False,
+            "watchAppleIcLoud": True,
+            "watchMicrosoftOneDrive": True,
         },
-        "uploadedOnRemovableMedia": "TRUE",
-        "readByBrowserOrOther": "FALSE",
+        "uploadedOnRemovableMedia": True,
+        "readByBrowserOrOther": False,
     },
-    "timeWindow": "60",
+    "timeWindow": 60,
     "id": "RuleId",
     "createdAt": "2020-02-18T01:00:45.006683Z",
     "createdBy": "UserWhoCreatedTheRule",
     "modifiedAt": "2020-02-19T01:57:45.006683Z",
     "modifiedBy": "UserWhoMostRecentlyModifiedTheRule",
-    "isSystem": "FALSE",
+    "isSystem": False,
 }
 
 TEST_FILE_TYPE_MISMATCH_RULE = {
@@ -110,10 +110,10 @@ TEST_FILE_TYPE_MISMATCH_RULE = {
     "name": "Removable Media Exfiltration Rule",
     "description": "Alert me on all removable media exfiltration.",
     "severity": "LOW",
-    "isEnabled": "TRUE",
+    "isEnabled": True,
     "fileBelongsTo": {"usersToAlertOn": "ALL_USERS", "userList": ["user1", "user2"]},
     "notificationConfig": {
-        "enabled": "TRUE",
+        "enabled": True,
         "notificationInfo": [
             {
                 "notificationType": "EMAIL",
@@ -121,14 +121,14 @@ TEST_FILE_TYPE_MISMATCH_RULE = {
             }
         ],
     },
-    "fileCategoryWatch": {"watchAllFiles": "FALSE", "fileCategoryList": ["ARCHIVE"]},
+    "fileCategoryWatch": {"watchAllFiles": False, "fileCategoryList": ["ARCHIVE"]},
     "ruleSource": "Departing Employee",
     "id": "RuleId",
     "createdAt": "2020-02-18T01:00:45.006683Z",
     "createdBy": "UserWhoCreatedTheRule",
     "modifiedAt": "2020-02-19T01:57:45.006683Z",
     "modifiedBy": "UserWhoMostRecentlyModifiedTheRule",
-    "isSystem": "FALSE",
+    "isSystem": False,
 }
 
 TEST_FILE_NAME_RULE = {
@@ -136,10 +136,10 @@ TEST_FILE_NAME_RULE = {
     "name": "Removable Media Exfiltration Rule",
     "description": "Alert me on all removable media exfiltration.",
     "severity": "LOW",
-    "isEnabled": "TRUE",
+    "isEnabled": True,
     "fileBelongsTo": {"usersToAlertOn": "ALL_USERS", "userList": ["user1", "user2"]},
     "notificationConfig": {
-        "enabled": "TRUE",
+        "enabled": True,
         "notificationInfo": [
             {
                 "notificationType": "EMAIL",
@@ -147,7 +147,7 @@ TEST_FILE_NAME_RULE = {
             }
         ],
     },
-    "fileCategoryWatch": {"watchAllFiles": "FALSE", "fileCategoryList": ["ARCHIVE"]},
+    "fileCategoryWatch": {"watchAllFiles": False, "fileCategoryList": ["ARCHIVE"]},
     "ruleSource": "Departing Employee",
     "fileNamePatterns": ["Q?ProductPlan.*", "*.cs"],
     "id": "RuleId",
@@ -155,7 +155,7 @@ TEST_FILE_NAME_RULE = {
     "createdBy": "UserWhoCreatedTheRule",
     "modifiedAt": "2020-02-19T01:57:45.006683Z",
     "modifiedBy": "UserWhoMostRecentlyModifiedTheRule",
-    "isSystem": "FALSE",
+    "isSystem": False,
 }
 
 
@@ -319,7 +319,6 @@ def test_get_users_returns_expected_data(httpserver_auth: HTTPServer):
         assert response.users[1].json() == json.dumps(TEST_RULE_USER_2)
 
 
-# TODO
 def test_get_details_cloud_share_permissions_rules_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
@@ -336,10 +335,13 @@ def test_get_details_cloud_share_permissions_rules_returns_expected_data(
     ) as mock_tenant_id:
         mock_tenant_id.return_value = TEST_TENANT_ID
         c = Client()
-        c.alert_rules.v1.get_details_cloud_share_permissions_rules(rule_ids=[])
+        page = c.alert_rules.v1.get_details_cloud_share_permissions_rules(rule_ids=[])
+        # load json responses into dictionaries to compare fields regardless of order
+        assert json.loads(page.rules[0].json()) == json.loads(
+            json.dumps(TEST_CLOUD_SHARE_PERMS_RULE)
+        )
 
 
-# TODO
 def test_get_details_endpoint_exfiltration_rules_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
@@ -356,10 +358,13 @@ def test_get_details_endpoint_exfiltration_rules_returns_expected_data(
     ) as mock_tenant_id:
         mock_tenant_id.return_value = TEST_TENANT_ID
         c = Client()
-        c.alert_rules.v1.get_details_endpoint_exfiltration_rules(rule_ids=[])
+        page = c.alert_rules.v1.get_details_endpoint_exfiltration_rules(rule_ids=[])
+        # load json responses into dictionaries to compare fields regardless of order
+        assert json.loads(page.rules[0].json()) == json.loads(
+            json.dumps(TEST_ENDPOINT_EXFIL_RULE)
+        )
 
 
-# TODO
 def test_get_details_file_type_mismatch_rules_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
@@ -376,10 +381,13 @@ def test_get_details_file_type_mismatch_rules_returns_expected_data(
     ) as mock_tenant_id:
         mock_tenant_id.return_value = TEST_TENANT_ID
         c = Client()
-        c.alert_rules.v1.get_details_file_type_mismatch_rules(rule_ids=[])
+        page = c.alert_rules.v1.get_details_file_type_mismatch_rules(rule_ids=[])
+        # load json responses into dictionaries to compare fields regardless of order
+        assert json.loads(page.rules[0].json()) == json.loads(
+            json.dumps(TEST_FILE_TYPE_MISMATCH_RULE)
+        )
 
 
-# TODO
 def test_get_details_file_name_rules_returns_expected_data(httpserver_auth: HTTPServer):
     data = {"rules": [TEST_FILE_NAME_RULE]}
     request = {"tenantId": TEST_TENANT_ID, "ruleIds": []}
@@ -392,4 +400,8 @@ def test_get_details_file_name_rules_returns_expected_data(httpserver_auth: HTTP
     ) as mock_tenant_id:
         mock_tenant_id.return_value = TEST_TENANT_ID
         c = Client()
-        c.alert_rules.v1.get_details_file_name_rules(rule_ids=[])
+        page = c.alert_rules.v1.get_details_file_name_rules(rule_ids=[])
+        # load json responses into dictionaries to compare fields regardless of order
+        assert json.loads(page.rules[0].json()) == json.loads(
+            json.dumps(TEST_FILE_NAME_RULE)
+        )
