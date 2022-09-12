@@ -8,6 +8,7 @@ from requests_toolbelt.sessions import BaseUrlSession
 from requests_toolbelt.utils.dump import dump_response
 
 from incydr.__about__ import __version__
+from incydr._alerts.client import AlertsClient
 from incydr._cases.client import CasesClient
 from incydr._core.auth import APIClientAuth
 from incydr._core.settings import IncydrSettings
@@ -78,6 +79,7 @@ class Client:
 
         self._session.hooks["response"] = [response_hook]
 
+        self._alerts = AlertsClient(self)
         self._cases = CasesClient(self)
         self._customer = CustomerClient(self)
         self._departments = DepartmentsClient(self)
@@ -123,6 +125,10 @@ class Client:
             'https://api.us.code42.com/v1/users'
         """
         return self._session
+
+    @property
+    def alerts(self):
+        return self._alerts
 
     @property
     def cases(self):
