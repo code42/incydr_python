@@ -7,7 +7,6 @@ from incydr._alert_rules.models.request import UpdateRulesRequest
 from incydr._alert_rules.models.request import UpdateUserIdsRequest
 from incydr._alert_rules.models.request import UpdateUsersRequest
 from incydr._alert_rules.models.request import UserRequest
-from incydr._alert_rules.models.response import AssignedUser
 from incydr._alert_rules.models.response import AssignedUsersList
 from incydr._alert_rules.models.response import CloudSharePermissionsRuleDetailsList
 from incydr._alert_rules.models.response import EndpointExfiltrationRuleDetailsList
@@ -68,7 +67,6 @@ class AlertRulesV1:
 
         **Parameters**:
 
-        * rule_type**:
         * **rule_type**: `str` -
         * **name**: `str` -
         * **description**: `str` -

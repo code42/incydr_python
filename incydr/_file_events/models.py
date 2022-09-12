@@ -141,7 +141,7 @@ class RemovableMedia(BaseModel):
     media_name: Optional[str] = Field(
         None,
         alias="mediaName",
-        description="For events detected on removable media, the media name of the device, as reported by the vendor/device. This is usually very similar to the productName, but can vary based on the rule_type of device. For example, if the device is a hard drive in a USB enclosure, this may be the combination of the drive model and the enclosure model.\nThis value is not provided by all devices, so it may be null in some cases.",
+        description="For events detected on removable media, the media name of the device, as reported by the vendor/device. This is usually very similar to the productName, but can vary based on the type of device. For example, if the device is a hard drive in a USB enclosure, this may be the combination of the drive model and the enclosure model.\nThis value is not provided by all devices, so it may be null in some cases.",
         example="Cruzer Blade",
     )
     name: Optional[str] = Field(
@@ -226,7 +226,7 @@ class RiskIndicator(BaseModel):
 class SearchFilterSearchTermV1(BaseModel):
     operator: Optional[Operator] = Field(
         None,
-        description="The rule_type of match to perform.  Default value is `IS`.",
+        description="The type of match to perform.  Default value is `IS`.",
         example="IS_NOT",
     )
     term: Optional[EventSearchTerm] = Field(
@@ -240,7 +240,7 @@ class SearchFilterSearchTermV1(BaseModel):
 class SearchFilterSearchTermV1Res(BaseModel):
     operator: Optional[Operator] = Field(
         None,
-        description="The rule_type of match to perform.  Default value is `IS`.",
+        description="The type of match to perform.  Default value is `IS`.",
         example="IS_NOT",
     )
     term: Optional[EventSearchTerm] = Field(
@@ -254,7 +254,7 @@ class SearchFilterSearchTermV1Res(BaseModel):
 class SearchFilterSearchTermV2(BaseModel):
     operator: Optional[Operator] = Field(
         None,
-        description="The rule_type of match to perform.  Default value is `IS`.",
+        description="The type of match to perform.  Default value is `IS`.",
         example="IS_NOT",
     )
     term: Optional[EventSearchTerm] = Field(
@@ -268,7 +268,7 @@ class SearchFilterSearchTermV2(BaseModel):
 class SearchFilterSearchTermV2Res(BaseModel):
     operator: Optional[Operator] = Field(
         None,
-        description="The rule_type of match to perform.  Default value is `IS`.",
+        description="The type of match to perform.  Default value is `IS`.",
         example="IS_NOT",
     )
     term: Optional[EventSearchTerm] = Field(
@@ -357,7 +357,7 @@ class Destination(BaseModel):
     account_type: Optional[str] = Field(
         None,
         alias="accountType",
-        description="For cloud sync apps installed on user devices, the rule_type of account where the event was observed. For example, 'BUSINESS' or 'PERSONAL'.",
+        description="For cloud sync apps installed on user devices, the type of account where the event was observed. For example, 'BUSINESS' or 'PERSONAL'.",
         example="BUSINESS",
     )
     category: Optional[str] = Field(
@@ -422,7 +422,7 @@ class Destination(BaseModel):
 class File(BaseModel):
     category: Optional[str] = Field(
         None,
-        description="A categorization of the file that is inferred from MIME rule_type.",
+        description="A categorization of the file that is inferred from MIME type.",
         example="Audio",
     )
     category_by_bytes: Optional[str] = Field(
@@ -471,13 +471,13 @@ class File(BaseModel):
     mime_type_by_bytes: Optional[str] = Field(
         None,
         alias="mimeTypeByBytes",
-        description="The MIME rule_type of the file based on its contents.",
+        description="The MIME type of the file based on its contents.",
         example="text/csv",
     )
     mime_type_by_extension: Optional[str] = Field(
         None,
         alias="mimeTypeByExtension",
-        description="The MIME rule_type of the file based on its extension.",
+        description="The MIME type of the file based on its extension.",
         example="audio/vorbis",
     )
     modified: Optional[datetime] = Field(
@@ -610,7 +610,7 @@ class FileEventV1(BaseModel):
     event_type: EventType = Field(
         ...,
         alias="eventType",
-        description="Indicates the rule_type of file event observed.",
+        description="Indicates the type of file event observed.",
         example="MODIFIED",
     )
     exposure: List[str] = Field(
@@ -627,7 +627,7 @@ class FileEventV1(BaseModel):
     file_category: Optional[str] = Field(
         None,
         alias="fileCategory",
-        description="A categorization of the file that is inferred from MIME rule_type.",
+        description="A categorization of the file that is inferred from MIME type.",
         example="Audio",
     )
     file_category_by_bytes: Optional[str] = Field(
@@ -677,7 +677,7 @@ class FileEventV1(BaseModel):
     file_type: FileType = Field(
         ...,
         alias="fileType",
-        description="The rule_type of file detected; only FILE types are searchable.",
+        description="The type of file detected; only FILE types are searchable.",
         example="FILE",
     )
     insertion_timestamp: Optional[datetime] = Field(
@@ -695,19 +695,19 @@ class FileEventV1(BaseModel):
     mime_type_by_bytes: Optional[str] = Field(
         None,
         alias="mimeTypeByBytes",
-        description="The MIME rule_type of the file based on its contents.",
+        description="The MIME type of the file based on its contents.",
         example="text/csv",
     )
     mime_type_by_extension: Optional[str] = Field(
         None,
         alias="mimeTypeByExtension",
-        description="The MIME rule_type of the file based on its extension.",
+        description="The MIME type of the file based on its extension.",
         example="audio/vorbis",
     )
     mime_type_mismatch: Optional[bool] = Field(
         None,
         alias="mimeTypeMismatch",
-        description="Indicates whether or not the MIME rule_type of the file based on its contents does not match the MIME rule_type based on its extension and that this mismatch is unexpected.",
+        description="Indicates whether or not the MIME type of the file based on its contents does not match the MIME type based on its extension and that this mismatch is unexpected.",
         example=True,
     )
     modify_timestamp: Optional[datetime] = Field(
@@ -791,7 +791,7 @@ class FileEventV1(BaseModel):
     removable_media_media_name: Optional[str] = Field(
         None,
         alias="removableMediaMediaName",
-        description="For events detected on removable media, the media name of the device, as reported by the vendor/device. This is usually very similar to the productName, but can vary based on the rule_type of device. For example, if the device is a hard drive in a USB enclosure, this may be the combination of the drive model and the enclosure model.\nThis value is not provided by all devices, so it may be null in some cases.",
+        description="For events detected on removable media, the media name of the device, as reported by the vendor/device. This is usually very similar to the productName, but can vary based on the type of device. For example, if the device is a hard drive in a USB enclosure, this may be the combination of the drive model and the enclosure model.\nThis value is not provided by all devices, so it may be null in some cases.",
         example="Cruzer Blade",
     )
     removable_media_name: Optional[str] = Field(
@@ -1052,7 +1052,7 @@ class QueryProblemSearchTermV1(BaseModel):
     )
     type: SearchProblemType = Field(
         ...,
-        description="The rule_type of problem that occured.",
+        description="The type of problem that occured.",
         example="SEARCH_FAILED",
     )
 
@@ -1070,7 +1070,7 @@ class QueryProblemSearchTermV2(BaseModel):
     )
     type: SearchProblemType = Field(
         ...,
-        description="The rule_type of problem that occured.",
+        description="The type of problem that occured.",
         example="SEARCH_FAILED",
     )
 
@@ -1085,7 +1085,7 @@ class RelatedEvent(BaseModel):
     event_action: Optional[str] = Field(
         None,
         alias="eventAction",
-        description="The rule_type of file event observed. For example: file-modified, application-read, removable-media-created.",
+        description="The type of file event observed. For example: file-modified, application-read, removable-media-created.",
         example="file-downloaded",
     )
     id: Optional[str] = Field(
@@ -1445,7 +1445,7 @@ class Source(BaseModel):
 class Event(BaseModel):
     action: Optional[str] = Field(
         None,
-        description="The rule_type of file event observed. For example: file-modified, application-read, removable-media-created.",
+        description="The type of file event observed. For example: file-modified, application-read, removable-media-created.",
         example="file-downloaded",
     )
     id: str = Field(

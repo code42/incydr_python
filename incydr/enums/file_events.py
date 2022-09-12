@@ -89,7 +89,7 @@ class EventSearchTerm(_Enum):
     REPORT_HEADERS = "report.headers"
     REPORT_ID = "report.id"
     REPORT_NAME = "report.name"
-    REPORT_TYPE = "report.rule_type"
+    REPORT_TYPE = "report.type"
     RISK_INDICATORS_NAME = "risk.indicators.name"
     RISK_INDICATORS_WEIGHT = "risk.indicators.weight"
     RISK_SCORE = "risk.score"
@@ -205,7 +205,7 @@ class Category(_Enum):
 
 
 class ShareType(_Enum):
-    """share rule_type _Enum values."""
+    """share type _Enum values."""
 
     PUBLIC_LINK_SHARE = "Anyone with the link"
     DOMAIN_SHARE = "Anyone in your organization"
@@ -213,7 +213,7 @@ class ShareType(_Enum):
 
 
 class ReportType(_Enum):
-    """report rule_type _Enum values."""
+    """report type _Enum values."""
 
     AD_HOC = "REPORT_TYPE_AD_HOC"
     SAVED = "REPORT_TYPE_SAVED"

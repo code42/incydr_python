@@ -28,7 +28,7 @@ _term_enum_map = {
     "source.category": Category,
     "destination.category": Category,
     "event.shareType": ShareType,
-    "report.rule_type": ReportType,
+    "report.type": ReportType,
     "risk.indicators.name": RiskIndicators,
     "risk.severity": RiskSeverity,
     "risk.trustReason": TrustReason,
