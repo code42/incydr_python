@@ -92,7 +92,7 @@ class UserRiskProfilesV1:
             supportUser=support_user,
         )
         response = self._parent.session.get(
-            "/v1/user_risk_profiles", params=data.dict()
+            "/v1/user-risk-profiles", params=data.dict()
         )
         return UserRiskProfilesPage.parse_response(response)
 
@@ -156,7 +156,7 @@ class UserRiskProfilesV1:
         **Returns**: A [`UserRiskProfile`][user_risk_profile-model] object with updated values from server.
         """
         response = self._parent.session.patch(
-            f"/v1/user_risk_profiles/{user_id}",
+            f"/v1/user-risk-profiles/{user_id}",
             json={"notes": notes, "startDate": start_date, "endDate": end_date},
         )
         return UserRiskProfile.parse_response(response)
@@ -174,7 +174,7 @@ class UserRiskProfilesV1:
         **Returns**: A `requests.Response` indicating success.
         """
         return self._parent.session.post(
-            f"/v1/user_risk_profiles/{user_id}/add-cloud-aliases",
+            f"/v1/user-risk-profiles/{user_id}/add-cloud-aliases",
             json={"userId": user_id, "cloudAliases": cloud_aliases},
         )
 
@@ -191,7 +191,7 @@ class UserRiskProfilesV1:
         **Returns**: A `requests.Response` indicating success.
         """
         return self._parent.session.post(
-            f"/v1/user_risk_profiles/{user_id}/delete-cloud-aliases",
+            f"/v1/user-risk-profiles/{user_id}/delete-cloud-aliases",
             json={"userId": user_id, "cloudAliases": cloud_aliases},
         )
 
