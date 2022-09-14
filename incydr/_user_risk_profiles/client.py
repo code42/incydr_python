@@ -1,13 +1,14 @@
+from datetime import datetime
 from itertools import count
 from typing import Iterator
 from typing import List
 
 from requests import Response
 
-from models import Date
-from models import QueryUserRiskProfilesRequest
-from models import UserRiskProfile
-from models import UserRiskProfilesPage
+from incydr._user_risk_profiles.models import Date
+from incydr._user_risk_profiles.models import QueryUserRiskProfilesRequest
+from incydr._user_risk_profiles.models import UserRiskProfile
+from incydr._user_risk_profiles.models import UserRiskProfilesPage
 
 
 class UserRiskProfilesV1:
@@ -31,24 +32,24 @@ class UserRiskProfilesV1:
         * **user_id**: `str` (required) - The unique ID for the user.
         **Returns**: A [`UserRiskProfile`][user-risk-profile-model] object representing the user risk profile.
         """
-        response = self._parent.session.get(f"/v1/user_risk_profile/{user_id}")
+        response = self._parent.session.get(f"/v1/user-risk-profiles/{user_id}")
         return UserRiskProfile.parse_response(response)
 
     def get_page(
-        self,
-        page: int = 1,
-        page_size: int = None,
-        manager_id: str = None,
-        title: str = None,
-        division: str = None,
-        department: str = None,
-        employment_type: str = None,
-        country: str = None,
-        region: str = None,
-        locality: str = None,
-        active: bool = None,
-        deleted: bool = None,
-        support_user: bool = None,
+            self,
+            page: int = 1,
+            page_size: int = 100,
+            manager_id: str = None,
+            title: str = None,
+            division: str = None,
+            department: str = None,
+            employment_type: str = None,
+            country: str = None,
+            region: str = None,
+            locality: str = None,
+            active: bool = None,
+            deleted: bool = None,
+            support_user: bool = None,
     ) -> UserRiskProfilesPage:
         """
         Get a page of user risk profiles.
@@ -97,19 +98,19 @@ class UserRiskProfilesV1:
         return UserRiskProfilesPage.parse_response(response)
 
     def iter_all(
-        self,
-        page_size: int = None,
-        manager_id: str = None,
-        title: str = None,
-        division: str = None,
-        department: str = None,
-        employment_type: str = None,
-        country: str = None,
-        region: str = None,
-        locality: str = None,
-        active: bool = None,
-        deleted: bool = None,
-        support_user: bool = None,
+            self,
+            page_size: int = 100,
+            manager_id: str = None,
+            title: str = None,
+            division: str = None,
+            department: str = None,
+            employment_type: str = None,
+            country: str = None,
+            region: str = None,
+            locality: str = None,
+            active: bool = None,
+            deleted: bool = None,
+            support_user: bool = None,
     ) -> Iterator[UserRiskProfile]:
         """
         Iterate over all user risk profiles.
@@ -119,7 +120,7 @@ class UserRiskProfilesV1:
         page_size = page_size or self._parent.settings.page_size
         for page_num in count(1):
             page = self.get_page(
-                page_num=page_num,
+                page=page_num,
                 page_size=page_size,
                 manager_id=manager_id,
                 title=title,
@@ -138,26 +139,37 @@ class UserRiskProfilesV1:
                 break
 
     def update(
-        self, user_id: str, notes: str, start_date: Date, end_date: Date
+            self,
+            user_id: str,
+            notes: str = None,
+            start_date: datetime = None,
+            end_date: datetime = None
     ) -> UserRiskProfile:
         """
         Updates a user risk profile.
 
         **Parameters**
 
-        * **user_risk_profile**: [`UserRiskProfile`][user_risk_profile-model] The modified case object.
+        * **user_risk_profile**: [`UserRiskProfile`][user-risk-profile-model] The modified case object.
 
         Usage example:
 
-            >>> user_risk_profile = client.user_risk_profiles.v1.get_user_risk_profile(23)
-            >>> user_risk_profile.notes = "Updated notes"
-            >>> client.user_risk_profiles.v1.update(user_risk_profile)
+            >>> client.user_risk_profiles.v1.update("34", "These are some notes",
+            >>>      "2020-12-23T14:24:44.593Z", "2022-07-18T16:40:53.335132Z")
 
-        **Returns**: A [`UserRiskProfile`][user_risk_profile-model] object with updated values from server.
+        **Returns**: A [`UserRiskProfile`][user-risk-profile-model] object with updated values from server.
         """
-        response = self._parent.session.patch(
+
+        datetime_start = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+        datetime_end = datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S.%fZ')
+
+        response = self._parent.session.post(
             f"/v1/user-risk-profiles/{user_id}",
-            json={"notes": notes, "startDate": start_date, "endDate": end_date},
+            json={"notes": notes,
+                  "startDate": Date(day=datetime_start.day, month=datetime_start.month,
+                                    year=datetime_start.year),
+                  "endDate": Date(day=datetime_end.day, month=datetime_end.month, year=datetime_end.year)
+                  },
         )
         return UserRiskProfile.parse_response(response)
 

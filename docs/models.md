@@ -48,3 +48,16 @@ available model methods.
 
 ::: incydr.models.DevicesPage
     :docstring:
+
+## User Risk Profiles
+---
+
+### `UserRiskProfile` model
+
+::: incydr.models.UserRiskProfile
+    :docstring:
+
+### `UserRiskProfilePage` model
+
+::: incydr.models.UserRiskProfilePage
+    :docstring:

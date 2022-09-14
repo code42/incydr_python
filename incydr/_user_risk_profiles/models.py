@@ -4,10 +4,25 @@ from typing import List
 from typing import Optional
 
 from pydantic import BaseModel
-from pydantic import Extra
 from pydantic import Field
 
 from incydr._core.models import ResponseModel
+
+
+class Date(BaseModel):
+    year: Optional[int] = Field(
+        None,
+        description="Year of date. Must be from 1 to 9999, or 0 if specifying a date without\n a year.",
+    )
+    month: Optional[int] = Field(
+        None,
+        description="Month of year. Must be from 1 to 12, or 0 if specifying a year without a\n month and day.",
+    )
+    day: Optional[int] = Field(
+        None,
+        description="Day of month. Must be from 1 to 31 and valid for the year and month, or 0\n if specifying a year "
+                    "by itself or a year and month where the day is not\n significant.",
+    )
 
 
 class UserRiskProfile(ResponseModel):
@@ -74,9 +89,6 @@ class UserRiskProfile(ResponseModel):
     userId: Optional[str] = Field(None, description="A unique user ID.")
     username: Optional[str] = Field(None, description="The user's Code42 username.")
 
-    class Config:
-        extra = Extra.forbid
-
 
 class UserRiskProfilesPage(ResponseModel):
     """
@@ -94,13 +106,10 @@ class UserRiskProfilesPage(ResponseModel):
     )
     userRiskProfiles: Optional[List[UserRiskProfile]] = None
 
-    class Config:
-        extra = Extra.forbid
-
 
 class QueryUserRiskProfilesRequest(BaseModel):
     page: Optional[int]
-    page_size: Optional[int] = 100
+    page_size: Optional[int]
     manager_id: Optional[str]
     title: Optional[str]
     division: Optional[str]
@@ -117,7 +126,7 @@ class QueryUserRiskProfilesRequest(BaseModel):
         use_enum_values = True
 
 
-class UpdatedUserRiskProfile(BaseModel):
+class UpdateUserRiskProfile(BaseModel):
     endDate: Optional[Date] = None
     notes: Optional[str] = Field(
         None,
@@ -126,9 +135,6 @@ class UpdatedUserRiskProfile(BaseModel):
     )
     startDate: Optional[Date] = None
 
-    class Config:
-        extra = Extra.forbid
-
 
 class AddCloudAliasesRequest(BaseModel):
     cloudAliases: Optional[List[str]] = None
@@ -136,34 +142,9 @@ class AddCloudAliasesRequest(BaseModel):
         None, description="The ID of the user to add cloud aliases.", example="123"
     )
 
-    class Config:
-        extra = Extra.forbid
-
 
 class DeleteCloudAliasesRequest(BaseModel):
     cloudAliases: Optional[List[str]] = None
     userId: Optional[str] = Field(
         None, description="The ID of the user to delete cloud aliases.", example="123"
     )
-
-    class Config:
-        extra = Extra.forbid
-
-
-class Date(BaseModel):
-    day: Optional[int] = Field(
-        None,
-        description="Day of month. Must be from 1 to 31 and valid for the year and month, or 0\n if specifying a year "
-        "by itself or a year and month where the day is not\n significant.",
-    )
-    month: Optional[int] = Field(
-        None,
-        description="Month of year. Must be from 1 to 12, or 0 if specifying a year without a\n month and day.",
-    )
-    year: Optional[int] = Field(
-        None,
-        description="Year of date. Must be from 1 to 9999, or 0 if specifying a date without\n a year.",
-    )
-
-    class Config:
-        extra = Extra.forbid
