@@ -28,7 +28,7 @@ class AlertState(str, Enum):
     pending = "PENDING"
 
 
-class AddNoteCommand(BaseModel):
+class AddNoteRequest(BaseModel):
     tenant_id: constr(max_length=40) = Field(
         ...,
         alias="tenantId",

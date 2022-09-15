@@ -1,3 +1,5 @@
+import base64
+import json
 import logging
 import re
 from collections import deque
@@ -125,6 +127,16 @@ class Client:
             'https://api.us.code42.com/v1/users'
         """
         return self._session
+
+    @property
+    def tenant_id(self):
+        """Property returning the current tenant ID."""
+        token = self.session.auth.token_response.access_token.get_secret_value()
+        payload = token.encode("ascii").split(b".")[-2]
+        extra = len(payload) % 4
+        if extra > 0:
+            payload += b"=" * (4 - extra)
+        return json.loads(base64.urlsafe_b64decode(payload))["tenantUid"]
 
     @property
     def alerts(self):
