@@ -97,6 +97,53 @@ available model methods.
 ::: incydr.models.SavedSearchesPage
     :docstring:
 
+## Legal Hold
+---
+
+### `PoliciesList` model
+
+::: incydr.models.PoliciesList
+    :docstring:
+
+### `Policy` model
+
+::: incydr.models.Policy
+    :docstring:
+
+### `MattersPage` model
+
+::: incydr.models.MattersPage
+    :docstring:
+
+### `Matter` model
+
+::: incydr.models.Matter
+    :docstring:
+
+### `CustodiansPage` model
+
+::: incydr.models.CustodiansPage
+    :docstring:
+
+### `Custodian` model
+
+::: incydr.models.Custodian
+    :docstring:
+
+### `CustodianMembershipsPage` model
+
+::: incydr.models.CustodianMembershipsPage
+    :docstring:
+
+### `CustodianMembership` model
+
+::: incydr.models.CustodianMembership
+    :docstring:
+
+### `MatterMembership` model
+
+::: incydr.models.MatterMembership
+    :docstring:
 
 ## Roles
 ---

@@ -64,7 +64,7 @@ class UsersV1:
         * **blocked**: `bool` - When true, return only blocked users. When false, return only unblocked users. Defaults to returning both.
         * **username**: `str` - The username of a user to search for.
         * **page_num**: `int` - Page number for results. Defaulting to 1.
-        * **page_size**: `int` - Max number of results to return per page. Defaulting to client settings page_size
+        * **page_size**: `int` - Max number of results to return per page. Defaulting to client's `page_size` setting.
 
         **Returns**: A ['UsersPage'][userspage-model] object.
         """
@@ -100,7 +100,7 @@ class UsersV1:
         * **active**: `bool` - Whether or not the device is active. If true, the device will show up on reports, etc.
         * **blocked**: `bool` - Whether or not the device is blocked.  If true, restores and logins are disabled.
         * **page_num**: `int` - Page number for results. Defaulting to 1.
-        * **page_size**: `int` - Max number of results to return per page. Defaulting to client settings page_size
+        * **page_size**: `int` - Max number of results to return per page. Defaulting to client's `page_size` settings.
         * **sort_dir**: `SortDirection` - 'asc' or 'desc'. The direction in which to sort the response based on the corresponding key. Defaults to 'asc'.
         * **sort_key**: `SortKeys` - One or more values on which the response will be sorted. Defaults to device name.
 

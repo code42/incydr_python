@@ -38,6 +38,7 @@ nav:
   - Devices: 'devices.md'
   - File Events: 'file_events.md'
   - File Event Queries: 'file_event_queries.md'
+  - Legal Hold: 'legal_hold.md'
   - Users: 'users.md'
   - Watchlists: 'watchlists.md'
   - Models: 'models.md'
