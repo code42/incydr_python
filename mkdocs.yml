@@ -30,10 +30,16 @@ edit_uri: ""
 nav:
   - Introduction: 'index.md'
   - Client: 'client.md'
-  - Settings: 'settings.md'
+  - Settings:
+    - Configuration: 'settings.md'
+    - Logging: 'logging.md'
   - Cases: 'cases.md'
   - Customer: 'customer.md'
   - Devices: 'devices.md'
+  - File Events: 'file_events.md'
+  - File Event Queries: 'file_event_queries.md'
+  - Users: 'users.md'
+  - Watchlists: 'watchlists.md'
   - UserRiskProfiles: 'userRiskProfiles.md'
   - Models: 'models.md'
 

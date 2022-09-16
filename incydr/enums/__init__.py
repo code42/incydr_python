@@ -1,7 +1,7 @@
-import enum
+import enum as _enum
 
 
-class Enum(str, enum.Enum):
+class _Enum(str, _enum.Enum):
     """
     An `enum.Enum` subclass that enables string comparison (`Enum.MEMBER == "MEMBER"`) and better exceptions that show
     all possible values.
@@ -16,6 +16,6 @@ class Enum(str, enum.Enum):
         )
 
 
-class SortDirection(Enum):
+class SortDirection(_Enum):
     ASC = "asc"
     DESC = "desc"

@@ -48,6 +48,7 @@ dependencies = [
 ]
 [tool.hatch.envs.style.scripts]
 check = "pre-commit run --all-files --show-diff-on-failure"
+check-no-diff = "pre-commit run --all-files"
 
 [tool.hatch.envs.docs]
 dependencies = [
@@ -58,6 +59,7 @@ dependencies = [
 [tool.hatch.envs.docs.scripts]
 build = "mkdocs build"
 serve = "mkdocs serve"
+svg = "python docs/example_logging.py"
 
 [tool.hatch.envs.default]
 dependencies = []
