@@ -9,7 +9,7 @@ from pydantic import Field
 from incydr._core.models import ResponseModel
 
 
-class Date(BaseModel):
+class Date(ResponseModel):
     year: Optional[int] = Field(
         None,
         description="Year of date. Must be from 1 to 9999, or 0 if specifying a date without\n a year.",
@@ -21,7 +21,7 @@ class Date(BaseModel):
     day: Optional[int] = Field(
         None,
         description="Day of month. Must be from 1 to 31 and valid for the year and month, or 0\n if specifying a year "
-                    "by itself or a year and month where the day is not\n significant.",
+        "by itself or a year and month where the day is not\n significant.",
     )
 
 
@@ -31,62 +31,70 @@ class UserRiskProfile(ResponseModel):
     **Fields**:
 
     * **active**: `bool` - Whether the user is active.
-    * **cloudAliases**: `List[str]` - List of cloud aliases for the user.
+    * **cloud_aliases**: `List[str]` - List of cloud aliases for the user.
     * **country**: `str` - The user's country.
     * **deleted**: `bool` - Whether the user is deleted.
     * **department**: `str` - The user's department.
-    * **displayName**: `str` - The user's friendly display name.
+    * **display_name**: `str` - The user's friendly display name.
     * **division**: `str` - The user's division.
-    * **employmentType**: `str` - The user's employment type.
-    * **endDate**: `Date` - The end date
+    * **employment_type**: `str` - The user's employment type.
+    * **end_date**: `Date` - The end date
     * **locality**: `str` - The user's locality (city).
-    * **managerDisplayName**: `str` - The user's manager's friendly display name.
-    * **managerId**: `str` - The Code42 user ID of the user's manager.
-    * **managerUsername**: `str` - The Code42 username of the user's manager.
+    * **manager_display_name**: `str` - The user's manager's friendly display name.
+    * **manager_id**: `str` - The Code42 user ID of the user's manager.
+    * **manager_username**: `str` - The Code42 username of the user's manager.
     * **notes**: `str` - Notes about the user.
     * **region**: `str` - The user's region (state).
-    * **startDate**: `Date` - The start date
-    * **supportUser**: `bool` - Whether the user is a support user.
-    * **tenantId**: `str` - The unique tenant ID.
+    * **start_date**: `Date` - The start date
+    * **support_user**: `bool` - Whether the user is a support user.
+    * **tenant_id**: `str` - The unique tenant ID.
     * **title**: `str` - The user's job title.
-    * **userId**: `str` - The unique user ID.
+    * **user_id**: `str` - The unique user ID.
     * **username**: `str` - The user's Code42 username.
     """
 
     active: Optional[bool] = Field(None, description="Whether the user is active.")
-    cloudAliases: Optional[List[str]] = Field(
-        None, description="A list of cloud aliases for the user."
+    cloud_aliases: Optional[List[str]] = Field(
+        None, description="A list of cloud aliases for the user.", alias="cloudAliases"
     )
     country: Optional[str] = Field(None, description="The user's country.")
     deleted: Optional[bool] = Field(None, description="Whether the user is deleted.")
     department: Optional[str] = Field(None, description="The user's department.")
-    displayName: Optional[str] = Field(
-        None, description="The user's friendly display name."
+    display_name: Optional[str] = Field(
+        None, description="The user's friendly display name.", alias="displayName"
     )
     division: Optional[str] = Field(None, description="The user's division.")
-    employmentType: Optional[str] = Field(
-        None, description="The user's employment type."
+    employment_type: Optional[str] = Field(
+        None, description="The user's employment type.", alias="employmentType"
     )
-    endDate: Optional[Date] = None
+    end_date: Optional[Date] = Field(None, alias="endDate")
     locality: Optional[str] = Field(None, description="The user's locality (city).")
-    managerDisplayName: Optional[str] = Field(
-        None, description="The user's manager's friendly display name."
+    manager_display_name: Optional[str] = Field(
+        None,
+        description="The user's manager's friendly display name.",
+        alias="managerDisplayName",
     )
-    managerId: Optional[str] = Field(
-        None, description="The Code42 user ID of the user's manager."
+    manager_id: Optional[str] = Field(
+        None, description="The Code42 user ID of the user's manager.", alias="managerId"
     )
-    managerUsername: Optional[str] = Field(
-        None, description="The Code42 username of the user's manager."
+    manager_username: Optional[str] = Field(
+        None,
+        description="The Code42 username of the user's manager.",
+        alias="managerUsername",
     )
     notes: Optional[str] = Field(None, description="Notes about the user.")
     region: Optional[str] = Field(None, description="The user's region (state).")
-    startDate: Optional[Date] = None
-    supportUser: Optional[bool] = Field(
-        None, description="Whether the user is a support user."
+    start_date: Optional[Date] = Field(None, alias="startDate")
+    support_user: Optional[bool] = Field(
+        None, description="Whether the user is a support user.", alias="supportUser"
     )
-    tenantId: Optional[str] = Field(None, description="A unique tenant ID.")
+    tenant_id: Optional[str] = Field(
+        None, description="A unique tenant ID.", alias="tenantId"
+    )
     title: Optional[str] = Field(None, description="The user's job title.")
-    userId: Optional[str] = Field(None, description="A unique user ID.")
+    user_id: Optional[str] = Field(
+        None, description="A unique user ID.", alias="userId"
+    )
     username: Optional[str] = Field(None, description="The user's Code42 username.")
 
 
@@ -97,14 +105,19 @@ class UserRiskProfilesPage(ResponseModel):
     **Fields**:
 
     * **total_count**: `int` The total count of all user risk profiles.
-    * **userRiskProfiles**: `List[UserRiskProfile]` The list of `n` number of user risk profiles
+    * **user_risk_profiles**: `List[UserRiskProfile]` The list of `n` number of user risk profiles
                             retrieved from the query, where `n=page_size`.
     """
 
-    totalCount: Optional[int] = Field(
-        None, description="The total count of all user risk profiles.", example=10
+    total_count: Optional[int] = Field(
+        None,
+        description="The total count of all user risk profiles.",
+        example=10,
+        alias="totalCount",
     )
-    userRiskProfiles: Optional[List[UserRiskProfile]] = None
+    user_risk_profiles: Optional[List[UserRiskProfile]] = Field(
+        None, alias="userRiskProfiles"
+    )
 
 
 class QueryUserRiskProfilesRequest(BaseModel):
@@ -126,7 +139,7 @@ class QueryUserRiskProfilesRequest(BaseModel):
         use_enum_values = True
 
 
-class UpdateUserRiskProfile(BaseModel):
+class UpdateUserRiskProfileRequest(BaseModel):
     endDate: Optional[Date] = None
     notes: Optional[str] = Field(
         None,

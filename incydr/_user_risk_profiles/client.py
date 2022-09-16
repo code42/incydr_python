@@ -7,6 +7,7 @@ from requests import Response
 
 from incydr._user_risk_profiles.models import Date
 from incydr._user_risk_profiles.models import QueryUserRiskProfilesRequest
+from incydr._user_risk_profiles.models import UpdateUserRiskProfileRequest
 from incydr._user_risk_profiles.models import UserRiskProfile
 from incydr._user_risk_profiles.models import UserRiskProfilesPage
 
@@ -28,28 +29,31 @@ class UserRiskProfilesV1:
     def get_user_risk_profile(self, user_id: str) -> UserRiskProfile:
         """
         Get a single user risk profile.
+
         **Parameters:**
+
         * **user_id**: `str` (required) - The unique ID for the user.
+
         **Returns**: A [`UserRiskProfile`][user-risk-profile-model] object representing the user risk profile.
         """
         response = self._parent.session.get(f"/v1/user-risk-profiles/{user_id}")
         return UserRiskProfile.parse_response(response)
 
     def get_page(
-            self,
-            page: int = 1,
-            page_size: int = 100,
-            manager_id: str = None,
-            title: str = None,
-            division: str = None,
-            department: str = None,
-            employment_type: str = None,
-            country: str = None,
-            region: str = None,
-            locality: str = None,
-            active: bool = None,
-            deleted: bool = None,
-            support_user: bool = None,
+        self,
+        page: int = 1,
+        page_size: int = 100,
+        manager_id: str = None,
+        title: str = None,
+        division: str = None,
+        department: str = None,
+        employment_type: str = None,
+        country: str = None,
+        region: str = None,
+        locality: str = None,
+        active: bool = None,
+        deleted: bool = None,
+        support_user: bool = None,
     ) -> UserRiskProfilesPage:
         """
         Get a page of user risk profiles.
@@ -98,23 +102,25 @@ class UserRiskProfilesV1:
         return UserRiskProfilesPage.parse_response(response)
 
     def iter_all(
-            self,
-            page_size: int = 100,
-            manager_id: str = None,
-            title: str = None,
-            division: str = None,
-            department: str = None,
-            employment_type: str = None,
-            country: str = None,
-            region: str = None,
-            locality: str = None,
-            active: bool = None,
-            deleted: bool = None,
-            support_user: bool = None,
+        self,
+        page_size: int = 100,
+        manager_id: str = None,
+        title: str = None,
+        division: str = None,
+        department: str = None,
+        employment_type: str = None,
+        country: str = None,
+        region: str = None,
+        locality: str = None,
+        active: bool = None,
+        deleted: bool = None,
+        support_user: bool = None,
     ) -> Iterator[UserRiskProfile]:
         """
         Iterate over all user risk profiles.
+
         Accepts the same parameters as `.get_page()` except `page_num`.
+
         **Returns**: A generator yielding individual [`UserRiskProfile`][user-risk-profile-model] objects.
         """
         page_size = page_size or self._parent.settings.page_size
@@ -134,42 +140,58 @@ class UserRiskProfilesV1:
                 deleted=deleted,
                 support_user=support_user,
             )
-            yield from page.userRiskProfiles
-            if len(page.userRiskProfiles) < page_size:
+            yield from page.user_risk_profiles
+            if len(page.user_risk_profiles) < page_size:
                 break
 
     def update(
-            self,
-            user_id: str,
-            notes: str = None,
-            start_date: datetime = None,
-            end_date: datetime = None
+        self,
+        user_id: str,
+        notes: str = None,
+        start_date: datetime = None,
+        end_date: datetime = None,
     ) -> UserRiskProfile:
         """
         Updates a user risk profile.
 
         **Parameters**
 
-        * **user_risk_profile**: [`UserRiskProfile`][user-risk-profile-model] The modified case object.
+        * **notes**: `str` - Additional notes for the user risk profile.
+        * **start_date**: `datetime` - The starting date for the user. Pass an empty string to clear the field.
+        * **end_date**: `datetime` - The departure date for the user.  Pass an empty string to clear the field.
 
-        Usage example:
-
-            >>> client.user_risk_profiles.v1.update("34", "These are some notes",
-            >>>      "2020-12-23T14:24:44.593Z", "2022-07-18T16:40:53.335132Z")
-
-        **Returns**: A [`UserRiskProfile`][user-risk-profile-model] object with updated values from server.
+        **Returns**: A [`UserRiskProfile`][user-risk-profile-model] object.
         """
+        paths = []
+        if start_date is not None:
+            paths += ["startDate"]
+            start_date = (
+                None
+                if start_date == ""
+                else Date(
+                    day=start_date.day, month=start_date.month, year=start_date.year
+                )
+            )
+        if end_date is not None:
+            paths += ["endDate"]
+            end_date = (
+                None
+                if end_date == ""
+                else Date(day=end_date.day, month=end_date.month, year=end_date.year)
+            )
+        if notes is not None:
+            paths += ["notes"]
+            if notes == "":
+                notes = None
 
-        datetime_start = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ")
-        datetime_end = datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S.%fZ')
-
-        response = self._parent.session.post(
+        data = UpdateUserRiskProfileRequest(
+            endDate=end_date, notes=notes, startDate=start_date
+        )
+        print(data.dict())
+        response = self._parent.session.patch(
             f"/v1/user-risk-profiles/{user_id}",
-            json={"notes": notes,
-                  "startDate": Date(day=datetime_start.day, month=datetime_start.month,
-                                    year=datetime_start.year),
-                  "endDate": Date(day=datetime_end.day, month=datetime_end.month, year=datetime_end.year)
-                  },
+            params={"paths": paths},
+            json=data.dict(),
         )
         return UserRiskProfile.parse_response(response)
 
@@ -185,6 +207,9 @@ class UserRiskProfilesV1:
 
         **Returns**: A `requests.Response` indicating success.
         """
+        if not isinstance(cloud_aliases, List):
+            cloud_aliases = [cloud_aliases]
+
         return self._parent.session.post(
             f"/v1/user-risk-profiles/{user_id}/add-cloud-aliases",
             json={"userId": user_id, "cloudAliases": cloud_aliases},
@@ -202,6 +227,9 @@ class UserRiskProfilesV1:
 
         **Returns**: A `requests.Response` indicating success.
         """
+        if not isinstance(cloud_aliases, List):
+            cloud_aliases = [cloud_aliases]
+
         return self._parent.session.post(
             f"/v1/user-risk-profiles/{user_id}/delete-cloud-aliases",
             json={"userId": user_id, "cloudAliases": cloud_aliases},

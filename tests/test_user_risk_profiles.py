@@ -6,27 +6,30 @@ from pytest_httpserver import HTTPServer
 from requests import Response
 
 from incydr import Client
-from incydr._user_risk_profiles.models import UpdateUserRiskProfile
 from incydr._user_risk_profiles.models import UserRiskProfile
 from incydr._user_risk_profiles.models import UserRiskProfilesPage
 
 TEST_USER_RISK_PROFILE_1 = {
-    "active": "true",
+    "active": True,
     "cloudAliases": [],
     "country": "France",
-    "deleted": "false",
+    "deleted": False,
     "department": "Finance",
     "displayName": "Phill",
     "division": "22-19",
     "employmentType": "Part-Time",
-    "endDate": "2022-07-18T16:40:53.335018Z",
+    "endDate": {
+        "year": 2021,
+        "month": 2,
+        "day": 1,
+    },
     "locality": None,
     "managerDisplayName": None,
     "managerId": None,
     "managerUsername": None,
     "notes": None,
     "region": None,
-    "startDate": "2022-07-18T16:39:51.356082Z",
+    "startDate": {"year": 2019, "month": 3, "day": 2},
     "supportUser": None,
     "tenantId": None,
     "title": None,
@@ -35,23 +38,23 @@ TEST_USER_RISK_PROFILE_1 = {
 }
 
 TEST_USER_RISK_PROFILE_2 = {
-    "active": "true",
+    "active": True,
     "cloudAliases": [],
     "country": "France",
-    "deleted": "false",
+    "deleted": False,
     "department": "Finance",
     "displayName": "Phill",
     "division": "22-19",
     "employmentType": "Part-Time",
-    "endDate": "2022-07-18T16:40:53.335018Z",
+    "endDate": {"year": 2022, "month": 7, "day": 18},
     "locality": "Paris",
     "managerDisplayName": "Phill #2",
     "managerId": "22-20",
     "managerUsername": "Bob-1234",
     "notes": "These are notes",
     "region": "Region of Paris",
-    "startDate": "2022-07-18T16:39:51.356082Z",
-    "supportUser": "true",
+    "startDate": {"year": 2020, "month": 2, "day": 1},
+    "supportUser": True,
     "tenantId": "124",
     "title": "Exist",
     "userId": "2",
@@ -68,10 +71,7 @@ def test_get_single_user_risk_profile_when_default_params_returns_expected_data(
     client = Client()
     user_risk_profile = client.user_risk_profiles.v1.get_user_risk_profile("2")
     assert isinstance(user_risk_profile, UserRiskProfile)
-    assert user_risk_profile.userId == 2
-    assert user_risk_profile.startDate == datetime.datetime.fromisoformat(
-        TEST_USER_RISK_PROFILE_2["startDate"].replace("Z", "+00:00")
-    )
+    assert user_risk_profile.user_id == "2"
     assert user_risk_profile.json() == json.dumps(TEST_USER_RISK_PROFILE_2)
 
 
@@ -92,9 +92,9 @@ def test_get_page_when_default_params_returns_expected_data(
     client = Client()
     page = client.user_risk_profiles.v1.get_page()
     assert isinstance(page, UserRiskProfilesPage)
-    assert page.userRiskProfiles[0].json() == json.dumps(TEST_USER_RISK_PROFILE_1)
-    assert page.userRiskProfiles[1].json() == json.dumps(TEST_USER_RISK_PROFILE_2)
-    assert page.totalCount == len(page.userRiskProfiles)
+    assert page.user_risk_profiles[0].json() == json.dumps(TEST_USER_RISK_PROFILE_1)
+    assert page.user_risk_profiles[1].json() == json.dumps(TEST_USER_RISK_PROFILE_2)
+    assert page.total_count == len(page.user_risk_profiles) == 2
 
 
 def test_update_user_risk_profile_when_default_params_returns_expected_data(
@@ -107,10 +107,7 @@ def test_update_user_risk_profile_when_default_params_returns_expected_data(
     client = Client()
     user_risk_profile = client.user_risk_profiles.v1.get_user_risk_profile(2)
     assert isinstance(user_risk_profile, UserRiskProfile)
-    assert user_risk_profile.userId == 2
-    assert user_risk_profile.startDate == datetime.datetime.fromisoformat(
-        TEST_USER_RISK_PROFILE_2["startDate"].replace("Z", "+00:00")
-    )
+    assert user_risk_profile.user_id == "2"
     assert user_risk_profile.json() == json.dumps(TEST_USER_RISK_PROFILE_2)
 
 
@@ -119,20 +116,17 @@ def test_iter_all_when_default_params_returns_expected_data(
 ):
     query_1 = {
         "page": 1,
-        "pageSize": 1,
+        "page_size": 2,
     }
-    query_2 = {
-        "page": 2,
-        "pageSize": 1
-    }
+    query_2 = {"page": 2, "page_size": 2}
 
     user_risk_profile_data_1 = {
-        "userRiskProfiles": [TEST_USER_RISK_PROFILE_1],
-        "totalCount": 1,
+        "userRiskProfiles": [TEST_USER_RISK_PROFILE_1, TEST_USER_RISK_PROFILE_2],
+        "totalCount": 2,
     }
     user_risk_profile_data_2 = {
-        "userRiskProfiles": [TEST_USER_RISK_PROFILE_2],
-        "totalCount": 1,
+        "userRiskProfiles": [],
+        "totalCount": 2,
     }
 
     httpserver_auth.expect_request(
@@ -144,7 +138,7 @@ def test_iter_all_when_default_params_returns_expected_data(
     ).respond_with_json(user_risk_profile_data_2)
 
     client = Client()
-    iterator = client.user_risk_profiles.v1.iter_all(page_size=1)
+    iterator = client.user_risk_profiles.v1.iter_all(page_size=2)
     total_user_risk_profiles = 0
     expected_user_risk_profiles = [TEST_USER_RISK_PROFILE_1, TEST_USER_RISK_PROFILE_2]
 
@@ -156,27 +150,40 @@ def test_iter_all_when_default_params_returns_expected_data(
 
 
 def test_update_when_default_params_returns_expected_data(httpserver_auth: HTTPServer):
+    query = {"paths": ["startDate", "endDate", "notes"]}
+    data = {
+        "endDate": {
+            "year": 2020,
+            "month": 9,
+            "day": 1,
+        },
+        "notes": "These are new notes",
+        "startDate": {
+            "year": 2022,
+            "month": 8,
+            "day": 2,
+        },
+    }
     httpserver_auth.expect_request(
-        "/v1/user-risk-profiles/2", method="PUT"
+        "/v1/user-risk-profiles/2",
+        method="PATCH",
+        query_string=urlencode(query, doseq=True),
+        json=data,
     ).respond_with_json(TEST_USER_RISK_PROFILE_2)
 
     client = Client()
     user_risk_profile = client.user_risk_profiles.v1.update(
         "2",
-        "These are new notes",
-        "2022-07-18T16:40:53.335019Z",
-        "2022-07-18T16:40:53.335678Z",
+        notes="These are new notes",
+        start_date=datetime.datetime(
+            2022, 8, 2, 13, 11, 7, 803762, tzinfo=datetime.timezone.utc
+        ),
+        end_date=datetime.datetime(
+            2020, 9, 1, 13, 11, 7, 803762, tzinfo=datetime.timezone.utc
+        ),
     )
 
-    assert isinstance(user_risk_profile, UpdateUserRiskProfile)
-    assert user_risk_profile.notes == TEST_USER_RISK_PROFILE_2["notes"]
-    assert user_risk_profile.startDate == TEST_USER_RISK_PROFILE_2["startDate"].replace(
-        "Z", "+00:00"
-    )
-    assert user_risk_profile.endDate == TEST_USER_RISK_PROFILE_2["startDate"].replace(
-        "Z", "+00:00"
-    )
-
+    assert isinstance(user_risk_profile, UserRiskProfile)
     assert user_risk_profile.json() == json.dumps(TEST_USER_RISK_PROFILE_2)
 
 
