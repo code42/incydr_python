@@ -5,14 +5,13 @@ from typing import List
 from typing import Optional
 from typing import Union
 
-from isodate import duration_isoformat
-from isodate import parse_duration
 from pydantic import BaseModel
 from pydantic import root_validator
-from pydantic import validate_arguments
 
 from incydr._queries.util import parse_timestamp
 from incydr.enums import _Enum
+from incydr.enums.alerts import AlertState, SeverityRating
+from incydr.enums.file_events import RiskSeverity
 
 
 class Operator(_Enum):
@@ -28,24 +27,31 @@ class Operator(_Enum):
 
 
 class AlertTerm(_Enum):
-    AlertId = "AlertId"
-    TenantId = "TenantId"
-    Type = "Type"
-    Name = "Name"
-    Description = "Description"
-    Actor = "Actor"
-    ActorId = "ActorId"
-    Target = "Target"
-    RiskSeverity = "RiskSeverity"
-    CreatedAt = "CreatedAt"
-    HasAuthSignificantWatchlist = "HasAuthSignificantWatchlist"
-    State = "State"
-    StateLastModifiedAt = "StateLastModifiedAt"
-    StateLastModifiedBy = "StateLastModifiedBy"
-    LastModifiedTime = "LastModifiedTime"
-    LastModifiedBy = "LastModifiedBy"
-    RuleId = "RuleId"
-    Severity = "Severity"
+    ALERT_ID = "AlertId"
+    TENANT_ID = "TenantId"
+    TYPE = "Type"
+    NAME = "Name"
+    DESCRIPTION = "Description"
+    ACTOR = "Actor"
+    ACTOR_ID = "ActorId"
+    TARGET = "Target"
+    RISK_SEVERITY = "RiskSeverity"
+    CREATED_AT = "CreatedAt"
+    HAS_AUTH_SIGNIFICANT_WATCHLIST = "HasAuthSignificantWatchlist"
+    STATE = "State"
+    STATE_LAST_MODIFIED_AT = "StateLastModifiedAt"
+    STATE_LAST_MODIFIED_BY = "StateLastModifiedBy"
+    LAST_MODIFIED_TIME = "LastModifiedTime"
+    LAST_MODIFIED_BY = "LastModifiedBy"
+    RULE_ID = "RuleId"
+    SEVERITY = "Severity"
+
+
+_term_enum_map = {
+    AlertTerm.STATE: AlertState,
+    AlertTerm.RISK_SEVERITY: RiskSeverity,
+    AlertTerm.SEVERITY: SeverityRating,
+}
 
 
 class Filter(BaseModel):
@@ -66,6 +72,10 @@ class Filter(BaseModel):
         AlertTerm(term)
         if term == "HasAuthSignificantWatchlist" and not isinstance(value, bool):
             raise ValueError("HasAuthSignificantWatchlist requires a boolean value.")
+
+        enum = _term_enum_map.get(term)
+        if enum:
+            enum(value)
 
         if operator in (Operator.EXISTS, Operator.DOES_NOT_EXIST):
             values["value"] = None
