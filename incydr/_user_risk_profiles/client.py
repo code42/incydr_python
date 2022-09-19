@@ -34,7 +34,7 @@ class UserRiskProfilesV1:
 
         * **user_id**: `str` (required) - The unique ID for the user.
 
-        **Returns**: A [`UserRiskProfile`][user-risk-profile-model] object representing the user risk profile.
+        **Returns**: A [`UserRiskProfile`][userriskprofile-model] object representing the user risk profile.
         """
         response = self._parent.session.get(f"/v1/user-risk-profiles/{user_id}")
         return UserRiskProfile.parse_response(response)
@@ -78,7 +78,7 @@ class UserRiskProfilesV1:
         * **support_user**: `bool` - When true, return only support users. When false, return only non-support users.
                                      Defaults to returning both
 
-        **Returns**: A ['UserRiskProfilesPage'][users-risk-profiles-page-model] object.
+        **Returns**: A ['UserRiskProfilesPage'][userriskprofilespage-model] object.
         """
         page_size = page_size or self._parent.settings.page_size
         data = QueryUserRiskProfilesRequest(
@@ -121,7 +121,7 @@ class UserRiskProfilesV1:
 
         Accepts the same parameters as `.get_page()` except `page_num`.
 
-        **Returns**: A generator yielding individual [`UserRiskProfile`][user-risk-profile-model] objects.
+        **Returns**: A generator yielding individual [`UserRiskProfile`][userriskprofile-model] objects.
         """
         page_size = page_size or self._parent.settings.page_size
         for page_num in count(1):
@@ -160,7 +160,7 @@ class UserRiskProfilesV1:
         * **start_date**: `datetime` - The starting date for the user. Pass an empty string to clear the field.
         * **end_date**: `datetime` - The departure date for the user.  Pass an empty string to clear the field.
 
-        **Returns**: A [`UserRiskProfile`][user-risk-profile-model] object.
+        **Returns**: A [`UserRiskProfile`][userriskprofile-model] object.
         """
         paths = []
         if start_date is not None:
