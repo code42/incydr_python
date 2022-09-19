@@ -12,6 +12,7 @@ from incydr._core.settings import IncydrSettings
 from incydr._customer.client import CustomerClient
 from incydr._devices.client import DevicesClient
 from incydr._file_events.client import FileEventsClient
+from incydr._trusted_activities.client import TrustedActivitiesClient
 
 _base_user_agent = user_agent("incydr", __version__)
 
@@ -80,6 +81,7 @@ class Client:
         self._customer = CustomerClient(self)
         self._file_events = FileEventsClient(self)
         self._devices = DevicesClient(self)
+        self._trusted_activities = TrustedActivitiesClient(self)
 
         self._session.auth.refresh()
 
@@ -152,3 +154,16 @@ class Client:
 
         """
         return self._devices
+
+    @property
+    def trusted_activities(self):
+        """
+        Property returning a [`TrustedActivities`](../trusted_activities) for interacting with
+        `/v*/trusted-activities` API endpoints.
+
+        Usage:
+
+            >>> client.trusted_activities.v2.get()
+
+        """
+        return self._trusted_activities

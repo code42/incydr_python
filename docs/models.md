@@ -48,3 +48,16 @@ available model methods.
 
 ::: incydr.models.DevicesPage
     :docstring:
+
+## Trusted Activities
+---
+
+### `TrustedActivity` model
+
+::: incydr.models.TrustedActivity
+    :docstring:
+
+### `TrustedActivitiesPage` model
+
+::: incydr.models.TrustedActivitiesPage
+    :docstring:

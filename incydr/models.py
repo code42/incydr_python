@@ -3,9 +3,19 @@ from incydr._cases.models import CasesPage
 from incydr._customer.models import Customer
 from incydr._devices.models import Device
 from incydr._devices.models import DevicesPage
+from incydr._trusted_activities.models import TrustedActivitiesPage
+from incydr._trusted_activities.models import TrustedActivity
 
 
-__all__ = ["Case", "CasesPage", "Customer", "DevicesPage", "Device"]
+__all__ = [
+    "Case",
+    "CasesPage",
+    "Customer",
+    "DevicesPage",
+    "Device",
+    "TrustedActivity",
+    "TrustedActivitiesPage",
+]
 
 
 __locals = locals()
