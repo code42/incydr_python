@@ -211,7 +211,7 @@ class Client:
     @property
     def user_risk_profiles(self):
         """
-        Property returning a [`UserRiskProfilesClient`](../userRiskProfiles) for interacting with
+        Property returning a [`UserRiskProfilesClient`](../user_risk_profiles) for interacting with
         `/v*/user_risk_profiles` API endpoints.
 
         Usage:
@@ -224,7 +224,7 @@ class Client:
     @property
     def watchlists(self):
         """
-        Property returning a ['WatchlistsClient'](../watchlists) for interacting with `/v*/watchlists` API endpoints.
+        Property returning a [`WatchlistsClient`](../watchlists) for interacting with `/v*/watchlists` API endpoints.
         Usage:
 
             >>> client.watchlists.v1.get_page()

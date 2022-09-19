@@ -131,9 +131,10 @@ available model methods.
 ::: incydr.models.UserRiskProfile
     :docstring:
 
-### `UserRiskProfilePage` model
+### `UserRiskProfilesPage` model
 
 ::: incydr.models.UserRiskProfilesPage
+    :docstring:
 
 ## Watchlists
 ---
