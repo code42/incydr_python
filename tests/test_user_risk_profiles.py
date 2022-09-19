@@ -37,6 +37,34 @@ TEST_USER_RISK_PROFILE_1 = {
     "username": None,
 }
 
+TEST_USER_RISK_PROFILE_1_UPDATED = {
+    "active": True,
+    "cloudAliases": [],
+    "country": "France",
+    "deleted": False,
+    "department": "Finance",
+    "displayName": "Phill",
+    "division": "22-19",
+    "employmentType": "Part-Time",
+    "endDate": {
+        "year": 2021,
+        "month": 2,
+        "day": 1,
+    },
+    "locality": None,
+    "managerDisplayName": None,
+    "managerId": None,
+    "managerUsername": None,
+    "notes": "New Notes",
+    "region": None,
+    "startDate": {"year": 2019, "month": 3, "day": 2},
+    "supportUser": None,
+    "tenantId": None,
+    "title": None,
+    "userId": "1",
+    "username": None,
+}
+
 TEST_USER_RISK_PROFILE_2 = {
     "active": True,
     "cloudAliases": [],
@@ -100,15 +128,19 @@ def test_get_page_when_default_params_returns_expected_data(
 def test_update_user_risk_profile_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
-    httpserver_auth.expect_request("/v1/user-risk-profiles/2").respond_with_json(
-        TEST_USER_RISK_PROFILE_2
-    )
+    roles_data = TEST_USER_RISK_PROFILE_1_UPDATED
+
+    httpserver_auth.expect_request(
+        "/v1/user-risk-profiles/1", method="PATCH"
+    ).respond_with_json(roles_data)
 
     client = Client()
-    user_risk_profile = client.user_risk_profiles.v1.get_user_risk_profile(2)
-    assert isinstance(user_risk_profile, UserRiskProfile)
-    assert user_risk_profile.user_id == "2"
-    assert user_risk_profile.json() == json.dumps(TEST_USER_RISK_PROFILE_2)
+    response = client.user_risk_profiles.v1.update(
+        user_id="1",
+        notes="New Notes"
+    )
+    assert isinstance(response, UserRiskProfile)
+    assert response.json() == json.dumps(TEST_USER_RISK_PROFILE_1_UPDATED)
 
 
 def test_iter_all_when_default_params_returns_expected_data(

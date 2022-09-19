@@ -187,7 +187,7 @@ class UserRiskProfilesV1:
         data = UpdateUserRiskProfileRequest(
             endDate=end_date, notes=notes, startDate=start_date
         )
-        print(data.dict())
+
         response = self._parent.session.patch(
             f"/v1/user-risk-profiles/{user_id}",
             params={"paths": paths},
