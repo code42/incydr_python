@@ -97,20 +97,6 @@ def test_get_page_when_default_params_returns_expected_data(
     assert page.total_count == len(page.user_risk_profiles) == 2
 
 
-def test_update_user_risk_profile_when_default_params_returns_expected_data(
-    httpserver_auth: HTTPServer,
-):
-    httpserver_auth.expect_request("/v1/user-risk-profiles/2").respond_with_json(
-        TEST_USER_RISK_PROFILE_2
-    )
-
-    client = Client()
-    user_risk_profile = client.user_risk_profiles.v1.get_user_risk_profile(2)
-    assert isinstance(user_risk_profile, UserRiskProfile)
-    assert user_risk_profile.user_id == "2"
-    assert user_risk_profile.json() == json.dumps(TEST_USER_RISK_PROFILE_2)
-
-
 def test_iter_all_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
