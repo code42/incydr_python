@@ -40,7 +40,7 @@ nav:
   - File Event Queries: 'file_event_queries.md'
   - Users: 'users.md'
   - Watchlists: 'watchlists.md'
-  - UserRiskProfiles: 'userRiskProfiles.md'
+  - User Risk Profiles: 'user_risk_profiles.md'
   - Models: 'models.md'
 
 markdown_extensions:

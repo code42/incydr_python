@@ -133,7 +133,7 @@ available model methods.
 
 ### `UserRiskProfilePage` model
 
-::: incydr.models.UserRiskProfilePage
+::: incydr.models.UserRiskProfilesPage
 
 ## Watchlists
 ---
