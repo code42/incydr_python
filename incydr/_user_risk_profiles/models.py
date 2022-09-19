@@ -33,24 +33,24 @@ class UserRiskProfile(ResponseModel):
     * **active**: `bool` - Whether the user is active.
     * **cloud_aliases**: `List[str]` - List of cloud aliases for the user.
     * **country**: `str` - The user's country.
-    * **deleted**: `bool` - Whether the user is deleted.
+    * **deleted**: `bool` - Whether the user has been deleted.
     * **department**: `str` - The user's department.
-    * **display_name**: `str` - The user's friendly display name.
+    * **display_name**: `str` - The user's display name.
     * **division**: `str` - The user's division.
     * **employment_type**: `str` - The user's employment type.
-    * **end_date**: `Date` - The end date
+    * **end_date**: `Date` - Departure date for the user
     * **locality**: `str` - The user's locality (city).
-    * **manager_display_name**: `str` - The user's manager's friendly display name.
-    * **manager_id**: `str` - The Code42 user ID of the user's manager.
+    * **manager_display_name**: `str` - The user's manager's display name.
+    * **manager_id**: `str` - Unique user ID of the user's manager.
     * **manager_username**: `str` - The Code42 username of the user's manager.
-    * **notes**: `str` - Notes about the user.
+    * **notes**: `str` - Additional notes about the user.
     * **region**: `str` - The user's region (state).
-    * **start_date**: `Date` - The start date
+    * **start_date**: `Date` - Starting date for the user.
     * **support_user**: `bool` - Whether the user is a support user.
-    * **tenant_id**: `str` - The unique tenant ID.
+    * **tenant_id**: `str` - Unique tenant ID.
     * **title**: `str` - The user's job title.
-    * **user_id**: `str` - The unique user ID.
-    * **username**: `str` - The user's Code42 username.
+    * **user_id**: `str` - Unique user ID.
+    * **username**: `str` - User's Code42 username.
     """
 
     active: Optional[bool] = Field(None, description="Whether the user is active.")

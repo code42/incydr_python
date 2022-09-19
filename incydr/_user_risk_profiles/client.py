@@ -20,7 +20,7 @@ class UserRiskProfilesV1:
 
         >>> import incydr
         >>> client = incydr.Client(**kwargs)
-        >>> client.user_risk_profiles.v1
+        >>> client.user_risk_profiles.v1.get_page()
     """
 
     def __init__(self, parent):
@@ -42,7 +42,7 @@ class UserRiskProfilesV1:
     def get_page(
         self,
         page: int = 1,
-        page_size: int = 100,
+        page_size: int = None,
         manager_id: str = None,
         title: str = None,
         division: str = None,
@@ -57,6 +57,7 @@ class UserRiskProfilesV1:
     ) -> UserRiskProfilesPage:
         """
         Get a page of user risk profiles.
+
         Filter results by passing the appropriate parameters:
 
         **Parameters**:
@@ -197,13 +198,12 @@ class UserRiskProfilesV1:
 
     def add_cloud_aliases(self, user_id: str, cloud_aliases: List[str]) -> Response:
         """
-        Add cloud aliases to user id
+        Add cloud aliases to a user risk profile.
 
         **Parameters:**
 
-        * **user_id**: `str` Unique numeric identifier for the user risk profile.
-        * **cloud_aliases**: `str | List[str]` A string or list of strings representing the cloud aliases to attach
-            to the user id.
+        * **user_id**: `str` - The unique ID of the user to add cloud aliases.
+        * **cloud_aliases**: `str | List[str]` - A string or list of strings representing the cloud aliases to add to the user risk profile.
 
         **Returns**: A `requests.Response` indicating success.
         """
@@ -217,13 +217,13 @@ class UserRiskProfilesV1:
 
     def delete_cloud_aliases(self, user_id: str, cloud_aliases: List[str]) -> Response:
         """
-        Delete cloud aliases for user id
+        Delete cloud aliases from a user risk profile.
 
         **Parameters:**
 
-        * **user_id**: `str` Unique numeric identifier for the user risk profile.
-        * **cloud_aliases**: `str | List[str]` A string or list of strings representing the cloud aliases to delete
-            from the user id.
+        * **user_id**: `str` - The unique ID of the user to add cloud aliases.
+        * **cloud_aliases**: `str | List[str]` - A string or list of strings representing the cloud aliases to delete
+            from the user risk profile.
 
         **Returns**: A `requests.Response` indicating success.
         """
