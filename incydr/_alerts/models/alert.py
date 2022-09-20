@@ -248,21 +248,3 @@ class AlertDetails(AlertSummary):
     note: Optional[Note] = Field(
         None, description="Most recent note added to the alert."
     )
-
-
-# class RuleMetadata(ObserverRuleMetadataEssentials):
-#     id: Optional[str] = Field(
-#         None, description="Id of the rule.", example="UniqueRuleId"
-#     )
-#     created_by: Optional[str] = Field(
-#         None,
-#         alias="createdBy",
-#         description="Username of the individual who created the rule.",
-#         example="UserWhoCreatedTheRule",
-#     )
-#     created_at: datetime = Field(
-#         ...,
-#         alias="createdAt",
-#         description="Timestamp of when the rule was created.",
-#         example="2020-02-19T01:57:45.006683Z",
-#     )

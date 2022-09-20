@@ -21,7 +21,7 @@ class QueryProblem(BaseModel):
 
 class AlertQueryPage(ResponseModel):
     """
-    A model representing a page of `Alert` objects resulting from an alert search query.
+    A model representing a page of `AlertSummary` objects resulting from an alert search query.
     """
 
     alerts: Optional[List[AlertSummary]] = Field(
@@ -41,6 +41,10 @@ class AlertQueryPage(ResponseModel):
 
 
 class AlertDetailsPage(ResponseModel):
+    """
+    A model representing a page of `AlertDetail` objects resulting from an alert detail query.
+    """
+
     alerts: Optional[List[AlertDetails]] = Field(
         None, description="The alerts returned by the details query."
     )

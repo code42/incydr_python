@@ -17,14 +17,14 @@ available model methods.
 ## Alerts
 ---
 
-### `AlertDetailsResponse` model
+### `AlertDetails` model
 
-::: incydr.models.AlertDetailsResponse
+::: incydr.models.AlertDetails
     :docstring:
 
-### `AlertQueryResponse` model
+### `AlertQueryPage` model
 
-::: incydr.models.AlertQueryResponse
+::: incydr.models.AlertQueryPage
     :docstring:
 
 ## Cases

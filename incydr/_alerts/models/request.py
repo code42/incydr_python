@@ -4,7 +4,6 @@ from typing import List
 from typing import Optional
 
 from pydantic import BaseModel
-from pydantic import conint
 from pydantic import constr
 from pydantic import Field
 
