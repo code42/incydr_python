@@ -1,5 +1,6 @@
 from itertools import count
 from typing import Iterator
+from typing import List
 
 from requests import Response
 
@@ -46,7 +47,7 @@ class TrustedActivitiesV2:
     def get_page(
         self,
         page: int = 1,
-        page_size: int = 100,
+        page_size: int = None,
         activity_type: ActivityType = None,
         sort_key: SortKeys = None,
         sort_direction: SortDirection = None,
@@ -111,7 +112,7 @@ class TrustedActivitiesV2:
         activity_type: ActivityType,
         value: str,
         description: str = None,
-        activity_action_groups: list[ActivityActionGroup] = None,
+        activity_action_groups: List[ActivityActionGroup] = None,
     ) -> TrustedActivity:
         """
         Create a trusted activity.
@@ -121,7 +122,7 @@ class TrustedActivitiesV2:
         * **activity_type**: `ActivityType` The type of the trusted activity.
         * **value**: `str` The value of the trusted activity.
         * **description**: `str` A description of the trusted activity.
-        * **activity_action_groups**: `list[ActivityActionGroup]` The list of activity
+        * **activity_action_groups**: `List[ActivityActionGroup]` The list of activity
         actions associated with the activity.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing

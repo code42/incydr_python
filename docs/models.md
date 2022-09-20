@@ -122,6 +122,7 @@ available model methods.
 ### `TrustedActivitiesPage` model
 
 ::: incydr.models.TrustedActivitiesPage
+    :docstring:
 
 ## Users
 ---

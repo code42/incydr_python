@@ -83,9 +83,9 @@ class Client:
         self._customer = CustomerClient(self)
         self._departments = DepartmentsClient(self)
         self._devices = DevicesClient(self)
-        self._trusted_activities = TrustedActivitiesClient(self)
         self._directory_groups = DirectoryGroupsClient(self)
         self._file_events = FileEventsClient(self)
+        self._trusted_activities = TrustedActivitiesClient(self)
         self._users = UsersClient(self)
         self._watchlists = WatchlistsClient(self)
 

@@ -135,4 +135,4 @@ class CreateTrustedActivityRequest(BaseModel):
     activity_type: Optional[str]
     value: Optional[str]
     description: Optional[str]
-    activity_action_groups: Optional[list[ActivityActionGroup]]
+    activity_action_groups: Optional[List[ActivityActionGroup]]
