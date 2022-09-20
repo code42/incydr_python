@@ -1,5 +1,7 @@
 import logging
+import re
 from collections import deque
+from textwrap import indent
 
 from requests_toolbelt import user_agent
 from requests_toolbelt.sessions import BaseUrlSession
@@ -10,11 +12,16 @@ from incydr._cases.client import CasesClient
 from incydr._core.auth import APIClientAuth
 from incydr._core.settings import IncydrSettings
 from incydr._customer.client import CustomerClient
+from incydr._departments.client import DepartmentsClient
 from incydr._devices.client import DevicesClient
+from incydr._directory_groups.client import DirectoryGroupsClient
 from incydr._file_events.client import FileEventsClient
 from incydr._trusted_activities.client import TrustedActivitiesClient
+from incydr._users.client import UsersClient
+from incydr._watchlists.client import WatchlistsClient
 
 _base_user_agent = user_agent("incydr", __version__)
+_auth_header_regex = re.compile(r"Authorization: (Bearer|Basic) \S+")
 
 
 class Client:
@@ -40,15 +47,14 @@ class Client:
         url: str = None,
         api_client_id: str = None,
         api_client_secret: str = None,
+        **settings_kwargs,
     ):
         self._settings = IncydrSettings(
-            url=url, api_client_id=api_client_id, api_client_secret=api_client_secret
+            url=url,
+            api_client_id=api_client_id,
+            api_client_secret=api_client_secret,
+            **settings_kwargs,
         )
-        if self._settings.use_rich:
-            from rich import pretty
-
-            pretty.install()
-
         self._request_history = deque(maxlen=self._settings.max_response_history)
 
         self._session = BaseUrlSession(base_url=self._settings.url)
@@ -62,15 +68,11 @@ class Client:
         )
 
         def response_hook(response, *args, **kwargs):
-            if self._settings.log_level < logging.INFO:
-                try:
-                    dumped = dump_response(response).decode("utf-8")
-                    self._settings.logger.debug(dumped)
-                except Exception as err:
-                    self._settings.logger.debug(
-                        f"Error dumping request/response info: {err}"
-                    )
-                    self._settings.logger.debug(response)
+            level = self._settings.log_level
+            if level == logging.INFO:
+                self._log_response_info(response)
+            if level == logging.DEBUG:
+                self._log_response_debug(response)
 
             self._request_history.appendleft(response)
             response.raise_for_status()
@@ -79,9 +81,13 @@ class Client:
 
         self._cases = CasesClient(self)
         self._customer = CustomerClient(self)
-        self._file_events = FileEventsClient(self)
+        self._departments = DepartmentsClient(self)
         self._devices = DevicesClient(self)
         self._trusted_activities = TrustedActivitiesClient(self)
+        self._directory_groups = DirectoryGroupsClient(self)
+        self._file_events = FileEventsClient(self)
+        self._users = UsersClient(self)
+        self._watchlists = WatchlistsClient(self)
 
         self._session.auth.refresh()
 
@@ -145,6 +151,17 @@ class Client:
         return self._customer
 
     @property
+    def departments(self):
+        """
+        Property returning a [`DepartmentsClient`](../departments) for interacting with `/v*/departments` API endpoints.
+        Usage:
+
+            >>> client.departments.v1.get_page()
+
+        """
+        return self._departments
+
+    @property
     def devices(self):
         """
         Property returning a [`DevicesClient`](../devices) for interacting with `/v*/devices` API endpoints.
@@ -154,6 +171,31 @@ class Client:
 
         """
         return self._devices
+
+    @property
+    def directory_groups(self):
+        """
+        Property returning a [`DirectoryGroupsClient`](../directory_groups) for interacting with `/v*/directory-groups` API endpoints.
+        Usage:
+
+            >>> client.directory_groups.v1.get_page()
+
+        """
+        return self._directory_groups
+
+    @property
+    def file_events(self):
+        """
+        Property returning a [`FileEventsClient`](../file_events) for interacting with `/v*/file-events` API endpoints.
+        Usage:
+
+            >>> from incydr import EventQuery
+            >>> query = EventQuery(start_date='P30D').equals('file.category', 'Document')
+
+            >>> client.file_events.v2.search(query)
+
+        """
+        return self._file_events
 
     @property
     def trusted_activities(self):
@@ -167,3 +209,46 @@ class Client:
 
         """
         return self._trusted_activities
+
+    @property
+    def users(self):
+        """
+        Property returning a [`UsersClient`](../users) for interacting with `/v*/users` API endpoints.
+        Usage:
+
+            >>> client.users.v1.get_page(active=True)
+
+        """
+        return self._users
+
+    @property
+    def watchlists(self):
+        """
+        Property returning a ['WatchlistsClient'](../watchlists) for interacting with `/v*/watchlists` API endpoints.
+        Usage:
+
+            >>> client.watchlists.v1.get_page()
+        """
+        return self._watchlists
+
+    def _log_response_info(self, response):
+        self._settings.logger.info(
+            f"{response.request.method} {response.request.url} status_code={response.status_code}"
+        )
+
+    def _log_response_debug(self, response):
+        try:
+            dumped = dump_response(
+                response, request_prefix=b"", response_prefix=b""
+            ).decode("utf-8")
+            dumped = re.sub(
+                _auth_header_regex,
+                "Authorization: <token_redacted>",
+                dumped,
+            )
+            if not self._settings.use_rich:
+                dumped = indent(dumped, prefix="\t")
+            self._settings.logger.debug(dumped)
+        except Exception as err:
+            self._settings.logger.debug(f"Error dumping request/response info: {err}")
+            self._settings.logger.debug(response)

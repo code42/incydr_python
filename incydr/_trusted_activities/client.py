@@ -17,10 +17,13 @@ from incydr.enums.trusted_activities import SortKeys
 class TrustedActivitiesV2:
     """
     Client for `/v2/trusted-activites` endpoints.
+
     Usage example:
+
         >>> import incydr
         >>> client = incydr.Client(**kwargs)
         >>> client.trusted_activities.v2
+
     """
 
     def __init__(self, parent):
@@ -34,7 +37,7 @@ class TrustedActivitiesV2:
 
         * **activity_id**: `str` (required) - The unique ID for the trusted activity.
 
-        **Returns**: A [`TrustedActivity`][trusted-activity-model] object representing the trusted activity.
+        **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing the trusted activity.
         """
 
         response = self._parent.session.get(f"/v2/trusted-activities/{activity_id}")
@@ -60,7 +63,7 @@ class TrustedActivitiesV2:
         * **sort_key**: `str` - The key by which to sort the returned list.
         * **sort_direction**: `str` - The order in which to sort the returned list.
 
-        **Returns**: A ['TrustedActivitiesPage'][trusted-activities-page-model] object.
+        **Returns**: A ['TrustedActivitiesPage'][trustedactivitiespage-model] object.
         """
 
         page_size = page_size or self._parent.settings.page_size
@@ -87,7 +90,7 @@ class TrustedActivitiesV2:
         Iterate over all trusted activities.
         Accepts the same parameters as `.get_page()` except `page_num`.
 
-        **Returns**: A generator yielding individual [`TrustedActivity`][trusted-activity-model] objects.
+        **Returns**: A generator yielding individual [`TrustedActivity`][trustedactivity-model] objects.
         """
 
         page_size = page_size or self._parent.settings.page_size
@@ -121,7 +124,7 @@ class TrustedActivitiesV2:
         * **activity_action_groups**: `list[ActivityActionGroup]` The list of activity
         actions associated with the activity.
 
-        **Returns**: A [`TrustedActivity`][trusted-activity-model] object representing
+        **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
         the newly created trusted activity.
         """
 
@@ -154,9 +157,7 @@ class TrustedActivitiesV2:
         return self._parent.session.delete(f"/v2/trusted-activities/{activity_id}")
 
     def update(
-        self,
-        activity_id: int,
-        trusted_activity: TrustedActivity
+        self, activity_id: int, trusted_activity: TrustedActivity
     ) -> TrustedActivity:
         """
         Updates a trusted activity.
@@ -164,7 +165,7 @@ class TrustedActivitiesV2:
         **Parameters**
 
         * **activity_id** `int` Unique numeric identifier for the trusted activity.
-        * **trusted_activity**: [`TrustedActivity`][trusted-activity-model] The modified case object.
+        * **trusted_activity**: [`TrustedActivity`][trustedactivity-model] The modified case object.
 
         Usage example:
 
@@ -172,7 +173,7 @@ class TrustedActivitiesV2:
             >>> activity.description = "New description"
             >>> client.trusted_activities.v2.update(2, activity)
 
-        **Returns**: A [`TrustedActivity`][trusted-activity-model] object with updated values from server.
+        **Returns**: A [`TrustedActivity`][trustedactivity-model] object with updated values from server.
         """
 
         data = UpdateTrustedActivity(**trusted_activity.dict())

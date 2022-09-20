@@ -1,7 +1,7 @@
-from incydr.enums import Enum
+from incydr.enums import _Enum
 
 
-class ActivityType(Enum):
+class ActivityType(_Enum):
     DOMAIN = "DOMAIN"
     ACCOUNT_NAME = "ACCOUNT_NAME"
     URL_PATH = "URL_PATH"
@@ -12,7 +12,7 @@ class ActivityType(Enum):
     FILE_UPLOAD = "FILE_UPLOAD"
 
 
-class Name(Enum):
+class Name(_Enum):
     DEFAULT = "DEFAULT"
     BOX = "BOX"
     GOOGLE_DRIVE = "GOOGLE_DRIVE"
@@ -22,14 +22,14 @@ class Name(Enum):
     OFFICE_365 = "OFFICE_365"
 
 
-class PrincipalType(Enum):
+class PrincipalType(_Enum):
     USER = "USER"
     API_KEY = "API_KEY"
     DEVICE = "DEVICE"
     SERVICE = "SERVICE"
 
 
-class SortKeys(Enum):
+class SortKeys(_Enum):
     ACTIVITY_ID = "ACTIVITY_ID"
     DESCRIPTION = "DESCRIPTION"
     TYPE = "TYPE"
@@ -38,6 +38,6 @@ class SortKeys(Enum):
     VALUE = "VALUE"
 
 
-class SortDirection(Enum):
+class SortDirection(_Enum):
     ASC = "ASC"
     DESC = "DESC"
