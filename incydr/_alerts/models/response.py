@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import Optional, List
+from typing import List
+from typing import Optional
 
-from pydantic import Field, BaseModel
+from pydantic import BaseModel
+from pydantic import Field
 
 from incydr._alerts.models.alert import AlertDetails
 from incydr._alerts.models.alert import AlertSummary
@@ -17,7 +19,11 @@ class QueryProblem(BaseModel):
     type: ProblemType = Field(..., description="The type of query problem.")
 
 
-class AlertQueryResponse(ResponseModel):
+class AlertQueryPage(ResponseModel):
+    """
+    A model representing a page of `Alert` objects resulting from an alert search query.
+    """
+
     alerts: Optional[List[AlertSummary]] = Field(
         None, description="List of alerts that are returned."
     )
@@ -34,7 +40,7 @@ class AlertQueryResponse(ResponseModel):
     )
 
 
-class AlertDetailsResponse(ResponseModel):
+class AlertDetailsPage(ResponseModel):
     alerts: Optional[List[AlertDetails]] = Field(
         None, description="The alerts returned by the details query."
     )

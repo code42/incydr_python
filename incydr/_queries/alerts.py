@@ -7,57 +7,27 @@ from typing import Union
 
 from pydantic import BaseModel
 from pydantic import root_validator
+from pydantic import StrictBool
 
 from incydr._queries.util import parse_timestamp
-from incydr.enums import _Enum
-from incydr.enums.alerts import AlertState, SeverityRating
-from incydr.enums.file_events import RiskSeverity
-
-
-class Operator(_Enum):
-    # all valid filter operators for querying alerts
-    IS = "IS"
-    IS_NOT = "IS_NOT"
-    EXISTS = "EXISTS"
-    DOES_NOT_EXIST = "DOES_NOT_EXIST"
-    ON = "ON"
-    ON_OR_AFTER = "ON_OR_AFTER"
-    ON_OR_BEFORE = "ON_OR_BEFORE"
-    CONTAINS = "CONTAINS"
-
-
-class AlertTerm(_Enum):
-    ALERT_ID = "AlertId"
-    TENANT_ID = "TenantId"
-    TYPE = "Type"
-    NAME = "Name"
-    DESCRIPTION = "Description"
-    ACTOR = "Actor"
-    ACTOR_ID = "ActorId"
-    TARGET = "Target"
-    RISK_SEVERITY = "RiskSeverity"
-    CREATED_AT = "CreatedAt"
-    HAS_AUTH_SIGNIFICANT_WATCHLIST = "HasAuthSignificantWatchlist"
-    STATE = "State"
-    STATE_LAST_MODIFIED_AT = "StateLastModifiedAt"
-    STATE_LAST_MODIFIED_BY = "StateLastModifiedBy"
-    LAST_MODIFIED_TIME = "LastModifiedTime"
-    LAST_MODIFIED_BY = "LastModifiedBy"
-    RULE_ID = "RuleId"
-    SEVERITY = "Severity"
+from incydr.enums.alerts import AlertState
+from incydr.enums.alerts import AlertTerm
+from incydr.enums.alerts import Operator
+from incydr.enums.alerts import RiskSeverity
+from incydr.enums.alerts import Severity
 
 
 _term_enum_map = {
     AlertTerm.STATE: AlertState,
     AlertTerm.RISK_SEVERITY: RiskSeverity,
-    AlertTerm.SEVERITY: SeverityRating,
+    AlertTerm.SEVERITY: Severity,
 }
 
 
 class Filter(BaseModel):
     term: AlertTerm
     operator: Operator
-    value: Optional[Union[bool, int, str]]
+    value: Optional[Union[StrictBool, int, str]]
 
     class Config:
         use_enum_values = True
@@ -76,10 +46,6 @@ class Filter(BaseModel):
         enum = _term_enum_map.get(term)
         if enum:
             enum(value)
-
-        if operator in (Operator.EXISTS, Operator.DOES_NOT_EXIST):
-            values["value"] = None
-            return values
 
         if operator in (Operator.IS, Operator.IS_NOT):
             if not isinstance(value, (str, int)):
@@ -114,14 +80,31 @@ class AlertQuery:
     """
     Class to build an alert query. Use the class methods to attach additional filter operators.
 
+    Usage examples:
+
+    Construct a query that finds all alerts created in the past 10 days that are now marked `RESOLVED`:
+
+        >>> import incydr
+        >>> from datetime import timedelta
+        >>> from incydr.enums.alerts import AlertState, AlertTerm
+        >>> query = incydr.AlertQuery(start_date=timedelta(days=10)).equals(AlertTerm.STATE, AlertState.RESOLVED)
+
+    Construct a query that finds alerts triggered by actor `user@example.com` with a risk severity of either `HIGH` or
+    `CRITICAL`:
+
+        >>> import incydr
+        >>> query = incydr.AlertQuery().equals("Actor", "user@example.com").equals("RiskSeverity", ["HIGH", "CRITICAL"])
+
     **Parameters**:
 
-         * **start_date**: `int | float | str | datetime | timedelta` -  Start of the date range to query for alerts.
-            Defaults to None.
-         * **end_date**: `int | float | str | datetime` - End of the date range to query for alerts. Defaults to
-            None.
-         * **on**: `date | datetime` - Retrieve alerts that occurred on a specific date (incompatible with either
-            `start_date` or `end_date` arguments).
+     * **start_date**: `int | float | str | datetime | timedelta` - Start of the date range to query for alerts.
+        Accepts `int|float` unix timestamp, string representation of the date (`%Y-%m-%d %H:%M:%S` or `%Y-%m-%d`
+        formats), or `datetime` object for absolute dates, or if a `timedelta` is provided it will be relative to the
+        current time when the query object was instantiated. Defaults to None.
+     * **end_date**: `int | float | str | datetime` - End of the date range to query for alerts. Defaults to
+        None.
+     * **on**: `str | date | datetime` - Retrieve alerts that occurred on a specific date (incompatible with either
+        `start_date` or `end_date` arguments).
     """
 
     def __init__(
@@ -141,13 +124,19 @@ class AlertQuery:
             )
 
     def __str__(self):
-        return str(self._query)
+        return str(self._query.__repr__())
 
-    def dict(self):
+    def dict(self, **kwargs):
         """
         Returns the query object as a dictionary.
         """
-        return self._query.dict()
+        return self._query.dict(**kwargs)
+
+    def json(self):
+        """
+        Returns the query object as json.
+        """
+        return self._query.json()
 
     def equals(self, term: str, values: Union[str, List[str]]):
         """
@@ -162,7 +151,8 @@ class AlertQuery:
 
         **Parameters**:
 
-        * **term**: `str` - The term which corresponds to an alert field.
+        * **term**: `str` - The term which corresponds to an alert field. List of valid terms can be found in the
+            [`incydr.enums.alerts.AlertTerm`][alert-term-enum] enum object.
         * **values**: `str`, `List[str]` - The value(s) for the term to match.
         """
         if isinstance(values, (str, bool)):
@@ -185,8 +175,8 @@ class AlertQuery:
         the indicated value(s).
 
         Example:
-            `AlertQuery().not_equals('State', 'CLOSED')` creates a query which will return alerts that are not in a "CLOSED"
-            state.
+            `AlertQuery().not_equals('State', 'RESOLVED')` creates a query which will return alerts that are not in a
+            `RESOLVED` state.
 
         **Parameters**:
 
@@ -222,11 +212,36 @@ class AlertQuery:
         **Parameters**:
 
         * **term**: `str` - The term which corresponds to an alert field.
-        * **values**: `str`, `List[str]` - The value(s) for the term to not match.
+        * **value**: `str` - The value for the term to match.
         """
         self._query.groups.append(
             FilterGroup(
                 filters=[Filter(term=term, operator=Operator.CONTAINS, value=value)]
+            )
+        )
+        return self
+
+    def does_not_contain(self, term: str, value: str):
+        """
+        Adds a `does_not_contain` filter to the query. The opposite of the `contains` filter.
+
+        When passed as part of a query, returns alerts where the field corresponding to the filter term does not contain
+        the provided string value.
+
+        Example:
+            `AlertQuery().does_not_contain('Description', 'removable media')` creates a query which will return alerts
+            where the alert rule description does not contain the string "removable media".
+
+        **Parameters**:
+
+        * **term**: `str` - The term which corresponds to an alert field.
+        * **value**: `str` - The value for the term to not match.
+        """
+        self._query.groups.append(
+            FilterGroup(
+                filters=[
+                    Filter(term=term, operator=Operator.DOES_NOT_CONTAIN, value=value)
+                ]
             )
         )
         return self
@@ -252,7 +267,7 @@ def _create_date_range_filter_group(start_date, end_date, on):
     if on:
         filters.append(
             Filter(
-                term=AlertTerm.CreatedAt,
+                term=AlertTerm.CREATED_AT,
                 operator=Operator.ON,
                 value=parse_timestamp(on),
             )
@@ -261,7 +276,7 @@ def _create_date_range_filter_group(start_date, end_date, on):
     if start_date:
         filters.append(
             Filter(
-                term=AlertTerm.CreatedAt,
+                term=AlertTerm.CREATED_AT,
                 operator=Operator.ON_OR_AFTER,
                 value=parse_timestamp(start_date),
             )
@@ -270,7 +285,7 @@ def _create_date_range_filter_group(start_date, end_date, on):
     if end_date:
         filters.append(
             Filter(
-                term=AlertTerm.CreatedAt,
+                term=AlertTerm.CREATED_AT,
                 operator=Operator.ON_OR_BEFORE,
                 value=parse_timestamp(end_date),
             )

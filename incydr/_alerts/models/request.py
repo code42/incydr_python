@@ -1,8 +1,12 @@
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List
+from typing import Optional
 
-from pydantic import BaseModel, constr, Field, conint
+from pydantic import BaseModel
+from pydantic import conint
+from pydantic import constr
+from pydantic import Field
 
 from incydr.enums.alerts import AlertState
 

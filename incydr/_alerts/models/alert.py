@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional, List
+from typing import List
+from typing import Optional
 
-from pydantic import BaseModel, constr, Field
+from pydantic import BaseModel
+from pydantic import constr
+from pydantic import Field
 
 from incydr._alerts.models.enums import NotificationType
-from incydr.enums.alerts import SeverityRating, RuleType, AlertState
+from incydr.enums.alerts import AlertState
+from incydr.enums.alerts import RuleType
+from incydr.enums.alerts import Severity
 from incydr.enums.file_events import RiskSeverity
 from incydr.enums.watchlists import WatchlistType
 
@@ -116,7 +121,7 @@ class ObserverRuleMetadata(AuditInfo):
         description="The description of the rule.",
         example="Will generate alerts when files moved to USB.",
     )
-    severity: Optional[SeverityRating] = Field(
+    severity: Optional[Severity] = Field(
         None, description="The static severity of the rule (deprecated)."
     )
     is_system: Optional[bool] = Field(
@@ -169,7 +174,7 @@ class AlertEssentials(BaseModel):
         example="authorityUserId",
     )
     target: Optional[str] = None
-    severity: Optional[SeverityRating] = Field(
+    severity: Optional[Severity] = Field(
         None, description="Indicates static rule severity of the alert."
     )
     risk_severity: Optional[RiskSeverity] = Field(

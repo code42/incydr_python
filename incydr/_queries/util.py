@@ -1,5 +1,5 @@
-from datetime import datetime
 from datetime import date
+from datetime import datetime
 from typing import Union
 
 MICROSECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"

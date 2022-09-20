@@ -33,6 +33,7 @@ nav:
   - Settings:
     - Configuration: 'settings.md'
     - Logging: 'logging.md'
+  - Alerts: 'alerts.md'
   - Cases: 'cases.md'
   - Customer: 'customer.md'
   - Devices: 'devices.md'

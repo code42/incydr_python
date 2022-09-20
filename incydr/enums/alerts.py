@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from incydr.enums import _Enum
+from incydr.enums.file_events import RiskSeverity  # noqa
 
 
 class AlertState(_Enum):
@@ -26,7 +27,7 @@ class RuleType(_Enum):
     FED_COMPOSITE = "FED_COMPOSITE"
 
 
-class SeverityRating(_Enum):
+class Severity(_Enum):
     """
     Possible severity values for an alert.
     """
@@ -38,13 +39,33 @@ class SeverityRating(_Enum):
 
 class Operator(_Enum):
     """
-    The filter operator to use.
+    The alert filter operators.
     """
 
-    is_ = "IS"
-    is_not = "IS_NOT"
-    on_or_before = "ON_OR_BEFORE"
-    on_or_after = "ON_OR_AFTER"
-    on = "ON"
-    contains = "CONTAINS"
-    does_not_contain = "DOES_NOT_CONTAIN"
+    IS = "IS"
+    IS_NOT = "IS_NOT"
+    ON_OR_BEFORE = "ON_OR_BEFORE"
+    ON_OR_AFTER = "ON_OR_AFTER"
+    ON = "ON"
+    CONTAINS = "CONTAINS"
+    DOES_NOT_CONTAIN = "DOES_NOT_CONTAIN"
+
+
+class AlertTerm(_Enum):
+    ALERT_ID = "AlertId"
+    TYPE = "Type"
+    NAME = "Name"
+    DESCRIPTION = "Description"
+    ACTOR = "Actor"
+    ACTOR_ID = "ActorId"
+    TARGET = "Target"
+    RISK_SEVERITY = "RiskSeverity"
+    CREATED_AT = "CreatedAt"
+    HAS_AUTH_SIGNIFICANT_WATCHLIST = "HasAuthSignificantWatchlist"
+    STATE = "State"
+    STATE_LAST_MODIFIED_AT = "StateLastModifiedAt"
+    STATE_LAST_MODIFIED_BY = "StateLastModifiedBy"
+    LAST_MODIFIED_TIME = "LastModifiedTime"
+    LAST_MODIFIED_BY = "LastModifiedBy"
+    RULE_ID = "RuleId"
+    SEVERITY = "Severity"
