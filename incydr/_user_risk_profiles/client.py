@@ -104,7 +104,7 @@ class UserRiskProfilesV1:
 
     def iter_all(
         self,
-        page_size: int = 100,
+        page_size: int = None,
         manager_id: str = None,
         title: str = None,
         division: str = None,
