@@ -70,9 +70,9 @@ def test_get_page_when_default_params_returns_expected_data(
         ],
         "totalCount": 2,
     }
-    httpserver_auth.expect_request("/v2/trusted-activities").respond_with_json(
-        trusted_activities_data
-    )
+    httpserver_auth.expect_request(
+        "/v2/trusted-activities", query_string=urlencode({"page": 1, "page_size": 100})
+    ).respond_with_json(trusted_activities_data)
 
     client = Client()
     page = client.trusted_activities.v2.get_page()
@@ -149,9 +149,7 @@ def test_create_user_risk_profile_when_default_params_returns_expected_data(
 def test_delete_user_risk_profile_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
-    httpserver_auth.expect_request("/v2/trusted-activities/1234").respond_with_json(
-        "{}"
-    )
+    httpserver_auth.expect_request("/v2/trusted-activities/1234").respond_with_data()
 
     client = Client()
     response = client.trusted_activities.v2.delete("1234")
