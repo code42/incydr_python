@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import List
 from typing import Optional
 
-from pydantic import BaseModel
 from pydantic import Field
 
 from incydr._core.models import ResponseModel
@@ -10,7 +9,7 @@ from incydr.enums.file_events import ReportType
 from incydr.enums.file_events import RiskSeverity
 
 
-class DestinationEmail(BaseModel):
+class DestinationEmail(ResponseModel):
     recipients: Optional[List[str]] = Field(
         description="The email addresses of those who received the email. Includes the To, Cc, and Bcc recipients.",
         example=["cody@example.com", "theboss@example.com"],
@@ -21,14 +20,14 @@ class DestinationEmail(BaseModel):
     )
 
 
-class DestinationUser(BaseModel):
+class DestinationUser(ResponseModel):
     email: Optional[List[str]] = Field(
         description="For endpoint events where a file in cloud storage is synced to a device, the email address of the user logged in to the cloud storage provider. For cloud events, the email addresses of users added as sharing recipients. In some case, OneDrive events may return multiple values, but this is often the same username formatted in different ways.",
         example=["first.last@example.com", "first_last_example_com"],
     )
 
 
-class FileClassification(BaseModel):
+class FileClassification(ResponseModel):
     value: Optional[str] = Field(
         description="The classification value applied to the file.",
         example="Classified",
@@ -39,7 +38,7 @@ class FileClassification(BaseModel):
     )
 
 
-class Hash(BaseModel):
+class Hash(ResponseModel):
     md5: Optional[str] = Field(
         description="The MD5 hash of the file contents.",
         example="a162591e78eb2c816a28907d3ac020f9",
@@ -56,7 +55,7 @@ class Hash(BaseModel):
     )
 
 
-class Process(BaseModel):
+class Process(ResponseModel):
     executable: Optional[str] = Field(
         description="The name of the process that accessed the file, as reported by the device’s operating system. Depending on your Code42 product plan, this value may be null for some event types.",
         example="bash",
@@ -67,7 +66,7 @@ class Process(BaseModel):
     )
 
 
-class RemovableMedia(BaseModel):
+class RemovableMedia(ResponseModel):
     bus_type: Optional[str] = Field(
         alias="busType",
         description="For events detected on removable media, indicates the communication system used to transfer data between the host and the removable device.",
@@ -107,7 +106,7 @@ class RemovableMedia(BaseModel):
     )
 
 
-class Report(BaseModel):
+class Report(ResponseModel):
     count: Optional[int] = Field(
         description="The total number of rows returned in the report.", example=20
     )
@@ -143,7 +142,7 @@ class Report(BaseModel):
         use_enum_values = True
 
 
-class RiskIndicator(BaseModel):
+class RiskIndicator(ResponseModel):
     name: Optional[str] = Field(
         description="Name of the risk indicator.", example="Browser upload"
     )
@@ -153,7 +152,7 @@ class RiskIndicator(BaseModel):
     )
 
 
-class SourceEmail(BaseModel):
+class SourceEmail(ResponseModel):
     from_: Optional[str] = Field(
         alias="from",
         description='The display name of the sender, as it appears in the "From" field in the email. In many cases, this is the same as source.email.sender, but it can be different if the message is sent by a server or other mail agent on behalf of someone else.',
@@ -165,7 +164,7 @@ class SourceEmail(BaseModel):
     )
 
 
-class Tab(BaseModel):
+class Tab(ResponseModel):
     title: Optional[str] = Field(
         description="The title of this app or browser tab.",
         example="Example Domain",
@@ -185,7 +184,7 @@ class Tab(BaseModel):
     )
 
 
-class User(BaseModel):
+class User(ResponseModel):
     device_uid: Optional[str] = Field(
         alias="deviceUid",
         description="Unique identifier for the device. Null if the file event occurred on a cloud provider.",
@@ -201,7 +200,7 @@ class User(BaseModel):
     )
 
 
-class Destination(BaseModel):
+class Destination(ResponseModel):
     account_name: Optional[str] = Field(
         alias="accountName",
         description="For cloud sync apps installed on user devices, the name of the cloud account where the event was observed. This can help identify if the activity occurred in a business or personal account.",
@@ -264,7 +263,7 @@ class Destination(BaseModel):
         use_enum_values = True
 
 
-class File(BaseModel):
+class File(ResponseModel):
     category: Optional[str] = Field(
         description="A categorization of the file that is inferred from MIME type.",
         example="Audio",
@@ -336,7 +335,7 @@ class File(BaseModel):
     )
 
 
-class Risk(BaseModel):
+class Risk(ResponseModel):
     indicators: Optional[List[RiskIndicator]] = Field(
         description="List of risk indicators identified for this event. If more than one risk indicator applies to this event, the sum of all indicators determines the total risk score.",
     )
@@ -362,7 +361,7 @@ class Risk(BaseModel):
         use_enum_values = True
 
 
-class Source(BaseModel):
+class Source(ResponseModel):
     category: Optional[str] = Field(
         description="General category of where the file originated. For example: Cloud Storage, Email, Social Media.",
         example="Social Media",
@@ -402,7 +401,7 @@ class Source(BaseModel):
     )
 
 
-class RelatedEvent(BaseModel):
+class RelatedEvent(ResponseModel):
     agent_timestamp: Optional[datetime] = Field(
         alias="agentTimestamp",
         description="Date and time that the Code42 service on the device detected an event; based on the device’s system clock and reported in Coordinated Universal Time (UTC).",
@@ -437,7 +436,7 @@ class RelatedEvent(BaseModel):
     )
 
 
-class Event(BaseModel):
+class Event(ResponseModel):
     action: Optional[str] = Field(
         description="The type of file event observed. For example: file-modified, application-read, removable-media-created.",
         example="file-downloaded",
@@ -469,6 +468,17 @@ class Event(BaseModel):
     )
 
 
+class Git(ResponseModel):
+    event_id: Optional[str] = Field(None, alias="eventId")
+    last_commit_hash: Optional[str] = Field(None, alias="lastCommitHash")
+    repository_email: Optional[str] = Field(None, alias="repositoryEmail")
+    repository_endpoint_path: Optional[str] = Field(
+        None, alias="repositoryEndpointPath"
+    )
+    repository_uri: Optional[str] = Field(None, alias="repositoryUri")
+    repository_user: Optional[str] = Field(None, alias="repositoryUser")
+
+
 class FileEventV2(ResponseModel):
     """
     **Fields**:
@@ -482,6 +492,7 @@ class FileEventV2(ResponseModel):
     * **risk**: `Risk` - A [`Risk`] object containing metadata on risk factors associated with the event.
     * **source**: `Source` - A [`Source`] object containing metadata about the source of the file event.
     * **user**: `User` - A [`User`] object containing metadata Attributes of the the Code42 username signed in to the Code42 app on the device.
+    * **git**: `Git` - A [`Git`] object containing git details for the event (if applicable).
     """
 
     timestamp: Optional[datetime] = Field(
@@ -507,3 +518,4 @@ class FileEventV2(ResponseModel):
     user: Optional[User] = Field(
         description="Attributes of the the Code42 username signed in to the Code42 app on the device.",
     )
+    git: Optional[Git] = Field(description="Git details for the event.")

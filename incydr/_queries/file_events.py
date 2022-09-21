@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from pydantic import root_validator
 from pydantic import validate_arguments
 
-from incydr._queries.util import parse_timestamp
+from incydr._queries.utils import parse_timestamp
 from incydr.enums.file_events import Category
 from incydr.enums.file_events import EventAction
 from incydr.enums.file_events import EventSearchTerm
@@ -32,23 +32,6 @@ _term_enum_map = {
     "risk.indicators.name": RiskIndicators,
     "risk.severity": RiskSeverity,
     "risk.trustReason": TrustReason,
-}
-
-file_category_extension_map = {
-    "AUDIO": FileCategory.AUDIO,
-    "DOCUMENT": FileCategory.DOCUMENT,
-    "EXECUTABLE": FileCategory.EXECUTABLE,
-    "IMAGE": FileCategory.IMAGE,
-    "PDF": FileCategory.PDF,
-    "PRESENTATION": FileCategory.PRESENTATION,
-    "SCRIPT": FileCategory.SCRIPT,
-    "SOURCE_CODE": FileCategory.SOURCE_CODE,
-    "SPREADSHEET": FileCategory.SPREADSHEET,
-    "VIDEO": FileCategory.VIDEO,
-    "VIRTUAL_DISK_IMAGE": FileCategory.VIRTUAL_DISK_IMAGE,
-    "ARCHIVE": FileCategory.ZIP,
-    "ZIP": FileCategory.ZIP,
-    "Zip": FileCategory.ZIP,
 }
 
 
@@ -79,17 +62,15 @@ class Filter(BaseModel):
                     f"`IS` and `IS_NOT` filters require a `str | int` value, got term={term}, operator={operator}, value={value}."
                 )
 
-        # catch additional enum terms
-        try:
-            value = file_category_extension_map[value]
-            values.update({"value": value})
-        except KeyError:
-            pass
-
         # check that value is a valid enum for that search term
         enum = _term_enum_map.get(term)
         if enum:
-            enum(value)
+            try:
+                values.update(
+                    {"value": enum[value.upper()]}
+                )  # check if enum name is passed as a value
+            except KeyError:
+                enum(value)
 
         return values
 

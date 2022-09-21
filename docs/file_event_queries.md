@@ -19,7 +19,7 @@ from incydr import EventQuery
 
 The `EventQuery(start_date=None, end_date=None)` class takes a start date and/or an end date in various forms, including a timestamp string, a datetime object, or a number (float, int).
 
-The `start_date` param can also take a duration (ex. filter for events which occurred in the last week) in the form of an ISO-duration string or a timedelta object.
+The `start_date` param can also take a duration in the form of an ISO-duration string or a timedelta object (ex. Use `start_date=P7D` to filter for events which occurred in the last week).
 
 ```python
 # to create a query which filters events which have the file category of 'Document' or 'Audio' from the past 1 day

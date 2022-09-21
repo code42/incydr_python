@@ -1,7 +1,7 @@
-import sys
 from pathlib import Path
 from typing import Optional
 
+import typer
 from requests.exceptions import HTTPError
 from rich.markdown import Markdown
 from rich.panel import Panel
@@ -12,18 +12,17 @@ from typer import echo
 from typer import Option
 from typer import Typer
 
-import incydr.cli.render as render
 from incydr._cases.models import CaseDetail
 from incydr.cli import console
 from incydr.cli import init_incydr_client
-from incydr.cli.options import columns_option
-from incydr.cli.options import single_format_option
-from incydr.cli.options import SingleFormat
-from incydr.cli.options import table_format_option
-from incydr.cli.options import TableFormat
+from incydr.cli.cmds.options.output_options import columns_option
+from incydr.cli.cmds.options.output_options import single_format_option
+from incydr.cli.cmds.options.output_options import SingleFormat
+from incydr.cli.cmds.options.output_options import table_format_option
+from incydr.cli.cmds.options.output_options import TableFormat
+from incydr.cli.cmds.utils import output_models_format
 from incydr.utils import CSVValidationError
 from incydr.utils import read_models_from_csv
-from incydr.utils import write_models_to_csv
 
 app = Typer()
 
@@ -81,23 +80,11 @@ def list_(
     format_: TableFormat = table_format_option,
     columns: Optional[str] = columns_option,
 ):
+    if not format_:
+        format_ = TableFormat.table
     client = ctx.obj()
     cases = client.cases.v1.iter_all()
-
-    if format_ == TableFormat.table and client.settings.use_rich:
-        with console.pager():
-            render.table(cases, columns=columns, title="Cases")
-
-    if format_ == TableFormat.csv:
-        write_models_to_csv(cases, sys.stdout, columns=columns)
-
-    if format_ == TableFormat.json:
-        for case in cases:
-            console.print_json(case.json(include=columns))
-
-    else:
-        for case in cases:
-            echo(case.json(include=columns))
+    output_models_format(cases, "Cases", format_, columns, client.settings.use_rich)
 
 
 @app.command()
@@ -129,6 +116,10 @@ def bulk_update(ctx: Context, csv: Path):
     except HTTPError as err:
         console.print(f"[red]Error:[/red] {err.response.text}")
 
+
+# TODO: convert to click commands
+
+cases = typer.main.get_command(app)
 
 if __name__ == "__main__":
     app.callback()(init_incydr_client)

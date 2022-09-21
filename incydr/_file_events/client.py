@@ -48,7 +48,6 @@ class FileEventsV2:
 
         if isinstance(query, SavedSearch):
             query = _create_query_from_saved_search(query)
-            print(query.dict())
 
         if isinstance(query, str):
             query = Query.parse_raw(query)
@@ -59,7 +58,7 @@ class FileEventsV2:
         response = self._parent.session.post("/v2/file-events", json=query.dict())
         return FileEventsPage.parse_response(response)
 
-    def get_all_saved_searches(self) -> SavedSearchesPage:
+    def list_saved_searches(self) -> SavedSearchesPage:
         """
         Get all saved searches.
 
@@ -68,7 +67,7 @@ class FileEventsV2:
         response = self._parent.session.get("/v2/file-events/saved-searches")
         return SavedSearchesPage.parse_response(response)
 
-    def get_saved_search_by_id(self, search_id: str) -> SavedSearch:
+    def get_saved_search(self, search_id: str) -> SavedSearch:
         """
         Get a single saved search.
 
@@ -99,7 +98,7 @@ class FileEventsV2:
 
         **Returns**: A [`FileEventsPage`][fileeventspage-model] object.
         """
-        return self.search(self.get_saved_search_by_id(search_id))
+        return self.search(self.get_saved_search(search_id))
 
     def _mount_retry_adapter(self):
         """Sets custom Retry strategy for FFS url requests to gracefully handle being rate-limited on FFS queries."""
