@@ -142,12 +142,9 @@ class AlertQuery:
         """
         Adds an `equals` filter to the query. The opposite of the `not_equals` filter.
 
-        When passed as part of a query, returns alerts where the field corresponding to the filter term equals the
-        indicated value(s).
+        Causes the query to return alerts where the field corresponding to the term equals the indicated value(s).
 
-        Example:
-            `AlertQuery().equals('Status', 'PENDING')` creates a query which will return all alerts with a status of
-            'PENDING'.
+        Example: `AlertQuery().equals('Status', 'PENDING')` will return all alerts with a status of 'PENDING'.
 
         **Parameters**:
 
@@ -167,7 +164,7 @@ class AlertQuery:
         self._query.groups.append(filter_group)
         return self
 
-    def not_equals(self, term, values: Union[str, List[str]]):
+    def not_equals(self, term: str, values: Union[str, List[str]]):
         """
         Adds an `not_equals` filter to the query. The opposite of the `equals` filter.
 
