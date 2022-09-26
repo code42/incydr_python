@@ -29,6 +29,7 @@ edit_uri: ""
 
 nav:
   - Introduction: 'index.md'
+  - Audit Log: 'audit_log.md'
   - Client: 'client.md'
   - Settings:
     - Configuration: 'settings.md'

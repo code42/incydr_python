@@ -1,3 +1,5 @@
+from incydr._audit_log.models import RpcSearchResponse
+from incydr._audit_log.models import RpcSearchResultsCountResponse
 from incydr._cases.models import Case
 from incydr._cases.models import CaseFileEvents
 from incydr._cases.models import CasesPage
@@ -54,6 +56,8 @@ __all__ = [
     "IncludedDepartment",
     "IncludedDirectoryGroupsList",
     "IncludedDirectoryGroup",
+    "RpcSearchResponse",
+    "RpcSearchResultsCountResponse",
 ]
 
 

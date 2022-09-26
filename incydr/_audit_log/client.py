@@ -1,0 +1,242 @@
+from pathlib import Path
+from typing import List
+
+from incydr._core.util import get_filename_from_content_disposition
+
+from incydr._audit_log.models import RpcSearchResponse
+from incydr._audit_log.models import DateRange
+from incydr._audit_log.models import UserTypes
+from incydr._audit_log.models import SearchAuditLogRequest
+from incydr._audit_log.models import RpcSearchResultsCountResponse
+from incydr._audit_log.models import ExportRequest
+from incydr._audit_log.models import RpcExportResponse
+
+
+class AuditLogV1:
+    """
+    Client for `/v1/audit` endpoints.
+    Usage example:
+        >>> import incydr
+        >>> client = incydr.Client(**kwargs)
+        >>> client.audit_log.v1.search_audit_log()
+    """
+
+    def __init__(self, parent):
+        self._parent = parent
+
+    def search_audit_log(
+            self,
+            page: int = 1,
+            page_size: int = None,
+            actor_ids: List[str] = None,
+            actor_ip_addresses: List[str] = None,
+            actor_names: List[str] = None,
+            date_range: DateRange = None,
+            event_types: List[str] = None,
+            resource_ids: List[str] = None,
+            user_types: List[UserTypes] = None
+    ) -> RpcSearchResponse:
+        """
+        Search audit log entries.
+
+        **Parameters:**
+
+        * **page**: `int` - Page number for results, starting at 1.
+        * **page_size**: `int` - Max number of results to return per page.
+        * **actor_ids**: `List[str]` - Finds events whose actor_id is one of the given ids.
+        * **actor_ip_addresses**: `List[str]` - Finds events whose actor_ip_address is one of the given IP addresses.
+        * **actor_names**: `List[str]` - Finds events whose actor_name is one of the given names.
+        * **date_range**: `DateRange` - Finds events whose date_range is within the given range.
+        * **event_types**: `List[str]` - Finds events whose type is one of the given types.
+        * **resource_ids**: `List[str]` - Filters searchable events that match resource_id.
+        * **user_types**: `List[UserTypes]` - Filters searchable events that match actor type.
+
+        **Returns**: A [`RpcSearchResponse`][rpc-search-response-model] object representing the search response.
+        """
+
+        page_size = page_size or self._parent.settings.page_size
+
+        data = SearchAuditLogRequest(
+            actor_ids=actor_ids,
+            actor_ip_addresses=actor_ip_addresses,
+            actor_names=actor_names,
+            date_range=date_range,
+            event_types=event_types,
+            page=page,
+            page_size=page_size,
+            resource_ids=resource_ids,
+            user_types=user_types
+        )
+
+        response = self._parent.session.post("/v1/audit/search-audit-log", json=data.dict())
+
+        return RpcSearchResponse.parse_response(response)
+
+    def search_results_export(
+            self,
+            page: int = 1,
+            page_size: int = None,
+            actor_ids: List[str] = None,
+            actor_ip_addresses: List[str] = None,
+            actor_names: List[str] = None,
+            date_range: DateRange = None,
+            event_types: List[str] = None,
+            resource_ids: List[str] = None,
+            user_types: List[UserTypes] = None
+    ) -> RpcSearchResponse:
+        """
+        Search audit log entries, specifically for large result sets.
+
+        **Parameters:**
+
+        * **page**: `int` - Page number for results, starting at 1.
+        * **page_size**: `int` - Max number of results to return per page.
+        * **actor_ids**: `List[str]` - Finds events whose actor_id is one of the given ids.
+        * **actor_ip_addresses**: `List[str]` - Finds events whose actor_ip_address is one of the given IP addresses.
+        * **actor_names**: `List[str]` - Finds events whose actor_name is one of the given names.
+        * **date_range**: `DateRange` - Finds events whose date_range is within the given range.
+        * **event_types**: `List[str]` - Finds events whose type is one of the given types.
+        * **resource_ids**: `List[str]` - Filters searchable events that match resource_id.
+        * **user_types**: `List[UserTypes]` - Filters searchable events that match actor type.
+
+        **Returns**: A [`RpcSearchResponse`][rpc-search-response-model] object representing the search response.
+        """
+
+        page_size = page_size or self._parent.settings.page_size
+
+        data = SearchAuditLogRequest(
+            actor_ids=actor_ids,
+            actor_ip_addresses=actor_ip_addresses,
+            actor_names=actor_names,
+            date_range=date_range,
+            event_types=event_types,
+            page=page,
+            page_size=page_size,
+            resource_ids=resource_ids,
+            user_types=user_types
+        )
+
+        response = self._parent.session.post("/v1/audit/search-results-export", json=data.dict())
+
+        return RpcSearchResponse.parse_response(response)
+
+    def search_results_count(
+            self,
+            page: int = 1,
+            page_size: int = None,
+            actor_ids: List[str] = None,
+            actor_ip_addresses: List[str] = None,
+            actor_names: List[str] = None,
+            date_range: DateRange = None,
+            event_types: List[str] = None,
+            resource_ids: List[str] = None,
+            user_types: List[UserTypes] = None
+    ) -> RpcSearchResultsCountResponse:
+        """
+        Get total result count of search.
+
+        **Parameters:**
+
+        * **page**: `int` - Page number for results, starting at 1.
+        * **page_size**: `int` - Max number of results to return per page.
+        * **actor_ids**: `List[str]` - Finds events whose actor_id is one of the given ids.
+        * **actor_ip_addresses**: `List[str]` - Finds events whose actor_ip_address is one of the given IP addresses.
+        * **actor_names**: `List[str]` - Finds events whose actor_name is one of the given names.
+        * **date_range**: `DateRange` - Finds events whose date_range is within the given range.
+        * **event_types**: `List[str]` - Finds events whose type is one of the given types.
+        * **resource_ids**: `List[str]` - Filters searchable events that match resource_id.
+        * **user_types**: `List[UserTypes]` - Filters searchable events that match actor type.
+
+        **Returns**: A [`RpcSearchResultsCountResponse`][rpc-search-results-count-response-model] object
+        representing the search response.
+        """
+
+        page_size = page_size or self._parent.settings.page_size
+
+        data = SearchAuditLogRequest(
+            actor_ids=actor_ids,
+            actor_ip_addresses=actor_ip_addresses,
+            actor_names=actor_names,
+            date_range=date_range,
+            event_types=event_types,
+            page=page,
+            page_size=page_size,
+            resource_ids=resource_ids,
+            user_types=user_types
+        )
+
+        response = self._parent.session.post("/v1/audit/search-results-count", json=data.dict())
+
+        return RpcSearchResultsCountResponse.parse_response(response)
+
+    def export_search_results(
+            self,
+            target_folder: Path,
+            actor_ids: List[str] = None,
+            actor_ip_addresses: List[str] = None,
+            actor_names: List[str] = None,
+            date_range: DateRange = None,
+            event_types: List[str] = None,
+            resource_ids: List[str] = None,
+            user_types: List[UserTypes] = None,
+    ) -> Path:
+        """
+        Export search results.
+
+        **Parameters:**
+
+        * **page**: `int` - Page number for results, starting at 1.
+        * **page_size**: `int` - Max number of results to return per page.
+        * **actor_ids**: `List[str]` - Finds events whose actor_id is one of the given ids.
+        * **actor_ip_addresses**: `List[str]` - Finds events whose actor_ip_address is one of the given IP addresses.
+        * **actor_names**: `List[str]` - Finds events whose actor_name is one of the given names.
+        * **date_range**: `DateRange` - Finds events whose date_range is within the given range.
+        * **event_types**: `List[str]` - Finds events whose type is one of the given types.
+        * **resource_ids**: `List[str]` - Filters searchable events that match resource_id.
+        * **user_types**: `List[UserTypes]` - Filters searchable events that match actor type.
+
+        **Returns**: A `pathlib.Path` object representing location of the downloaded csv file.
+        """
+
+        data = ExportRequest(
+            actor_ids=actor_ids,
+            actor_ip_addresses=actor_ip_addresses,
+            actor_names=actor_names,
+            date_range=date_range,
+            event_types=event_types,
+            resource_ids=resource_ids,
+            user_types=user_types
+        )
+
+        export_response = self._parent.session.post("/v1/audit/export", json=data.dict())
+
+        download_token = RpcExportResponse.parse_response(export_response)
+
+        folder = Path(target_folder)  # ensure a Path object if we get passed a string
+        if not folder.is_dir():
+            raise ValueError(
+                f"`target_folder` argument must resolve to a folder: {target_folder}"
+            )
+
+        download_response = self._parent.session.get(
+            "/v1/audit/redeemDownloadToken?downloadToken=" + download_token.download_token)
+
+        filename = get_filename_from_content_disposition(
+            download_response, fallback=f"AuditLog_SearchResults.csv"
+        )
+        target = folder / filename
+        target.write_bytes(download_response.content)
+
+        return target
+
+
+class AuditLogClient:
+    def __init__(self, parent):
+        self._parent = parent
+        self._v1 = None
+
+    @property
+    def v1(self):
+        if self._v1 is None:
+            self._v1 = AuditLogV1(self._parent)
+        return self._v1

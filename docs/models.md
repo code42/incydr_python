@@ -14,6 +14,19 @@
 See [Pydantic documentation](https://pydantic-docs.helpmanual.io/usage/models/#model-properties) for full list of
 available model methods.
 
+## Audit Log
+---
+
+### `RpcSearchResponse` model
+
+::: incydr.models.RpcSearchResponse
+    :docstring:
+
+### `RpcSearchResultsCountResponse` model
+
+::: incydr.models.RpcSearchResultsCountResponse
+    :docstring:
+
 ## Cases
 ---
 
