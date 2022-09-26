@@ -5,13 +5,30 @@ from typing import Optional
 from pydantic import Field
 
 from incydr._core.models import ResponseModel
-from incydr._file_events.models.enums import GroupClause
 from incydr._file_events.models.event import FileEventV2
-from incydr._file_events.models.request import SearchFilter
-from incydr._file_events.models.request import SearchFilterGroup
 from incydr.enums import SortDirection
-from incydr.enums.file_events import EventSearchTerm
-from incydr.enums.file_events import SearchProblemType
+
+
+class SearchFilter(ResponseModel):
+    operator: Optional[str] = Field(
+        description="The type of match to perform.  Default value is `IS`.",
+        example="IS_NOT",
+    )
+    term: Optional[str] = Field(description="The field to match.", example="user.email")
+    value: Optional[str] = Field(
+        None, description="The input for the search.", example="ari@example.com"
+    )
+
+
+class SearchFilterGroup(ResponseModel):
+    filter_clause: Optional[str] = Field(
+        alias="filterClause",
+        description="Grouping clause for filters.  Default is `AND`.",
+        example="AND",
+    )
+    filters: List[SearchFilter] = Field(
+        description="One or more SearchFilters to be combined in a query."
+    )
 
 
 class QueryProblem(ResponseModel):
@@ -34,7 +51,7 @@ class QueryProblem(ResponseModel):
         description="Additional description of the problem.",
         example="Request timed out.  Refine your filter criteria and try again.",
     )
-    type: SearchProblemType = Field(
+    type: Optional[str] = Field(
         description="The type of problem that occured.", example="SEARCH_FAILED"
     )
 
@@ -76,7 +93,7 @@ class SavedSearch(ResponseModel):
     **Fields**:
 
     * **api_version**: `int` - The version of the API used to create the search.
-    * **columns**: `List[EventSearchTerm]` - The list of columns to be displayed in the web app for the search.
+    * **columns**: `List[str]` - The list of columns to be displayed in the web app for the search.
     * **created_by_uid**: `str` - The ID of the user who created the saved search.
     * **created_by_username**: `str` - The username of the user who created the saved search.
     * **creation_timestamp**: `datetime` - The time at which the saved search was created.
@@ -89,7 +106,7 @@ class SavedSearch(ResponseModel):
     * **name**: `str` - The name given to the saved search.
     * **notes**: `str` - Optional notes about the search.
     * **srt_dir**: `SortDirection` - `asc` or `desc`. The direction in which to sort the response based on the corresponding key. Defaults to 'asc'.
-    * **srt_key**: `EventSearchTerm` - One or more values on which the response will be sorted. Defaults to event ID.
+    * **srt_key**: `str` - One or more values on which the response will be sorted. Defaults to event ID.
 
     """
 
@@ -98,7 +115,7 @@ class SavedSearch(ResponseModel):
         description="Version of the API used to create the search.",
         example=1,
     )
-    columns: Optional[List[EventSearchTerm]] = Field(
+    columns: Optional[List[str]] = Field(
         description="List of columns to be displayed in the web app for the search.",
     )
     created_by_uid: Optional[str] = Field(
@@ -116,7 +133,7 @@ class SavedSearch(ResponseModel):
         description="Time at which the saved search was created.",
         example="2020-10-27T15:16:05.369203Z",
     )
-    group_clause: Optional[GroupClause] = Field(
+    group_clause: Optional[str] = Field(
         alias="groupClause",
         description="Grouping clause for any specified groups.",
         example="OR",
@@ -154,12 +171,9 @@ class SavedSearch(ResponseModel):
     srt_dir: Optional[SortDirection] = Field(
         alias="srtDir", description="Sort direction.", example="asc"
     )
-    srt_key: Optional[EventSearchTerm] = Field(
+    srt_key: Optional[str] = Field(
         alias="srtKey", description="Search term for sorting.", example="event.id"
     )
-
-    class Config:
-        use_enum_values = True
 
 
 class SavedSearchesPage(ResponseModel):

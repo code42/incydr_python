@@ -6,11 +6,11 @@ from pytest_httpserver import HTTPServer
 
 from incydr._core.client import Client
 from incydr._file_events.models.event import FileEventV2
-from incydr._file_events.models.request import SearchFilter
-from incydr._file_events.models.request import SearchFilterGroup
 from incydr._file_events.models.response import FileEventsPage
 from incydr._file_events.models.response import SavedSearch
 from incydr._file_events.models.response import SavedSearchesPage
+from incydr._file_events.models.response import SearchFilter
+from incydr._file_events.models.response import SearchFilterGroup
 from incydr._queries.file_events import EventQuery
 
 MICROSECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
