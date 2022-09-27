@@ -60,8 +60,8 @@ class UsersV1:
 
         **Parameters**:
 
-        * **active**: `bool` - When true, return only active users. When false, return only inactive users. Defaults to returning both.
-        * **blocked**: `bool` - When true, return only blocked users. When false, return only unblocked users. Defaults to returning both.
+        * **active**: `bool | None` - When true, return only active users. When false, return only inactive users. Defaults to returning both.
+        * **blocked**: `bool | None` - When true, return only blocked users. When false, return only unblocked users. Defaults to returning both.
         * **username**: `str` - The username of a user to search for.
         * **page_num**: `int` - Page number for results. Defaulting to 1.
         * **page_size**: `int` - Max number of results to return per page. Defaulting to client's `page_size` setting.

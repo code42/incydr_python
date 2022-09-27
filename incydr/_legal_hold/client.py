@@ -78,7 +78,7 @@ class LegalHoldV1:
         **Parameters**:
 
         * **user_id**: `str` - Get matters that were created by the user with this unique ID.
-        * **active**: `bool` - When true, get only active matters. When false, returns only inactive matters.  Defaults to None, returns all matters.
+        * **active**: `bool | None` - When true, get only active matters. When false, returns only inactive matters.  Defaults to None, returns all matters.
         * **name**: `str` - Get matters whose `name` either equals or partially contains this value.
         * **page_num**: `int` - Page number for results, starting at 1. Defaults to None
         * **page_size**: `int` - Max number of results to return for a page. Defaults to client's `page_size` setting.
@@ -232,7 +232,7 @@ class LegalHoldV1:
 
     def add_user_to_matter(self, matter_id: str, user_id: str) -> MatterMembership:
         """
-        Get a list of custodians on a matter.
+        Add a user to a matter.
 
         **Parameters**:
 
