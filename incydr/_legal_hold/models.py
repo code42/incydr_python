@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import Any
-from typing import List
 from typing import Optional
 
 from pydantic import BaseModel
@@ -163,34 +162,6 @@ class ReactivateMatterResponse(ResponseModel):
     )
 
 
-class CustodianMembershipsPage(ResponseModel):
-    """
-    A model representing a page of `CustodianMembership` objects.
-
-    **Fields**:
-
-    * **matters**: `List[CustodianMembership]` - The list of the `n` number of matter memberships for a custodian, where `n=page_size`.
-    """
-
-    matters: Optional[List[CustodianMembership]] = Field(
-        None, description="A list of Legal Hold matters for a custodian."
-    )
-
-
-class CustodiansPage(ResponseModel):
-    """
-    A model representing a page of `Custodian` objects.
-
-    **Fields**:
-
-    * **custodians**: `List[Custodian]` - The list of `n` number of custodians on a matter, where `n=page_size`.
-    """
-
-    custodians: Optional[List[Custodian]] = Field(
-        None, description="A list of Legal Hold custodians on a matter."
-    )
-
-
 class CreatorPrincipal(ResponseModel):
     type: Optional[str] = None
     principal_id: Optional[str] = Field(None, alias="principalId")
@@ -282,32 +253,4 @@ class Policy(ResponseModel):
         None,
         description="The date the policy was last modified.",
         alias="modificationDate",
-    )
-
-
-class MattersPage(ResponseModel):
-    """
-    A model representing a list of `Policy` objects.
-
-    **Fields**:
-
-    * **policies**: `List[Policy]` - The list of `n` number of legal hold matters, where `n=page_size`.
-    """
-
-    matters: Optional[List[Matter]] = Field(
-        None, description="A list of Legal Hold matters."
-    )
-
-
-class PoliciesList(ResponseModel):
-    """
-    A model representing a list of `Policy` objects.
-
-    **Fields**:
-
-    * **policies**: `List[Policy]` - The list of legal hold policies.
-    """
-
-    policies: Optional[List[Policy]] = Field(
-        None, description="A list of Legal Hold policies."
     )

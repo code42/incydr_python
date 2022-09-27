@@ -1,17 +1,15 @@
 import json
 from datetime import datetime
+from typing import List
 from urllib.parse import urlencode
 
 from pytest_httpserver import HTTPServer
 
 from incydr._core.client import Client
 from incydr._legal_hold.models import Custodian
-from incydr._legal_hold.models import CustodianMembershipsPage
-from incydr._legal_hold.models import CustodiansPage
+from incydr._legal_hold.models import CustodianMembership
 from incydr._legal_hold.models import Matter
 from incydr._legal_hold.models import MatterMembership
-from incydr._legal_hold.models import MattersPage
-from incydr._legal_hold.models import PoliciesList
 from incydr._legal_hold.models import Policy
 from incydr._legal_hold.models import ReactivateMatterResponse
 
@@ -98,9 +96,11 @@ def test_list_policies_returns_expected_data(httpserver_auth: HTTPServer):
     ).respond_with_json(data)
     c = Client()
     page = c.legal_hold.v1.list_policies()
-    assert isinstance(page, PoliciesList)
-    assert page.policies[0].json() == json.dumps(TEST_POLICY_1)
-    assert page.policies[1].json() == json.dumps(TEST_POLICY_2)
+    assert isinstance(page, List)
+    assert isinstance(page[0], Policy)
+    assert isinstance(page[1], Policy)
+    assert page[0].json() == json.dumps(TEST_POLICY_1)
+    assert page[1].json() == json.dumps(TEST_POLICY_2)
 
 
 def test_get_policy_returns_expected_data(httpserver_auth: HTTPServer):
@@ -143,9 +143,11 @@ def test_get_page_matters_when_custom_params_returns_expected_data(
     page = c.legal_hold.v1.get_page_matters(
         user_id=TEST_USER_ID, active=True, name="Test", page_num=2, page_size=2
     )
-    assert isinstance(page, MattersPage)
-    assert page.matters[0].json() == json.dumps(TEST_MATTER_1)
-    assert page.matters[1].json() == json.dumps(TEST_MATTER_2)
+    assert isinstance(page, List)
+    assert isinstance(page[0], Matter)
+    assert isinstance(page[1], Matter)
+    assert page[0].json() == json.dumps(TEST_MATTER_1)
+    assert page[1].json() == json.dumps(TEST_MATTER_2)
 
 
 def test_get_page_matters_when_default_params_returns_expected_data(
@@ -160,9 +162,11 @@ def test_get_page_matters_when_default_params_returns_expected_data(
     ).respond_with_json(data)
     c = Client()
     page = c.legal_hold.v1.get_page_matters()
-    assert isinstance(page, MattersPage)
-    assert page.matters[0].json() == json.dumps(TEST_MATTER_1)
-    assert page.matters[1].json() == json.dumps(TEST_MATTER_2)
+    assert isinstance(page, List)
+    assert isinstance(page[0], Matter)
+    assert isinstance(page[1], Matter)
+    assert page[0].json() == json.dumps(TEST_MATTER_1)
+    assert page[1].json() == json.dumps(TEST_MATTER_2)
 
 
 def test_iter_all_matters_returns_expected_data(httpserver_auth: HTTPServer):
@@ -280,9 +284,11 @@ def test_get_page_custodians_returns_expected_data(httpserver_auth: HTTPServer):
     custodians = c.legal_hold.v1.get_page_custodians(
         TEST_MATTER_ID, page_num=1, page_size=2
     )
-    assert isinstance(custodians, CustodiansPage)
-    assert custodians.custodians[0].json() == json.dumps(TEST_CUSTODIAN_1)
-    assert custodians.custodians[1].json() == json.dumps(TEST_CUSTODIAN_2)
+    assert isinstance(custodians, List)
+    assert isinstance(custodians[0], Custodian)
+    assert isinstance(custodians[1], Custodian)
+    assert custodians[0].json() == json.dumps(TEST_CUSTODIAN_1)
+    assert custodians[1].json() == json.dumps(TEST_CUSTODIAN_2)
 
 
 def test_iter_all_custodians_returns_expected_data(httpserver_auth: HTTPServer):
@@ -361,5 +367,6 @@ def test_list_matters_for_user_returns_expected_data(httpserver_auth: HTTPServer
     matters = c.legal_hold.v1.list_matters_for_user(
         user_id=TEST_USER_ID, page_num=1, page_size=2
     )
-    assert isinstance(matters, CustodianMembershipsPage)
-    assert matters.matters[0].json() == json.dumps(membership)
+    assert isinstance(matters, List)
+    assert isinstance(matters[0], CustodianMembership)
+    assert matters[0].json() == json.dumps(membership)

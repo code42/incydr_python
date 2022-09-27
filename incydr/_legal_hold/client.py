@@ -1,15 +1,15 @@
 from itertools import count
 from typing import Iterator
+from typing import List
+
+from pydantic import parse_obj_as
 
 from incydr._legal_hold.models import CreateMatterRequest
 from incydr._legal_hold.models import Custodian
-from incydr._legal_hold.models import CustodianMembershipsPage
-from incydr._legal_hold.models import CustodiansPage
+from incydr._legal_hold.models import CustodianMembership
 from incydr._legal_hold.models import ListMattersRequest
 from incydr._legal_hold.models import Matter
 from incydr._legal_hold.models import MatterMembership
-from incydr._legal_hold.models import MattersPage
-from incydr._legal_hold.models import PoliciesList
 from incydr._legal_hold.models import Policy
 from incydr._legal_hold.models import ReactivateMatterResponse
 
@@ -40,14 +40,14 @@ class LegalHoldV1:
     def __init__(self, parent):
         self._parent = parent
 
-    def list_policies(self) -> PoliciesList:
+    def list_policies(self) -> List[Policy]:
         """
         Get a list of policies.
 
-        **Returns**: A [`PoliciesList`][policieslist-model] object.
+        **Returns**: A list of [`Policy`][policy-model] objects.
         """
         response = self._parent.session.get(url="/v1/legal-hold/policies")
-        return PoliciesList.parse_response(response)
+        return parse_obj_as(List[Policy], response.json()["policies"])
 
     def get_policy(self, policy_id: str) -> Policy:
         """
@@ -69,7 +69,7 @@ class LegalHoldV1:
         name: str = None,
         page_num: int = 1,
         page_size: int = None,
-    ) -> MattersPage:
+    ) -> List[Matter]:
         """
         Get a page of matters.
 
@@ -83,7 +83,7 @@ class LegalHoldV1:
         * **page_num**: `int` - Page number for results, starting at 1. Defaults to None
         * **page_size**: `int` - Max number of results to return for a page. Defaults to client's `page_size` setting.
 
-        **Returns**: A [`MattersPage`][matterspage-model] object.
+        **Returns**: A list of [`Matter`][matter-model] objects.
         """
         page_size = page_size or self._parent.settings.page_size
         data = ListMattersRequest(
@@ -96,7 +96,7 @@ class LegalHoldV1:
         response = self._parent.session.get(
             url="/v1/legal-hold/matters", params=data.dict()
         )
-        return MattersPage.parse_response(response)
+        return parse_obj_as(List[Matter], response.json()["matters"])
 
     def iter_all_matters(
         self,
@@ -121,8 +121,8 @@ class LegalHoldV1:
                 page_num=page_num,
                 page_size=page_size,
             )
-            yield from page.matters
-            if len(page.matters) < page_size:
+            yield from page
+            if len(page) < page_size:
                 break
 
     def create_matter(
@@ -192,7 +192,7 @@ class LegalHoldV1:
 
     def get_page_custodians(
         self, matter_id: str, page_num: int = 1, page_size: int = None
-    ) -> CustodiansPage:
+    ) -> List[Custodian]:
         """
         Get a list of custodians on a matter.
 
@@ -202,14 +202,14 @@ class LegalHoldV1:
         * **page_num**: `int` - Page number for results, starting at 1. Defaults to None
         * **page_size**: `int` - Max number of results to return for a page. Defaults to client's `page_size` setting.
 
-        **Returns**: A [`CustodiansPage`][custodianspage-model] object.
+        **Returns**: A list of [`Custodian`][custodian-model] objects.
         """
         page_size = page_size or self._parent.settings.page_size
         data = {"page": page_num, "pageSize": page_size}
         response = self._parent.session.get(
             url=f"/v1/legal-hold/matters/{matter_id}/custodians", params=data
         )
-        return CustodiansPage.parse_response(response)
+        return parse_obj_as(List[Custodian], response.json()["custodians"])
 
     def iter_all_custodians(
         self, matter_id: str, page_size: int = None
@@ -226,8 +226,8 @@ class LegalHoldV1:
             page = self.get_page_custodians(
                 matter_id=matter_id, page_num=page_num, page_size=page_size
             )
-            yield from page.custodians
-            if len(page.custodians) < page_size:
+            yield from page
+            if len(page) < page_size:
                 break
 
     def add_user_to_matter(self, matter_id: str, user_id: str) -> MatterMembership:
@@ -239,7 +239,7 @@ class LegalHoldV1:
         * **matter_id**: `str` (required) - Unique ID of a legal hold matter.
         * **user_id**: `int` (required) - Unique ID of the user to add to the matter.
 
-        **Returns**: A [`CustodiansPage`][custodianspage-model] object.
+        **Returns**: A [`MatterMembership`][mattermembership-model] object.
         """
         data = {"userId": user_id}
         response = self._parent.session.post(
@@ -249,7 +249,7 @@ class LegalHoldV1:
 
     def list_matters_for_user(
         self, user_id: str, page_num: int = 1, page_size: int = None
-    ) -> CustodianMembershipsPage:
+    ) -> List[CustodianMembership]:
         """
         Get a list of matters for a user.
 
@@ -259,11 +259,11 @@ class LegalHoldV1:
         * **page_num**: `int` - Page number for results, starting at 1. Defaults to None
         * **page_size**: `int` - Max number of results to return for a page. Defaults to client's `page_size` setting.
 
-        **Returns**: A [`CustodianMembershipsPage`][custodianmembershipspage-model] object.
+        **Returns**: A list of [`CustodianMembership`][custodianmembership-model] objects.
         """
         page_size = page_size or self._parent.settings.page_size
         data = {"page": page_num, "pageSize": page_size}
         response = self._parent.session.get(
             f"/v1/legal-hold/custodians/{user_id}", params=data
         )
-        return CustodianMembershipsPage.parse_response(response)
+        return parse_obj_as(List[CustodianMembership], response.json()["matters"])
