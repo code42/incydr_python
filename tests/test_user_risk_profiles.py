@@ -101,10 +101,10 @@ def test_iter_all_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     query_1 = {
-        "page": 1,
+        "page_num": 1,
         "page_size": 2,
     }
-    query_2 = {"page": 2, "page_size": 2}
+    query_2 = {"page_num": 2, "page_size": 2}
 
     user_risk_profile_data_1 = {
         "userRiskProfiles": [TEST_USER_RISK_PROFILE_1, TEST_USER_RISK_PROFILE_2],

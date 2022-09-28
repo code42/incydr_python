@@ -121,7 +121,7 @@ class UserRiskProfilesPage(ResponseModel):
 
 
 class QueryUserRiskProfilesRequest(BaseModel):
-    page: Optional[int]
+    page_num: Optional[int]
     page_size: Optional[int]
     manager_id: Optional[str]
     title: Optional[str]

@@ -41,7 +41,7 @@ class UserRiskProfilesV1:
 
     def get_page(
         self,
-        page: int = 1,
+        page_num: int = 1,
         page_size: int = None,
         manager_id: str = None,
         title: str = None,
@@ -62,7 +62,7 @@ class UserRiskProfilesV1:
 
         **Parameters**:
 
-        * **page**: `int` - Page number for results, starting at 1.
+        * **page_num**: `int` - Page number for results, starting at 1.
         * **page_size**: `int` - Max number of results to return per page.
         * **manager_id**: `str` - The Code42 user ID of the user's manager to search for.
         * **title**: `str` - The user's job title to search for.
@@ -72,18 +72,18 @@ class UserRiskProfilesV1:
         * **country**: `str` - The user's country to search for.
         * **region**: `str` - The user's region (state) to search for.
         * **locality**: `str` - The user's locality (city) to search for.
-        * **active**: `bool` - When true, return only active users. When false, return only inactive users.
-                               Defaults to returning both.
-        * **deleted**: `bool` - When true, return only deleted users. When false, return only non-deleted users.
-                                Defaults to returning both.
-        * **support_user**: `bool` - When true, return only support users. When false, return only non-support users.
-                                     Defaults to returning both
+        ** **active**: `bool | None` - When true, return only active users. When false, return only inactive users.
+                                       Defaults to `None` (returning both).
+        * **deleted**: `bool | None` - When true, return only deleted users. When false, return only non-deleted users.
+                                       Defaults to returning both.
+        * **support_user**: `bool | None` - When true, return only support users. When false, return only non-support users.
+                                            Defaults to returning both
 
         **Returns**: A ['UserRiskProfilesPage'][userriskprofilespage-model] object.
         """
         page_size = page_size or self._parent.settings.page_size
         data = QueryUserRiskProfilesRequest(
-            page=page,
+            page_num=page_num,
             page_size=page_size,
             manager_id=manager_id,
             title=title,
@@ -127,7 +127,7 @@ class UserRiskProfilesV1:
         page_size = page_size or self._parent.settings.page_size
         for page_num in count(1):
             page = self.get_page(
-                page=page_num,
+                page_num=page_num,
                 page_size=page_size,
                 manager_id=manager_id,
                 title=title,
