@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 from typing import List
 
@@ -6,9 +7,9 @@ from incydr._core.util import get_filename_from_content_disposition
 from incydr._audit_log.models import RpcSearchResponse
 from incydr._audit_log.models import DateRange
 from incydr._audit_log.models import UserTypes
-from incydr._audit_log.models import SearchAuditLogRequest
+from incydr._audit_log.models import QueryAuditLogRequest
 from incydr._audit_log.models import RpcSearchResultsCountResponse
-from incydr._audit_log.models import ExportRequest
+from incydr._audit_log.models import QueryExportRequest
 from incydr._audit_log.models import RpcExportResponse
 
 
@@ -26,12 +27,13 @@ class AuditLogV1:
 
     def search_audit_log(
             self,
-            page: int = 1,
+            page_num: int = 1,
             page_size: int = None,
             actor_ids: List[str] = None,
             actor_ip_addresses: List[str] = None,
             actor_names: List[str] = None,
-            date_range: DateRange = None,
+            start_time: datetime = None,
+            end_time: datetime = None,
             event_types: List[str] = None,
             resource_ids: List[str] = None,
             user_types: List[UserTypes] = None
@@ -41,12 +43,13 @@ class AuditLogV1:
 
         **Parameters:**
 
-        * **page**: `int` - Page number for results, starting at 1.
+        * **page_num**: `int` - page_num number for results, starting at 1.
         * **page_size**: `int` - Max number of results to return per page.
         * **actor_ids**: `List[str]` - Finds events whose actor_id is one of the given ids.
         * **actor_ip_addresses**: `List[str]` - Finds events whose actor_ip_address is one of the given IP addresses.
         * **actor_names**: `List[str]` - Finds events whose actor_name is one of the given names.
-        * **date_range**: `DateRange` - Finds events whose date_range is within the given range.
+        * **start_time**: `datetime`
+        * **end_time**: `datetime`
         * **event_types**: `List[str]` - Finds events whose type is one of the given types.
         * **resource_ids**: `List[str]` - Filters searchable events that match resource_id.
         * **user_types**: `List[UserTypes]` - Filters searchable events that match actor type.
@@ -56,16 +59,22 @@ class AuditLogV1:
 
         page_size = page_size or self._parent.settings.page_size
 
-        data = SearchAuditLogRequest(
-            actor_ids=actor_ids,
-            actor_ip_addresses=actor_ip_addresses,
-            actor_names=actor_names,
-            date_range=date_range,
-            event_types=event_types,
-            page=page,
-            page_size=page_size,
-            resource_ids=resource_ids,
-            user_types=user_types
+        date_range = DateRange()
+        if start_time:
+            date_range.startTime = start_time
+        if end_time:
+            date_range.endTime = end_time
+
+        data = QueryAuditLogRequest(
+            actorIds=actor_ids,
+            actorIpAddresses=actor_ip_addresses,
+            actorNames=actor_names,
+            dateRange=date_range,
+            eventTypes=event_types,
+            pageNum=page_num,
+            pageSize=page_size,
+            resourceIds=resource_ids,
+            userTypes=user_types
         )
 
         response = self._parent.session.post("/v1/audit/search-audit-log", json=data.dict())
@@ -74,12 +83,13 @@ class AuditLogV1:
 
     def search_results_export(
             self,
-            page: int = 1,
+            page_num: int = 1,
             page_size: int = None,
             actor_ids: List[str] = None,
             actor_ip_addresses: List[str] = None,
             actor_names: List[str] = None,
-            date_range: DateRange = None,
+            start_time: datetime = None,
+            end_time: datetime = None,
             event_types: List[str] = None,
             resource_ids: List[str] = None,
             user_types: List[UserTypes] = None
@@ -89,12 +99,13 @@ class AuditLogV1:
 
         **Parameters:**
 
-        * **page**: `int` - Page number for results, starting at 1.
+        * **page_num**: `int` - Page number for results, starting at 1.
         * **page_size**: `int` - Max number of results to return per page.
         * **actor_ids**: `List[str]` - Finds events whose actor_id is one of the given ids.
         * **actor_ip_addresses**: `List[str]` - Finds events whose actor_ip_address is one of the given IP addresses.
         * **actor_names**: `List[str]` - Finds events whose actor_name is one of the given names.
-        * **date_range**: `DateRange` - Finds events whose date_range is within the given range.
+        * **start_time**: `datetime`
+        * **end_time**: `datetime`
         * **event_types**: `List[str]` - Finds events whose type is one of the given types.
         * **resource_ids**: `List[str]` - Filters searchable events that match resource_id.
         * **user_types**: `List[UserTypes]` - Filters searchable events that match actor type.
@@ -104,16 +115,22 @@ class AuditLogV1:
 
         page_size = page_size or self._parent.settings.page_size
 
-        data = SearchAuditLogRequest(
-            actor_ids=actor_ids,
-            actor_ip_addresses=actor_ip_addresses,
-            actor_names=actor_names,
-            date_range=date_range,
-            event_types=event_types,
-            page=page,
-            page_size=page_size,
-            resource_ids=resource_ids,
-            user_types=user_types
+        date_range = DateRange()
+        if start_time:
+            date_range.startTime = start_time
+        if end_time:
+            date_range.endTime = end_time
+
+        data = QueryAuditLogRequest(
+            actorIds=actor_ids,
+            actorIpAddresses=actor_ip_addresses,
+            actorNames=actor_names,
+            dateRange=date_range,
+            eventTypes=event_types,
+            pageNum=page_num,
+            pageSize=page_size,
+            resourceIds=resource_ids,
+            userTypes=user_types
         )
 
         response = self._parent.session.post("/v1/audit/search-results-export", json=data.dict())
@@ -122,12 +139,13 @@ class AuditLogV1:
 
     def search_results_count(
             self,
-            page: int = 1,
+            page_num: int = 1,
             page_size: int = None,
             actor_ids: List[str] = None,
             actor_ip_addresses: List[str] = None,
             actor_names: List[str] = None,
-            date_range: DateRange = None,
+            start_time: datetime = None,
+            end_time: datetime = None,
             event_types: List[str] = None,
             resource_ids: List[str] = None,
             user_types: List[UserTypes] = None
@@ -137,12 +155,13 @@ class AuditLogV1:
 
         **Parameters:**
 
-        * **page**: `int` - Page number for results, starting at 1.
+        * **page_num**: `int` - Page number for results, starting at 1.
         * **page_size**: `int` - Max number of results to return per page.
         * **actor_ids**: `List[str]` - Finds events whose actor_id is one of the given ids.
         * **actor_ip_addresses**: `List[str]` - Finds events whose actor_ip_address is one of the given IP addresses.
         * **actor_names**: `List[str]` - Finds events whose actor_name is one of the given names.
-        * **date_range**: `DateRange` - Finds events whose date_range is within the given range.
+        * **start_time**: `datetime`
+        * **end_time**: `datetime`
         * **event_types**: `List[str]` - Finds events whose type is one of the given types.
         * **resource_ids**: `List[str]` - Filters searchable events that match resource_id.
         * **user_types**: `List[UserTypes]` - Filters searchable events that match actor type.
@@ -153,16 +172,22 @@ class AuditLogV1:
 
         page_size = page_size or self._parent.settings.page_size
 
-        data = SearchAuditLogRequest(
-            actor_ids=actor_ids,
-            actor_ip_addresses=actor_ip_addresses,
-            actor_names=actor_names,
-            date_range=date_range,
-            event_types=event_types,
-            page=page,
-            page_size=page_size,
-            resource_ids=resource_ids,
-            user_types=user_types
+        date_range = DateRange()
+        if start_time:
+            date_range.startTime = start_time
+        if end_time:
+            date_range.endTime = end_time
+
+        data = QueryAuditLogRequest(
+            actorIds=actor_ids,
+            actorIpAddresses=actor_ip_addresses,
+            actorNames=actor_names,
+            dateRange=date_range,
+            eventTypes=event_types,
+            pageNum=page_num,
+            pageSize=page_size,
+            resourceIds=resource_ids,
+            userTypes=user_types
         )
 
         response = self._parent.session.post("/v1/audit/search-results-count", json=data.dict())
@@ -175,7 +200,8 @@ class AuditLogV1:
             actor_ids: List[str] = None,
             actor_ip_addresses: List[str] = None,
             actor_names: List[str] = None,
-            date_range: DateRange = None,
+            start_time: datetime = None,
+            end_time: datetime = None,
             event_types: List[str] = None,
             resource_ids: List[str] = None,
             user_types: List[UserTypes] = None,
@@ -185,12 +211,11 @@ class AuditLogV1:
 
         **Parameters:**
 
-        * **page**: `int` - Page number for results, starting at 1.
-        * **page_size**: `int` - Max number of results to return per page.
         * **actor_ids**: `List[str]` - Finds events whose actor_id is one of the given ids.
         * **actor_ip_addresses**: `List[str]` - Finds events whose actor_ip_address is one of the given IP addresses.
         * **actor_names**: `List[str]` - Finds events whose actor_name is one of the given names.
-        * **date_range**: `DateRange` - Finds events whose date_range is within the given range.
+        * **start_time**: `datetime`
+        * **end_time**: `datetime`
         * **event_types**: `List[str]` - Finds events whose type is one of the given types.
         * **resource_ids**: `List[str]` - Filters searchable events that match resource_id.
         * **user_types**: `List[UserTypes]` - Filters searchable events that match actor type.
@@ -198,14 +223,20 @@ class AuditLogV1:
         **Returns**: A `pathlib.Path` object representing location of the downloaded csv file.
         """
 
-        data = ExportRequest(
-            actor_ids=actor_ids,
-            actor_ip_addresses=actor_ip_addresses,
-            actor_names=actor_names,
-            date_range=date_range,
-            event_types=event_types,
-            resource_ids=resource_ids,
-            user_types=user_types
+        date_range = DateRange()
+        if start_time:
+            date_range.startTime = start_time
+        if end_time:
+            date_range.endTime = end_time
+
+        data = QueryExportRequest(
+            actorIds=actor_ids,
+            actorIpAddresses=actor_ip_addresses,
+            actorNames=actor_names,
+            dateRange=date_range,
+            eventTypes=event_types,
+            resourceIds=resource_ids,
+            userTypes=user_types
         )
 
         export_response = self._parent.session.post("/v1/audit/export", json=data.dict())

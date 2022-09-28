@@ -17,14 +17,8 @@ class UserTypes(Enum):
 
 
 class DateRange(BaseModel):
-    end_time: Optional[datetime] = Field(
-        None,
-        alias="endTime"
-    )
-    start_time: Optional[datetime] = Field(
-        None,
-        alias="startTime"
-    )
+    endTime: Optional[datetime]
+    startTime: Optional[datetime]
 
 
 class RpcExportResponse(ResponseModel):
@@ -64,104 +58,23 @@ class RpcSearchResultsCountResponse(ResponseModel):
     )
 
 
-class ExportRequest(BaseModel):
-    actor_ids: Optional[List[str]] = Field(
-        None,
-        description='Finds events whose actor_id is one of the given ids. An actor may be a human user or a service.',
-        example='albertha.rice@yahoo.com',
-        alias="actorIds"
-    )
-    actor_ip_addresses: Optional[List[str]] = Field(
-        None,
-        description='Finds events whose actor_ip_address is one of the given IP addresses.',
-        example='127.0.0.1',
-        alias="actorIpAddresses"
-    )
-    actor_names: Optional[List[str]] = Field(
-        None,
-        description='Finds events whose actor_name is one of the given names. An actor may be a human user or a '
-                    'service.',
-        example='JinJenz',
-        alias="actorNames"
-    )
-    date_range: Optional[DateRange] = Field(
-        None,
-        alias="dateRange"
-    )
-    event_types: Optional[List[str]] = Field(
-        None,
-        description='Finds events whose type is one of the given types.',
-        example='support_user_access_disabled',
-        title='Some examples: support_user_access_disabled, alert_note_edited, api_client_created, logged_in, '
-              'case_archived, account_name_added, file_download, search_issued, federation_created, user_activated, '
-              'risk_profile_cloud_alias_added',
-        alias="eventTypes"
-    )
-    resource_ids: Optional[List[str]] = Field(
-        None,
-        description='Filters export events that match resource_id',
-        example=1523,
-        alias="resourceIds"
-    )
-    user_types: Optional[List[UserTypes]] = Field(
-        None,
-        description='Filters export events that match actor type',
-        example='User',
-        alias="userTypes"
-    )
+class QueryExportRequest(BaseModel):
+    actorIds: Optional[List[str]]
+    actorIpAddresses: Optional[List[str]]
+    actorNames: Optional[List[str]]
+    dateRange: Optional[DateRange]
+    eventTypes: Optional[List[str]]
+    resourceIds: Optional[List[str]]
+    userTypes: Optional[List[UserTypes]]
 
 
-class SearchAuditLogRequest(BaseModel):
-    actor_ids: Optional[List[str]] = Field(
-        None,
-        description='Finds events whose actor_id is one of the given ids. An actor may be a human user or a service.',
-        example='albertha.rice@yahoo.com',
-        alias="actor_ids"
-    )
-    actor_ip_addresses: Optional[List[str]] = Field(
-        None,
-        description='Finds events whose actor_ip_address is one of the given IP addresses.',
-        example='127.0.0.1',
-        alias="actorIpAddresses"
-    )
-    actor_names: Optional[List[str]] = Field(
-        None,
-        description='Finds events whose actor_name is one of the given names. An actor may be a human user or a '
-                    'service.',
-        example='JinJenz',
-        alias="actorNames"
-    )
-    date_range: Optional[DateRange] = Field(
-        None,
-        alias="dateRange"
-    )
-    event_types: Optional[List[str]] = Field(
-        None,
-        description='Finds events whose type is one of the given types.',
-        example='support_user_access_disabled',
-        title='Some examples: support_user_access_disabled, alert_note_edited, api_client_created, logged_in, '
-              'case_archived, account_name_added, file_download, search_issued, federation_created, user_activated, '
-              'risk_profile_cloud_alias_added',
-        alias="eventTypes"
-    )
-    page: int = Field(
-        None,
-        description='Which page of events to view.'
-    )
-    page_size: int = Field(
-        None,
-        description='How many elements to return on each page.',
-        alias="pageSize"
-    )
-    resource_ids: Optional[List[str]] = Field(
-        None,
-        description='Filters searchable events that match resource_id.',
-        example=1523,
-        alias="resourceIds"
-    )
-    user_types: Optional[List[UserTypes]] = Field(
-        None,
-        description='Filters searchable events that match actor type.',
-        example='User',
-        alias="userTypes"
-    )
+class QueryAuditLogRequest(BaseModel):
+    actorIds: Optional[List[str]]
+    actorIpAddresses: Optional[List[str]]
+    actorNames: Optional[List[str]]
+    dateRange: Optional[DateRange]
+    eventTypes: Optional[List[str]]
+    pageNum: int
+    pageSize: int
+    resourceIds: Optional[List[str]]
+    userTypes: Optional[List[UserTypes]]
