@@ -200,12 +200,12 @@ class Client:
     @property
     def trusted_activities(self):
         """
-        Property returning a [`TrustedActivities`](../trusted_activities) for interacting with
+        Property returning a [`TrustedActivitiesClient`](../trusted_activities) for interacting with
         `/v*/trusted-activities` API endpoints.
 
         Usage:
 
-            >>> client.trusted_activities.v2.get()
+            >>> client.trusted_activities.v2.get_page()
 
         """
         return self._trusted_activities

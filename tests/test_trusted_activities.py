@@ -86,10 +86,10 @@ def test_iter_all_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     query_1 = {
-        "page": 1,
+        "page_num": 1,
         "page_size": 2,
     }
-    query_2 = {"page": 2, "page_size": 2}
+    query_2 = {"page_num": 2, "page_size": 2}
 
     trusted_activities_data_1 = {
         "trustedActivities": [TEST_TRUSTED_ACTIVITY_1, TEST_TRUSTED_ACTIVITY_2],

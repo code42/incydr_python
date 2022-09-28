@@ -36,8 +36,3 @@ class SortKeys(_Enum):
     UPDATED_BY_PRINCIPAL_NAME = "UPDATED_BY_PRINCIPAL_NAME"
     UPDATE_TIME = "UPDATE_TIME"
     VALUE = "VALUE"
-
-
-class SortDirection(_Enum):
-    ASC = "ASC"
-    DESC = "DESC"

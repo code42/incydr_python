@@ -62,28 +62,38 @@ class TrustedActivity(ResponseModel):
         None,
         description="The unique identifier of the trusted activity.",
         alias="activityId",
+        allow_mutation=False
     )
     description: Optional[str] = Field(
         None, description="A description of the trusted activity."
     )
-    principal_type: Optional[PrincipalType] = Field(None, alias="principalType")
+    principal_type: Optional[PrincipalType] = Field(
+        None,
+        alias="principalType",
+        allow_mutation=False
+    )
     activity_type: Optional[ActivityType] = Field(
-        None, description="The type of the trusted activity.", alias="activityType"
+        None,
+        description="The type of the trusted activity.",
+        alias="activityType"
     )
     update_time: Optional[datetime] = Field(
         None,
         description="The time at which the trust activity was last created or modified.",
         alias="updateTime",
+        allow_mutation=False
     )
     updated_by_principal_id: Optional[str] = Field(
         None,
         description="The unique identifier of the user who last updated the trust activity.",
         alias="updatedByPrincipalId",
+        allow_mutation=False
     )
     updated_by_principal_name: Optional[str] = Field(
         None,
         description="The username of the user who last updated the trusted activity.",
         alias="updatedByPrincipalName",
+        allow_mutation=False
     )
     value: Optional[str] = Field(None, description="The value of the trusted activity.")
 
@@ -121,7 +131,7 @@ class TrustedActivitiesPage(ResponseModel):
 
 
 class QueryTrustedActivitiesRequest(BaseModel):
-    page: Optional[int]
+    page_num: Optional[int]
     page_size: Optional[int]
     activity_type: Optional[str]
     sort_key: Optional[str]

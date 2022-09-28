@@ -2,6 +2,7 @@ from itertools import count
 from typing import Iterator
 from typing import List
 
+from incydr.enums import SortDirection
 from requests import Response
 
 from incydr._trusted_activities.models import ActivityActionGroup
@@ -11,7 +12,6 @@ from incydr._trusted_activities.models import TrustedActivitiesPage
 from incydr._trusted_activities.models import TrustedActivity
 from incydr._trusted_activities.models import UpdateTrustedActivity
 from incydr.enums.trusted_activities import ActivityType
-from incydr.enums.trusted_activities import SortDirection
 from incydr.enums.trusted_activities import SortKeys
 
 
@@ -23,7 +23,7 @@ class TrustedActivitiesV2:
 
         >>> import incydr
         >>> client = incydr.Client(**kwargs)
-        >>> client.trusted_activities.v2
+        >>> client.trusted_activities.v2.get_page()
 
     """
 
@@ -46,7 +46,7 @@ class TrustedActivitiesV2:
 
     def get_page(
         self,
-        page: int = 1,
+        page_num: int = 1,
         page_size: int = None,
         activity_type: ActivityType = None,
         sort_key: SortKeys = None,
@@ -58,7 +58,7 @@ class TrustedActivitiesV2:
 
         **Parameters**:
 
-        * **page**: `int` - Page number for results, starting at 1.
+        * **page_num**: `int` - Page number for results, starting at 1.
         * **page_size**: `int` - Max number of results to return per page.
         * **activity_type**: `str` - The type of the trusted activity.
         * **sort_key**: `str` - The key by which to sort the returned list.
@@ -69,7 +69,7 @@ class TrustedActivitiesV2:
 
         page_size = page_size or self._parent.settings.page_size
         data = QueryTrustedActivitiesRequest(
-            page=page,
+            page_num=page_num,
             page_size=page_size,
             activity_type=activity_type,
             sort_key=sort_key,
@@ -97,7 +97,7 @@ class TrustedActivitiesV2:
         page_size = page_size or self._parent.settings.page_size
         for page_num in count(1):
             page = self.get_page(
-                page=page_num,
+                page_num=page_num,
                 page_size=page_size,
                 activity_type=activity_type,
                 sort_key=sort_key,
@@ -158,15 +158,18 @@ class TrustedActivitiesV2:
         return self._parent.session.delete(f"/v2/trusted-activities/{activity_id}")
 
     def update(
-        self, activity_id: int, trusted_activity: TrustedActivity
+        self,
+        activity_id: int,
+        trusted_activity: TrustedActivity
     ) -> TrustedActivity:
         """
         Updates a trusted activity.
+        Valid updatable fields: description, value, activity_type, activity_action_group
 
         **Parameters**
 
         * **activity_id** `int` Unique numeric identifier for the trusted activity.
-        * **trusted_activity**: [`TrustedActivity`][trustedactivity-model] The modified case object.
+        * **trusted_activity**: [`TrustedActivity`][trustedactivity-model] The modified trusted activity object.
 
         Usage example:
 
