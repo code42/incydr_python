@@ -48,7 +48,6 @@ class FileEventsV2:
 
         if isinstance(query, SavedSearch):
             query = _create_query_from_saved_search(query)
-            print(query.dict())
 
         if isinstance(query, str):
             query = Query.parse_raw(query)

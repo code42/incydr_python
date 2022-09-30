@@ -184,7 +184,7 @@ class WatchlistsV1:
 
     def get_member(self, watchlist_id: str, user_id: str) -> WatchlistUser:
         """
-        Get a single member of a watchlist.
+        Get a single member of a watchlist. A member may have been added as an included user, or is a member of an included department, etc.
 
         **Parameters**:
 
@@ -202,7 +202,7 @@ class WatchlistsV1:
         self, watchlist_id: Union[str, WatchlistType]
     ) -> WatchlistMembersList:
         """
-        Get a list of all members of a watchlist.
+        Get a list of all members of a watchlist. These users may have been added as an included user, or are members of an included department, etc.
 
         **Parameters**:
 
