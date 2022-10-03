@@ -119,27 +119,6 @@ def test_query_alert_state():
             "filters": [{"term": "State", "operator": "IS", "value": "OPEN"}],
         }
     ]
-    query = AlertQuery().equals("State", "PENDING")
-    assert query.dict()["groups"] == [
-        {
-            "filterClause": "AND",
-            "filters": [{"term": "State", "operator": "IS", "value": "PENDING"}],
-        }
-    ]
-    query = AlertQuery().equals("State", "IN_PROGRESS")
-    assert query.dict()["groups"] == [
-        {
-            "filterClause": "AND",
-            "filters": [{"term": "State", "operator": "IS", "value": "IN_PROGRESS"}],
-        }
-    ]
-    query = AlertQuery().equals("State", "RESOLVED")
-    assert query.dict()["groups"] == [
-        {
-            "filterClause": "AND",
-            "filters": [{"term": "State", "operator": "IS", "value": "RESOLVED"}],
-        }
-    ]
     query = AlertQuery().equals("State", ["OPEN", "PENDING"])
     assert query.dict()["groups"] == [
         {
@@ -160,20 +139,6 @@ def test_query_alert_severity():
             "filters": [{"term": "Severity", "operator": "IS", "value": "HIGH"}],
         }
     ]
-    query = AlertQuery().equals("Severity", "MEDIUM")
-    assert query.dict()["groups"] == [
-        {
-            "filterClause": "AND",
-            "filters": [{"term": "Severity", "operator": "IS", "value": "MEDIUM"}],
-        }
-    ]
-    query = AlertQuery().equals("Severity", "LOW")
-    assert query.dict()["groups"] == [
-        {
-            "filterClause": "AND",
-            "filters": [{"term": "Severity", "operator": "IS", "value": "LOW"}],
-        }
-    ]
     query = AlertQuery().equals("Severity", ["HIGH", "MEDIUM"])
     assert query.dict()["groups"] == [
         {
@@ -192,22 +157,6 @@ def test_query_alert_risk_severity():
         {
             "filterClause": "AND",
             "filters": [{"term": "RiskSeverity", "operator": "IS", "value": "HIGH"}],
-        }
-    ]
-    query = AlertQuery().equals("RiskSeverity", "MODERATE")
-    assert query.dict()["groups"] == [
-        {
-            "filterClause": "AND",
-            "filters": [
-                {"term": "RiskSeverity", "operator": "IS", "value": "MODERATE"}
-            ],
-        }
-    ]
-    query = AlertQuery().equals("RiskSeverity", "LOW")
-    assert query.dict()["groups"] == [
-        {
-            "filterClause": "AND",
-            "filters": [{"term": "RiskSeverity", "operator": "IS", "value": "LOW"}],
         }
     ]
     query = AlertQuery().equals("RiskSeverity", ["HIGH", "MODERATE"])
