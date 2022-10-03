@@ -37,19 +37,21 @@ The `on` argument tells the alerts service to retrieve all alerts created on the
 - a string representation of a date in either `%Y-%m-%d %H:%M:%S` or `%Y-%m-%d` formats (again if time data is supplied
   it will have no effect on the query)
 
+To create a query which filters alerts which have a state of `OPEN` or `PENDING` and were created in the past 3 days:
 ```python
-# to create a query which filters alerts which have a state of 'OPEN' or 'PENDING' and were created in the past 3 days:
-
 query = AlertQuery(start_date=timedelta(days=3)).equals('State', ['OPEN', 'PENDING'])
 ```
 
-All operator methods take a term string, which matches an alert field (ex: `'RiskSeverity'`), to filter on as their first arg. The second arg is the value(s) to compare.
+All filter methods take a `term` string as their first argument, which indicates which field to filter on (ex: `'RiskSeverity'`), 
+and the second arg is the value (or list of values) to search for.
 
-The following operators are available for filtering:
-* `equals`
-* `not_equals`
-* `contains`
-* `does_not_contain`
-* `matches_any`
+The following filter methods are available:
+* `.equals(term, value)`
+* `.not_equals(term, value)`
+* `.contains(term, value)`
+* `.does_not_contain(term, value)`
 
-Pass the event query object to the `alerts.v1.search()` method to get the results.
+By default, all filters in a query will be combined in an `AND` group, meaning only results matching _all_ filters will
+be returned. If you want to `OR` the filters, call the `.matches_any()` method on the query. 
+
+Pass the event constructed query object to the `client.alerts.v1.search()` method to get execute the search.
