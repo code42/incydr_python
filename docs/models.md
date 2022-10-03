@@ -17,14 +17,14 @@ available model methods.
 ## Audit Log
 ---
 
-### `RpcSearchResponse` model
+### `AuditEventsPage` model
 
-::: incydr.models.RpcSearchResponse
+::: incydr.models.AuditEventsPage
     :docstring:
 
-### `RpcSearchResultsCountResponse` model
+### `AuditEventsCount` model
 
-::: incydr.models.RpcSearchResultsCountResponse
+::: incydr.models.AuditEventsCount
     :docstring:
 
 ## Cases

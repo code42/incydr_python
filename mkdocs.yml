@@ -29,11 +29,11 @@ edit_uri: ""
 
 nav:
   - Introduction: 'index.md'
-  - Audit Log: 'audit_log.md'
   - Client: 'client.md'
   - Settings:
     - Configuration: 'settings.md'
     - Logging: 'logging.md'
+  - Audit Log: 'audit_log.md'
   - Cases: 'cases.md'
   - Customer: 'customer.md'
   - Departments: 'departments.md'

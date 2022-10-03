@@ -132,7 +132,7 @@ class Client:
         Property returning a [`AuditLog`](../audit) for interacting with
         `/v*/audit` API endpoints.
         Usage:
-            >>> client.audit_log.v1.search_audit_log()
+            >>> client.audit_log.v1.get_page()
         """
         return self._audit_log
 
