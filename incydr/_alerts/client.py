@@ -10,7 +10,6 @@ from .models.request import UpdateAlertStateRequest
 from .models.response import AlertDetails
 from .models.response import AlertQueryPage
 from incydr._queries.alerts import AlertQuery
-from incydr._queries.alerts import Query
 from incydr.enums.alerts import AlertState
 
 
@@ -41,10 +40,11 @@ class AlertsV1:
         **Returns**: An [`AlertQueryPage`][alertquerypage-model] object.
         """
         if isinstance(query, str):
-            query = Query.parse_raw(query)
-            query.tenantId = self._parent.tenant_id
+            query = AlertQuery.from_string(query)
         if isinstance(query, AlertQuery):
             query._query.tenantId = self._parent.tenant_id
+        else:
+            raise ValueError("query must be either a string or `AlertQuery` object.")
         response = self._parent.session.post(
             "/v1/alerts/query-alerts", json=query.dict()
         )
@@ -60,10 +60,11 @@ class AlertsV1:
         **Returns**: A generator yielding individual [`AlertSummary`][alertsummary-model] objects.
         """
         if isinstance(query, str):
-            query = Query.parse_raw(query)
-            query.tenantId = self._parent.tenant_id
+            query = AlertQuery.from_string(query)
         if isinstance(query, AlertQuery):
             query._query.tenantId = self._parent.tenant_id
+        else:
+            raise ValueError("query must be either a string or `AlertQuery` object.")
         for page_num in count(0):
             query.page_num = page_num
             response = self._parent.session.post(

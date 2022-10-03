@@ -1,9 +1,11 @@
+import pytest
 from pytest_httpserver import HTTPServer
 
 from incydr import AlertQuery
 from incydr import Client
 from incydr._alerts.models.response import AlertDetails
 from incydr._alerts.models.response import AlertQueryPage
+from incydr._alerts.models.response import AlertSummary
 
 TEST_ALERTS_RESPONSE = {
     "type$": "ALERT_QUERY_RESPONSE",
@@ -127,7 +129,7 @@ TEST_ALERT_DETAILS_RESPONSE = {
 }
 
 
-def test_alert_query(httpserver_auth: HTTPServer):
+def test_alert_query_class(httpserver_auth: HTTPServer):
     query = AlertQuery().equals("State", "OPEN")
     expected = query.dict()
     expected["tenantId"] = "abcd-1234"
@@ -140,6 +142,56 @@ def test_alert_query(httpserver_auth: HTTPServer):
     response = client.alerts.v1.search(query)
     assert isinstance(response, AlertQueryPage)
 
+    with pytest.raises(ValueError):
+        client.alerts.v1.search(dict())
+
+
+def test_alert_query_str(httpserver_auth: HTTPServer):
+    query = AlertQuery().equals("State", "OPEN")
+    expected = query.dict()
+    expected["tenantId"] = "abcd-1234"
+
+    httpserver_auth.expect_request(
+        "/v1/alerts/query-alerts", method="POST", json=expected
+    ).respond_with_json(TEST_ALERTS_RESPONSE)
+
+    client = Client()
+    response = client.alerts.v1.search(query.json())
+    assert isinstance(response, AlertQueryPage)
+
+
+def test_iter_all_class(httpserver_auth: HTTPServer):
+    query = AlertQuery().equals("State", "OPEN")
+    expected = query.dict()
+    expected["tenantId"] = "abcd-1234"
+
+    httpserver_auth.expect_request(
+        "/v1/alerts/query-alerts", method="POST", json=expected
+    ).respond_with_json(TEST_ALERTS_RESPONSE)
+
+    client = Client()
+    response = client.alerts.v1.iter_all(query)
+    for alert in response:
+        assert isinstance(alert, AlertSummary)
+
+    with pytest.raises(ValueError):
+        next(client.alerts.v1.iter_all(dict()))
+
+
+def test_iter_all_str(httpserver_auth: HTTPServer):
+    query = AlertQuery().equals("State", "OPEN")
+    expected = query.dict()
+    expected["tenantId"] = "abcd-1234"
+
+    httpserver_auth.expect_request(
+        "/v1/alerts/query-alerts", method="POST", json=expected
+    ).respond_with_json(TEST_ALERTS_RESPONSE)
+
+    client = Client()
+    response = client.alerts.v1.iter_all(query.json())
+    for alert in response:
+        assert isinstance(alert, AlertSummary)
+
 
 def test_alert_detail_query(httpserver_auth: HTTPServer):
     expected = {"alertIds": ["123", "234"]}
@@ -149,6 +201,18 @@ def test_alert_detail_query(httpserver_auth: HTTPServer):
 
     client = Client()
     response = client.alerts.v1.get_details(["123", "234"])
+    assert isinstance(response, list)
+    assert isinstance(response[0], AlertDetails)
+
+
+def test_alert_detail_query_single(httpserver_auth: HTTPServer):
+    expected = {"alertIds": ["123"]}
+    httpserver_auth.expect_request(
+        "/v1/alerts/query-details", method="POST", json=expected
+    ).respond_with_json(TEST_ALERT_DETAILS_RESPONSE)
+
+    client = Client()
+    response = client.alerts.v1.get_details("123")
     assert isinstance(response, list)
     assert isinstance(response[0], AlertDetails)
 
@@ -181,4 +245,20 @@ def test_alert_change_state(httpserver_auth: HTTPServer):
 
     client = Client()
     response = client.alerts.v1.change_state(alert_ids=["1234"], state="PENDING")
+    assert response.status_code == 200
+
+
+def test_alert_change_state_single(httpserver_auth: HTTPServer):
+    expected = {
+        "tenantId": "abcd-1234",
+        "alertIds": ["1234"],
+        "state": "PENDING",
+        "note": None,
+    }
+    httpserver_auth.expect_request(
+        "/v1/alerts/update-state", method="POST", json=expected
+    ).respond_with_data("", status=200)
+
+    client = Client()
+    response = client.alerts.v1.change_state(alert_ids="1234", state="PENDING")
     assert response.status_code == 200

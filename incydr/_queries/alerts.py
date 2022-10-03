@@ -287,6 +287,13 @@ class AlertQuery:
         self._query.groupClause = "OR"
         return self
 
+    @classmethod
+    def from_string(cls, query: str):
+        _query = Query.parse_raw(query)
+        new = cls()
+        new._query = _query
+        return new
+
 
 def _create_date_range_filter_group(start_date, end_date, on):
 
