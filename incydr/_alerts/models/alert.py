@@ -5,16 +5,8 @@ from typing import List
 from typing import Optional
 
 from pydantic import BaseModel
-from pydantic import PrivateAttr
 from pydantic import constr
 from pydantic import Field
-
-from incydr._alerts.models.enums import NotificationType
-from incydr.enums.alerts import AlertState
-from incydr.enums.alerts import RuleType
-from incydr.enums.alerts import Severity
-from incydr.enums.file_events import RiskSeverity
-from incydr.enums.watchlists import WatchlistType
 
 
 class Observation(BaseModel):
@@ -81,18 +73,6 @@ class AuditInfo(BaseModel):
     )
 
 
-class NotificationInfo(BaseModel):
-    notification_type: NotificationType = Field(
-        ..., alias="notificationType", description="Type of notification."
-    )
-    notification_address: Optional[str] = Field(
-        None,
-        alias="notificationAddress",
-        description="Address notification was sent to.",
-        example="myUsername@company.com",
-    )
-
-
 class Watchlist(BaseModel):
     id: Optional[str] = Field(
         None, description="Unique id of this watchlist.", example="guid"
@@ -100,7 +80,7 @@ class Watchlist(BaseModel):
     name: Optional[str] = Field(
         None, description="Name of the watchlist.", example="Development Department"
     )
-    type: WatchlistType = Field(
+    type: Optional[str] = Field(
         ..., description="Type of watchlist.", example="DEPARTING_EMPLOYEE"
     )
     is_significant: bool = Field(
@@ -122,7 +102,7 @@ class ObserverRuleMetadata(AuditInfo):
         description="The description of the rule.",
         example="Will generate alerts when files moved to USB.",
     )
-    severity: Optional[Severity] = Field(
+    severity: Optional[str] = Field(
         None, description="The static severity of the rule (deprecated)."
     )
     is_system: Optional[bool] = Field(
@@ -158,16 +138,15 @@ class AlertSummary(BaseModel):
     * **state**: `AlertState` The current state of the alert.
     * **state_last_modified_by**: `str` The actor who last modified the alert state.
     * **state_last_modified_at**: `datetime` The timestamp when the alert state was last modified.
-    * **name**: `str`
-    * **description**: `str`
-    * **actor**: `str`
-    * **actor_id**: `str`
-    * **target**: `str`
-    * **severity**: `str`
-    * **risk_severity**: `str`
-    * **notification_info**: `str`
-    * **rule_id**: `str`
-    * **watchlists**: `str`
+    * **name**: `str` The name of the alert.  Same as the name of the rule that triggered it.
+    * **description**: `str` The description of the alert.  Same as the description of the rule that triggered it.
+    * **actor**: `str` The user who triggered the alert.
+    * **actor_id**: `str` The user id who triggered the alert, if it is available.
+    * **target**: `str` Unused legacy property.
+    * **severity**: `Severity` Indicates static rule severity of the alert. (Deprecated)
+    * **risk_severity**: `RiskSeverity` Indicates event risk severity of the alert.
+    * **rule_id**: `str` The unique id corresponding to the rule which triggered the alert.
+    * **watchlists**: `str` Watchlists the actor is on at the time of the alert (if any).
     """
 
     tenant_id: constr(max_length=40) = Field(
@@ -176,7 +155,7 @@ class AlertSummary(BaseModel):
         description="The unique identifier representing the tenant.",
         example="MyExampleTenant",
     )
-    type: RuleType = Field(..., description="Rule type that generated the alert.")
+    type: Optional[str] = Field(..., description="Rule type that generated the alert.")
     id: Optional[str] = Field(
         None, description="The unique id of the alert.", example="alertId"
     )
@@ -186,7 +165,7 @@ class AlertSummary(BaseModel):
         description="The timestamp when the alert was created.",
         example="2020-02-19T01:57:45.006683Z",
     )
-    state: AlertState = Field(..., description="The current state of the alert.")
+    state: Optional[str] = Field(..., description="The current state of the alert.")
     state_last_modified_by: Optional[str] = Field(None, alias="stateLastModifiedBy")
     state_last_modified_at: Optional[datetime] = Field(
         None, alias="stateLastModifiedAt"
@@ -213,10 +192,10 @@ class AlertSummary(BaseModel):
         example="authorityUserId",
     )
     target: Optional[str] = None
-    severity: Optional[Severity] = Field(
+    severity: Optional[str] = Field(
         None, description="Indicates static rule severity of the alert."
     )
-    risk_severity: Optional[RiskSeverity] = Field(
+    risk_severity: Optional[str] = Field(
         None,
         alias="riskSeverity",
         description="Indicates event risk severity of the alert.",
@@ -248,7 +227,7 @@ class ObserverRuleMetadataEssentials(ObserverRuleMetadata):
         description="Id of the rule in the observer.",
         example="UniqueRuleId",
     )
-    type: RuleType = Field(..., description="Rule type of the rule.")
+    type: Optional[str] = Field(..., description="Rule type of the rule.")
 
 
 class AlertDetails(AlertSummary):

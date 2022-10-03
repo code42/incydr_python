@@ -3,14 +3,6 @@ from __future__ import annotations
 from incydr.enums import _Enum
 
 
-class NotificationType(_Enum):
-    """
-    Type of notification.
-    """
-
-    EMAIL = "EMAIL"
-
-
 class ProblemType(_Enum):
     """
     Potential issues when running a query on alerts.
