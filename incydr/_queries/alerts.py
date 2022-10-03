@@ -6,9 +6,9 @@ from typing import Optional
 from typing import Union
 
 from pydantic import BaseModel
+from pydantic import conint
 from pydantic import root_validator
 from pydantic import StrictBool
-from pydantic import conint
 
 from incydr._queries.util import parse_timestamp
 from incydr.enums.alerts import AlertState

@@ -21,7 +21,7 @@ The `AlertQuery` class can be imported directly from the `incydr` module.
 from incydr import AlertQuery
 ```
 
-The `AlertQuery` class can be constructed with arguments to define the date range for the query. The `start_date` 
+The `AlertQuery` class can be constructed with arguments to define the date range for the query. The `start_date`
 argument sets the beginning of the date range to query, it can accept the following:
 
 - a Unix epoch timestamp as an `int` or `float`
@@ -42,7 +42,7 @@ To create a query which filters alerts which have a state of `OPEN` or `PENDING`
 query = AlertQuery(start_date=timedelta(days=3)).equals('State', ['OPEN', 'PENDING'])
 ```
 
-All filter methods take a `term` string as their first argument, which indicates which field to filter on (ex: `'RiskSeverity'`), 
+All filter methods take a `term` string as their first argument, which indicates which field to filter on (ex: `'RiskSeverity'`),
 and the second arg is the value (or list of values) to search for.
 
 The following filter methods are available:
@@ -52,6 +52,6 @@ The following filter methods are available:
 * `.does_not_contain(term, value)`
 
 By default, all filters in a query will be combined in an `AND` group, meaning only results matching _all_ filters will
-be returned. If you want to `OR` the filters, call the `.matches_any()` method on the query. 
+be returned. If you want to `OR` the filters, call the `.matches_any()` method on the query.
 
 Pass the event constructed query object to the `client.alerts.v1.search()` method to get execute the search.

@@ -1,13 +1,14 @@
 from itertools import count
 from typing import List
 from typing import Union
+
 from pydantic import parse_obj_as
 
 from .models.request import AddNoteRequest
 from .models.request import AlertDetailsRequest
 from .models.request import UpdateAlertStateRequest
-from .models.response import AlertQueryPage
 from .models.response import AlertDetails
+from .models.response import AlertQueryPage
 from incydr._queries.alerts import AlertQuery
 from incydr._queries.alerts import Query
 from incydr.enums.alerts import AlertState

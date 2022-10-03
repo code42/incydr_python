@@ -6,7 +6,6 @@ from typing import Optional
 from pydantic import BaseModel
 from pydantic import Field
 
-from incydr._alerts.models.alert import AlertDetails
 from incydr._alerts.models.alert import AlertSummary
 from incydr._alerts.models.enums import ProblemType
 from incydr._core.models import ResponseModel

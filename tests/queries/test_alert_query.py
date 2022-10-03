@@ -1,10 +1,7 @@
 import pytest
 
 from incydr import AlertQuery
-from incydr.enums.alerts import AlertState
 from incydr.enums.alerts import AlertTerm
-from incydr.enums.alerts import RiskSeverity
-from incydr.enums.alerts import Severity
 
 
 def test_base_query():
