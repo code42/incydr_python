@@ -27,12 +27,3 @@ class ProblemType(_Enum):
     MISSING_FILTERS = "MissingFilters"
     MAX_FILTERS_EXCEEDED = "MaxFiltersExceeded"
     SEARCH_FAILED = "SearchFailed"
-
-
-class SearchClause(_Enum):
-    """
-    The filter clause to use when combining the search filters.  Must be AND/OR.s
-    """
-
-    AND = "AND"
-    OR = "OR"
