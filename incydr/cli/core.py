@@ -1,5 +1,3 @@
-from typing import Literal
-
 import click
 
 try:
@@ -10,11 +8,10 @@ try:
 except ImportError:  # pragma: nocover
     rich = None  # type: ignore
 
-MarkupMode = Literal["markdown", "rich", None]
-
 
 class IncydrCommand(click.Command):
     def __init__(self, *args, **kwargs):
+        # self.rich_markup_mode should be one of ["markdown", "rich", None]
         self.rich_markup_mode = "rich"
         super().__init__(*args, **kwargs)
 
