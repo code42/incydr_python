@@ -16,6 +16,7 @@ from incydr._departments.client import DepartmentsClient
 from incydr._devices.client import DevicesClient
 from incydr._directory_groups.client import DirectoryGroupsClient
 from incydr._file_events.client import FileEventsClient
+from incydr._user_risk_profiles.client import UserRiskProfiles
 from incydr._users.client import UsersClient
 from incydr._watchlists.client import WatchlistsClient
 
@@ -85,6 +86,7 @@ class Client:
         self._directory_groups = DirectoryGroupsClient(self)
         self._file_events = FileEventsClient(self)
         self._users = UsersClient(self)
+        self._user_risk_profiles = UserRiskProfiles(self)
         self._watchlists = WatchlistsClient(self)
 
         self._session.auth.refresh()
@@ -207,9 +209,22 @@ class Client:
         return self._users
 
     @property
+    def user_risk_profiles(self):
+        """
+        Property returning a [`UserRiskProfilesClient`](../user_risk_profiles) for interacting with
+        `/v*/user_risk_profiles` API endpoints.
+
+        Usage:
+
+            >>> client.user_risk_profiles.v1.get_user_risk_profile("23")
+
+        """
+        return self._user_risk_profiles
+
+    @property
     def watchlists(self):
         """
-        Property returning a ['WatchlistsClient'](../watchlists) for interacting with `/v*/watchlists` API endpoints.
+        Property returning a [`WatchlistsClient`](../watchlists) for interacting with `/v*/watchlists` API endpoints.
         Usage:
 
             >>> client.watchlists.v1.get_page()
