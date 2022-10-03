@@ -193,7 +193,7 @@ class EventQuery:
         ]
         filter_group = FilterGroup(
             filters=filters,
-            filterClause="OR" if len(values) > 1 else "AND",
+            filterClause="AND",
         )
         self._query.groups.append(filter_group)
         return self

@@ -13,6 +13,8 @@ from incydr._file_events.models.response import SavedSearch
 from incydr._file_events.models.response import SavedSearchesPage
 from incydr._trusted_activities.models import TrustedActivitiesPage
 from incydr._trusted_activities.models import TrustedActivity
+from incydr._user_risk_profiles.models import UserRiskProfile
+from incydr._user_risk_profiles.models import UserRiskProfilesPage
 from incydr._users.models import Role
 from incydr._users.models import UpdateRolesResponse
 from incydr._users.models import User
@@ -58,8 +60,9 @@ __all__ = [
     "IncludedDepartment",
     "IncludedDirectoryGroupsList",
     "IncludedDirectoryGroup",
+    "UserRiskProfilesPage",
+    "UserRiskProfile",
 ]
-
 
 __locals = locals()
 for __name in __all__:
