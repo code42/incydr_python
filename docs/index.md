@@ -37,7 +37,7 @@ version. For example, to interact with `/v1/cases` endpoints:
 
 ```pycon
 >>> import incydr
->>> client = incydr.client.Client()
+>>> client = incydr.Client()
 >>> client.cases.v1.create(name="Test", description="Created with Incydr SDK")
 Case(
     number=28,

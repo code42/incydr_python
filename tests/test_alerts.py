@@ -2,7 +2,7 @@ from pytest_httpserver import HTTPServer
 
 from incydr import AlertQuery
 from incydr import Client
-from incydr._alerts.models.response import AlertDetailsPage
+from incydr._alerts.models.response import AlertDetails
 from incydr._alerts.models.response import AlertQueryPage
 
 TEST_ALERTS_RESPONSE = {
@@ -149,7 +149,8 @@ def test_alert_detail_query(httpserver_auth: HTTPServer):
 
     client = Client()
     response = client.alerts.v1.get_details(["123", "234"])
-    assert isinstance(response, AlertDetailsPage)
+    assert isinstance(response, list)
+    assert isinstance(response[0], AlertDetails)
 
 
 def test_alert_add_note(httpserver_auth: HTTPServer):

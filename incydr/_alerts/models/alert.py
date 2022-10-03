@@ -5,6 +5,7 @@ from typing import List
 from typing import Optional
 
 from pydantic import BaseModel
+from pydantic import PrivateAttr
 from pydantic import constr
 from pydantic import Field
 
@@ -144,7 +145,31 @@ class ObserverRuleMetadata(AuditInfo):
     )
 
 
-class AlertEssentials(BaseModel):
+class AlertSummary(BaseModel):
+    """
+    A model representing an alert summary.
+
+    **Fields**:
+
+    * **tenant_id**: `str` The unique identifier representing the tenant.
+    * **type**: `RuleType` Rule type that generated the alert.
+    * **id**: `str` The unique id of the alert.
+    * **created_at**: `datetime` The timestamp when the alert was created.
+    * **state**: `AlertState` The current state of the alert.
+    * **state_last_modified_by**: `str` The actor who last modified the alert state.
+    * **state_last_modified_at**: `datetime` The timestamp when the alert state was last modified.
+    * **name**: `str`
+    * **description**: `str`
+    * **actor**: `str`
+    * **actor_id**: `str`
+    * **target**: `str`
+    * **severity**: `str`
+    * **risk_severity**: `str`
+    * **notification_info**: `str`
+    * **rule_id**: `str`
+    * **watchlists**: `str`
+    """
+
     tenant_id: constr(max_length=40) = Field(
         ...,
         alias="tenantId",
@@ -152,6 +177,20 @@ class AlertEssentials(BaseModel):
         example="MyExampleTenant",
     )
     type: RuleType = Field(..., description="Rule type that generated the alert.")
+    id: Optional[str] = Field(
+        None, description="The unique id of the alert.", example="alertId"
+    )
+    created_at: datetime = Field(
+        ...,
+        alias="createdAt",
+        description="The timestamp when the alert was created.",
+        example="2020-02-19T01:57:45.006683Z",
+    )
+    state: AlertState = Field(..., description="The current state of the alert.")
+    state_last_modified_by: Optional[str] = Field(None, alias="stateLastModifiedBy")
+    state_last_modified_at: Optional[datetime] = Field(
+        None, alias="stateLastModifiedAt"
+    )
     name: Optional[str] = Field(
         None,
         description="The name of the alert.  Same as the name of the rule that triggered it.",
@@ -183,23 +222,11 @@ class AlertEssentials(BaseModel):
         description="Indicates event risk severity of the alert.",
         example="MODERATE",
     )
-    notification_info: Optional[List[NotificationInfo]] = Field(
-        None,
-        alias="notificationInfo",
-        description="Notification information of the alert.  Not queried/returned.",
-        example=[],
-    )
     rule_id: Optional[str] = Field(
         None,
         alias="ruleId",
         description="The unique id corresponding to the rule which triggered the alert.",
         example="uniqueRuleId",
-    )
-    rule_source: Optional[str] = Field(
-        None,
-        alias="ruleSource",
-        description="Indicates source of rule creation.  Either alerting or lens application name.",
-        example="Departing Employee",
     )
     watchlists: Optional[List[Watchlist]] = Field(
         None,
@@ -224,27 +251,16 @@ class ObserverRuleMetadataEssentials(ObserverRuleMetadata):
     type: RuleType = Field(..., description="Rule type of the rule.")
 
 
-class AlertSummary(AlertEssentials):
-    id: Optional[str] = Field(
-        None, description="The unique id of the alert.", example="alertId"
-    )
-    created_at: datetime = Field(
-        ...,
-        alias="createdAt",
-        description="The timestamp when the alert was created.",
-        example="2020-02-19T01:57:45.006683Z",
-    )
-    state: AlertState = Field(..., description="The current state of the alert.")
-    state_last_modified_by: Optional[str] = Field(None, alias="stateLastModifiedBy")
-    state_last_modified_at: Optional[datetime] = Field(
-        None, alias="stateLastModifiedAt"
-    )
-
-
 class AlertDetails(AlertSummary):
-    observations: Optional[List[Observation]] = Field(
-        None, description="Observation list included on the alert."
-    )
-    note: Optional[Note] = Field(
-        None, description="Most recent note added to the alert."
-    )
+    """
+    A model representing the full details of an alert. Includes all the fields from `AlertSummary` plus file event
+    observations (the events that triggered the alert), and any notes that have been added to the alert.
+
+    **Fields**:
+
+    * **observations**: `List[Observation]` List of observed file events that triggered the alert.
+    * **note**: `str` Most recent note added to the alert.
+    """
+
+    observations: Optional[List[Observation]]
+    note: Optional[Note]

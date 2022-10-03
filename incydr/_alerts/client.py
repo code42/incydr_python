@@ -1,20 +1,34 @@
+from itertools import count
 from typing import List
+from typing import Union
+from pydantic import parse_obj_as
 
 from .models.request import AddNoteRequest
 from .models.request import AlertDetailsRequest
 from .models.request import UpdateAlertStateRequest
-from .models.response import AlertDetailsPage
 from .models.response import AlertQueryPage
+from .models.response import AlertDetails
 from incydr._queries.alerts import AlertQuery
 from incydr._queries.alerts import Query
 from incydr.enums.alerts import AlertState
 
 
 class AlertsV1:
+    """
+    Client for `/v1/alerts` endpoints.
+
+    Usage example:
+
+        >>> import incydr
+        >>> from incydr.enums.alerts import AlertState
+        >>> client = incydr.Client(**kwargs)
+        >>> client.alerts.v1.change_state("<alert_id>", AlertState.RESOLVED)
+    """
+
     def __init__(self, parent):
         self._parent = parent
 
-    def search(self, query: AlertQuery):
+    def search(self, query: Union[str, AlertQuery]):
         """
         Search for alerts.
 
@@ -35,21 +49,47 @@ class AlertsV1:
         )
         return AlertQueryPage.parse_response(response)
 
-    def get_details(self, alert_ids: List[str]):
+    def iter_all(self, query: Union[str, AlertQuery]):
+        """
+        Retrieve all alerts for a given query, automatically retrieving multiple pages if they exist.
+
+        * **query**: `AlertQuery | str` (required) - The query object to filter alerts by
+        different fields.
+
+        **Returns**: A generator yielding individual [`AlertSummary`][alertsummary-model] objects.
+        """
+        if isinstance(query, str):
+            query = Query.parse_raw(query)
+            query.tenantId = self._parent.tenant_id
+        if isinstance(query, AlertQuery):
+            query._query.tenantId = self._parent.tenant_id
+        for page_num in count(0):
+            query.page_num = page_num
+            response = self._parent.session.post(
+                "/v1/alerts/query-alerts", json=query.dict()
+            )
+            page = AlertQueryPage.parse_response(response)
+            yield from page.alerts
+            if len(page.alerts) < query.page_size:
+                break
+
+    def get_details(self, alert_ids: Union[str, List[str]]):
         """
         Get full details for a set of alerts.
 
         **Parameters**:
 
-        * **alert_ids**: `List[str]` (required) - List of alertId strings.
+        * **alert_ids**: `str | List[str]` (required) - Single alertId or list of alertId strings.
 
-        **Returns**: A [`AlertDetailsPage`][alertdetailspage-model] object.
+        **Returns**: A list of [`AlertDetails`][alertdetails-model] objects.
         """
+        if isinstance(alert_ids, str):
+            alert_ids = [alert_ids]
         data = AlertDetailsRequest(alertIds=alert_ids)
         response = self._parent.session.post(
             "/v1/alerts/query-details", json=data.dict(by_alias=True)
         )
-        return AlertDetailsPage.parse_response(response)
+        return parse_obj_as(List[AlertDetails], response.json()["alerts"])
 
     def add_note(self, alert_id: str, note: str):
         """
@@ -70,14 +110,16 @@ class AlertsV1:
             "/v1/alerts/add-note", json=data.dict(by_alias=True)
         )
 
-    def change_state(self, alert_ids: List[str], state: AlertState, note: str = None):
+    def change_state(
+        self, alert_ids: Union[str, List[str]], state: AlertState, note: str = None
+    ):
         """
         Change the state of an alert (and optionally add note indicating reason for change in the same request).
 
         **Parameters**:
 
-        * **alert_id**: `List[str]` (required) - ID of the alert to update.
-        * **state**: `AlertState` (required) - State to set alert to.
+        * **alert_id**: `str | List[str]` (required) - ID or list of IDs of the alert(s) to update.
+        * **state**: `AlertState` (required) - State to set alert(s) to.
         * **note**: `str` - Optional note text.
 
         **Returns**: A `Response` object indicating success.

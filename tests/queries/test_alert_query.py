@@ -15,7 +15,6 @@ def test_base_query():
         "groups": [],
         "pgNum": 0,
         "pgSize": 100,
-        "pgToken": None,
         "srtDir": "DESC",
         "srtKey": "CreatedAt",
     }

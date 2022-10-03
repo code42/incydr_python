@@ -22,8 +22,15 @@ class QueryProblem(BaseModel):
 class AlertQueryPage(ResponseModel):
     """
     A model representing a page of `AlertSummary` objects resulting from an alert search query.
+
+    **Fields**:
+
+    * **alerts**: `List[AlertSummary]` List of alerts that found by query.
+    * **total_count**: `int` The count of alerts found.
+    * **problems**: `List[QueryProblem]` Potential issues that were hit while trying to run the query.
     """
 
+    type: str = Field(alias="type$")
     alerts: Optional[List[AlertSummary]] = Field(
         None, description="List of alerts that are returned."
     )
@@ -37,14 +44,4 @@ class AlertQueryPage(ResponseModel):
         None,
         description="Potential issues that were hit while trying to run the query.",
         example=[],
-    )
-
-
-class AlertDetailsPage(ResponseModel):
-    """
-    A model representing a page of `AlertDetail` objects resulting from an alert detail query.
-    """
-
-    alerts: Optional[List[AlertDetails]] = Field(
-        None, description="The alerts returned by the details query."
     )

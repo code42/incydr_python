@@ -8,6 +8,7 @@ from typing import Union
 from pydantic import BaseModel
 from pydantic import root_validator
 from pydantic import StrictBool
+from pydantic import conint
 
 from incydr._queries.util import parse_timestamp
 from incydr.enums.alerts import AlertState
@@ -66,14 +67,14 @@ class Query(BaseModel):
     groupClause: str = "AND"
     groups: Optional[List[FilterGroup]]
     pgNum: int = 0
-    pgSize: int = 100
-    pgToken: Optional[str]
+    pgSize: conint(gt=0, le=500) = 100
     srtDir: str = "DESC"
     srtKey: AlertTerm = "CreatedAt"
 
     class Config:
         use_enum_values = True
         json_encoders = {datetime: lambda dt: dt.isoformat().replace("+00:00", "Z")}
+        validate_assignment = True
 
 
 class AlertQuery:
@@ -125,6 +126,38 @@ class AlertQuery:
 
     def __str__(self):
         return str(self._query.__repr__())
+
+    @property
+    def page_size(self):
+        return self._query.pgSize
+
+    @page_size.setter
+    def page_size(self, value):
+        self._query.pgSize = value
+
+    @property
+    def page_num(self):
+        return self._query.pgNum
+
+    @page_num.setter
+    def page_num(self, value):
+        self._query.pgNum = value
+
+    @property
+    def sort_direction(self):
+        return self._query.srtDir
+
+    @sort_direction.setter
+    def sort_direction(self, value):
+        self._query.srtDir = value
+
+    @property
+    def sort_key(self):
+        return self._query.srtKey
+
+    @sort_key.setter
+    def sort_key(self, value):
+        self._query.srtKey = value
 
     def dict(self, **kwargs):
         """
