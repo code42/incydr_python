@@ -13,7 +13,7 @@ from incydr.enums.trusted_activities import Name
 from incydr.enums.trusted_activities import PrincipalType
 
 
-class ProviderObject(ResponseModel):
+class ProviderObject(BaseModel):
     name: Optional[Name] = Field(
         None,
         description="The name of a provider for a specified activity action.\n  ### Supported providers for trusted "
@@ -24,7 +24,7 @@ class ProviderObject(ResponseModel):
     )
 
 
-class ActivityAction(ResponseModel):
+class ActivityAction(BaseModel):
     providers: Optional[List[ProviderObject]] = Field(
         None,
         description="A list of enabled providers for the specified activity action.",
@@ -39,7 +39,7 @@ class ActivityAction(ResponseModel):
     )
 
 
-class ActivityActionGroup(ResponseModel):
+class ActivityActionGroup(BaseModel):
     activity_actions: Optional[List[ActivityAction]] = Field(
         None,
         description="The list of activity actions for an activity action group.",
@@ -62,43 +62,42 @@ class TrustedActivity(ResponseModel):
         None,
         description="The unique identifier of the trusted activity.",
         alias="activityId",
-        allow_mutation=False
+        allow_mutation=False,
     )
     description: Optional[str] = Field(
         None, description="A description of the trusted activity."
     )
     principal_type: Optional[PrincipalType] = Field(
-        None,
-        alias="principalType",
-        allow_mutation=False
+        None, alias="principalType", allow_mutation=False
     )
     activity_type: Optional[ActivityType] = Field(
-        None,
-        description="The type of the trusted activity.",
-        alias="activityType"
+        None, description="The type of the trusted activity.", alias="activityType"
     )
     update_time: Optional[datetime] = Field(
         None,
         description="The time at which the trust activity was last created or modified.",
         alias="updateTime",
-        allow_mutation=False
+        allow_mutation=False,
     )
     updated_by_principal_id: Optional[str] = Field(
         None,
         description="The unique identifier of the user who last updated the trust activity.",
         alias="updatedByPrincipalId",
-        allow_mutation=False
+        allow_mutation=False,
     )
     updated_by_principal_name: Optional[str] = Field(
         None,
         description="The username of the user who last updated the trusted activity.",
         alias="updatedByPrincipalName",
-        allow_mutation=False
+        allow_mutation=False,
     )
     value: Optional[str] = Field(None, description="The value of the trusted activity.")
 
+    class Config:
+        validate_assignment = True
 
-class UpdateTrustedActivity(ResponseModel):
+
+class UpdateTrustedActivity(BaseModel):
     activity_action_groups: Optional[List[ActivityActionGroup]] = Field(
         None,
         description="The list of activity action groups for the trusted activity. \n- `DOMAIN` - If array is empty, "

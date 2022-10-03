@@ -2,7 +2,6 @@ from itertools import count
 from typing import Iterator
 from typing import List
 
-from incydr.enums import SortDirection
 from requests import Response
 
 from incydr._trusted_activities.models import ActivityActionGroup
@@ -11,6 +10,7 @@ from incydr._trusted_activities.models import QueryTrustedActivitiesRequest
 from incydr._trusted_activities.models import TrustedActivitiesPage
 from incydr._trusted_activities.models import TrustedActivity
 from incydr._trusted_activities.models import UpdateTrustedActivity
+from incydr.enums import SortDirection
 from incydr.enums.trusted_activities import ActivityType
 from incydr.enums.trusted_activities import SortKeys
 
@@ -64,7 +64,7 @@ class TrustedActivitiesV2:
         * **sort_key**: `str` - The key by which to sort the returned list.
         * **sort_direction**: `str` - The order in which to sort the returned list.
 
-        **Returns**: A ['TrustedActivitiesPage'][trustedactivitiespage-model] object.
+        **Returns**: A [`TrustedActivitiesPage`][trustedactivitiespage-model] object.
         """
 
         page_size = page_size or self._parent.settings.page_size
@@ -158,9 +158,7 @@ class TrustedActivitiesV2:
         return self._parent.session.delete(f"/v2/trusted-activities/{activity_id}")
 
     def update(
-        self,
-        activity_id: int,
-        trusted_activity: TrustedActivity
+        self, activity_id: int, trusted_activity: TrustedActivity
     ) -> TrustedActivity:
         """
         Updates a trusted activity.

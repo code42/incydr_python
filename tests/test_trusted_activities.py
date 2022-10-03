@@ -71,7 +71,8 @@ def test_get_page_when_default_params_returns_expected_data(
         "totalCount": 2,
     }
     httpserver_auth.expect_request(
-        "/v2/trusted-activities", query_string=urlencode({"page": 1, "page_size": 100})
+        "/v2/trusted-activities",
+        query_string=urlencode({"page_num": 1, "page_size": 100}),
     ).respond_with_json(trusted_activities_data)
 
     client = Client()
