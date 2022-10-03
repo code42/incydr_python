@@ -51,12 +51,6 @@ def try_get_logger_for_server(output, certs, ignore_cert_validation):
     if len(output) > 1 and output[2] != "":
         port = int(output[2])
 
-    if ignore_cert_validation and certs:
-        raise click.BadOptionUsage(
-            option_name="--certs",
-            message="--certs can't be used with --ignore-cert-validation.",
-        )
-
     # certs and ignore-cert-validation only compatible with TLS_TCP
     if protocol != ServerProtocol.TLS_TCP:
         arg = None

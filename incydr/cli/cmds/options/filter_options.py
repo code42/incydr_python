@@ -1,89 +1,110 @@
 import click
 
+from incydr.cli.core import incompatible_with
+
+AdvancedQueryAndSavedSearchIncompatible = incompatible_with(
+    ["advanced_query", "saved_search"]
+)
+
 start_option = click.option(
     "--start",
     default=None,
     help="The beginning of the date range in which to look for file events. Accepts a date/time in yyyy-MM-dd (UTC) or"
     "yyyy-MM-dd HH:MM:SS (UTC+24-hr time) format or a duration in the form of an ISO-duration string (ex. Pass `P7D` to filter for events which occurred in the last week).",
+    cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 end_option = click.option(
     "--end",
     default=None,
     help="The end of the date range in which to look for file events, argument format options are the same as `--start`.",
+    cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 event_action_option = click.option(
     "--event-action",
     default=None,
     help="The type of file event observed.",
+    cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 username_option = click.option(
     "--username",
     default=None,
     help="The Code42 username used to sign in to the Code42 app on the device. Null if the file event occurred on a cloud provider.",
+    cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 md5_option = click.option(
     "--md5",
     default=None,
     help="The MD5 hash of the file contents.",
+    cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 sha256_option = click.option(
     "--sha256",
     default=None,
     help="The SHA-256 hash of the file contents.",
+    cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 source_category_option = click.option(
     "--source-category",
     default=None,
     help="General category of where the file originated. For example: Cloud Storage, Email, Social Media.",
+    cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 destination_category_option = click.option(
     "--destination-category",
     default=None,
     help="General category of the file destination. For example: Cloud Storage, Email, Social Media.",
+    cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 file_name_option = click.option(
     "--file-name",
     default=None,
     help="The name of the file, including the file extension.",
+    cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 file_directory_option = click.option(
     "--file-directory",
     default=None,
     help="The file location on the user's device; a forward or backslash must be included at the end of the filepath. Possibly null if the file event occurred on a cloud provider.",
+    cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 file_category_option = click.option(
     "--file-category",
     default=None,
     help="A categorization of the file that is inferred from MIME type.",
+    cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 risk_indicator_option = click.option(
     "--risk-indicator",
     default=None,
     help="List of risk indicators identified for this event. If more than one risk indicator applies to this event, the sum of all indicators determines the total risk score.",
+    cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 risk_severity_option = click.option(
     "--risk-severity",
     default=None,
     help="The general risk assessment of the event, based on the numeric score.",
+    cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 risk_score_option = click.option(
     "--risk-score",
     default=None,
     help="Filter results by risk scores greater than the provided value. The risk score is the sum of the weights for each risk indicator. This score is used to determine the overall risk severity of the event.",
+    cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 include_all_option = click.option(
     "--include-no-risk-events",
     "include_all",
     default=False,
     help="Include all events in results, including those that have no risk associated with them.",
+    cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 
 saved_search_option = click.option(
     "--saved-search",
     default=None,
     help="Get events from a saved search with the given ID.  WARNING: Using a saved search is incompatible with other query-building arguments.  Any additional filter options will be ignored.",
+    cls=incompatible_with(["advanced_query"]),
 )
-# TODO - is it alright to just ignore other filter options when --saved-search or --advanced-query is passed? Should we raise errors if they try and pass additional options
 advanced_query_option = click.option(
     "--advanced-query",
     default=None,

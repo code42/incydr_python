@@ -2,6 +2,7 @@ from enum import Enum
 
 import click
 
+from incydr.cli.core import incompatible_with
 from incydr.cli.logger import ServerProtocol
 
 
@@ -54,6 +55,7 @@ ignore_cert_validation_option = click.option(
     "--ignore-cert-validation",
     default=False,
     help="Set to skip CA certificate validation. Incompatible with the 'certs' option.",
+    cls=incompatible_with(["certs"]),
 )
 certs_option = click.option(
     "--certs",
