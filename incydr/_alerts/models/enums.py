@@ -36,12 +36,3 @@ class SearchClause(_Enum):
 
     AND = "AND"
     OR = "OR"
-
-
-class SortDirection(_Enum):
-    """
-    The sort direction applied to the returned page of alerts.
-    """
-
-    ASC = "ASC"
-    DESC = "DESC"
