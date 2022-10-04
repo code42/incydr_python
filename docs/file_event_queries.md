@@ -48,6 +48,22 @@ The following operators are available for filtering:
 
 Pass the event query object to the `file_events.v2.search()` method to get the results.
 
+## Saved Searches
+
+You can convert a saved search response object into an `EventQuery` to be used for searching using the
+`EventQuery.from_saved_search()` classmethod:
+
+```python
+import incydr
+
+client = incydr.Client(**kwargs)
+
+saved_search = client.file_events.v2.get_saved_search_by_id("<saved_search_id>")
+query = incydr.EventQuery.from_saved_search(saved_search)
+
+results = client.file_events.v2.search(query)
+```
+
 ## Pagination
 
 To facilitate paging when a search query results in more total file events found than the `.page_size` value of the query
