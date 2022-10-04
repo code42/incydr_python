@@ -7,7 +7,6 @@ from .models.response import SavedSearchesPage
 from incydr._queries.file_events import EventQuery
 
 
-
 class FileEventsV2:
     """
     Client for `/v2/file-events` endpoints.

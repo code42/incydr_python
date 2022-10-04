@@ -13,6 +13,7 @@ from pydantic import root_validator
 from pydantic import validate_arguments
 
 from incydr._core.models import IncydrModel
+from incydr._file_events.models.response import SavedSearch
 from incydr._queries.util import parse_timestamp
 from incydr.enums.file_events import Category
 from incydr.enums.file_events import EventAction
@@ -24,7 +25,6 @@ from incydr.enums.file_events import RiskIndicators
 from incydr.enums.file_events import RiskSeverity
 from incydr.enums.file_events import ShareType
 from incydr.enums.file_events import TrustReason
-from incydr._file_events.models.response import SavedSearch
 
 _term_enum_map = {
     "file.category": FileCategory,

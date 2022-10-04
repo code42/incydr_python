@@ -50,17 +50,17 @@ Pass the event query object to the `file_events.v2.search()` method to get the r
 
 ## Pagination
 
-To facilitate paging when a search query results in more total file events found than the `.page_size` value of the query 
+To facilitate paging when a search query results in more total file events found than the `.page_size` value of the query
 (the maximum page size is `10,000` events), the [file events search endpoint](https://developer.code42.com/api/#tag/File-Events/operation/searchEventsUsingPOST_1)
 accepts a "page token" parameter, which indicates which event ID the currently requested page should start at.
 
 By default, an `EventQuery` sets the `.page_token` value to an empty string (`""`), which tells the file events
 service that this is the initial query and that it should return the next page token value in the response.
 
-!!! note 
+!!! note
 
     If `.page_token` is set to `None`, then the response will _not_ contain a next page token value, and pagination will need to be done
-    manually by incrementing the `.page_num` property of the query.  
+    manually by incrementing the `.page_num` property of the query.
 
     Using page numbers will only result in a maximum of 10,000 events returned, so it is recommended to always use page tokens.
 
