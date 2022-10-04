@@ -10,15 +10,7 @@ from pydantic import SecretStr
 from pydantic import ValidationError
 
 
-class ResponseModel(BaseModel):
-    @classmethod
-    def parse_response(cls, response: requests.Response):
-        try:
-            return cls.parse_raw(response.text)
-        except ValidationError as err:
-            err.response = response
-            raise
-
+class IncydrModel(BaseModel):
     def json(
         self,
         *,
@@ -90,6 +82,16 @@ class ResponseModel(BaseModel):
                 yield field_repr
             else:
                 yield name, field_repr
+
+
+class ResponseModel(IncydrModel):
+    @classmethod
+    def parse_response(cls, response: requests.Response):
+        try:
+            return cls.parse_raw(response.text)
+        except ValidationError as err:
+            err.response = response
+            raise
 
 
 class AuthResponse(ResponseModel):
