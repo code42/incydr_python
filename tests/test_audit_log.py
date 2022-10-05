@@ -1,7 +1,6 @@
 from pytest_httpserver import HTTPServer
 
 from incydr import Client
-from incydr._audit_log.models import AuditEventsCount
 from incydr._audit_log.models import AuditEventsPage
 
 Test_Audit_Log_1 = {
@@ -78,12 +77,12 @@ def test_search_results_export_when_default_params_returns_expected_data(
 def test_search_results_count_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
-    audit_events_count_data = {"total_result_count": 2}
+    audit_events_count_data = {"totalResultCount": 2}
     httpserver_auth.expect_request("/v1/audit/search-results-count").respond_with_json(
         audit_events_count_data
     )
 
     client = Client()
-    page = client.audit_log.v1.search_results_count()
-    assert isinstance(page, AuditEventsCount)
-    assert page.total_result_count == 2
+    results_count = client.audit_log.v1.search_results_count()
+    assert isinstance(results_count, int)
+    assert results_count == 2

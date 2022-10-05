@@ -25,15 +25,6 @@ class DateRange(BaseModel):
     startTime: Optional[datetime]
 
 
-class AuditEventsExport(ResponseModel):
-    download_token: str = Field(
-        None,
-        description="Download token to execute an export, acquired from the export api.",
-        example="07FIbJogTJ2aHTBcyreAbYOvsd0FlEKuLyNumVvkbOQ=",
-        alias="downloadToken",
-    )
-
-
 class AuditEventsPage(ResponseModel):
     """
     A model representing a page of audit events.
@@ -59,23 +50,6 @@ class AuditEventsPage(ResponseModel):
         description="The index of the first result returned, in relation to total results found",
         example=0,
         alias="paginationRangeStartIndex",
-    )
-
-
-class AuditEventsCount(ResponseModel):
-    """
-    A model representing the total audit events result count.
-
-    **Fields**:
-
-    * **total_result_count**: `int` The total number of results found by this search.
-    """
-
-    total_result_count: int = Field(
-        None,
-        description="The total number of results found by this search",
-        example=104,
-        alias="totalResultCount",
     )
 
 

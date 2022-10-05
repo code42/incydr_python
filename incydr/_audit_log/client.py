@@ -2,8 +2,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
-from incydr._audit_log.models import AuditEventsCount
-from incydr._audit_log.models import AuditEventsExport
+from pydantic import parse_obj_as
+
 from incydr._audit_log.models import AuditEventsPage
 from incydr._audit_log.models import DateRange
 from incydr._audit_log.models import QueryAuditLogRequest
@@ -154,9 +154,9 @@ class AuditLogV1:
         event_types: List[str] = None,
         resource_ids: List[str] = None,
         user_types: List[UserTypes] = None,
-    ) -> AuditEventsCount:
+    ) -> int:
         """
-        Get total result count of search.
+        Get the total result count of a search.
 
         **Parameters:**
 
@@ -171,8 +171,7 @@ class AuditLogV1:
         * **resource_ids**: `List[str]` - Filters searchable events that match resource_id.
         * **user_types**: `List[UserTypes]` - Filters searchable events that match actor type.
 
-        **Returns**: A [`AuditEventsCount`][auditeventscount-model] object
-        representing the search response.
+        **Returns**: `int` Number representing to count of audit logs from search.
         """
 
         page_size = page_size or self._parent.settings.page_size
@@ -199,7 +198,7 @@ class AuditLogV1:
             "/v1/audit/search-results-count", json=data.dict()
         )
 
-        return AuditEventsCount.parse_response(response)
+        return response.json()["totalResultCount"]
 
     def export_search_results(
         self,
@@ -218,6 +217,8 @@ class AuditLogV1:
 
         **Parameters:**
 
+        * **target_folder**: `Path | str` - A string or `pathlib.Path` object that represents the folder
+        which the file will be saved to.
         * **actor_ids**: `List[str]` - Finds events whose actor_id is one of the given ids.
         * **actor_ip_addresses**: `List[str]` - Finds events whose actor_ip_address is one of the given IP addresses.
         * **actor_names**: `List[str]` - Finds events whose actor_name is one of the given names.
@@ -250,7 +251,7 @@ class AuditLogV1:
             "/v1/audit/export", json=data.dict()
         )
 
-        download_token = AuditEventsExport.parse_response(export_response)
+        download_token = parse_obj_as(str, export_response)
 
         folder = Path(target_folder)  # ensure a Path object if we get passed a string
         if not folder.is_dir():
