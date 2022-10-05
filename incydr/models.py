@@ -1,13 +1,6 @@
-from incydr._alert_rules.models.response import AssignedUser
-from incydr._alert_rules.models.response import AssignedUsersList
-from incydr._alert_rules.models.response import CloudSharePermissionsRuleDetails
-from incydr._alert_rules.models.response import CloudSharePermissionsRuleDetailsList
-from incydr._alert_rules.models.response import EndpointExfiltrationRuleDetails
-from incydr._alert_rules.models.response import EndpointExfiltrationRuleDetailsList
-from incydr._alert_rules.models.response import FileNameRuleDetails
-from incydr._alert_rules.models.response import FileNameRuleDetailsList
-from incydr._alert_rules.models.response import FileTypeMismatchRuleDetails
-from incydr._alert_rules.models.response import FileTypeMismatchRuleDetailsList
+from incydr._alert_rules.models.response import RuleDetails
+from incydr._alert_rules.models.response import RuleUser
+from incydr._alert_rules.models.response import RuleUsersList
 from incydr._cases.models import Case
 from incydr._cases.models import CaseFileEvents
 from incydr._cases.models import CasesPage
@@ -51,16 +44,9 @@ __all__ = [
     "UsersPage",
     "Role",
     "UpdateRolesResponse",
-    "AssignedUsersList",
-    "AssignedUser",
-    "CloudSharePermissionsRuleDetailsList",
-    "CloudSharePermissionsRuleDetails",
-    "FileNameRuleDetailsList",
-    "FileNameRuleDetails",
-    "FileTypeMismatchRuleDetailsList",
-    "FileTypeMismatchRuleDetails",
-    "EndpointExfiltrationRuleDetailsList",
-    "EndpointExfiltrationRuleDetails",
+    "RuleUsersList",
+    "RuleUser",
+    "RuleDetails",
     "DepartmentsPage",
     "DirectoryGroupsPage",
     "DirectoryGroup",

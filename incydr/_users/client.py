@@ -66,7 +66,7 @@ class UsersV1:
         * **page_num**: `int` - Page number for results. Defaulting to 1.
         * **page_size**: `int` - Max number of results to return per page. Defaulting to client settings page_size
 
-        **Returns**: A ['UsersPage'][userspage-model] object.
+        **Returns**: A [`UsersPage`][userspage-model] object.
         """
         page_size = page_size or self._parent.settings.page_size
         data = QueryUsersRequest(
@@ -104,7 +104,7 @@ class UsersV1:
         * **sort_dir**: `SortDirection` - 'asc' or 'desc'. The direction in which to sort the response based on the corresponding key. Defaults to 'asc'.
         * **sort_key**: `SortKeys` - One or more values on which the response will be sorted. Defaults to device name.
 
-        **Returns**: A ['DevicesPage'][devicespage-model] object.
+        **Returns**: A [`DevicesPage`][devicespage-model] object.
         """
         page_size = page_size or self._parent.settings.page_size
         data = QueryDevicesRequest(
@@ -158,7 +158,7 @@ class UsersV1:
 
         * **user_id**: `str` (required) - The unique ID for the user.
 
-        **Returns**: A list of ['Role'][role-model] objects.
+        **Returns**: A list of [`Role`][role-model] objects.
         """
         response = self._parent.session.get(f"/v1/users/{user_id}/roles")
         return parse_obj_as(List[Role], response.json()["roles"])
@@ -172,7 +172,7 @@ class UsersV1:
         * **user_id**: `str` (required) - The unique ID for the user.
         * **roles_ids**: `List[str]` The new role IDs to assign the user (ex: desktop-user). These will replace the existing roles assigned to the user."
 
-        **Returns**: A ['UpdateRolesResponse'][updaterolesresponse-model] object.
+        **Returns**: A [`UpdateRolesResponse`][updaterolesresponse-model] object.
         """
         data = UpdateRolesRequest(roleIds=role_ids)
         response = self._parent.session.put(

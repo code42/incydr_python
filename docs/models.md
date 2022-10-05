@@ -18,56 +18,20 @@ available model methods.
 ## Alert Rules
 ---
 
-### `AssignedUsersList` model
+### `RuleUser` model
 
-::: incydr.models.AssignedUsersList
+::: incydr.models.RuleUser
     :docstring:
 
-### `AssignedUser` model
+### `RuleUsersList` model
 
-::: incydr.models.AssignedUser
+::: incydr.models.RuleUsersList
     :docstring:
 
-### `CloudSharePermissionsRuleDetailsList` model
+### `RuleDetails` model
 
-::: incydr.models.CloudSharePermissionsRuleDetailsList
+::: incydr.models.RuleDetails
     :docstring:
-
-### `CloudSharePermissionsRuleDetails` model
-
-::: incydr.models.CloudSharePermissionsRuleDetails
-    :docstring:
-
-### `FileNameRuleDetailsList` model
-
-::: incydr.models.FileNameRuleDetailsList
-    :docstring:
-
-### `FileNameRuleDetails` model
-
-::: incydr.models.FileNameRuleDetails
-    :docstring:
-
-### `FileTypeMismatchRuleDetailsList` model
-
-::: incydr.models.FileTypeMismatchRuleDetailsList
-    :docstring:
-
-### `FileTypeMismatchRuleDetails` model
-
-::: incydr.models.FileTypeMismatchRuleDetails
-    :docstring:
-
-### `EndpointExfiltrationRuleDetailsList` model
-
-::: incydr.models.EndpointExfiltrationRuleDetailsList
-    :docstring:
-
-### `EndpointExfiltrationRuleDetails` model
-
-::: incydr.models.EndpointExfiltrationRuleDetails
-    :docstring:
-
 
 ## Cases
 ---
