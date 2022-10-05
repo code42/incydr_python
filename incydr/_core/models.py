@@ -15,6 +15,7 @@ class Model(BaseModel):
     Subclass of pydantic's `BaseModel` to change the `.dict()` and `.json()` methods to dump fields with `by_alias=True`
     as the default.
     """
+
     def json(
         self,
         *,
