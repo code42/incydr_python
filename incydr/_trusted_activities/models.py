@@ -23,33 +23,40 @@ class ProviderObject(BaseModel):
         "`OFFICE_365`\n  - `ACCOUNT_NAME`\n    - `CLOUD_SYNC`\n      - `DROPBOX`\n      - `ONE_DRIVE`\n",
     )
 
+    class Config:
+        use_enum_values = True
+
 
 class ActivityAction(BaseModel):
-    providers: Optional[List[ProviderObject]] = Field(
-        None,
-        description="A list of enabled providers for the specified activity action.",
-    )
-    activity_type: Optional[ActivityType] = Field(
+    type: Optional[ActivityType] = Field(
         None,
         description="The type of an activity action.\n### Supported trusted activity types for each activity action "
         "type\n\n- `CLOUD_SHARE` \n  - `DOMAIN`\n- `CLOUD_SYNC` \n  - `DOMAIN`\n  - `ACCOUNT_NAME`\n- "
         "`EMAIL` \n  - `DOMAIN`\n- `FILE_UPLOAD`\n  - `DOMAIN`\n\nNote: `SLACK` and `URL_PATH` do not "
-        "need any activity actions specified.\n",
-        alias="activityType",
+        "need any activity actions specified.\n"
     )
+    providers: Optional[List[ProviderObject]] = Field(
+        None,
+        description="A list of enabled providers for the specified activity action.",
+    )
+
+    class Config:
+        use_enum_values = True
 
 
 class ActivityActionGroup(BaseModel):
-    activity_actions: Optional[List[ActivityAction]] = Field(
-        None,
-        description="The list of activity actions for an activity action group.",
-        alias="activityActions",
-    )
     name: Optional[Name] = Field(
         None,
         description="The name of the activity action group. Currently, only `DEFAULT` activity action group is "
         "supported.",
     )
+    activityActions: Optional[List[ActivityAction]] = Field(
+        None,
+        description="The list of activity actions for an activity action group."
+    )
+
+    class Config:
+        use_enum_values = True
 
 
 class TrustedActivity(ResponseModel):
@@ -136,12 +143,12 @@ class QueryTrustedActivitiesRequest(BaseModel):
     sort_key: Optional[str]
     sort_direction: Optional[str]
 
-    class Config:
-        use_enum_values = True
-
 
 class CreateTrustedActivityRequest(BaseModel):
-    activity_type: Optional[str]
+    type: Optional[str]
     value: Optional[str]
     description: Optional[str]
-    activity_action_groups: Optional[List[ActivityActionGroup]]
+    activityActionGroups: Optional[List[ActivityActionGroup]]
+
+    class Config:
+        use_enum_values = True

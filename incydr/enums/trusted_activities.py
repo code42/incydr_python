@@ -10,16 +10,26 @@ class ActivityType(_Enum):
     CLOUD_SYNC = "CLOUD_SYNC"
     EMAIL = "EMAIL"
     FILE_UPLOAD = "FILE_UPLOAD"
+    GIT_PUSH = "GIT_PUSH"
+    GIT_REPOSITORY_URI = "GIT_REPOSITORY_URI"
+
+
+class DomainCloudSync(_Enum):
+    BOX = "BOX"
+    GOOGLE_DRIVE = "GOOGLE_DRIVE"
+    ICLOUD = "ICLOUD"
+    ONEDRIVE = "ONEDRIVE"
 
 
 class Name(_Enum):
     DEFAULT = "DEFAULT"
-    BOX = "BOX"
+    DROPBOX = "DROPBOX"
     GOOGLE_DRIVE = "GOOGLE_DRIVE"
     ICLOUD = "ICLOUD"
     ONE_DRIVE = "ONE_DRIVE"
     GMAIL = "GMAIL"
     OFFICE_365 = "OFFICE_365"
+    BOX = "BOX"
 
 
 class PrincipalType(_Enum):

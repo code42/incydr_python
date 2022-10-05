@@ -4,14 +4,14 @@ from typing import List
 
 from requests import Response
 
-from incydr._trusted_activities.models import ActivityActionGroup
+from incydr._trusted_activities.models import ActivityActionGroup, ActivityAction, ProviderObject
 from incydr._trusted_activities.models import CreateTrustedActivityRequest
 from incydr._trusted_activities.models import QueryTrustedActivitiesRequest
 from incydr._trusted_activities.models import TrustedActivitiesPage
 from incydr._trusted_activities.models import TrustedActivity
 from incydr._trusted_activities.models import UpdateTrustedActivity
 from incydr.enums import SortDirection
-from incydr.enums.trusted_activities import ActivityType
+from incydr.enums.trusted_activities import ActivityType, Name, DomainCloudSync
 from incydr.enums.trusted_activities import SortKeys
 
 
@@ -45,12 +45,12 @@ class TrustedActivitiesV2:
         return TrustedActivity.parse_response(response)
 
     def get_page(
-        self,
-        page_num: int = 1,
-        page_size: int = None,
-        activity_type: ActivityType = None,
-        sort_key: SortKeys = None,
-        sort_direction: SortDirection = None,
+            self,
+            page_num: int = 1,
+            page_size: int = None,
+            activity_type: ActivityType = None,
+            sort_key: SortKeys = None,
+            sort_direction: SortDirection = None,
     ) -> TrustedActivitiesPage:
         """
         Get a page of trusted activities.
@@ -81,11 +81,11 @@ class TrustedActivitiesV2:
         return TrustedActivitiesPage.parse_response(response)
 
     def iter_all(
-        self,
-        page_size: int = None,
-        activity_type: ActivityType = None,
-        sort_key: SortKeys = None,
-        sort_direction: SortDirection = None,
+            self,
+            page_size: int = None,
+            activity_type: ActivityType = None,
+            sort_key: SortKeys = None,
+            sort_direction: SortDirection = None,
     ) -> Iterator[TrustedActivity]:
         """
         Iterate over all trusted activities.
@@ -107,34 +107,215 @@ class TrustedActivitiesV2:
             if len(page.trusted_activities) < page_size:
                 break
 
-    def create(
-        self,
-        activity_type: ActivityType,
-        value: str,
-        description: str = None,
-        activity_action_groups: List[ActivityActionGroup] = None,
+    def create_trusted_activity_for_domain(
+            self,
+            domain: str,
+            description: str = None,
+            file_upload: bool = None,
+            cloud_sync_list: List[DomainCloudSync] = None,
+            git_push: bool = None
     ) -> TrustedActivity:
         """
         Create a trusted activity.
 
         **Parameters:**
 
-        * **activity_type**: `ActivityType` The type of the trusted activity.
-        * **value**: `str` The value of the trusted activity.
+        * **domain**: `str` The domain of the trusted activity.
         * **description**: `str` A description of the trusted activity.
-        * **activity_action_groups**: `List[ActivityActionGroup]` The list of activity
-        actions associated with the activity.
+        * **file_upload**: `bool` Activity is trusted if the Tab URL or Tab title include this domain.
+        * **cloud_sync_list**: `List[DomainCloudSync]` Activity is trusted if the username signed in to the
+        sync app is one of the listed domain.
+        * **git_push**: `bool` Activity is trusted for Git push events to this domain.
+
+
+        **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
+        the newly created trusted activity.
+        """
+
+        activity_actions = []
+
+        if file_upload:
+            activity_actions.append(ActivityAction(type=ActivityType.FILE_UPLOAD))
+
+        if git_push:
+            activity_actions.append(ActivityAction(type=ActivityType.GIT_PUSH))
+
+        if len(cloud_sync_list) != 0:
+            providers = []
+
+            for cloud_sync in cloud_sync_list:
+                if cloud_sync in DomainCloudSync.__members__:
+                    providers.append(ProviderObject(name=Name[cloud_sync]))
+
+            activity_actions.append(ActivityAction(providers=providers, type=ActivityType.CLOUD_SYNC))
+
+        activity_action_group = \
+            ActivityActionGroup(
+                activityActions=activity_actions,
+                name=Name.DEFAULT
+            )
+
+        data = CreateTrustedActivityRequest(
+            type=ActivityType.DOMAIN,
+            value=domain,
+            description=description,
+            activityActionGroups=[activity_action_group],
+        )
+
+        print(data.dict())
+
+        response = self._parent.session.post(
+            url="/v2/trusted-activities", json=data.dict()
+        )
+        return TrustedActivity.parse_response(response)
+
+    def create_trusted_activity_for_specific_url_path(
+            self,
+            url: str,
+            description: str = None,
+    ) -> TrustedActivity:
+        """
+        Create a trusted activity.
+
+        **Parameters:**
+
+        * **url**: `str` The url of the trusted activity.
+        * **description**: `str` A description of the trusted activity.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
         the newly created trusted activity.
         """
 
         data = CreateTrustedActivityRequest(
-            activity_type=activity_type,
-            value=value,
+            type=ActivityType.URL_PATH,
+            value=url,
             description=description,
-            activity_action_groups=activity_action_groups,
+            activityActionGroups=[],
         )
+
+        response = self._parent.session.post(
+            url="/v2/trusted-activities", json=data.dict()
+        )
+        return TrustedActivity.parse_response(response)
+
+    def create_trusted_activity_for_slack(
+            self,
+            workspace_name: str,
+            description: str = None,
+    ) -> TrustedActivity:
+        """
+        Create a trusted activity.
+
+        **Parameters:**
+
+        * **workspace_name**: `str` The workspace name of the trusted activity.
+        * **description**: `str` A description of the trusted activity.
+
+        **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
+        the newly created trusted activity.
+        """
+
+        data = CreateTrustedActivityRequest(
+            type=ActivityType.SLACK,
+            value=workspace_name,
+            description=description,
+            activityActionGroups=[],
+        )
+
+        response = self._parent.session.post(
+            url="/v2/trusted-activities", json=data.dict()
+        )
+        return TrustedActivity.parse_response(response)
+
+    def create_trusted_activity_for_account_name(
+            self,
+            account_name: str,
+            description: str = None,
+            dropbox: bool = False,
+            one_drive: bool = False
+    ) -> TrustedActivity:
+        """
+        Create a trusted activity for account name.
+
+        **Parameters:**
+
+        * **account_name**: `str` The account name of the trusted activity.
+        * **description**: `str` A description of the trusted activity.
+        * **dropbox**: `bool` Cloud sync service to trust.
+        * **oneDrive** `bool` Cloud sync service to trust.
+
+        **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
+        the newly created trusted activity.
+        """
+
+        providers = []
+
+        if dropbox:
+            providers.append(ProviderObject(name=Name.DROPBOX))
+
+        if one_drive:
+            providers.append(ProviderObject(name=Name.ONE_DRIVE))
+
+        activity_action_group = \
+            ActivityActionGroup(
+                activityActions=
+                [
+                    ActivityAction(
+                        providers=providers,
+                        type=ActivityType.CLOUD_SYNC
+                    )
+                ],
+                name=Name.DEFAULT
+            )
+
+        data = CreateTrustedActivityRequest(
+            type=ActivityType.ACCOUNT_NAME,
+            value=account_name,
+            description=description,
+            activityActionGroups=[activity_action_group],
+        )
+
+        response = self._parent.session.post(
+            url="/v2/trusted-activities", json=data.dict()
+        )
+        return TrustedActivity.parse_response(response)
+
+    def create_trusted_activity_for_git_repository_uri(
+            self,
+            git_uri: str,
+            description: str = None,
+    ) -> TrustedActivity:
+        """
+        Create a trusted activity.
+
+        **Parameters:**
+
+        * **git_uri**: `str` The Git URI of the trusted activity.
+        * **description**: `str` A description of the trusted activity.
+
+        **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
+        the newly created trusted activity.
+        """
+
+        activity_action_group = \
+            ActivityActionGroup(
+                activityActions=
+                [
+                    ActivityAction(
+                        providers=[],
+                        type=ActivityType.GIT_PUSH
+                    )
+                ],
+                name=Name.DEFAULT
+            )
+
+        data = CreateTrustedActivityRequest(
+            type=ActivityType.GIT_REPOSITORY_URI,
+            value=git_uri,
+            description=description,
+            activityActionGroups=[activity_action_group]
+        )
+
         response = self._parent.session.post(
             url="/v2/trusted-activities", json=data.dict()
         )
@@ -158,7 +339,7 @@ class TrustedActivitiesV2:
         return self._parent.session.delete(f"/v2/trusted-activities/{activity_id}")
 
     def update(
-        self, activity_id: int, trusted_activity: TrustedActivity
+            self, activity_id: int, trusted_activity: TrustedActivity
     ) -> TrustedActivity:
         """
         Updates a trusted activity.
