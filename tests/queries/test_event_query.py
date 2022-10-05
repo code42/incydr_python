@@ -116,7 +116,7 @@ def test_event_query_is_not_when_multiple_values_creates_expected_filter_group()
         "file.category", ["Document", "Audio", "Executable"]
     )
     expected = FilterGroup(
-        filterClause="OR",
+        filterClause="AND",
         filters=[
             Filter(term="file.category", operator="IS_NOT", value="Document"),
             Filter(term="file.category", operator="IS_NOT", value="Audio"),
