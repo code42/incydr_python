@@ -58,7 +58,7 @@ Pass the event constructed query object to the `client.alerts.v1.search()` metho
 
 ## Pagination
 
-If a query results in more results than the configured page size of the query (max page size is 500), increment the 
+If a query results in more results than the configured page size of the query (max page size is 500), increment the
 `.page_num` value of the query and re-run the `.search()` method:
 
 ```python
