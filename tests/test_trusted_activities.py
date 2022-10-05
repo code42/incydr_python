@@ -7,39 +7,41 @@ from requests import Response
 from incydr import Client
 from incydr._trusted_activities.models import TrustedActivitiesPage
 from incydr._trusted_activities.models import TrustedActivity
+from incydr.enums.trusted_activities import ActivityType
 
 TEST_TRUSTED_ACTIVITY_1 = {
     "activityActionGroups": [
         {
-            "activityActions": [
-                {"providers": [{"name": "BOX"}], "activityType": "CLOUD_SHARE"}
-            ],
             "name": "DEFAULT",
+            "activityActions": [
+                {"type": "CLOUD_SHARE", "providers": [{"name": "BOX"}]}
+            ],
         }
     ],
     "activityId": "1234",
     "description": None,
     "principalType": None,
-    "activityType": "DOMAIN",
+    "activityType": None,
     "updateTime": None,
     "updatedByPrincipalId": "123",
     "updatedByPrincipalName": "Indiscreet User",
     "value": "Onedrive",
+    "type": "DOMAIN",
 }
 
 TEST_TRUSTED_ACTIVITY_2 = {
     "activityActionGroups": [
         {
-            "activityActions": [
-                {"providers": [{"name": "BOX"}], "activityType": "CLOUD_SHARE"}
-            ],
             "name": "DEFAULT",
+            "activityActions": [
+                {"type": "CLOUD_SHARE", "providers": [{"name": "BOX"}]}
+            ],
         }
     ],
     "activityId": "1324",
     "description": "This is a description",
     "principalType": "API_KEY",
-    "activityType": "DOMAIN",
+    "activityType": "SLACK",
     "updateTime": None,
     "updatedByPrincipalId": "999",
     "updatedByPrincipalName": "John Debuyer",
@@ -121,33 +123,224 @@ def test_iter_all_when_default_params_returns_expected_data(
     assert total_trusted_activities == 2
 
 
-def test_create_user_risk_profile_when_default_params_returns_expected_data(
+def test_create_trusted_activity_domain_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
+    domain = "testDomain.com"
+    activity_type = ActivityType.DOMAIN
+    activity_action_groups = [
+        {
+            "name": "DEFAULT",
+            "activityActions": [
+                {"type": "FILE_UPLOAD", "providers": None},
+                {"type": "GIT_PUSH", "providers": None},
+                {
+                    "type": "CLOUD_SYNC",
+                    "providers": [{"name": "BOX"}, {"name": "ICLOUD"}],
+                },
+            ],
+        }
+    ]
+
     test_data = {
-        "activity_type": "ACCOUNT_NAME",
-        "value": "New value",
-        "description": "New description",
-        "activity_action_groups": None,
+        "type": activity_type,
+        "value": domain,
+        "description": "Description",
+        "activityActionGroups": activity_action_groups,
     }
 
     test_response = TEST_TRUSTED_ACTIVITY_1.copy()
     test_response.update(test_data)
+
+    test_response.update({"activityType": activity_type})
 
     httpserver_auth.expect_request(
         uri="/v2/trusted-activities", method="POST", json=test_data
     ).respond_with_json(test_response)
 
     client = Client()
-    trusted_activity = client.trusted_activities.v2.create(**test_data)
+    trusted_activity = client.trusted_activities.v2.create_trusted_activity_for_domain(
+        domain=domain,
+        description="Description",
+        file_upload=True,
+        cloud_sync_list=["BOX", "ICLOUD"],
+        git_push=True,
+    )
 
     assert isinstance(trusted_activity, TrustedActivity)
-    assert trusted_activity.activity_type == test_data["activity_type"]
-    assert trusted_activity.value == test_data["value"]
+    assert trusted_activity.activity_type == activity_type
+    assert trusted_activity.value == domain
     assert trusted_activity.description == test_data["description"]
+    assert trusted_activity.activity_action_groups == activity_action_groups
 
 
-def test_delete_user_risk_profile_when_default_params_returns_expected_data(
+def test_create_trusted_activity_specific_url_path_when_default_params_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
+    url = "testDomain.com"
+    activity_type = ActivityType.URL_PATH
+    activity_action_groups = []
+
+    test_data = {
+        "type": activity_type,
+        "value": url,
+        "description": "Description",
+        "activityActionGroups": activity_action_groups,
+    }
+
+    test_response = TEST_TRUSTED_ACTIVITY_1.copy()
+    test_response.update(test_data)
+
+    test_response.update({"activityType": activity_type})
+
+    httpserver_auth.expect_request(
+        uri="/v2/trusted-activities", method="POST", json=test_data
+    ).respond_with_json(test_response)
+
+    client = Client()
+    trusted_activity = (
+        client.trusted_activities.v2.create_trusted_activity_for_specific_url_path(
+            url=url, description="Description"
+        )
+    )
+
+    assert isinstance(trusted_activity, TrustedActivity)
+    assert trusted_activity.activity_type == activity_type
+    assert trusted_activity.value == url
+    assert trusted_activity.description == test_data["description"]
+    assert trusted_activity.activity_action_groups == activity_action_groups
+
+
+def test_create_trusted_activity_slack_when_default_params_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
+    workspace_name = "test workspace"
+    activity_type = ActivityType.SLACK
+    activity_action_groups = []
+
+    test_data = {
+        "type": activity_type,
+        "value": workspace_name,
+        "description": "Description",
+        "activityActionGroups": activity_action_groups,
+    }
+
+    test_response = TEST_TRUSTED_ACTIVITY_1.copy()
+    test_response.update(test_data)
+
+    test_response.update({"activityType": activity_type})
+
+    httpserver_auth.expect_request(
+        uri="/v2/trusted-activities", method="POST", json=test_data
+    ).respond_with_json(test_response)
+
+    client = Client()
+    trusted_activity = client.trusted_activities.v2.create_trusted_activity_for_slack(
+        workspace_name=workspace_name, description="Description"
+    )
+
+    assert isinstance(trusted_activity, TrustedActivity)
+    assert trusted_activity.activity_type == activity_type
+    assert trusted_activity.value == workspace_name
+    assert trusted_activity.description == test_data["description"]
+    assert trusted_activity.activity_action_groups == activity_action_groups
+
+
+def test_create_trusted_activity_account_name_when_default_params_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
+    account_name = "test account"
+    activity_type = ActivityType.ACCOUNT_NAME
+    activity_action_groups = [
+        {
+            "name": "DEFAULT",
+            "activityActions": [
+                {
+                    "type": "CLOUD_SYNC",
+                    "providers": [{"name": "DROPBOX"}, {"name": "ONE_DRIVE"}],
+                }
+            ],
+        }
+    ]
+
+    test_data = {
+        "type": activity_type,
+        "value": account_name,
+        "description": "Description",
+        "activityActionGroups": activity_action_groups,
+    }
+
+    test_response = TEST_TRUSTED_ACTIVITY_1.copy()
+    test_response.update(test_data)
+
+    test_response.update({"activityType": activity_type})
+
+    httpserver_auth.expect_request(
+        uri="/v2/trusted-activities", method="POST", json=test_data
+    ).respond_with_json(test_response)
+
+    client = Client()
+    trusted_activity = (
+        client.trusted_activities.v2.create_trusted_activity_for_account_name(
+            account_name=account_name,
+            description="Description",
+            dropbox=True,
+            one_drive=True,
+        )
+    )
+
+    assert isinstance(trusted_activity, TrustedActivity)
+    assert trusted_activity.activity_type == activity_type
+    assert trusted_activity.value == account_name
+    assert trusted_activity.description == test_data["description"]
+    assert trusted_activity.activity_action_groups == activity_action_groups
+
+
+def test_create_trusted_activity_git_repository_uri_when_default_params_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
+    git_uri = "test.com:example/myRepo"
+    activity_type = ActivityType.GIT_REPOSITORY_URI
+    activity_action_groups = [
+        {
+            "name": "DEFAULT",
+            "activityActions": [
+                {"type": "GIT_PUSH", "providers": []},
+            ],
+        }
+    ]
+
+    test_data = {
+        "type": activity_type,
+        "value": git_uri,
+        "description": "Description",
+        "activityActionGroups": activity_action_groups,
+    }
+
+    test_response = TEST_TRUSTED_ACTIVITY_1.copy()
+    test_response.update(test_data)
+
+    test_response.update({"activityType": activity_type})
+
+    httpserver_auth.expect_request(
+        uri="/v2/trusted-activities", method="POST", json=test_data
+    ).respond_with_json(test_response)
+
+    client = Client()
+    trusted_activity = (
+        client.trusted_activities.v2.create_trusted_activity_for_git_repository_uri(
+            git_uri=git_uri, description="Description"
+        )
+    )
+
+    assert isinstance(trusted_activity, TrustedActivity)
+    assert trusted_activity.activity_type == activity_type
+    assert trusted_activity.value == git_uri
+    assert trusted_activity.description == test_data["description"]
+    assert trusted_activity.activity_action_groups == activity_action_groups
+
+
+def test_delete_trusted_activity_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     httpserver_auth.expect_request("/v2/trusted-activities/1234").respond_with_data()

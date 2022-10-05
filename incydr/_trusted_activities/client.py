@@ -4,14 +4,18 @@ from typing import List
 
 from requests import Response
 
-from incydr._trusted_activities.models import ActivityActionGroup, ActivityAction, ProviderObject
+from incydr._trusted_activities.models import ActivityAction
+from incydr._trusted_activities.models import ActivityActionGroup
 from incydr._trusted_activities.models import CreateTrustedActivityRequest
+from incydr._trusted_activities.models import ProviderObject
 from incydr._trusted_activities.models import QueryTrustedActivitiesRequest
 from incydr._trusted_activities.models import TrustedActivitiesPage
 from incydr._trusted_activities.models import TrustedActivity
 from incydr._trusted_activities.models import UpdateTrustedActivity
 from incydr.enums import SortDirection
-from incydr.enums.trusted_activities import ActivityType, Name, DomainCloudSync
+from incydr.enums.trusted_activities import ActivityType
+from incydr.enums.trusted_activities import DomainCloudSync
+from incydr.enums.trusted_activities import Name
 from incydr.enums.trusted_activities import SortKeys
 
 
@@ -45,12 +49,12 @@ class TrustedActivitiesV2:
         return TrustedActivity.parse_response(response)
 
     def get_page(
-            self,
-            page_num: int = 1,
-            page_size: int = None,
-            activity_type: ActivityType = None,
-            sort_key: SortKeys = None,
-            sort_direction: SortDirection = None,
+        self,
+        page_num: int = 1,
+        page_size: int = None,
+        activity_type: ActivityType = None,
+        sort_key: SortKeys = None,
+        sort_direction: SortDirection = None,
     ) -> TrustedActivitiesPage:
         """
         Get a page of trusted activities.
@@ -81,11 +85,11 @@ class TrustedActivitiesV2:
         return TrustedActivitiesPage.parse_response(response)
 
     def iter_all(
-            self,
-            page_size: int = None,
-            activity_type: ActivityType = None,
-            sort_key: SortKeys = None,
-            sort_direction: SortDirection = None,
+        self,
+        page_size: int = None,
+        activity_type: ActivityType = None,
+        sort_key: SortKeys = None,
+        sort_direction: SortDirection = None,
     ) -> Iterator[TrustedActivity]:
         """
         Iterate over all trusted activities.
@@ -108,12 +112,12 @@ class TrustedActivitiesV2:
                 break
 
     def create_trusted_activity_for_domain(
-            self,
-            domain: str,
-            description: str = None,
-            file_upload: bool = None,
-            cloud_sync_list: List[DomainCloudSync] = None,
-            git_push: bool = None
+        self,
+        domain: str,
+        description: str = None,
+        file_upload: bool = None,
+        cloud_sync_list: List[DomainCloudSync] = None,
+        git_push: bool = None,
     ) -> TrustedActivity:
         """
         Create a trusted activity.
@@ -124,7 +128,7 @@ class TrustedActivitiesV2:
         * **description**: `str` A description of the trusted activity.
         * **file_upload**: `bool` Activity is trusted if the Tab URL or Tab title include this domain.
         * **cloud_sync_list**: `List[DomainCloudSync]` Activity is trusted if the username signed in to the
-        sync app is one of the listed domain.
+        sync app is one of the listed domain. If list is empty, all activity actions are enabled.
         * **git_push**: `bool` Activity is trusted for Git push events to this domain.
 
 
@@ -147,13 +151,13 @@ class TrustedActivitiesV2:
                 if cloud_sync in DomainCloudSync.__members__:
                     providers.append(ProviderObject(name=Name[cloud_sync]))
 
-            activity_actions.append(ActivityAction(providers=providers, type=ActivityType.CLOUD_SYNC))
-
-        activity_action_group = \
-            ActivityActionGroup(
-                activityActions=activity_actions,
-                name=Name.DEFAULT
+            activity_actions.append(
+                ActivityAction(providers=providers, type=ActivityType.CLOUD_SYNC)
             )
+
+        activity_action_group = ActivityActionGroup(
+            activityActions=activity_actions, name=Name.DEFAULT
+        )
 
         data = CreateTrustedActivityRequest(
             type=ActivityType.DOMAIN,
@@ -162,17 +166,15 @@ class TrustedActivitiesV2:
             activityActionGroups=[activity_action_group],
         )
 
-        print(data.dict())
-
         response = self._parent.session.post(
             url="/v2/trusted-activities", json=data.dict()
         )
         return TrustedActivity.parse_response(response)
 
     def create_trusted_activity_for_specific_url_path(
-            self,
-            url: str,
-            description: str = None,
+        self,
+        url: str,
+        description: str = None,
     ) -> TrustedActivity:
         """
         Create a trusted activity.
@@ -199,9 +201,9 @@ class TrustedActivitiesV2:
         return TrustedActivity.parse_response(response)
 
     def create_trusted_activity_for_slack(
-            self,
-            workspace_name: str,
-            description: str = None,
+        self,
+        workspace_name: str,
+        description: str = None,
     ) -> TrustedActivity:
         """
         Create a trusted activity.
@@ -228,11 +230,11 @@ class TrustedActivitiesV2:
         return TrustedActivity.parse_response(response)
 
     def create_trusted_activity_for_account_name(
-            self,
-            account_name: str,
-            description: str = None,
-            dropbox: bool = False,
-            one_drive: bool = False
+        self,
+        account_name: str,
+        description: str = None,
+        dropbox: bool = False,
+        one_drive: bool = False,
     ) -> TrustedActivity:
         """
         Create a trusted activity for account name.
@@ -243,6 +245,8 @@ class TrustedActivitiesV2:
         * **description**: `str` A description of the trusted activity.
         * **dropbox**: `bool` Cloud sync service to trust.
         * **oneDrive** `bool` Cloud sync service to trust.
+
+        At least 1 activity action group (dropbox, oneDrive) is required to be trusted.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
         the newly created trusted activity.
@@ -256,17 +260,15 @@ class TrustedActivitiesV2:
         if one_drive:
             providers.append(ProviderObject(name=Name.ONE_DRIVE))
 
-        activity_action_group = \
-            ActivityActionGroup(
-                activityActions=
-                [
-                    ActivityAction(
-                        providers=providers,
-                        type=ActivityType.CLOUD_SYNC
-                    )
-                ],
-                name=Name.DEFAULT
-            )
+        # At least 1 activity action group is required
+        assert len(providers) != 0
+
+        activity_action_group = ActivityActionGroup(
+            activityActions=[
+                ActivityAction(providers=providers, type=ActivityType.CLOUD_SYNC)
+            ],
+            name=Name.DEFAULT,
+        )
 
         data = CreateTrustedActivityRequest(
             type=ActivityType.ACCOUNT_NAME,
@@ -281,9 +283,9 @@ class TrustedActivitiesV2:
         return TrustedActivity.parse_response(response)
 
     def create_trusted_activity_for_git_repository_uri(
-            self,
-            git_uri: str,
-            description: str = None,
+        self,
+        git_uri: str,
+        description: str = None,
     ) -> TrustedActivity:
         """
         Create a trusted activity.
@@ -297,23 +299,16 @@ class TrustedActivitiesV2:
         the newly created trusted activity.
         """
 
-        activity_action_group = \
-            ActivityActionGroup(
-                activityActions=
-                [
-                    ActivityAction(
-                        providers=[],
-                        type=ActivityType.GIT_PUSH
-                    )
-                ],
-                name=Name.DEFAULT
-            )
+        activity_action_group = ActivityActionGroup(
+            activityActions=[ActivityAction(providers=[], type=ActivityType.GIT_PUSH)],
+            name=Name.DEFAULT,
+        )
 
         data = CreateTrustedActivityRequest(
             type=ActivityType.GIT_REPOSITORY_URI,
             value=git_uri,
             description=description,
-            activityActionGroups=[activity_action_group]
+            activityActionGroups=[activity_action_group],
         )
 
         response = self._parent.session.post(
@@ -339,7 +334,7 @@ class TrustedActivitiesV2:
         return self._parent.session.delete(f"/v2/trusted-activities/{activity_id}")
 
     def update(
-            self, activity_id: int, trusted_activity: TrustedActivity
+        self, activity_id: int, trusted_activity: TrustedActivity
     ) -> TrustedActivity:
         """
         Updates a trusted activity.

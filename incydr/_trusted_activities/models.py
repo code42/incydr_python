@@ -33,7 +33,7 @@ class ActivityAction(BaseModel):
         description="The type of an activity action.\n### Supported trusted activity types for each activity action "
         "type\n\n- `CLOUD_SHARE` \n  - `DOMAIN`\n- `CLOUD_SYNC` \n  - `DOMAIN`\n  - `ACCOUNT_NAME`\n- "
         "`EMAIL` \n  - `DOMAIN`\n- `FILE_UPLOAD`\n  - `DOMAIN`\n\nNote: `SLACK` and `URL_PATH` do not "
-        "need any activity actions specified.\n"
+        "need any activity actions specified.\n",
     )
     providers: Optional[List[ProviderObject]] = Field(
         None,
@@ -51,8 +51,7 @@ class ActivityActionGroup(BaseModel):
         "supported.",
     )
     activityActions: Optional[List[ActivityAction]] = Field(
-        None,
-        description="The list of activity actions for an activity action group."
+        None, description="The list of activity actions for an activity action group."
     )
 
     class Config:
@@ -60,6 +59,21 @@ class ActivityActionGroup(BaseModel):
 
 
 class TrustedActivity(ResponseModel):
+    """A model representing an TrustedActivity.
+
+    **Fields**:
+
+    * **activity_action_groups**: `List[ActivityActionGroup]` The list of activity actions associated with the activity.
+    * **activity_id**: `str` The unique identifier of the trusted activity.
+    * **description**: `str` A description of the trusted activity.
+    * **principal_type**: `PrincipalType | None`
+    * **activity_type**: `ActivityType | None` The type of the trusted activity.
+    * **update_time**: `datetime | None` The time at which the trust activity was last created or modified.
+    * **updated_by_principal_id**: `str | None` The unique identifier of the user who last updated the trust activity.
+    * **updated_by_principal_name**: `str | None` The username of the user who last updated the trusted activity.
+    * **value**: `str` The value of the trusted activity.
+    """
+
     activity_action_groups: Optional[List[ActivityActionGroup]] = Field(
         None,
         description="The list of activity actions associated with the activity.",
@@ -128,6 +142,15 @@ class UpdateTrustedActivity(BaseModel):
 
 
 class TrustedActivitiesPage(ResponseModel):
+    """
+    A model representing a page of `TrustedActivity` objects.
+
+    **Fields**:
+
+    * **total_count**: `int` Total count of trusted activities found by the query.
+    * **trusted_activities**: `List[TrustedActivity]` The list of trusted activities retrieved from the query.
+    """
+
     total_count: Optional[float] = Field(None, alias="totalCount")
     trusted_activities: Optional[List[TrustedActivity]] = Field(
         None,
