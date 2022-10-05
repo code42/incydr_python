@@ -140,6 +140,9 @@ class UpdateTrustedActivity(BaseModel):
     )
     value: Optional[str] = Field(None, description="The value of the trusted activity.")
 
+    class Config:
+        extra = "ignore"
+
 
 class TrustedActivitiesPage(ResponseModel):
     """

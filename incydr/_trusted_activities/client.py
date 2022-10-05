@@ -333,9 +333,7 @@ class TrustedActivitiesV2:
         """
         return self._parent.session.delete(f"/v2/trusted-activities/{activity_id}")
 
-    def update(
-        self, activity_id: int, trusted_activity: TrustedActivity
-    ) -> TrustedActivity:
+    def update(self, trusted_activity: TrustedActivity) -> TrustedActivity:
         """
         Updates a trusted activity.
         Valid updatable fields: description, value, activity_type, activity_action_group
@@ -356,7 +354,8 @@ class TrustedActivitiesV2:
 
         data = UpdateTrustedActivity(**trusted_activity.dict())
         response = self._parent.session.patch(
-            f"/v2/trusted-activities/{activity_id}", json=data.dict(by_alias=True)
+            f"/v2/trusted-activities/{trusted_activity.activity_id}",
+            json=data.dict(by_alias=True),
         )
         return TrustedActivity.parse_response(response)
 
