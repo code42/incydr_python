@@ -12,7 +12,7 @@ from pydantic import Field
 from pydantic import root_validator
 from pydantic import validate_arguments
 
-from incydr._core.models import IncydrModel
+from incydr._core.models import Model
 from incydr._file_events.models.response import SavedSearch
 from incydr._queries.util import parse_timestamp
 from incydr.enums.file_events import Category
@@ -103,7 +103,7 @@ class FilterGroup(BaseModel):
     filters: Optional[List[Filter]]
 
 
-class EventQuery(IncydrModel):
+class EventQuery(Model):
     """
     Class to build a file event query. Use the class methods to attach additional filter operators.
 

@@ -10,7 +10,11 @@ from pydantic import SecretStr
 from pydantic import ValidationError
 
 
-class IncydrModel(BaseModel):
+class Model(BaseModel):
+    """
+    Subclass of pydantic's `BaseModel` to change the `.dict()` and `.json()` methods to dump fields with `by_alias=True`
+    as the default.
+    """
     def json(
         self,
         *,
@@ -84,7 +88,7 @@ class IncydrModel(BaseModel):
                 yield name, field_repr
 
 
-class ResponseModel(IncydrModel):
+class ResponseModel(Model):
     @classmethod
     def parse_response(cls, response: requests.Response):
         try:
