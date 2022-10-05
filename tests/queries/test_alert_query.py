@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from incydr import AlertQuery
@@ -12,9 +14,15 @@ def test_base_query():
         "groups": [],
         "pgNum": 0,
         "pgSize": 100,
-        "srtDir": "DESC",
+        "srtDirection": "DESC",
         "srtKey": "CreatedAt",
     }
+
+
+def test_parse_query_string():
+    query_str = """{"srtDirection":"DESC","pgNum":0,"pgSize":100,"srtKey":"CreatedAt","groups":[{"filterClause":"OR","filters":[{"value":"OPEN","term":"State","operator":"IS"},{"value":"PENDING","term":"State","operator":"IS"}]},{"filterClause":"OR","filters":[{"value":"HIGH","term":"RiskSeverity","operator":"IS"},{"value":"LOW","term":"RiskSeverity","operator":"IS"}]},{"filterClause":"AND","filters":[{"value":"2022-09-28T13:59:30.586Z","term":"CreatedAt","operator":"ON_OR_AFTER"},{"value":"2022-10-05T13:59:30.586Z","term":"CreatedAt","operator":"ON_OR_BEFORE"}]},{"filterClause":"AND","filters":[{"value":"2022-07-07T13:59:30.586Z","term":"CreatedAt","operator":"ON_OR_AFTER"}]}],"tenantId":"tenant-abc-123","groupClause":"AND"}"""
+    query = AlertQuery.parse_raw(query_str)
+    assert query.dict() == json.loads(query_str)
 
 
 @pytest.mark.parametrize(

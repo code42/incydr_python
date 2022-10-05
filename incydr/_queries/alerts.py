@@ -7,9 +7,11 @@ from typing import Union
 
 from pydantic import BaseModel
 from pydantic import conint
+from pydantic import Field
 from pydantic import root_validator
 from pydantic import StrictBool
 
+from incydr._core.models import Model
 from incydr._queries.util import parse_timestamp
 from incydr.enums.alerts import AlertState
 from incydr.enums.alerts import AlertTerm
@@ -62,22 +64,7 @@ class FilterGroup(BaseModel):
     filters: Optional[List[Filter]]
 
 
-class Query(BaseModel):
-    tenantId: str = None
-    groupClause: str = "AND"
-    groups: Optional[List[FilterGroup]]
-    pgNum: int = 0
-    pgSize: conint(gt=0, le=500) = 100
-    srtDir: str = "DESC"
-    srtKey: AlertTerm = "CreatedAt"
-
-    class Config:
-        use_enum_values = True
-        json_encoders = {datetime: lambda dt: dt.isoformat().replace("+00:00", "Z")}
-        validate_assignment = True
-
-
-class AlertQuery:
+class AlertQuery(Model):
     """
     Class to build an alert query. Use the class methods to attach additional filter operators.
 
@@ -108,68 +95,36 @@ class AlertQuery:
         `start_date` or `end_date` arguments).
     """
 
+    tenant_id: str = Field(None, alias="tenantId")
+    group_clause: str = Field("AND", alias="groupClause")
+    groups: Optional[List[FilterGroup]]
+    page_num: int = Field(0, alias="pgNum")
+    page_size: conint(gt=0, le=500) = Field(100, alias="pgSize")
+    sort_dir: str = Field("DESC", alias="srtDirection")
+    sort_key: AlertTerm = Field("CreatedAt", alias="srtKey")
+
+    class Config:
+        use_enum_values = True
+        json_encoders = {datetime: lambda dt: dt.isoformat().replace("+00:00", "Z")}
+        validate_assignment = True
+
     def __init__(
         self,
         start_date: Union[datetime, timedelta, int, float, str] = None,
         end_date: Union[datetime, int, float, str] = None,
         on: Union[date, datetime, int, float, str] = None,
+        **kwargs,
     ):
-        self._query = Query(groups=[])
+        groups = kwargs.get("groups") or []
         if on and any((start_date, end_date)):
             raise ValueError(
                 "cannot use 'on' argument with 'start_date' or 'end_date' arguments."
             )
         if start_date or end_date or on:
-            self._query.groups.append(
-                _create_date_range_filter_group(start_date, end_date, on)
-            )
-
-    def __str__(self):
-        return str(self._query.__repr__())
-
-    @property
-    def page_size(self):
-        return self._query.pgSize
-
-    @page_size.setter
-    def page_size(self, value):
-        self._query.pgSize = value
-
-    @property
-    def page_num(self):
-        return self._query.pgNum
-
-    @page_num.setter
-    def page_num(self, value):
-        self._query.pgNum = value
-
-    @property
-    def sort_direction(self):
-        return self._query.srtDir
-
-    @sort_direction.setter
-    def sort_direction(self, value):
-        self._query.srtDir = value
-
-    @property
-    def sort_key(self):
-        return self._query.srtKey
-
-    @sort_key.setter
-    def sort_key(self, value):
-        self._query.srtKey = value
-
-    def dict(self, **kwargs):
-        """
-        Returns the query object as a dictionary.
-        """
-        return self._query.dict(**kwargs)
-
-    def json(self):
-        """
-        Returns the query object as json.
-        """
-        return self._query.json()
+            date_filter = _create_date_range_filter_group(start_date, end_date, on)
+            groups.append(date_filter)
+        kwargs["groups"] = groups
+        super().__init__(**kwargs)
 
     def equals(self, term: str, values: Union[str, List[str]]):
         """
@@ -194,7 +149,7 @@ class AlertQuery:
             filters=filters,
             filterClause="OR" if len(values) > 1 else "AND",
         )
-        self._query.groups.append(filter_group)
+        self.groups.append(filter_group)
         return self
 
     def not_equals(self, term: str, values: Union[str, List[str]]):
@@ -225,7 +180,7 @@ class AlertQuery:
             filters=filters,
             filterClause="OR" if len(values) > 1 else "AND",
         )
-        self._query.groups.append(filter_group)
+        self.groups.append(filter_group)
         return self
 
     def contains(self, term: str, value: str):
@@ -244,7 +199,7 @@ class AlertQuery:
         * **term**: `str` - The term which corresponds to an alert field.
         * **value**: `str` - The value for the term to match.
         """
-        self._query.groups.append(
+        self.groups.append(
             FilterGroup(
                 filters=[Filter(term=term, operator=Operator.CONTAINS, value=value)]
             )
@@ -267,7 +222,7 @@ class AlertQuery:
         * **term**: `str` - The term which corresponds to an alert field.
         * **value**: `str` - The value for the term to not match.
         """
-        self._query.groups.append(
+        self.groups.append(
             FilterGroup(
                 filters=[
                     Filter(term=term, operator=Operator.DOES_NOT_CONTAIN, value=value)
@@ -284,15 +239,8 @@ class AlertQuery:
 
         Default operator is `AND`, which returns only alerts that match _all_ filters in the query.
         """
-        self._query.groupClause = "OR"
+        self.group_clause = "OR"
         return self
-
-    @classmethod
-    def from_string(cls, query: str):
-        _query = Query.parse_raw(query)
-        new = cls()
-        new._query = _query
-        return new
 
 
 def _create_date_range_filter_group(start_date, end_date, on):

@@ -146,20 +146,6 @@ def test_alert_query_class(httpserver_auth: HTTPServer):
         client.alerts.v1.search(dict())
 
 
-def test_alert_query_str(httpserver_auth: HTTPServer):
-    query = AlertQuery().equals("State", "OPEN")
-    expected = query.dict()
-    expected["tenantId"] = "abcd-1234"
-
-    httpserver_auth.expect_request(
-        "/v1/alerts/query-alerts", method="POST", json=expected
-    ).respond_with_json(TEST_ALERTS_RESPONSE)
-
-    client = Client()
-    response = client.alerts.v1.search(query.json())
-    assert isinstance(response, AlertQueryPage)
-
-
 def test_iter_all_class(httpserver_auth: HTTPServer):
     query = AlertQuery().equals("State", "OPEN")
     expected = query.dict()
@@ -176,21 +162,6 @@ def test_iter_all_class(httpserver_auth: HTTPServer):
 
     with pytest.raises(ValueError):
         next(client.alerts.v1.iter_all(dict()))
-
-
-def test_iter_all_str(httpserver_auth: HTTPServer):
-    query = AlertQuery().equals("State", "OPEN")
-    expected = query.dict()
-    expected["tenantId"] = "abcd-1234"
-
-    httpserver_auth.expect_request(
-        "/v1/alerts/query-alerts", method="POST", json=expected
-    ).respond_with_json(TEST_ALERTS_RESPONSE)
-
-    client = Client()
-    response = client.alerts.v1.iter_all(query.json())
-    for alert in response:
-        assert isinstance(alert, AlertSummary)
 
 
 def test_alert_detail_query(httpserver_auth: HTTPServer):

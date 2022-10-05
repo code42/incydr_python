@@ -55,3 +55,34 @@ By default, all filters in a query will be combined in an `AND` group, meaning o
 be returned. If you want to `OR` the filters, call the `.matches_any()` method on the query.
 
 Pass the event constructed query object to the `client.alerts.v1.search()` method to get execute the search.
+
+## Pagination
+
+If a query results in more results than the configured page size of the query (max page size is 500), increment the 
+`.page_num` value of the query and re-run the `.search()` method:
+
+```python
+from datetime import timedelta
+import incydr
+client = incydr.Client(**kwargs)
+
+query = incydr.AlertQuery(start_date=timedelta(days=10))
+first_page = client.alerts.v1.search(query)
+if first_page.total_count > query.page_size:
+    query.page_num += 1
+second_page = client.alerts.v1.search(query)
+... # continue until all alerts are retrieved
+```
+
+Alternately, the `client.alerts.v1.iter_all()` method will automatically request pages until all the results are complete
+and will yield each Alert individually, so you don't need to think about paging at all:
+
+```python
+from datetime import timedelta
+import incydr
+client = incydr.Client(**kwargs)
+
+query = incydr.AlertQuery(start_date=timedelta(days=10))
+for alert in client.alerts.v1.iter_all(query):
+    ... # process alert here
+```

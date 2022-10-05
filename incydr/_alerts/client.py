@@ -1,9 +1,12 @@
 from itertools import count
+from typing import Iterator
 from typing import List
 from typing import Union
 
+import requests
 from pydantic import parse_obj_as
 
+from .models.alert import AlertSummary
 from .models.request import AddNoteRequest
 from .models.request import AlertDetailsRequest
 from .models.request import UpdateAlertStateRequest
@@ -28,43 +31,35 @@ class AlertsV1:
     def __init__(self, parent):
         self._parent = parent
 
-    def search(self, query: Union[str, AlertQuery]):
+    def search(self, query: AlertQuery) -> AlertQueryPage:
         """
         Search for alerts.
 
         **Parameters**:
 
-        * **query**: `AlertQuery | str` (required) - The query object to filter alerts by
-        different fields.
+        * **query**: `AlertQuery` (required) - The query object to filter alerts by different fields.
 
         **Returns**: An [`AlertQueryPage`][alertquerypage-model] object.
         """
-        if isinstance(query, str):
-            query = AlertQuery.from_string(query)
-        if isinstance(query, AlertQuery):
-            query._query.tenantId = self._parent.tenant_id
-        else:
-            raise ValueError("query must be either a string or `AlertQuery` object.")
+        if not isinstance(query, AlertQuery):
+            raise ValueError("query must be either an `AlertQuery` object.")
+        query.tenant_id = self._parent.tenant_id
         response = self._parent.session.post(
             "/v1/alerts/query-alerts", json=query.dict()
         )
         return AlertQueryPage.parse_response(response)
 
-    def iter_all(self, query: Union[str, AlertQuery]):
+    def iter_all(self, query: AlertQuery) -> Iterator[AlertSummary]:
         """
         Retrieve all alerts for a given query, automatically retrieving multiple pages if they exist.
 
-        * **query**: `AlertQuery | str` (required) - The query object to filter alerts by
-        different fields.
+        * **query**: `AlertQuery` (required) - The query object used to filter alerts by different fields.
 
         **Returns**: A generator yielding individual [`AlertSummary`][alertsummary-model] objects.
         """
-        if isinstance(query, str):
-            query = AlertQuery.from_string(query)
-        if isinstance(query, AlertQuery):
-            query._query.tenantId = self._parent.tenant_id
-        else:
-            raise ValueError("query must be either a string or `AlertQuery` object.")
+        if not isinstance(query, AlertQuery):
+            raise ValueError("query must be either an `AlertQuery` object.")
+        query.tenant_id = self._parent.tenant_id
         for page_num in count(0):
             query.page_num = page_num
             response = self._parent.session.post(
@@ -75,7 +70,7 @@ class AlertsV1:
             if len(page.alerts) < query.page_size:
                 break
 
-    def get_details(self, alert_ids: Union[str, List[str]]):
+    def get_details(self, alert_ids: Union[str, List[str]]) -> List[AlertDetails]:
         """
         Get full details for a set of alerts.
 
@@ -93,7 +88,7 @@ class AlertsV1:
         )
         return parse_obj_as(List[AlertDetails], response.json()["alerts"])
 
-    def add_note(self, alert_id: str, note: str):
+    def add_note(self, alert_id: str, note: str) -> requests.Response:
         """
         Add a note to an alert.
 
@@ -114,7 +109,7 @@ class AlertsV1:
 
     def change_state(
         self, alert_ids: Union[str, List[str]], state: AlertState, note: str = None
-    ):
+    ) -> requests.Response:
         """
         Change the state of an alert (and optionally add note indicating reason for change in the same request).
 
