@@ -2,8 +2,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
-from pydantic import parse_obj_as
-
 from incydr._audit_log.models import AuditEventsPage
 from incydr._audit_log.models import DateRange
 from incydr._audit_log.models import QueryAuditLogRequest
@@ -247,21 +245,18 @@ class AuditLogV1:
             userTypes=user_types,
         )
 
-        export_response = self._parent.session.post(
-            "/v1/audit/export", json=data.dict()
-        )
-
-        download_token = parse_obj_as(str, export_response)
-
         folder = Path(target_folder)  # ensure a Path object if we get passed a string
         if not folder.is_dir():
             raise ValueError(
                 f"`target_folder` argument must resolve to a folder: {target_folder}"
             )
 
+        export_response = self._parent.session.post(
+            "/v1/audit/export", json=data.dict()
+        )
+
         download_response = self._parent.session.get(
-            "/v1/audit/redeemDownloadToken?downloadToken="
-            + download_token.download_token
+            f"/v1/audit/redeemDownloadToken?downloadToken={export_response.json()['downloadToken']}"
         )
 
         filename = get_filename_from_content_disposition(
