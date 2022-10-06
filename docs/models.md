@@ -138,7 +138,6 @@ available model methods.
 ::: incydr.models.UpdateRolesResponse
     :docstring:
 
-
 ## Users
 ---
 
@@ -150,6 +149,19 @@ available model methods.
 ### `UsersPage` model
 
 ::: incydr.models.UsersPage
+    :docstring:
+
+## User Risk Profiles
+---
+
+### `UserRiskProfile` model
+
+::: incydr.models.UserRiskProfile
+    :docstring:
+
+### `UserRiskProfilesPage` model
+
+::: incydr.models.UserRiskProfilesPage
     :docstring:
 
 ## Watchlists
