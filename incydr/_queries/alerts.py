@@ -103,11 +103,6 @@ class AlertQuery(Model):
     sort_dir: str = Field("DESC", alias="srtDirection")
     sort_key: AlertTerm = Field("CreatedAt", alias="srtKey")
 
-    class Config:
-        use_enum_values = True
-        json_encoders = {datetime: lambda dt: dt.isoformat().replace("+00:00", "Z")}
-        validate_assignment = True
-
     def __init__(
         self,
         start_date: Union[datetime, timedelta, int, float, str] = None,
