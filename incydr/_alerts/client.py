@@ -42,7 +42,7 @@ class AlertsV1:
         **Returns**: An [`AlertQueryPage`][alertquerypage-model] object.
         """
         if not isinstance(query, AlertQuery):
-            raise ValueError("query must be either an `AlertQuery` object.")
+            raise ValueError("query must be an `incydr.AlertQuery` object.")
         query.tenant_id = self._parent.tenant_id
         response = self._parent.session.post(
             "/v1/alerts/query-alerts", json=query.dict()
@@ -58,7 +58,7 @@ class AlertsV1:
         **Returns**: A generator yielding individual [`AlertSummary`][alertsummary-model] objects.
         """
         if not isinstance(query, AlertQuery):
-            raise ValueError("query must be either an `AlertQuery` object.")
+            raise ValueError("query must be an `incydr.AlertQuery` object.")
         query.tenant_id = self._parent.tenant_id
         for page_num in count(0):
             query.page_num = page_num
