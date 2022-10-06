@@ -251,6 +251,8 @@ class WatchlistsPage(ResponseModel):
     """
     A model representing a page of `Watchlist` objects.
 
+    **Fields**:
+
     * **total_count**: `int` - Total count of watchlists found by the query.
     * **watchlists**: `List[Watchlist]` - The list `n` number of watchlists retrieved from the query, where `n=page_size`.
     """
