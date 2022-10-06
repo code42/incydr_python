@@ -7,9 +7,13 @@ from typing import Union
 from isodate import duration_isoformat
 from isodate import parse_duration
 from pydantic import BaseModel
+from pydantic import conint
+from pydantic import Field
 from pydantic import root_validator
 from pydantic import validate_arguments
 
+from incydr._core.models import Model
+from incydr._file_events.models.response import SavedSearch
 from incydr._queries.util import parse_timestamp
 from incydr.enums.file_events import Category
 from incydr.enums.file_events import EventAction
@@ -99,21 +103,7 @@ class FilterGroup(BaseModel):
     filters: Optional[List[Filter]]
 
 
-class Query(BaseModel):
-    groupClause: str = "AND"
-    groups: Optional[List[FilterGroup]]
-    pgNum: int = 1
-    pgSize: int = 100
-    pgToken: Optional[str]
-    srtDir: str = "asc"
-    srtKey: EventSearchTerm = "event.id"
-
-    class Config:
-        use_enum_values = True
-        json_encoders = {datetime: lambda dt: dt.isoformat().replace("+00:00", "Z")}
-
-
-class EventQuery:
+class EventQuery(Model):
     """
     Class to build a file event query. Use the class methods to attach additional filter operators.
 
@@ -123,39 +113,44 @@ class EventQuery:
          * **end_date**: `int`, `float`, `str`, `datetime` - End of the date range to query for events.  Defaults to None.
     """
 
+    group_clause: str = Field("AND", alias="groupClause")
+    groups: Optional[List[FilterGroup]]
+    page_num: int = Field(1, alias="pgNum")
+    page_size: conint(le=10000) = Field(100, alias="pgSize")
+    page_token: Optional[str] = Field("", alias="pgToken")
+    sort_dir: str = Field("asc", alias="srtDir")
+    sort_key: EventSearchTerm = Field("event.id", alias="srtKey")
+
+    class Config:
+        validate_assignment = True
+        use_enum_values = True
+        json_encoders = {datetime: lambda dt: dt.isoformat().replace("+00:00", "Z")}
+
     def __init__(
         self,
         start_date: Union[datetime, timedelta, int, float, str] = None,
         end_date: Union[datetime, int, float, str] = None,
     ):
-        self._query = Query(groups=[])
+        groups = []
         if start_date or end_date:
-            self._query.groups.append(
-                _create_date_range_filter_group(start_date, end_date)
-            )
-
-    def __str__(self):
-        return str(self._query)
-
-    def dict(self):
-        """
-        Returns the query object as a dictionary.
-        """
-        return self._query.dict()
+            groups.append(_create_date_range_filter_group(start_date, end_date))
+        super().__init__(groups=groups)
 
     def equals(self, term: str, values: Union[str, List[str]]):
         """
-        Adds an `equals` filter to the query. The opposite of the `not_equals` filter.
+        Adds an `equals` filter to the query.
 
-        When passed as part of a query, returns events when the field corresponding to the filter term equals the indicated value(s).
+        When passed as part of a query, returns events when the field corresponding to the filter term equals the
+        indicated value(s).
 
         Example:
-            `EventQuery(**kwargs).equals('file.category', 'Document')` creates a query which will return file events where the `file.category` field is equal to `Document`.
+            `EventQuery(**kwargs).equals('file.category', 'Document')` creates a query which will return file events
+            where the `file.category` field is equal to `Document`.
 
         **Parameters**:
 
         * **term**: `str` - The term which corresponds to a file event field.
-        * **values**: `str`, `List[str]` - The value(s) for the term to match.
+        * **values**: `str | List[str]` - The value(s) for the term to match.
         """
         if isinstance(values, str):
             values = [values]
@@ -166,7 +161,7 @@ class EventQuery:
             filters=filters,
             filterClause="OR" if len(values) > 1 else "AND",
         )
-        self._query.groups.append(filter_group)
+        self.groups.append(filter_group)
         return self
 
     def not_equals(self, term, values: Union[str, List[str]]):
@@ -181,7 +176,7 @@ class EventQuery:
         **Parameters**:
 
         * **term**: `str` - The term which corresponds to a file event field.
-        * **values**: `str`, `List[str]` - The value(s) for the term to not match.
+        * **values**: `str | List[str]` - The value(s) for the term to not match.
         """
 
         if isinstance(values, str):
@@ -195,7 +190,7 @@ class EventQuery:
             filters=filters,
             filterClause="AND",
         )
-        self._query.groups.append(filter_group)
+        self.groups.append(filter_group)
         return self
 
     def exists(self, term: str):
@@ -211,14 +206,14 @@ class EventQuery:
 
         * **term**: `str` - The term which corresponds to a file event field.
         """
-        self._query.groups.append(
+        self.groups.append(
             FilterGroup(filters=[Filter(term=term, operator=Operator.EXISTS)])
         )
         return self
 
     def does_not_exist(self, term: str):
         """
-        Adds a `does_not_exist` filter to the query. The opposite of the `exists` filter.
+        Adds a `does_not_exist` filter to the query.
 
         When passed as part of a query, returns events when the field corresponding to the filter term is `null`.
 
@@ -229,7 +224,7 @@ class EventQuery:
 
         * **term**: `str` - The term which corresponds to a file event field.
         """
-        self._query.groups.append(
+        self.groups.append(
             FilterGroup(filters=[Filter(term=term, operator=Operator.DOES_NOT_EXIST)])
         )
         return self
@@ -250,7 +245,7 @@ class EventQuery:
         * **values**: `int` - The value for the term to be greater than.
         """
 
-        self._query.groups.append(
+        self.groups.append(
             FilterGroup(
                 filters=[Filter(term=term, operator=Operator.GREATER_THAN, value=value)]
             )
@@ -272,7 +267,7 @@ class EventQuery:
         * **term**: `str` - The term which corresponds to a file event field.
         * **values**: `int` - The value for the term to be less than.
         """
-        self._query.groups.append(
+        self.groups.append(
             FilterGroup(
                 filters=[Filter(term=term, operator=Operator.LESS_THAN, value=value)]
             )
@@ -286,8 +281,28 @@ class EventQuery:
 
         Default operator is `AND`, which returns events that match all filters in the query.
         """
-        self._query.groupClause = "OR"
+        self.group_clause = "OR"
         return self
+
+    @classmethod
+    def from_saved_search(cls, saved_search: SavedSearch):
+        query = cls()
+        if saved_search.group_clause:
+            query.group_clause = saved_search.group_clause
+        if saved_search.groups:
+            for i in saved_search.groups:
+                filters = [
+                    Filter.construct(value=f.value, operator=f.operator, term=f.term)
+                    for f in i.filters
+                ]
+                query.groups.append(
+                    FilterGroup.construct(filterClause=i.filter_clause, filters=filters)
+                )
+        if saved_search.srt_dir:
+            query.sort_dir = saved_search.srt_dir
+        if saved_search.srt_key:
+            query.sort_key = saved_search.srt_key
+        return query
 
 
 def _create_date_range_filter_group(start_date, end_date):

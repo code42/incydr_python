@@ -32,7 +32,7 @@ def test_event_query_when_start_date_creates_on_or_after_filter_group(start_time
             )
         ]
     )
-    assert q._query.groups.pop() == expected
+    assert q.groups.pop() == expected
 
 
 @pytest.mark.parametrize(
@@ -55,7 +55,7 @@ def test_event_query_when_end_date_creates_on_or_before_filter_group(end_timesta
             )
         ]
     )
-    assert q._query.groups.pop() == expected
+    assert q.groups.pop() == expected
 
 
 @pytest.mark.parametrize(
@@ -70,12 +70,12 @@ def test_event_query_when_start_date_duration_creates_within_the_last_filter_gro
         filterClause="AND",
         filters=[Filter(term="@timestamp", operator="WITHIN_THE_LAST", value="P7D")],
     )
-    assert q._query.groups.pop() == expected
+    assert q.groups.pop() == expected
 
 
 def test_event_query_when_with_no_date_args_appends_no_groups():
     q = EventQuery()
-    assert len(q._query.groups) == 0
+    assert len(q.groups) == 0
 
 
 def test_event_query_is_when_single_value_creates_expected_filter_group():
@@ -84,7 +84,7 @@ def test_event_query_is_when_single_value_creates_expected_filter_group():
         filterClause="AND",
         filters=[Filter(term="file.category", operator="IS", value="Document")],
     )
-    assert q._query.groups.pop() == expected
+    assert q.groups.pop() == expected
 
 
 def test_event_query_is_when_multiple_values_creates_expected_filter_group():
@@ -99,7 +99,7 @@ def test_event_query_is_when_multiple_values_creates_expected_filter_group():
             Filter(term="file.category", operator="IS", value="Executable"),
         ],
     )
-    assert q._query.groups.pop() == expected
+    assert q.groups.pop() == expected
 
 
 def test_event_query_is_not_when_single_value_creates_expected_filter_group():
@@ -108,7 +108,7 @@ def test_event_query_is_not_when_single_value_creates_expected_filter_group():
         filterClause="AND",
         filters=[Filter(term="file.category", operator="IS_NOT", value="Document")],
     )
-    assert q._query.groups.pop() == expected
+    assert q.groups.pop() == expected
 
 
 def test_event_query_is_not_when_multiple_values_creates_expected_filter_group():
@@ -123,7 +123,7 @@ def test_event_query_is_not_when_multiple_values_creates_expected_filter_group()
             Filter(term="file.category", operator="IS_NOT", value="Executable"),
         ],
     )
-    assert q._query.groups.pop() == expected
+    assert q.groups.pop() == expected
 
 
 def test_event_query_is_when_no_values_raises_error():
@@ -149,7 +149,7 @@ def test_event_query_exists_creates_expected_filter_group():
     expected = FilterGroup(
         filters=[Filter(term="event.action", operator="EXISTS", value=None)]
     )
-    assert q._query.groups.pop() == expected
+    assert q.groups.pop() == expected
 
 
 def test_event_query_does_not_exist_creates_expected_filter_group():
@@ -157,7 +157,7 @@ def test_event_query_does_not_exist_creates_expected_filter_group():
     expected = FilterGroup(
         filters=[Filter(term="event.action", operator="DOES_NOT_EXIST", value=None)]
     )
-    assert q._query.groups.pop() == expected
+    assert q.groups.pop() == expected
 
 
 @pytest.mark.parametrize("input,expected_value", [(10, 10), ("10", 10.0), (10.0, 10.0)])
@@ -168,7 +168,7 @@ def test_event_query_greater_than_creates_expected_filter_group(input, expected_
             Filter(term="risk.score", operator="GREATER_THAN", value=expected_value)
         ]
     )
-    assert q._query.groups.pop() == expected
+    assert q.groups.pop() == expected
 
 
 def test_event_query_greater_than_when_non_numerical_value_raises_error():
@@ -183,7 +183,7 @@ def test_event_query_less_than_creates_expected_filter_group(input, expected_val
     expected = FilterGroup(
         filters=[Filter(term="risk.score", operator="LESS_THAN", value=expected_value)]
     )
-    assert q._query.groups.pop() == expected
+    assert q.groups.pop() == expected
 
 
 def test_event_query_less_than_when_non_numerical_value_raises_error():
@@ -194,4 +194,4 @@ def test_event_query_less_than_when_non_numerical_value_raises_error():
 
 def test_event_query_matches_any_sets_query_group_clause_to_or():
     q = EventQuery(start_date=TEST_START_DATE).matches_any()
-    assert q._query.groupClause == "OR"
+    assert q.group_clause == "OR"
