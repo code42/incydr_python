@@ -10,6 +10,7 @@ from incydr._alert_rules.models.request import GetRulesRequest
 from incydr._alert_rules.models.request import UserRequest
 from incydr._alert_rules.models.response import RuleDetails
 from incydr._alert_rules.models.response import RuleUsersList
+from incydr._user_risk_profiles.models import UserRiskProfile
 
 
 class AlertRulesClient:
@@ -128,38 +129,30 @@ class AlertRulesV2:
                 url="/v2/alert-rules/disable", json=rule_ids
             )
 
-    def add_users(
-        self,
-        rule_id: str,
-        users: Union[str, List[str], List[List[str]]],
-    ) -> Response:
+    def add_users(self, rule_id: str, user_id: str, aliases: List[str]) -> Response:
         """
         Add users to an alert rule. Note that added users could become either included included or excluded from the rule, depending on the rule's configuration.
 
         **Parameters**:
 
         * **rule_id**: `str` (required) - The ID of the rule to update.
-        * **users**: `List[str]`, `List[List[str]` (required) - A list of user IDs to add to the rule.  Use lists where the first element is the user ID to add user aliases associated with a given user. Ex: `users=['user-id-1', ['user-id-2', 'user-alias-2']]`
+        * **user_id**: `str` - Unique user ID.
+        * **aliases**: `List[str]` - A list of aliases associated with a given user.
 
         **Returns**: A `requests.Response` indicating success.
         """
-        if isinstance(users, str):
-            users = [users]
 
-        users_list = []
+        # get aliases from User Risk Profile
+        if aliases == "ALL":
+            aliases = self._get_user_aliases(user_id)
 
-        for user in users:
-            if isinstance(user, str):
-                users_list.append(
-                    UserRequest(userIdFromAuthority=user, aliases=[]).dict()
-                )
-            else:
-                users_list.append(
-                    UserRequest(userIdFromAuthority=user[0], aliases=user[1:]).dict()
-                )
+        if not isinstance(aliases, List):
+            aliases = [aliases]
+
+        request = [UserRequest(userIdFromAuthority=user_id, aliases=aliases).dict()]
 
         return self._parent.session.post(
-            url=f"/v2/alert-rules/{rule_id}/users", json=users_list
+            url=f"/v2/alert-rules/{rule_id}/users", json=request
         )
 
     def remove_users(self, rule_id: str, users: Union[str, List[str]]) -> Response:
@@ -180,7 +173,7 @@ class AlertRulesV2:
         )
 
     def remove_user_aliases(
-        self, rule_id: str, user_aliases: Union[str, List[str]]
+        self, rule_id: str, user_id: str, aliases: Union[str, List[str]]
     ) -> Response:
         """
         Remove user aliases from a rule. Note that removed user aliases could become either included included or excluded from the rule, depending on the rule's configuration.
@@ -188,23 +181,23 @@ class AlertRulesV2:
         **Parameters**:
 
         * **rule_id**: `str` (required) - The ID of the rule to update.
-        * **user_aliases**: `List[List[str]]` (required) - A list of user IDs with the associated aliases to remove from the rule. Each list should be have the user ID as the first element and desired aliases as the following elements. Ex: `users=[['user-id-1', 'user-alias-1', 'user-alias-12'], ['user-id-2', 'user-alias-2']]`
+        * **user_id**: `str` - Unique user ID.
+        * **aliases**: `List[str]` - A list of aliases associated with a given user.
 
         **Returns**: A `requests.Response` indicating success.
         """
-        users = []
 
-        for user in user_aliases:
-            if not isinstance(user, List):
-                raise ValueError(
-                    "Each user list element should contain the user ID followed by the desired user aliases to remove from the rule."
-                )
-            users.append(
-                UserRequest(userIdFromAuthority=user[0], aliases=user[1:]).dict()
-            )
+        # get aliases from User Risk Profile
+        if aliases == "ALL":
+            aliases = self._get_user_aliases(user_id)
+
+        if isinstance(aliases, str):
+            aliases = [aliases]
+
+        request = [UserRequest(userIdFromAuthority=user_id, aliases=aliases).dict()]
 
         return self._parent.session.post(
-            url=f"/v2/alert-rules/{rule_id}/remove-user-aliases", json=users
+            url=f"/v2/alert-rules/{rule_id}/remove-user-aliases", json=request
         )
 
     def remove_all_users(self, rule_id: str) -> Response:
@@ -231,3 +224,8 @@ class AlertRulesV2:
         """
         response = self._parent.session.get(url=f"/v2/alert-rules/{rule_id}/users")
         return RuleUsersList.parse_response(response)
+
+    def _get_user_aliases(self, user_id):
+        response = self._parent.session.get(f"/v1/user-risk-profiles/{user_id}")
+        profile = UserRiskProfile.parse_response(response)
+        return profile.cloud_aliases

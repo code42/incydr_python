@@ -222,6 +222,34 @@ TEST_RULE_2 = {
     "isSystemRule": True,
 }
 
+TEST_USER_RISK_PROFILE = {
+    "active": True,
+    "cloudAliases": ["cloud-user-1@email.com", "foo@bar.com", "bazAccount"],
+    "country": "France",
+    "deleted": False,
+    "department": "Finance",
+    "displayName": "Phill",
+    "division": "22-19",
+    "employmentType": "Part-Time",
+    "endDate": {
+        "year": 2021,
+        "month": 2,
+        "day": 1,
+    },
+    "locality": None,
+    "managerDisplayName": None,
+    "managerId": None,
+    "managerUsername": None,
+    "notes": None,
+    "region": None,
+    "startDate": {"year": 2019, "month": 3, "day": 2},
+    "supportUser": None,
+    "tenantId": None,
+    "title": None,
+    "userId": "1",
+    "username": None,
+}
+
 
 def test_get_page_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
@@ -367,11 +395,36 @@ def test_disable_rules_when_multiple_rule_ids_returns_expected_data(
     )
 
 
+def test_add_users_when_all_looks_up_profile_and_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
+    data = [
+        {
+            "userIdFromAuthority": "user-1",
+            "aliases": ["cloud-user-1@email.com", "foo@bar.com", "bazAccount"],
+        },
+    ]
+    httpserver_auth.expect_ordered_request(
+        "/v1/user-risk-profiles/user-1"
+    ).respond_with_json(TEST_USER_RISK_PROFILE)
+    httpserver_auth.expect_ordered_request(
+        uri=f"/v2/alert-rules/{TEST_RULE_ID}/users",
+        method="POST",
+        json=data,
+    ).respond_with_data()
+
+    c = Client()
+    assert (
+        c.alert_rules.v2.add_users(
+            TEST_RULE_ID, user_id="user-1", aliases="ALL"
+        ).status_code
+        == 200
+    )
+
+
 def test_add_users_returns_expected_data(httpserver_auth: HTTPServer):
     data = [
         {"userIdFromAuthority": "user-1", "aliases": ["alias-1", "alias-2"]},
-        {"userIdFromAuthority": "user-2", "aliases": []},
-        {"userIdFromAuthority": "user-3", "aliases": ["alias-3"]},
     ]
     httpserver_auth.expect_request(
         uri=f"/v2/alert-rules/{TEST_RULE_ID}/users", method="POST", json=data
@@ -380,12 +433,7 @@ def test_add_users_returns_expected_data(httpserver_auth: HTTPServer):
     c = Client()
     assert (
         c.alert_rules.v2.add_users(
-            TEST_RULE_ID,
-            users=[
-                ["user-1", "alias-1", "alias-2"],
-                "user-2",
-                ["user-3", "alias-3"],
-            ],
+            TEST_RULE_ID, user_id="user-1", aliases=["alias-1", "alias-2"]
         ).status_code
         == 200
     )
@@ -411,8 +459,6 @@ def test_remove_users_returns_expected_data(
 def test_remove_user_aliases_returns_expected_data(httpserver_auth: HTTPServer):
     data = [
         {"userIdFromAuthority": "user-1", "aliases": ["alias-0", "alias-1"]},
-        {"userIdFromAuthority": "user-2", "aliases": ["alias-2"]},
-        {"userIdFromAuthority": "user-3", "aliases": ["alias-3"]},
     ]
     httpserver_auth.expect_request(
         uri=f"/v2/alert-rules/{TEST_RULE_ID}/remove-user-aliases",
@@ -423,12 +469,34 @@ def test_remove_user_aliases_returns_expected_data(httpserver_auth: HTTPServer):
     c = Client()
     assert (
         c.alert_rules.v2.remove_user_aliases(
-            TEST_RULE_ID,
-            user_aliases=[
-                ["user-1", "alias-0", "alias-1"],
-                ["user-2", "alias-2"],
-                ["user-3", "alias-3"],
-            ],
+            TEST_RULE_ID, user_id="user-1", aliases=["alias-0", "alias-1"]
+        ).status_code
+        == 200
+    )
+
+
+def test_remove_user_aliases_when_all_looks_up_profile_and_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
+    data = [
+        {
+            "userIdFromAuthority": "user-1",
+            "aliases": ["cloud-user-1@email.com", "foo@bar.com", "bazAccount"],
+        },
+    ]
+    httpserver_auth.expect_ordered_request(
+        "/v1/user-risk-profiles/user-1"
+    ).respond_with_json(TEST_USER_RISK_PROFILE)
+    httpserver_auth.expect_ordered_request(
+        uri=f"/v2/alert-rules/{TEST_RULE_ID}/remove-user-aliases",
+        method="POST",
+        json=data,
+    ).respond_with_data()
+
+    c = Client()
+    assert (
+        c.alert_rules.v2.remove_user_aliases(
+            TEST_RULE_ID, user_id="user-1", aliases="ALL"
         ).status_code
         == 200
     )
