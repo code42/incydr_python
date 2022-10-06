@@ -1,5 +1,3 @@
-from typing import Union
-
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
@@ -7,9 +5,6 @@ from .models.response import FileEventsPage
 from .models.response import SavedSearch
 from .models.response import SavedSearchesPage
 from incydr._queries.file_events import EventQuery
-from incydr._queries.file_events import Filter
-from incydr._queries.file_events import FilterGroup
-from incydr._queries.file_events import Query
 
 
 class FileEventsV2:
@@ -30,33 +25,29 @@ class FileEventsV2:
         self._parent = parent
         self._retry_adapter_mounted = False
 
-    def search(
-        self,
-        query: Union[str, Query, EventQuery, SavedSearch],
-    ) -> FileEventsPage:
+    def search(self, query: EventQuery) -> FileEventsPage:
         """
-        Search file events.
+        Search for file events.
+
+        If the search response contains a `next_page_token` value, it will automatically be set on the query object's
+        `.page_token` field. So if a query results in more total events than your set page size, you can just make
+        another call to `.search()` with the same query object to fetch the next page. To get all events from a query,
+        continue calling search with the same `EventQuery` object until the response has an empty `.file_events` field.
+
+        See [File Event Pagination][pagination] for more details.
 
         **Parameters**:
 
-        * **query**: `EventQuery | SavedSearch | str` (required) - The query object to filter file events by
-        different fields.
+        * **query**: `EventQuery` (required) - The query object to filter file events by different fields.
 
         **Returns**: A [`FileEventsPage`][fileeventspage-model] object.
         """
         self._mount_retry_adapter()
 
-        if isinstance(query, SavedSearch):
-            query = _create_query_from_saved_search(query)
-
-        if isinstance(query, str):
-            query = Query.parse_raw(query)
-
-        if isinstance(query, dict):
-            query = Query(**query)
-
         response = self._parent.session.post("/v2/file-events", json=query.dict())
-        return FileEventsPage.parse_response(response)
+        page = FileEventsPage.parse_response(response)
+        query.page_token = page.next_pg_token
+        return page
 
     def list_saved_searches(self) -> SavedSearchesPage:
         """
@@ -85,20 +76,6 @@ class FileEventsV2:
         # the api will return a 404 if a no saved searches matching the id are found.
         page = SavedSearchesPage.parse_response(response)
         return page.searches[0]
-
-    def execute_saved_search(self, search_id: str) -> FileEventsPage:
-        """
-        Search file events using a saved search. A helper method which behaves the same as retrieving
-        a saved search with the `get_saved_search_by_id()` and then passing the returned response object
-        to the `search()` method.
-
-        **Parameters**:
-
-        * **search_id**: `str` - The unique ID of the saved search.
-
-        **Returns**: A [`FileEventsPage`][fileeventspage-model] object.
-        """
-        return self.search(self.get_saved_search(search_id))
 
     def _mount_retry_adapter(self):
         """Sets custom Retry strategy for FFS url requests to gracefully handle being rate-limited on FFS queries."""
@@ -133,26 +110,6 @@ class FileEventsClient:
         if self._v2 is None:
             self._v2 = FileEventsV2(self._parent)
         return self._v2
-
-
-def _create_query_from_saved_search(saved_search: SavedSearch) -> Query:
-    query = Query(groups=[])
-    if saved_search.group_clause:
-        query.groupClause = saved_search.group_clause
-    if saved_search.groups:
-        for i in saved_search.groups:
-            filters = [
-                Filter.construct(value=f.value, operator=f.operator, term=f.term)
-                for f in i.filters
-            ]
-            query.groups.append(
-                FilterGroup.construct(filterClause=i.filter_clause, filters=filters)
-            )
-    if saved_search.srt_dir:
-        query.srtDir = saved_search.srt_dir
-    if saved_search.srt_key:
-        query.srtKey = saved_search.srt_key
-    return query
 
 
 class FFSQueryRetryStrategy(Retry):
