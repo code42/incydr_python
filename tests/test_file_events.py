@@ -434,7 +434,7 @@ TEST_SAVED_SEARCH_QUERY = {
     ],
     "pgNum": 1,
     "pgSize": 100,
-    "pgToken": None,
+    "pgToken": "",
     "srtDir": "asc",
     "srtKey": "event.id",
 }
@@ -461,13 +461,7 @@ def mock_list_saved_searches(httpserver_auth):
 
 
 @pytest.mark.parametrize(
-    ("query, expected_query"),
-    [
-        (TEST_EVENT_QUERY, TEST_DICT_QUERY),
-        (TEST_SAVED_SEARCH_1, TEST_SAVED_SEARCH_QUERY),
-        (TEST_DICT_QUERY, TEST_DICT_QUERY),
-        (json.dumps(TEST_DICT_QUERY), TEST_DICT_QUERY),
-    ],
+    "query, expected_query",
     [(TEST_EVENT_QUERY, TEST_DICT_QUERY)],
 )
 def test_search_sends_expected_query(
@@ -636,7 +630,7 @@ def test_search_when_filter_params_makes_expected_api_call(
         ],
         "pgNum": 1,
         "pgSize": 100,
-        "pgToken": None,
+        "pgToken": "",
         "srtDir": "asc",
         "srtKey": "event.id",
     }
@@ -687,11 +681,20 @@ def test_search_when_filter_params_makes_expected_api_call(
             10,
         ],
     )
-
     assert result.exit_code == 0
 
 
-def test_search_when_advanced_query_makes_expected_api_call(runner):
+def test_search_when_advanced_query_makes_expected_api_call(runner, httpserver_auth):
+    event_data = {
+        "fileEvents": [TEST_EVENT_1, TEST_EVENT_2],
+        "nextPgToken": None,
+        "problems": None,
+        "totalCount": 2,
+    }
+    httpserver_auth.expect_request(
+        "/v2/file-events", method="POST", json=TEST_DICT_QUERY
+    ).respond_with_json(event_data)
+
     result = runner.invoke(
         incydr,
         [
@@ -699,14 +702,14 @@ def test_search_when_advanced_query_makes_expected_api_call(runner):
             "search",
             "--advanced-query",
             json.dumps(TEST_DICT_QUERY),
-        ],  # TODO
+        ],
     )
     assert result.exit_code == 0
 
 
 def test_search_when_saved_search_makes_expected_api_call(
     runner, mock_get_saved_search, httpserver_auth
-):  # TODO
+):
     event_data = {
         "fileEvents": [TEST_EVENT_1, TEST_EVENT_2],
         "nextPgToken": None,
@@ -720,7 +723,6 @@ def test_search_when_saved_search_makes_expected_api_call(
     result = runner.invoke(
         incydr, ["file-events", "search", "--saved-search", TEST_SAVED_SEARCH_ID]
     )
-
     assert result.exit_code == 0
 
 

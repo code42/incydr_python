@@ -14,7 +14,7 @@ from pydantic import validate_arguments
 
 from incydr._core.models import Model
 from incydr._file_events.models.response import SavedSearch
-from incydr._queries.util import parse_timestamp
+from incydr._queries.utils import parse_timestamp
 from incydr.enums.file_events import Category
 from incydr.enums.file_events import EventAction
 from incydr.enums.file_events import EventSearchTerm
@@ -84,6 +84,16 @@ class FilterGroup(BaseModel):
     filters: Optional[List[Filter]]
 
 
+class Query(Model):
+    groupClause: str = "AND"
+    groups: Optional[List[FilterGroup]]
+    pgNum: int = 1
+    pgSize: int = 100
+    pgToken: Optional[str]
+    srtDir: str = "asc"
+    srtKey: EventSearchTerm = "event.id"
+
+
 class EventQuery(Model):
     """
     Class to build a file event query. Use the class methods to attach additional filter operators.
@@ -111,11 +121,15 @@ class EventQuery(Model):
         self,
         start_date: Union[datetime, timedelta, int, float, str] = None,
         end_date: Union[datetime, int, float, str] = None,
+        **kwargs,
     ):
-        groups = []
+        groups = kwargs.get("groups") or []
+
         if start_date or end_date:
             groups.append(_create_date_range_filter_group(start_date, end_date))
-        super().__init__(groups=groups)
+
+        kwargs["groups"] = groups
+        super().__init__(**kwargs)
 
     def equals(self, term: str, values: Union[str, List[str]]):
         """
@@ -267,6 +281,9 @@ class EventQuery(Model):
 
     @classmethod
     def from_saved_search(cls, saved_search: SavedSearch):
+        """
+        Create an `EventQuery` object from a `SavedSearch` response.
+        """
         query = cls()
         if saved_search.group_clause:
             query.group_clause = saved_search.group_clause
@@ -284,6 +301,14 @@ class EventQuery(Model):
         if saved_search.srt_key:
             query.sort_key = saved_search.srt_key
         return query
+
+    # @classmethod
+    # def from_string(cls, advanced_query: str):
+    #     """
+    #     Create an `EventQuery` object from a json string.
+    #     """
+    #     query = cls()
+    #     q = Query.parse_raw(str)
 
 
 def _create_date_range_filter_group(start_date, end_date):

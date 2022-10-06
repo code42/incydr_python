@@ -58,7 +58,7 @@ import incydr
 
 client = incydr.Client(**kwargs)
 
-saved_search = client.file_events.v2.get_saved_search_by_id("<saved_search_id>")
+saved_search = client.file_events.v2.get_saved_search("<saved_search_id>")
 query = incydr.EventQuery.from_saved_search(saved_search)
 
 results = client.file_events.v2.search(query)

@@ -8,10 +8,8 @@ from rich.panel import Panel
 from rich.table import Table
 from typer import echo
 
-from incydr._file_events.client import _create_query_from_saved_search
 from incydr._file_events.models.response import SavedSearch
 from incydr._queries.file_events import EventQuery
-from incydr._queries.file_events import Query
 from incydr.cli import console
 from incydr.cli.cmds.options.filter_options import advanced_query_option
 from incydr.cli.cmds.options.filter_options import filter_options
@@ -104,11 +102,10 @@ def search(
         )
 
     if saved_search:
-        query = _create_query_from_saved_search(
-            client.file_events.v2.get_saved_search(saved_search)
-        )
+        saved_search = client.file_events.v2.get_saved_search(saved_search)
+        query = EventQuery.from_saved_search(saved_search)
     elif advanced_query:
-        query = Query.parse_raw(advanced_query)
+        query = EventQuery.parse_raw(advanced_query)
     else:
         query = _create_query(
             start=start,
