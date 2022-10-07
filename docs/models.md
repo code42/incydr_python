@@ -14,6 +14,19 @@
 See [Pydantic documentation](https://pydantic-docs.helpmanual.io/usage/models/#model-properties) for full list of
 available model methods.
 
+## Alerts
+---
+
+### `AlertDetails` model
+
+::: incydr.models.AlertDetails
+    :docstring:
+
+### `AlertQueryPage` model
+
+::: incydr.models.AlertQueryPage
+    :docstring:
+
 ## Cases
 ---
 

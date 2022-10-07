@@ -134,7 +134,7 @@ class IncydrSettings(BaseSettings):
     @validator("use_rich")
     def _validate_use_rich(cls, value, **kwargs):
         if value:
-            pretty.install(max_length=2)
+            pretty.install()
         else:
             sys.displayhook = _sys_displayhook
         return value
