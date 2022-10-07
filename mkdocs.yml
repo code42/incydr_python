@@ -1,13 +1,16 @@
-site_name: Incydr SDK
+site_name: ""
 site_description: A next-generation python client for Incydr.
 site_url: https://developer.code42.com
 
 theme:
-    name: 'material'
-    favicon: favicon.ico
-    logo: favicon.ico
+    name: material
+    favicon: images/favicon.ico
+    logo: images/logo_developers.svg
     features:
         - navigation.sections
+        - navigation.tabs
+        - navigation.tabs.sticky
+        - navigation.instant
         - navigation.tracking
         - content.code.annotate
     palette:
@@ -29,22 +32,31 @@ edit_uri: ""
 
 nav:
   - Introduction: 'index.md'
-  - Client: 'client.md'
-  - Settings:
-    - Configuration: 'settings.md'
-    - Logging: 'logging.md'
-  - Cases: 'cases.md'
-  - Customer: 'customer.md'
-  - Departments: 'departments.md'
-  - Devices: 'devices.md'
-  - Directory Groups: 'directory_groups.md'
-  - File Events: 'file_events.md'
-  - File Event Queries: 'file_event_queries.md'
-  - Legal Hold: 'legal_hold.md'
-  - Users: 'users.md'
-  - User Risk Profiles: 'user_risk_profiles.md'
-  - Watchlists: 'watchlists.md'
-  - Models: 'models.md'
+  - API Reference: 'api-reference.md'
+  - SDK:
+    - Introduction: 'sdk/index.md'
+    - Client: 'sdk/client.md'
+    - Settings:
+        - Configuration: 'sdk/settings.md'
+        - Logging: 'sdk/logging.md'
+    - Cases: 'sdk/cases.md'
+    - Customer: 'sdk/customer.md'
+    - Departments: 'sdk/departments.md'
+    - Devices: 'sdk/devices.md'
+    - Directory Groups: 'sdk/directory_groups.md'
+    - File Events: 'sdk/file_events.md'
+    - File Event Queries: 'sdk/file_event_queries.md'
+    - Legal Hold: 'sdk/legal_hold.md'
+    - Users: 'sdk/users.md'
+    - User Risk Profiles: 'sdk/user_risk_profiles.md'
+    - Watchlists: 'sdk/watchlists.md'
+    - Models: 'sdk/models.md'
+  - CLI:
+      - Commands: 'cli/commands.md'
+  - Guides:
+    - Microsoft Sentinel:
+      - Data Collector API: 'guides/azure-sentinel-data-collector.md'
+      - Log Analytics Agent: 'guides/azure-sentinel-log-analytics.md'
 
 markdown_extensions:
   - pymdownx.critic
