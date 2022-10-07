@@ -27,6 +27,10 @@ available model methods.
 ::: incydr.models.CasesPage
     :docstring:
 
+### `CaseFileEvents` model
+
+::: incydr.models.CaseFileEvents
+    :docstring:
 
 ## Customer
 ---
@@ -36,6 +40,13 @@ available model methods.
 ::: incydr.models.Customer
     :docstring:
 
+## Departments
+---
+
+### `DepartmentsPage` model
+
+::: incydr.models.DepartmentsPage
+    :docstring:
 
 ## Devices
 ---
@@ -50,6 +61,18 @@ available model methods.
 ::: incydr.models.DevicesPage
     :docstring:
 
+## Directory Groups
+---
+
+### `DirectoryGroup` model
+
+::: incydr.models.DirectoryGroup
+    :docstring:
+
+### `DirectoryGroupsPage` model
+
+::: incydr.models.DirectoryGroupsPage
+    :docstring:
 
 ## File Events
 ---
@@ -74,6 +97,33 @@ available model methods.
 ::: incydr.models.SavedSearchesPage
     :docstring:
 
+## Legal Hold
+---
+
+### `Policy` model
+
+::: incydr.models.Policy
+    :docstring:
+
+### `Matter` model
+
+::: incydr.models.Matter
+    :docstring:
+
+### `Custodian` model
+
+::: incydr.models.Custodian
+    :docstring:
+
+### `CustodianMembership` model
+
+::: incydr.models.CustodianMembership
+    :docstring:
+
+### `MatterMembership` model
+
+::: incydr.models.MatterMembership
+    :docstring:
 
 ## Roles
 ---
@@ -88,7 +138,6 @@ available model methods.
 ::: incydr.models.UpdateRolesResponse
     :docstring:
 
-
 ## Users
 ---
 
@@ -100,4 +149,70 @@ available model methods.
 ### `UsersPage` model
 
 ::: incydr.models.UsersPage
+    :docstring:
+
+## User Risk Profiles
+---
+
+### `UserRiskProfile` model
+
+::: incydr.models.UserRiskProfile
+    :docstring:
+
+### `UserRiskProfilesPage` model
+
+::: incydr.models.UserRiskProfilesPage
+    :docstring:
+
+## Watchlists
+---
+
+### `Watchlist` model
+
+::: incydr.models.Watchlist
+    :docstring:
+
+### `WatchlistsPage` model
+
+::: incydr.models.WatchlistsPage
+    :docstring:
+
+### `WatchlistUser` model
+
+::: incydr.models.WatchlistUser
+    :docstring:
+
+### `WatchlistMembersList` model
+
+::: incydr.models.WatchlistMembersList
+    :docstring:
+
+### `IncludedUsersList` model
+
+::: incydr.models.IncludedUsersList
+    :docstring:
+
+### `ExcludedUsersList` model
+
+::: incydr.models.ExcludedUsersList
+    :docstring:
+
+### `IncludedDepartmentsList` model
+
+::: incydr.models.IncludedDepartmentsList
+    :docstring:
+
+### `IncludedDepartment` model
+
+::: incydr.models.IncludedDepartment
+    :docstring:
+
+### `IncludedDirectoryGroupsList` model
+
+::: incydr.models.IncludedDirectoryGroupsList
+    :docstring:
+
+### `IncludedDirectoryGroup` model
+
+::: incydr.models.IncludedDirectoryGroup
     :docstring:

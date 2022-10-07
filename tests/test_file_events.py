@@ -6,11 +6,11 @@ from pytest_httpserver import HTTPServer
 
 from incydr._core.client import Client
 from incydr._file_events.models.event import FileEventV2
-from incydr._file_events.models.request import SearchFilter
-from incydr._file_events.models.request import SearchFilterGroup
 from incydr._file_events.models.response import FileEventsPage
 from incydr._file_events.models.response import SavedSearch
 from incydr._file_events.models.response import SavedSearchesPage
+from incydr._file_events.models.response import SearchFilter
+from incydr._file_events.models.response import SearchFilterGroup
 from incydr._queries.file_events import EventQuery
 
 MICROSECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -398,7 +398,7 @@ TEST_DICT_QUERY = {
     ],
     "pgNum": 1,
     "pgSize": 100,
-    "pgToken": None,
+    "pgToken": "",
     "srtDir": "asc",
     "srtKey": "event.id",
 }
@@ -440,18 +440,14 @@ TEST_SAVED_SEARCH_QUERY = {
 
 @pytest.mark.parametrize(
     ("query, expected_query"),
-    [
-        (TEST_EVENT_QUERY, TEST_DICT_QUERY),
-        (TEST_SAVED_SEARCH_1, TEST_SAVED_SEARCH_QUERY),
-        (TEST_DICT_QUERY, TEST_DICT_QUERY),
-    ],
+    [(TEST_EVENT_QUERY, TEST_DICT_QUERY)],
 )
 def test_search_sends_expected_query(
     httpserver_auth: HTTPServer, query, expected_query
 ):
     event_data = {
         "fileEvents": [TEST_EVENT_1, TEST_EVENT_2],
-        "nextPgToken": None,
+        "nextPgToken": "",
         "problems": None,
         "totalCount": 2,
     }
@@ -476,7 +472,8 @@ def test_search_returns_expected_data(httpserver_auth: HTTPServer):
     )
 
     client = Client()
-    page = client.file_events.v2.search(TEST_DICT_QUERY)
+    query = EventQuery.construct(**TEST_DICT_QUERY)
+    page = client.file_events.v2.search(query)
     assert isinstance(page, FileEventsPage)
     assert page.file_events[0] == FileEventV2.parse_obj(TEST_EVENT_1)
     assert page.file_events[1] == FileEventV2.parse_obj(TEST_EVENT_2)
@@ -509,24 +506,3 @@ def test_get_saved_search_by_id_returns_expected_data(httpserver_auth: HTTPServe
     search = client.file_events.v2.get_saved_search_by_id(search_id)
     assert isinstance(search, SavedSearch)
     assert search.json() == TEST_SAVED_SEARCH_1.json()
-
-
-def test_execute_saved_search_makes_expected_calls(httpserver_auth: HTTPServer):
-    search_id = "saved-search-1"
-    search_data = SavedSearchesPage(searches=[TEST_SAVED_SEARCH_1]).json()
-    event_data = {
-        "fileEvents": [TEST_EVENT_1, TEST_EVENT_2],
-        "nextPgToken": None,
-        "problems": None,
-        "totalCount": 2,
-    }
-    httpserver_auth.expect_ordered_request(
-        f"/v2/file-events/saved-searches/{search_id}", method="GET"
-    ).respond_with_data(search_data)
-    httpserver_auth.expect_ordered_request(
-        "/v2/file-events", method="POST", json=TEST_SAVED_SEARCH_QUERY
-    ).respond_with_json(event_data)
-
-    client = Client()
-    response = client.file_events.v2.execute_saved_search(search_id)
-    assert isinstance(response, FileEventsPage)

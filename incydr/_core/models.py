@@ -10,14 +10,11 @@ from pydantic import SecretStr
 from pydantic import ValidationError
 
 
-class ResponseModel(BaseModel):
-    @classmethod
-    def parse_response(cls, response: requests.Response):
-        try:
-            return cls.parse_raw(response.text)
-        except ValidationError as err:
-            err.response = response
-            raise
+class Model(BaseModel):
+    """
+    Subclass of pydantic's `BaseModel` to change the `.dict()` and `.json()` methods to dump fields with `by_alias=True`
+    as the default.
+    """
 
     def json(
         self,
@@ -82,6 +79,16 @@ class ResponseModel(BaseModel):
         use_enum_values = True
         json_encoders = {datetime: lambda dt: dt.isoformat().replace("+00:00", "Z")}
         extra = "allow"
+
+
+class ResponseModel(Model):
+    @classmethod
+    def parse_response(cls, response: requests.Response):
+        try:
+            return cls.parse_raw(response.text)
+        except ValidationError as err:
+            err.response = response
+            raise
 
 
 class AuthResponse(ResponseModel):
