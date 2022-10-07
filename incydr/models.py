@@ -10,6 +10,11 @@ from incydr._directory_groups.models import DirectoryGroupsPage
 from incydr._file_events.models.event import FileEventV2
 from incydr._file_events.models.response import FileEventsPage
 from incydr._file_events.models.response import SavedSearch
+from incydr._legal_hold.models import Custodian
+from incydr._legal_hold.models import CustodianMembership
+from incydr._legal_hold.models import Matter
+from incydr._legal_hold.models import MatterMembership
+from incydr._legal_hold.models import Policy
 from incydr._user_risk_profiles.models import UserRiskProfile
 from incydr._user_risk_profiles.models import UserRiskProfilesPage
 from incydr._users.models import Role
@@ -54,6 +59,11 @@ __all__ = [
     "IncludedDepartment",
     "IncludedDirectoryGroupsList",
     "IncludedDirectoryGroup",
+    "Policy",
+    "Matter",
+    "Custodian",
+    "CustodianMembership",
+    "MatterMembership",
     "UserRiskProfilesPage",
     "UserRiskProfile",
 ]

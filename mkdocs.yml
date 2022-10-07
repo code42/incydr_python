@@ -40,6 +40,7 @@ nav:
   - Directory Groups: 'directory_groups.md'
   - File Events: 'file_events.md'
   - File Event Queries: 'file_event_queries.md'
+  - Legal Hold: 'legal_hold.md'
   - Users: 'users.md'
   - User Risk Profiles: 'user_risk_profiles.md'
   - Watchlists: 'watchlists.md'
