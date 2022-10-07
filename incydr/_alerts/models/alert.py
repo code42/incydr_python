@@ -4,12 +4,13 @@ from datetime import datetime
 from typing import List
 from typing import Optional
 
-from pydantic import BaseModel
 from pydantic import constr
 from pydantic import Field
 
+from incydr._core.models import Model
 
-class Observation(BaseModel):
+
+class Observation(Model):
     id: Optional[str] = Field(
         None, description="Id of given observation.", example="uniqueObservationId"
     )
@@ -37,7 +38,7 @@ class Observation(BaseModel):
     )
 
 
-class Note(BaseModel):
+class Note(Model):
     id: Optional[str] = Field(
         None, description="Unique id of the note.", example="noteId"
     )
@@ -58,7 +59,7 @@ class Note(BaseModel):
     )
 
 
-class AuditInfo(BaseModel):
+class AuditInfo(Model):
     modified_by: Optional[str] = Field(
         None,
         alias="modifiedBy",
@@ -73,7 +74,7 @@ class AuditInfo(BaseModel):
     )
 
 
-class Watchlist(BaseModel):
+class Watchlist(Model):
     id: Optional[str] = Field(
         None, description="Unique id of this watchlist.", example="guid"
     )
@@ -125,7 +126,7 @@ class ObserverRuleMetadata(AuditInfo):
     )
 
 
-class AlertSummary(BaseModel):
+class AlertSummary(Model):
     """
     A model representing an alert summary.
 
