@@ -47,9 +47,11 @@ output_option = click.option(
     "--output",
     default=None,
     type=ServerProtocol,
-    help="Use to send the data to a syslog server.  Pass a string in the format PROTOCOL:HOSTNAME:PORT to output "
-    "to the specified server endpoint, where format is either UDP, TCP or TLS_TCP.  "
+    help="Use to send the raw-json data in to a syslog server.  Pass a string in the format PROTOCOL:HOSTNAME:PORT to output "
+    "to the specified server endpoint, where format is either UDP, TCP or TLS_TCP.  Also accepts strings of the format HOSTNAME "
+    "and HOSTNAME:PORT where port will default to 514 and protocol will default to UDP."
     "--certs or --ignore-cert-validation options can be used with TLS_TCP format.",
+    cls=incompatible_with(["format"]),
 )
 ignore_cert_validation_option = click.option(
     "--ignore-cert-validation",

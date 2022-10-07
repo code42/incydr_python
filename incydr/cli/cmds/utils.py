@@ -3,7 +3,6 @@ import sys
 from typing import Iterable
 from typing import Optional
 
-from click import BadOptionUsage
 from typer import echo
 
 from incydr.cli import console
@@ -18,17 +17,16 @@ from incydr.utils import write_models_to_csv
 
 
 def output_response_format(
-    response,
-    key: str,
+    results,
     title: str,
     format_: TableFormat = TableFormat.table,
     columns: Optional[str] = None,
     use_rich=True,
 ):
+    # response should be an array of dict objects
+
     if format_ is None:
         format_ = TableFormat.table
-
-    results = response.json()[key]
 
     if not any(results):
         echo("No results found.")
@@ -86,31 +84,19 @@ def output_models_format(
 
 
 def output_format_logger(
-    models: Iterable[Model],
+    results,
     output: str,
-    format_: TableFormat = TableFormat.json,
     columns: Optional[str] = None,
     certs: Optional[str] = None,
     ignore_cert_validation: Optional[bool] = None,
 ):
-    if format_ in [TableFormat.csv, TableFormat.table]:
-        raise BadOptionUsage(
-            "--format",
-            "--output can only be used with json and raw-json formats.  Defaults to json.",
-        )
+
+    if not any(results):
+        return
 
     logger = try_get_logger_for_server(output, certs, ignore_cert_validation)
 
-    # TODO - do we need to provide two json formats, is there a use case for sending anything but raw data?
-    # TODO - this would also let us ignore the format option
-    if format_ == TableFormat.json:
-        for result in models:
-            if columns:
-                result = {c: result[c] for c in columns}
-            logger.info(json.dumps(result, indent=4))
-
-    else:
-        for result in models:
-            if columns:
-                result = {c: result[c] for c in columns}
-            logger.info(json.dumps(result))
+    for result in results:
+        if columns:
+            result = {c: result[c] for c in columns}
+        logger.info(json.dumps(result))

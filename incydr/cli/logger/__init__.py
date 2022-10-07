@@ -3,6 +3,7 @@ import logging
 from threading import Lock
 
 import click
+from click import BadOptionUsage
 
 from incydr.cli.logger.enums import ServerProtocol
 from incydr.cli.logger.handlers import NoPrioritySysLogHandler
@@ -45,11 +46,26 @@ def try_get_logger_for_server(output, certs, ignore_cert_validation):
 
     # parse output
     output = output.split(":")
-    protocol = output[0].upper()  # TODO
-    hostname = output[1]
+
+    protocol = ServerProtocol.UDP
     port = 514
-    if len(output) > 1 and output[2] != "":
-        port = int(output[2])
+
+    if len(output) == 1:  # HOSTNAME
+        hostname = output[0]
+    elif len(output) == 2:  # HOSTNAME:PORT
+        hostname = output[0]
+        port = output[1]
+    elif len(output) == 3:  # PROTOCOL:HOSTNAME:PORT
+        protocol = output[0].upper()
+        hostname = output[1]
+        port = output[2]
+    else:
+        raise BadOptionUsage(
+            "--output",
+            "Error parsing output string.  Pass a string in the format PROTOCOL:HOSTNAME:PORT to output "
+            "to the specified server endpoint, where format is either UDP, TCP or TLS_TCP.  Also accepts strings of the format HOSTNAME "
+            "and HOSTNAME:PORT where port will default to 514 and protocol will default to UDP.",
+        )
 
     # certs and ignore-cert-validation only compatible with TLS_TCP
     if protocol != ServerProtocol.TLS_TCP:

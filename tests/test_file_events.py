@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from datetime import timezone
+from typing import List
 
 import pytest
 from pytest_httpserver import HTTPServer
@@ -9,7 +10,6 @@ from incydr._core.client import Client
 from incydr._file_events.models.event import FileEventV2
 from incydr._file_events.models.response import FileEventsPage
 from incydr._file_events.models.response import SavedSearch
-from incydr._file_events.models.response import SavedSearchesPage
 from incydr._file_events.models.response import SearchFilter
 from incydr._file_events.models.response import SearchFilterGroup
 from incydr._queries.file_events import EventQuery
@@ -444,20 +444,23 @@ TEST_SAVED_SEARCH_ID = "saved-search-1"
 
 @pytest.fixture
 def mock_get_saved_search(httpserver_auth):
-    search_data = SavedSearchesPage(searches=[TEST_SAVED_SEARCH_1]).json()
+    search_data = {"searches": [json.loads(TEST_SAVED_SEARCH_1.json())]}
     httpserver_auth.expect_request(
         f"/v2/file-events/saved-searches/{TEST_SAVED_SEARCH_ID}", method="GET"
-    ).respond_with_data(search_data)
+    ).respond_with_json(search_data)
 
 
 @pytest.fixture
 def mock_list_saved_searches(httpserver_auth):
-    search_data = SavedSearchesPage(
-        searches=[TEST_SAVED_SEARCH_1, TEST_SAVED_SEARCH_2]
-    ).json()
+    search_data = {
+        "searches": [
+            json.loads(TEST_SAVED_SEARCH_1.json()),
+            json.loads(TEST_SAVED_SEARCH_2.json()),
+        ]
+    }
     httpserver_auth.expect_request(
         "/v2/file-events/saved-searches", method="GET"
-    ).respond_with_data(search_data)
+    ).respond_with_json(search_data)
 
 
 @pytest.mark.parametrize(
@@ -505,9 +508,11 @@ def test_search_returns_expected_data(httpserver_auth: HTTPServer):
 def test_list_saved_searches_returns_expected_data(mock_list_saved_searches):
     client = Client()
     page = client.file_events.v2.list_saved_searches()
-    assert isinstance(page, SavedSearchesPage)
-    assert page.searches[0].json() == TEST_SAVED_SEARCH_1.json()
-    assert page.searches[1].json() == TEST_SAVED_SEARCH_2.json()
+    assert isinstance(page, List)
+    for item in page:
+        assert isinstance(item, SavedSearch)
+    assert page[0].json() == TEST_SAVED_SEARCH_1.json()
+    assert page[1].json() == TEST_SAVED_SEARCH_2.json()
 
 
 def test_get_saved_search_returns_expected_data(mock_get_saved_search):

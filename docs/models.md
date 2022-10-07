@@ -92,11 +92,6 @@ available model methods.
 ::: incydr.models.SavedSearch
     :docstring:
 
-### `SavedSearchesPage` model
-
-::: incydr.models.SavedSearchesPage
-    :docstring:
-
 ## Roles
 ---
 

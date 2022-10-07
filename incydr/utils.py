@@ -89,7 +89,7 @@ def write_models_to_csv(
 
 
 def write_dict_to_csv(
-    models: Dict,
+    models: List[Dict],
     path: Union[str, Path, IOBase, TextIO] = None,
     columns: str = None,
 ):

@@ -21,7 +21,6 @@ from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.utils import output_format_logger
-from incydr.cli.cmds.utils import output_models_format
 from incydr.cli.cmds.utils import output_response_format
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
@@ -125,14 +124,12 @@ def search(
             include_all=include_all,
         )
     events = client.session.post("/v2/file-events", json=query.dict())
+    events = events.json()["fileEvents"]
     if output:
-        output_format_logger(
-            events, output, format_, columns, certs, ignore_cert_validation
-        )
+        output_format_logger(events, output, columns, certs, ignore_cert_validation)
     else:
         output_response_format(
             events,
-            "fileEvents",
             "File Events",
             format_,
             columns,
@@ -173,8 +170,9 @@ def list_saved_searches(
     List saved searches.
     """
     client = ctx.obj()
-    searches = client.file_events.v2.list_saved_searches().searches
-    output_models_format(
+    response = client.session.get("/v2/file-events/saved-searches")
+    searches = response.json()["searches"]
+    output_response_format(
         searches, "Saved Searches", format_, columns, client.settings.use_rich
     )
 
