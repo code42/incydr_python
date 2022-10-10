@@ -22,11 +22,6 @@ available model methods.
 ::: incydr.models.AuditEventsPage
     :docstring:
 
-### `AuditEventsCount` model
-
-::: incydr.models.AuditEventsCount
-    :docstring:
-
 ## Cases
 ---
 

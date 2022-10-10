@@ -1,4 +1,3 @@
-from incydr._audit_log.models import AuditEventsCount
 from incydr._audit_log.models import AuditEventsPage
 from incydr._cases.models import Case
 from incydr._cases.models import CaseFileEvents
@@ -57,7 +56,6 @@ __all__ = [
     "IncludedDirectoryGroupsList",
     "IncludedDirectoryGroup",
     "AuditEventsPage",
-    "AuditEventsCount",
 ]
 
 

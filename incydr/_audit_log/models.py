@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
 from enum import Enum
 from typing import Dict
 from typing import List
@@ -12,7 +11,7 @@ from pydantic import Field
 from incydr._core.models import ResponseModel
 
 
-class UserTypes(Enum):
+class UserTypes(str, Enum):
     USER = "USER"
     SUPPORT_USER = "SUPPORT_USER"
     API_CLIENT = "API_CLIENT"
@@ -21,8 +20,8 @@ class UserTypes(Enum):
 
 
 class DateRange(BaseModel):
-    endTime: Optional[datetime]
-    startTime: Optional[datetime]
+    endTime: Optional[float]
+    startTime: Optional[float]
 
 
 class AuditEventsPage(ResponseModel):

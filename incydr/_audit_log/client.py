@@ -60,9 +60,9 @@ class AuditLogV1:
 
         date_range = DateRange()
         if start_time:
-            date_range.startTime = start_time
+            date_range.startTime = start_time.timestamp()
         if end_time:
-            date_range.endTime = end_time
+            date_range.endTime = end_time.timestamp()
 
         data = QueryAuditLogRequest(
             actorIds=actor_ids,
@@ -118,9 +118,9 @@ class AuditLogV1:
 
         date_range = DateRange()
         if start_time:
-            date_range.startTime = start_time
+            date_range.startTime = start_time.timestamp()
         if end_time:
-            date_range.endTime = end_time
+            date_range.endTime = end_time.timestamp()
 
         data = QueryAuditLogRequest(
             actorIds=actor_ids,
@@ -176,9 +176,9 @@ class AuditLogV1:
 
         date_range = DateRange()
         if start_time:
-            date_range.startTime = start_time
+            date_range.startTime = start_time.timestamp()
         if end_time:
-            date_range.endTime = end_time
+            date_range.endTime = end_time.timestamp()
 
         data = QueryAuditLogRequest(
             actorIds=actor_ids,
@@ -231,9 +231,9 @@ class AuditLogV1:
 
         date_range = DateRange()
         if start_time:
-            date_range.startTime = start_time
+            date_range.startTime = start_time.timestamp()
         if end_time:
-            date_range.endTime = end_time
+            date_range.endTime = end_time.timestamp()
 
         data = QueryExportRequest(
             actorIds=actor_ids,
