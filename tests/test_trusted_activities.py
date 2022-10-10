@@ -1,6 +1,7 @@
 import json
 from urllib.parse import urlencode
 
+import pytest
 from pytest_httpserver import HTTPServer
 from requests import Response
 
@@ -123,7 +124,7 @@ def test_iter_all_when_default_params_returns_expected_data(
     assert total_trusted_activities == 2
 
 
-def test_create_trusted_activity_domain_when_default_params_returns_expected_data(
+def test_add_domain_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     domain = "testDomain.com"
@@ -136,7 +137,24 @@ def test_create_trusted_activity_domain_when_default_params_returns_expected_dat
                 {"type": "GIT_PUSH", "providers": None},
                 {
                     "type": "CLOUD_SYNC",
-                    "providers": [{"name": "BOX"}, {"name": "ICLOUD"}],
+                    "providers": [
+                        {"name": "BOX"},
+                        {"name": "ICLOUD"},
+                        {"name": "GOOGLE_DRIVE"},
+                        {"name": "ONE_DRIVE"},
+                    ],
+                },
+                {
+                    "type": "CLOUD_SHARE",
+                    "providers": [
+                        {"name": "BOX"},
+                        {"name": "GOOGLE_DRIVE"},
+                        {"name": "ONE_DRIVE"},
+                    ],
+                },
+                {
+                    "type": "EMAIL",
+                    "providers": [{"name": "GMAIL"}, {"name": "OFFICE_365"}],
                 },
             ],
         }
@@ -159,11 +177,13 @@ def test_create_trusted_activity_domain_when_default_params_returns_expected_dat
     ).respond_with_json(test_response)
 
     client = Client()
-    trusted_activity = client.trusted_activities.v2.create_trusted_activity_for_domain(
+    trusted_activity = client.trusted_activities.v2.add_domain(
         domain=domain,
         description="Description",
         file_upload=True,
-        cloud_sync_list=["BOX", "ICLOUD"],
+        cloud_sync_services=["BOX", "ICLOUD", "GOOGLE_DRIVE", "ONE_DRIVE"],
+        cloud_share_services=["BOX", "GOOGLE_DRIVE", "ONE_DRIVE"],
+        email_share_services=["GMAIL", "OFFICE_365"],
         git_push=True,
     )
 
@@ -174,7 +194,29 @@ def test_create_trusted_activity_domain_when_default_params_returns_expected_dat
     assert trusted_activity.activity_action_groups == activity_action_groups
 
 
-def test_create_trusted_activity_specific_url_path_when_default_params_returns_expected_data(
+def test_add_domain_when_invalid_trusted_provider_value_raises_error():
+    domain = "testDomain.com"
+    client = Client()
+    with pytest.raises(ValueError) as e:
+        client.trusted_activities.v2.add_domain(
+            domain=domain,
+            cloud_sync_services=["invalid-value"],
+        )
+    assert (
+        "'invalid-value' is not a valid incydr.enums.trusted_activities.CloudSyncApps. Expected one of ['BOX', 'GOOGLE_DRIVE', 'ICLOUD', 'ONE_DRIVE']"
+        in str(e.value)
+    )
+
+
+def test_add_domain_when_no_trusted_actions_raises_error():
+    domain = "testDomain.com"
+    client = Client()
+    with pytest.raises(ValueError) as e:
+        client.trusted_activities.v2.add_domain(domain=domain)
+    assert "At least 1 action for the domain must be trusted." in str(e.value)
+
+
+def test_add_url_path_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     url = "testDomain.com"
@@ -198,10 +240,8 @@ def test_create_trusted_activity_specific_url_path_when_default_params_returns_e
     ).respond_with_json(test_response)
 
     client = Client()
-    trusted_activity = (
-        client.trusted_activities.v2.create_trusted_activity_for_specific_url_path(
-            url=url, description="Description"
-        )
+    trusted_activity = client.trusted_activities.v2.add_url_path(
+        url=url, description="Description"
     )
 
     assert isinstance(trusted_activity, TrustedActivity)
@@ -235,7 +275,7 @@ def test_create_trusted_activity_slack_when_default_params_returns_expected_data
     ).respond_with_json(test_response)
 
     client = Client()
-    trusted_activity = client.trusted_activities.v2.create_trusted_activity_for_slack(
+    trusted_activity = client.trusted_activities.v2.add_slack_workspace(
         workspace_name=workspace_name, description="Description"
     )
 
@@ -246,7 +286,7 @@ def test_create_trusted_activity_slack_when_default_params_returns_expected_data
     assert trusted_activity.activity_action_groups == activity_action_groups
 
 
-def test_create_trusted_activity_account_name_when_default_params_returns_expected_data(
+def test_add_account_name_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     account_name = "test account"
@@ -272,7 +312,6 @@ def test_create_trusted_activity_account_name_when_default_params_returns_expect
 
     test_response = TEST_TRUSTED_ACTIVITY_1.copy()
     test_response.update(test_data)
-
     test_response.update({"activityType": activity_type})
 
     httpserver_auth.expect_request(
@@ -280,13 +319,11 @@ def test_create_trusted_activity_account_name_when_default_params_returns_expect
     ).respond_with_json(test_response)
 
     client = Client()
-    trusted_activity = (
-        client.trusted_activities.v2.create_trusted_activity_for_account_name(
-            account_name=account_name,
-            description="Description",
-            dropbox=True,
-            one_drive=True,
-        )
+    trusted_activity = client.trusted_activities.v2.add_account_name(
+        account_name=account_name,
+        description="Description",
+        dropbox=True,
+        one_drive=True,
     )
 
     assert isinstance(trusted_activity, TrustedActivity)
@@ -296,7 +333,17 @@ def test_create_trusted_activity_account_name_when_default_params_returns_expect
     assert trusted_activity.activity_action_groups == activity_action_groups
 
 
-def test_create_trusted_activity_git_repository_uri_when_default_params_returns_expected_data(
+def test_add_account_name_when_no_trusted_providers_raises_error():
+    client = Client()
+
+    with pytest.raises(ValueError) as e:
+        client.trusted_activities.v2.add_account_name(account_name="foo@bar.com")
+    assert "At least 1 cloud sync service (dropbox, one_drive) must be trusted." in str(
+        e.value
+    )
+
+
+def test_add_git_repository_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     git_uri = "test.com:example/myRepo"
@@ -327,10 +374,8 @@ def test_create_trusted_activity_git_repository_uri_when_default_params_returns_
     ).respond_with_json(test_response)
 
     client = Client()
-    trusted_activity = (
-        client.trusted_activities.v2.create_trusted_activity_for_git_repository_uri(
-            git_uri=git_uri, description="Description"
-        )
+    trusted_activity = client.trusted_activities.v2.add_git_repository(
+        git_uri=git_uri, description="Description"
     )
 
     assert isinstance(trusted_activity, TrustedActivity)

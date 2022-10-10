@@ -115,7 +115,7 @@ available model methods.
 
 ### `TrustedActivity` model
 
-::: incydr.models.TrustedActivity
+::: incydr.models.TrustedAct****ivity
     :docstring:
 
 ### `TrustedActivitiesPage` model

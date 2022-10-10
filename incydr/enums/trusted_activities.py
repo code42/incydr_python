@@ -14,11 +14,22 @@ class ActivityType(_Enum):
     GIT_REPOSITORY_URI = "GIT_REPOSITORY_URI"
 
 
-class DomainCloudSync(_Enum):
+class CloudSyncApps(_Enum):
     BOX = "BOX"
     GOOGLE_DRIVE = "GOOGLE_DRIVE"
     ICLOUD = "ICLOUD"
-    ONEDRIVE = "ONEDRIVE"
+    ONE_DRIVE = "ONE_DRIVE"
+
+
+class CloudShareApps(_Enum):
+    BOX = "BOX"
+    GOOGLE_DRIVE = "GOOGLE_DRIVE"
+    ONE_DRIVE = "ONE_DRIVE"
+
+
+class EmailServices(_Enum):
+    GMAIL = "GMAIL"
+    OFFICE_365 = "OFFICE_365"
 
 
 class Name(_Enum):

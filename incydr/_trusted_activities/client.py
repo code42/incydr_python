@@ -14,7 +14,9 @@ from incydr._trusted_activities.models import TrustedActivity
 from incydr._trusted_activities.models import UpdateTrustedActivity
 from incydr.enums import SortDirection
 from incydr.enums.trusted_activities import ActivityType
-from incydr.enums.trusted_activities import DomainCloudSync
+from incydr.enums.trusted_activities import CloudShareApps
+from incydr.enums.trusted_activities import CloudSyncApps
+from incydr.enums.trusted_activities import EmailServices
 from incydr.enums.trusted_activities import Name
 from incydr.enums.trusted_activities import SortKeys
 
@@ -112,27 +114,35 @@ class TrustedActivitiesV2:
             if len(page.trusted_activities) < page_size:
                 break
 
-    def create_trusted_activity_for_domain(
+    def add_domain(
         self,
         domain: str,
         description: str = None,
         file_upload: bool = None,
-        cloud_sync_list: List[DomainCloudSync] = None,
+        cloud_sync_services: List[CloudSyncApps] = None,
+        cloud_share_services: List[CloudShareApps] = None,
+        email_share_services: List[EmailServices] = None,
         git_push: bool = None,
     ) -> TrustedActivity:
         """
-        Create a trusted activity.
+        Trust activity across an entire domain.
 
         **Parameters:**
 
-        * **domain**: `str` (required) - The domain of the trusted activity.
-        * **description**: `str` - A description of the trusted activity.
+        * **domain**: `str` (required) - Domain to trust.
+        * **description**: `str` - Optional description of the trusted activity.
         * **file_upload**: `bool` - Whether to trust activity if the tab URL or tab title includes this domain.
-        * **cloud_sync_list**: `List[DomainCloudSync]` - Activity is trusted if the username signed in to the
-        sync app is one of the listed domains (`BOX`, `GOOGLE_DRIVE`, `ICLOUD` and/or `ONEDRIVE`).
+        * **cloud_sync_services**: `List[CloudSyncApps]` - Activity is trusted if the username signed in to the
+        sync app is one of the listed domains.  Supported cloud storage apps for file syncing are
+            `BOX`, `GOOGLE_DRIVE`, `ICLOUD` and/or `ONE_DRIVE`.
+        * **cloud_share_services**: `List[CloudShareApps]` - Activity is trusted if the user it's shared with is on this domain.
+            Supported cloud storage services for file sharing are `BOX`, `GOOGLE_DRIVE` and/or `ONE_DRIVE`. You must
+            have a cloud connector configured for your tenant to support this trusted action.
+        * **email_share_services**: `List[EmailServices]` - Activity is trusted if the email recipient is on this domain.
+            Supported email services are `GMAIL` and/or `MICROSOFT_365`.  You must have an email connector configured
+            for your tenant to support this trusted action.
         If list is empty, all supported cloud sync domains are trusted.
         * **git_push**: `bool` - Whether to trust Git push events to this domain.
-
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
         the newly created trusted activity.
@@ -140,51 +150,73 @@ class TrustedActivitiesV2:
 
         activity_actions = []
 
+        # FILE UPLOAD
         if file_upload:
             activity_actions.append(ActivityAction(type=ActivityType.FILE_UPLOAD))
 
+        # GIT PUSH
         if git_push:
             activity_actions.append(ActivityAction(type=ActivityType.GIT_PUSH))
 
-        if len(cloud_sync_list) != 0:
+        # CLOUD SYNC SERVICES
+        services = [
+            (
+                cloud_sync_services,
+                CloudSyncApps,
+                ActivityType.CLOUD_SYNC,
+            ),  # CLOUD SYNC SERVICES
+            (
+                cloud_share_services,
+                CloudShareApps,
+                ActivityType.CLOUD_SHARE,
+            ),  # CLOUD_SHARE_SERVICES
+            (
+                email_share_services,
+                EmailServices,
+                ActivityType.EMAIL,
+            ),  # # EMAIL_SHARE_SERVICES
+        ]
+        for element in services:
+            service, enum, activity_type = element
+            if service is None:
+                continue
             providers = []
-
-            for cloud_sync in cloud_sync_list:
-                if cloud_sync in DomainCloudSync.__members__:
-                    providers.append(ProviderObject(name=Name[cloud_sync]))
-
+            for provider in service:
+                providers.append(ProviderObject(name=enum(provider)))
             activity_actions.append(
-                ActivityAction(providers=providers, type=ActivityType.CLOUD_SYNC)
+                ActivityAction(providers=providers, type=activity_type)
             )
 
-        activity_action_group = ActivityActionGroup(
-            activityActions=activity_actions, name=Name.DEFAULT
-        )
+        if len(activity_actions) < 1:
+            raise ValueError("At least 1 action for the domain must be trusted.")
 
         data = CreateTrustedActivityRequest(
             type=ActivityType.DOMAIN,
             value=domain,
             description=description,
-            activityActionGroups=[activity_action_group],
+            activityActionGroups=[
+                ActivityActionGroup(activityActions=activity_actions, name=Name.DEFAULT)
+            ],
         )
 
+        print(data.dict())
         response = self._parent.session.post(
             url="/v2/trusted-activities", json=data.dict()
         )
         return TrustedActivity.parse_response(response)
 
-    def create_trusted_activity_for_specific_url_path(
+    def add_url_path(
         self,
         url: str,
         description: str = None,
     ) -> TrustedActivity:
         """
-        Create a trusted activity.
+        Trust browser uploads to only part of a domain by including a specific path.  For example: `github.com/company` will only trust uploads to the `company` repository.
 
         **Parameters:**
 
-        * **url**: `str` (required) - The url of the trusted activity.
-        * **description**: `str` - A description of the trusted activity.
+        * **url**: `str` (required) - URL path to trust.
+        * **description**: `str` - Optional description of the trusted activity.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
         the newly created trusted activity.
@@ -202,18 +234,18 @@ class TrustedActivitiesV2:
         )
         return TrustedActivity.parse_response(response)
 
-    def create_trusted_activity_for_slack(
+    def add_slack_workspace(
         self,
         workspace_name: str,
         description: str = None,
     ) -> TrustedActivity:
         """
-        Create a trusted activity.
+        Trust activity uploaded through a slack workspace.
 
         **Parameters:**
 
-        * **workspace_name**: `str` (required) - The workspace name of the trusted activity.
-        * **description**: `str` - A description of the trusted activity.
+        * **workspace_name**: `str` (required) - Name of the slack workspace to trust.
+        * **description**: `str` - Optional description of the trusted activity.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
         the newly created trusted activity.
@@ -231,7 +263,7 @@ class TrustedActivitiesV2:
         )
         return TrustedActivity.parse_response(response)
 
-    def create_trusted_activity_for_account_name(
+    def add_account_name(
         self,
         account_name: str,
         description: str = None,
@@ -239,12 +271,12 @@ class TrustedActivitiesV2:
         one_drive: bool = False,
     ) -> TrustedActivity:
         """
-        Create a trusted activity for account name.
+        Trust activity for a specific corporate account for cloud sync apps installed on user devices.
 
         **Parameters:**
 
-        * **account_name**: `str` (required) - The account name of the trusted activity.
-        * **description**: `str` A description of the trusted activity.
+        * **account_name**: `str` (required) - Account name to trust for the specified cloud sync services.
+        * **description**: `str` - Optional description of the trusted activity.
         * **dropbox**: `bool` - Whether to trust Dropbox as a cloud sync service.  Defaults to False.
         * **one_drive** `bool` - Whether to trust OneDrive as a cloud sync service.  Defaults to False.
 
@@ -267,7 +299,6 @@ class TrustedActivitiesV2:
             raise ValueError(
                 "At least 1 cloud sync service (dropbox, one_drive) must be trusted."
             )
-        assert len(providers) != 0
 
         activity_action_group = ActivityActionGroup(
             activityActions=[
@@ -288,18 +319,18 @@ class TrustedActivitiesV2:
         )
         return TrustedActivity.parse_response(response)
 
-    def create_trusted_activity_for_git_repository_uri(
+    def add_git_repository(
         self,
         git_uri: str,
         description: str = None,
     ) -> TrustedActivity:
         """
-        Create a trusted activity.
+        Trust file uploads to a git repository.
 
         **Parameters:**
 
-        * **git_uri**: `str` - (required) The Git URI of the trusted activity.
-        * **description**: `str` - A description of the trusted activity.
+        * **git_uri**: `str` (required) - Git URI to trust.
+        * **description**: `str` - Optional description of the trusted activity.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
         the newly created trusted activity.
