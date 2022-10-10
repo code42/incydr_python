@@ -179,6 +179,7 @@ class CasesV1:
                 name=name,
                 status=status,
                 page_num=page_num,
+                page_size=page_size,
                 sort_dir=sort_dir,
                 sort_key=sort_key,
             )

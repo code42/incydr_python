@@ -33,6 +33,7 @@ nav:
   - Settings:
     - Configuration: 'settings.md'
     - Logging: 'logging.md'
+  - Alerts: 'alerts.md'
   - Cases: 'cases.md'
   - Customer: 'customer.md'
   - Departments: 'departments.md'
@@ -40,6 +41,7 @@ nav:
   - Directory Groups: 'directory_groups.md'
   - File Events: 'file_events.md'
   - File Event Queries: 'file_event_queries.md'
+  - Legal Hold: 'legal_hold.md'
   - Trusted Activites: 'trusted_activities.md'
   - Users: 'users.md'
   - User Risk Profiles: 'user_risk_profiles.md'

@@ -194,7 +194,9 @@ def test_add_domain_when_default_params_returns_expected_data(
     assert trusted_activity.activity_action_groups == activity_action_groups
 
 
-def test_add_domain_when_invalid_trusted_provider_value_raises_error():
+def test_add_domain_when_invalid_trusted_provider_value_raises_error(
+    httpserver_auth: HTTPServer,
+):
     domain = "testDomain.com"
     client = Client()
     with pytest.raises(ValueError) as e:
@@ -208,7 +210,7 @@ def test_add_domain_when_invalid_trusted_provider_value_raises_error():
     )
 
 
-def test_add_domain_when_no_trusted_actions_raises_error():
+def test_add_domain_when_no_trusted_actions_raises_error(httpserver_auth: HTTPServer):
     domain = "testDomain.com"
     client = Client()
     with pytest.raises(ValueError) as e:
@@ -333,7 +335,9 @@ def test_add_account_name_when_default_params_returns_expected_data(
     assert trusted_activity.activity_action_groups == activity_action_groups
 
 
-def test_add_account_name_when_no_trusted_providers_raises_error():
+def test_add_account_name_when_no_trusted_providers_raises_error(
+    httpserver_auth: HTTPServer,
+):
     client = Client()
 
     with pytest.raises(ValueError) as e:

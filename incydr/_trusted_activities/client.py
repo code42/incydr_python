@@ -199,7 +199,6 @@ class TrustedActivitiesV2:
             ],
         )
 
-        print(data.dict())
         response = self._parent.session.post(
             url="/v2/trusted-activities", json=data.dict()
         )

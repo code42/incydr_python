@@ -62,8 +62,8 @@ class DevicesV1:
 
         **Parameters**:
 
-        * **active**: `bool` - Whether or not the device is active. If true, the device will show up on reports, etc.
-        * **blocked**: `bool` - Whether or not the device is blocked.  If true, restores and logins are disabled.
+        * **active**: `bool | None` - When true, return only active devices. When false, return only inactive devices. Defaults to returning both.
+        * **blocked**: `bool | None` - When true, return only blocked devices. When false, return only unblocked devices. Defaults to returning both.
         * **page_num**: `int` - Page number for results, starting at 1.
         * **page_size**: `int` - Max number of results to return per page.
         * **sort_dir**: `SortDirection` - 'asc' or 'desc'. The direction in which to sort the response based on the corresponding key. Defaults to 'asc'.

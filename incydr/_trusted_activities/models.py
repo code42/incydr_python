@@ -46,7 +46,7 @@ class ActivityAction(BaseModel):
 
 class ActivityActionGroup(BaseModel):
     name: Optional[Name] = Field(
-        "DEFAULT",
+        Name.DEFAULT,
         description="The name of the activity action group. Currently, only `DEFAULT` activity action group is "
         "supported.",
     )

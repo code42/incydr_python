@@ -14,6 +14,19 @@
 See [Pydantic documentation](https://pydantic-docs.helpmanual.io/usage/models/#model-properties) for full list of
 available model methods.
 
+## Alerts
+---
+
+### `AlertDetails` model
+
+::: incydr.models.AlertDetails
+    :docstring:
+
+### `AlertQueryPage` model
+
+::: incydr.models.AlertQueryPage
+    :docstring:
+
 ## Cases
 ---
 
@@ -95,6 +108,34 @@ available model methods.
 ### `SavedSearchesPage` model
 
 ::: incydr.models.SavedSearchesPage
+    :docstring:
+
+## Legal Hold
+---
+
+### `Policy` model
+
+::: incydr.models.Policy
+    :docstring:
+
+### `Matter` model
+
+::: incydr.models.Matter
+    :docstring:
+
+### `Custodian` model
+
+::: incydr.models.Custodian
+    :docstring:
+
+### `CustodianMembership` model
+
+::: incydr.models.CustodianMembership
+    :docstring:
+
+### `MatterMembership` model
+
+::: incydr.models.MatterMembership
     :docstring:
 
 ## Roles
