@@ -63,10 +63,10 @@ class TrustedActivitiesV2:
         **Parameters**:
 
         * **page_num**: `int` - Page number for results, starting at 1.
-        * **page_size**: `int` - Max number of results to return per page.
-        * **activity_type**: `str` - The type of the trusted activity.
-        * **sort_key**: `str` - The key by which to sort the returned list.
-        * **sort_direction**: `str` - The order in which to sort the returned list.
+        * **page_size**: `int` - Max number of results to return per page. Defaults to client's `page_size` setting.
+        * **activity_type**: `ActivityType` - The type of the trusted activity.
+        * **sort_key**: `SortKeys` - The key by which to sort the returned list.
+        * **sort_direction**: `SortDirection` - The order in which to sort the returned list.
 
         **Returns**: A [`TrustedActivitiesPage`][trustedactivitiespage-model] object.
         """
@@ -93,6 +93,7 @@ class TrustedActivitiesV2:
     ) -> Iterator[TrustedActivity]:
         """
         Iterate over all trusted activities.
+
         Accepts the same parameters as `.get_page()` except `page_num`.
 
         **Returns**: A generator yielding individual [`TrustedActivity`][trustedactivity-model] objects.
@@ -124,12 +125,13 @@ class TrustedActivitiesV2:
 
         **Parameters:**
 
-        * **domain**: `str` The domain of the trusted activity.
-        * **description**: `str` A description of the trusted activity.
-        * **file_upload**: `bool` Activity is trusted if the Tab URL or Tab title include this domain.
-        * **cloud_sync_list**: `List[DomainCloudSync]` Activity is trusted if the username signed in to the
-        sync app is one of the listed domain. If list is empty, all activity actions are enabled.
-        * **git_push**: `bool` Activity is trusted for Git push events to this domain.
+        * **domain**: `str` (required) - The domain of the trusted activity.
+        * **description**: `str` - A description of the trusted activity.
+        * **file_upload**: `bool` - Whether to trust activity if the tab URL or tab title includes this domain.
+        * **cloud_sync_list**: `List[DomainCloudSync]` - Activity is trusted if the username signed in to the
+        sync app is one of the listed domains (`BOX`, `GOOGLE_DRIVE`, `ICLOUD` and/or `ONEDRIVE`).
+        If list is empty, all supported cloud sync domains are trusted.
+        * **git_push**: `bool` - Whether to trust Git push events to this domain.
 
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
@@ -181,8 +183,8 @@ class TrustedActivitiesV2:
 
         **Parameters:**
 
-        * **url**: `str` The url of the trusted activity.
-        * **description**: `str` A description of the trusted activity.
+        * **url**: `str` (required) - The url of the trusted activity.
+        * **description**: `str` - A description of the trusted activity.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
         the newly created trusted activity.
@@ -210,8 +212,8 @@ class TrustedActivitiesV2:
 
         **Parameters:**
 
-        * **workspace_name**: `str` The workspace name of the trusted activity.
-        * **description**: `str` A description of the trusted activity.
+        * **workspace_name**: `str` (required) - The workspace name of the trusted activity.
+        * **description**: `str` - A description of the trusted activity.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
         the newly created trusted activity.
@@ -241,12 +243,12 @@ class TrustedActivitiesV2:
 
         **Parameters:**
 
-        * **account_name**: `str` The account name of the trusted activity.
+        * **account_name**: `str` (required) - The account name of the trusted activity.
         * **description**: `str` A description of the trusted activity.
-        * **dropbox**: `bool` Cloud sync service to trust.
-        * **oneDrive** `bool` Cloud sync service to trust.
+        * **dropbox**: `bool` - Whether to trust Dropbox as a cloud sync service.  Defaults to False.
+        * **one_drive** `bool` - Whether to trust OneDrive as a cloud sync service.  Defaults to False.
 
-        At least 1 activity action group (dropbox, oneDrive) is required to be trusted.
+        At least 1 activity action group (dropbox, one_drive) is required to be trusted.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
         the newly created trusted activity.
@@ -261,6 +263,10 @@ class TrustedActivitiesV2:
             providers.append(ProviderObject(name=Name.ONE_DRIVE))
 
         # At least 1 activity action group is required
+        if len(providers) < 1:
+            raise ValueError(
+                "At least 1 cloud sync service (dropbox, one_drive) must be trusted."
+            )
         assert len(providers) != 0
 
         activity_action_group = ActivityActionGroup(
@@ -292,8 +298,8 @@ class TrustedActivitiesV2:
 
         **Parameters:**
 
-        * **git_uri**: `str` The Git URI of the trusted activity.
-        * **description**: `str` A description of the trusted activity.
+        * **git_uri**: `str` - (required) The Git URI of the trusted activity.
+        * **description**: `str` - A description of the trusted activity.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
         the newly created trusted activity.
@@ -322,7 +328,7 @@ class TrustedActivitiesV2:
 
         **Parameters**:
 
-        * **activity_id** `int` Unique numeric identifier for the trusted activity.
+        * **activity_id** `int` (required) - Unique ID for the trusted activity.
 
         Usage example:
 
@@ -340,8 +346,8 @@ class TrustedActivitiesV2:
 
         **Parameters**
 
-        * **activity_id** `int` Unique numeric identifier for the trusted activity.
-        * **trusted_activity**: [`TrustedActivity`][trustedactivity-model] The modified trusted activity object.
+        * **activity_id** `int` (required) - Unique numeric identifier for the trusted activity.
+        * **trusted_activity**: [`TrustedActivity`][trustedactivity-model] (required) - The modified trusted activity object.
 
         Usage example:
 
