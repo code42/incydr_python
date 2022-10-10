@@ -89,7 +89,7 @@ def test_get_page_when_all_params_returns_expected_data(
     assert page.pagination_range_end_index == len(page.events) == 2
 
 
-def test_search_results_export_when_default_params_returns_expected_data(
+def test_search_events_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     audit_events_data = {
@@ -105,7 +105,7 @@ def test_search_results_export_when_default_params_returns_expected_data(
     )
 
     client = Client()
-    page = client.audit_log.v1.search_results_export()
+    page = client.audit_log.v1.search_events()
     assert isinstance(page, AuditEventsPage)
     assert page.events[0] == Test_Audit_Log_1
     assert page.events[1] == Test_Audit_Log_2

@@ -82,10 +82,8 @@ class AuditLogV1:
 
         return AuditEventsPage.parse_response(response)
 
-    def search_results_export(
+    def search_events(
         self,
-        page_num: int = 1,
-        page_size: int = None,
         actor_ids: List[str] = None,
         actor_ip_addresses: List[str] = None,
         actor_names: List[str] = None,
@@ -96,12 +94,14 @@ class AuditLogV1:
         user_types: List[UserTypes] = None,
     ) -> AuditEventsPage:
         """
-        Search audit log entries, specifically for large result sets.
+        Search audit log entries, specifically for large return sets.
+
+        Returns up to 100,000 events that match the search criteria provided.
+
+        Default: returns first 100,000 events.
 
         **Parameters:**
 
-        * **page_num**: `int` - Page number for results, starting at 1.
-        * **page_size**: `int` - Max number of results to return per page.
         * **actor_ids**: `List[str]` - Finds events whose actor_id is one of the given ids.
         * **actor_ip_addresses**: `List[str]` - Finds events whose actor_ip_address is one of the given IP addresses.
         * **actor_names**: `List[str]` - Finds events whose actor_name is one of the given names.
@@ -113,8 +113,6 @@ class AuditLogV1:
 
         **Returns**: A [`AuditEventsPage`][auditeventspage-model] object representing the search response.
         """
-
-        page_size = page_size or self._parent.settings.page_size
 
         date_range = DateRange()
         if start_time:
@@ -128,8 +126,8 @@ class AuditLogV1:
             actorNames=actor_names,
             dateRange=date_range,
             eventTypes=event_types,
-            pageNum=page_num,
-            pageSize=page_size,
+            pageNum=0,
+            pageSize=0,
             resourceIds=resource_ids,
             userTypes=user_types,
         )
