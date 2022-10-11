@@ -1,3 +1,5 @@
+import base64
+import json
 import logging
 import re
 from collections import deque
@@ -8,6 +10,7 @@ from requests_toolbelt.sessions import BaseUrlSession
 from requests_toolbelt.utils.dump import dump_response
 
 from incydr.__about__ import __version__
+from incydr._alerts.client import AlertsClient
 from incydr._audit_log.client import AuditLogClient
 from incydr._cases.client import CasesClient
 from incydr._core.auth import APIClientAuth
@@ -17,6 +20,8 @@ from incydr._departments.client import DepartmentsClient
 from incydr._devices.client import DevicesClient
 from incydr._directory_groups.client import DirectoryGroupsClient
 from incydr._file_events.client import FileEventsClient
+from incydr._legal_hold.client import LegalHoldClient
+from incydr._user_risk_profiles.client import UserRiskProfiles
 from incydr._users.client import UsersClient
 from incydr._watchlists.client import WatchlistsClient
 
@@ -79,6 +84,7 @@ class Client:
 
         self._session.hooks["response"] = [response_hook]
 
+        self._alerts = AlertsClient(self)
         self._audit_log = AuditLogClient(self)
         self._cases = CasesClient(self)
         self._customer = CustomerClient(self)
@@ -86,7 +92,9 @@ class Client:
         self._devices = DevicesClient(self)
         self._directory_groups = DirectoryGroupsClient(self)
         self._file_events = FileEventsClient(self)
+        self._legal_hold = LegalHoldClient(self)
         self._users = UsersClient(self)
+        self._user_risk_profiles = UserRiskProfiles(self)
         self._watchlists = WatchlistsClient(self)
 
         self._session.auth.refresh()
@@ -127,9 +135,29 @@ class Client:
         return self._session
 
     @property
+    def tenant_id(self):
+        """Property returning the current tenant ID."""
+        token = self.session.auth.token_response.access_token.get_secret_value()
+        payload = token.encode("ascii").split(b".")[-2]
+        extra = len(payload) % 4
+        if extra > 0:
+            payload += b"=" * (4 - extra)
+        return json.loads(base64.urlsafe_b64decode(payload))["tenantUid"]
+
+    @property
+    def alerts(self):
+        """
+        Property returning an [`AlertsClient`](../alerts) for interacting with
+        `/v*/alerts` API endpoints.
+        Usage:
+            >>> client.alerts.v1.get_page()
+        """
+        return self._alerts
+
+    @property
     def audit_log(self):
         """
-        Property returning a [`AuditLog`](../audit) for interacting with
+        Property returning an [`AuditLogClient`](../audit_log) for interacting with
         `/v*/audit` API endpoints.
         Usage:
             >>> client.audit_log.v1.get_page()
@@ -208,6 +236,17 @@ class Client:
         return self._file_events
 
     @property
+    def legal_hold(self):
+        """
+        Property returning a [`LegalHoldClient`](../legal_hold) for interacting with `/v*/legal-hold` API endpoints.
+        Usage:
+
+            >>> client.legal_hold.v1.list_policies()
+
+        """
+        return self._legal_hold
+
+    @property
     def users(self):
         """
         Property returning a [`UsersClient`](../users) for interacting with `/v*/users` API endpoints.
@@ -219,9 +258,22 @@ class Client:
         return self._users
 
     @property
+    def user_risk_profiles(self):
+        """
+        Property returning a [`UserRiskProfilesClient`](../user_risk_profiles) for interacting with
+        `/v*/user_risk_profiles` API endpoints.
+
+        Usage:
+
+            >>> client.user_risk_profiles.v1.get_user_risk_profile("23")
+
+        """
+        return self._user_risk_profiles
+
+    @property
     def watchlists(self):
         """
-        Property returning a ['WatchlistsClient'](../watchlists) for interacting with `/v*/watchlists` API endpoints.
+        Property returning a [`WatchlistsClient`](../watchlists) for interacting with `/v*/watchlists` API endpoints.
         Usage:
 
             >>> client.watchlists.v1.get_page()
