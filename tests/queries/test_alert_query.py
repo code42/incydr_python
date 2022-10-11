@@ -137,20 +137,20 @@ def test_query_alert_state():
 
 
 def test_query_alert_severity():
-    query = AlertQuery().equals("Severity", "HIGH")
+    query = AlertQuery().equals("AlertSeverity", "HIGH")
     assert query.dict()["groups"] == [
         {
             "filterClause": "AND",
-            "filters": [{"term": "Severity", "operator": "IS", "value": "HIGH"}],
+            "filters": [{"term": "AlertSeverity", "operator": "IS", "value": "HIGH"}],
         }
     ]
-    query = AlertQuery().equals("Severity", ["HIGH", "MEDIUM"])
+    query = AlertQuery().equals("AlertSeverity", ["HIGH", "MEDIUM"])
     assert query.dict()["groups"] == [
         {
             "filterClause": "OR",
             "filters": [
-                {"term": "Severity", "operator": "IS", "value": "HIGH"},
-                {"term": "Severity", "operator": "IS", "value": "MEDIUM"},
+                {"term": "AlertSeverity", "operator": "IS", "value": "HIGH"},
+                {"term": "AlertSeverity", "operator": "IS", "value": "MEDIUM"},
             ],
         }
     ]
