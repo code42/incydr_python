@@ -112,7 +112,7 @@ def test_search_events_when_default_params_returns_expected_data(
     assert page.pagination_range_end_index == len(page.events) == 2
 
 
-def test_search_results_count_when_default_params_returns_expected_data(
+def test_get_events_count_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     audit_events_count_data = {"totalResultCount": 2}
@@ -121,12 +121,12 @@ def test_search_results_count_when_default_params_returns_expected_data(
     )
 
     client = Client()
-    results_count = client.audit_log.v1.search_results_count()
+    results_count = client.audit_log.v1.get_event_count()
     assert isinstance(results_count, int)
     assert results_count == 2
 
 
-def test_export_search_results_when_default_params_makes_expected_calls(
+def test_download_events_when_default_params_makes_expected_calls(
     httpserver_auth: HTTPServer,
 ):
     export_event_data = {
@@ -148,6 +148,6 @@ def test_export_search_results_when_default_params_makes_expected_calls(
     ).respond_with_json(redeem_events_data)
 
     client = Client()
-    response = client.audit_log.v1.export_search_results(Path.cwd())
+    response = client.audit_log.v1.download_events(Path.cwd())
 
     assert isinstance(response, Path)

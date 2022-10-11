@@ -31,7 +31,7 @@ class CustomerV1:
         """
         Get customer account information.
 
-        Returns: A [`Customer`][customer-model] object representing account information.
+        **Returns**: A [`Customer`][customer-model] object representing account information.
 
         """
         response = self._parent.session.get("/v1/customer")

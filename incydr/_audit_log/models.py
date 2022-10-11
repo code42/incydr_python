@@ -31,6 +31,8 @@ class AuditEventsPage(ResponseModel):
     **Fields**:
 
     * **events**: `List[Dict[Optional[str], Optional[str]]]` A list of zero or more events matching the given criteria.
+        Each event is represented as a dictionary of property names associated with that event.  These fields may differ
+        from event to event.
     * **pagination_range_end_index**: `int` The index of the last result returned, in relation to total results found.
     * **pagination_range_start_index**: `int` The index of the first result returned, in relation to total results found.
     """
