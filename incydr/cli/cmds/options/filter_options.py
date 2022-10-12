@@ -94,6 +94,7 @@ risk_score_option = click.option(
 include_all_option = click.option(
     "--include-no-risk-events",
     "include_all",
+    is_flag=True,
     default=False,
     help="Include all events in results, including those that have no risk associated with them.",
     cls=AdvancedQueryAndSavedSearchIncompatible,

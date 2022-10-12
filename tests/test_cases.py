@@ -10,6 +10,9 @@ from incydr import Client
 from incydr._cases.models import Case
 from incydr._cases.models import CaseDetail
 from incydr._cases.models import CasesPage
+from incydr.cli.main import incydr
+
+TEST_CASE_NUMBER = 42
 
 TEST_CASE_1 = {
     "number": 1,
@@ -50,6 +53,7 @@ TEST_CASE_2 = {
 }
 
 
+
 def test_create(httpserver_auth: HTTPServer):
     test_data = {
         "name": "test_name",
@@ -86,7 +90,6 @@ def test_create_raises_validation_error_when_param_constraint_exceeded(
     with pytest.raises(ValidationError):
         c.cases.v1.create(name="x", findings="x" * 30_001)
 
-
 def test_get_single_case(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request("/v1/cases/2").respond_with_json(TEST_CASE_2)
     c = Client()
@@ -121,3 +124,76 @@ def test_get_page(httpserver_auth: HTTPServer):
     assert page.cases[0].json() == json.dumps(slim_1)
     assert page.cases[1].json() == json.dumps(slim_2)
     assert page.total_count == len(page.cases)
+
+# ************************************************ CLI ************************************************
+
+
+def test_create_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    test_data = {
+        "name": "test_name",
+        "description": "test_description",
+        "subject": "test_subject",
+        "assignee": "test_assignee",
+        "findings": "test_findings",
+    }
+    test_response = TEST_CASE_1.copy()
+    test_response.update(test_data)
+    httpserver_auth.expect_request(
+        uri="/v1/cases", method="POST", json=test_data
+    ).respond_with_json(test_response)
+
+    result = runner.invoke(
+        incydr, ["cases", "create", "test_name", "--description", "test_description",
+                 "--subject", "test_subject", "--assignee", "test_assignee", "--findings", "test_findings"]
+    )
+    assert result.exit_code == 0
+    
+
+def test_delete_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    result = runner.invoke(
+        incydr, ["cases", "delete", TEST_CASE_NUMBER]
+    )
+    pass
+
+def test_list_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    result = runner.invoke(incydr, ["cases", "list"])
+    pass
+
+def test_show_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    result = runner.invoke(
+        incydr, ["cases", "show", TEST_CASE_NUMBER]
+    )
+    pass
+
+def test_bulk_update_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    pass
+
+def test_download_summary_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    pass
+
+def test_download_cases_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    pass
+
+def test_download_events_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    pass
+
+def test_download_source_file_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    pass
+
+def test_show_file_event_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    pass
+
+def test_list_file_events_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    pass
+
+def test_file_events_add_when_event_ids_list_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    pass
+
+def test_file_events_add_when_csv_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    pass
+
+def test_file_events_remove_when_event_ids_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    pass
+
+def test_file_events_remove_when_csv_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    pass

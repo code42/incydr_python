@@ -1,5 +1,7 @@
 import click
+from requests.exceptions import HTTPError
 
+from incydr.cli import console
 from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
@@ -14,11 +16,13 @@ from incydr.cli.core import IncydrGroup
 @click.pass_context
 def incydr(ctx, log_level, log_file):
     init_client(ctx, log_level, log_file)
-    pass
 
 
 incydr.add_command(file_events)
 incydr.add_command(cases, name="cases")
 
 if __name__ == "__main__":
-    incydr()
+    try:
+        incydr()
+    except HTTPError as err:
+        console.print(f"[red]Error:[/red] {err.response.text}")

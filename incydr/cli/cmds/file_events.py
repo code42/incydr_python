@@ -11,6 +11,9 @@ from typer import echo
 from incydr._file_events.models.response import SavedSearch
 from incydr._queries.file_events import EventQuery
 from incydr.cli import console
+from incydr.cli import init_client
+from incydr.cli import log_file_option
+from incydr.cli import log_level_option
 from incydr.cli.cmds.options.filter_options import advanced_query_option
 from incydr.cli.cmds.options.filter_options import filter_options
 from incydr.cli.cmds.options.filter_options import saved_search_option
@@ -48,8 +51,11 @@ def render_search(search_: SavedSearch):
 
 
 @click.group(cls=IncydrGroup)
-def file_events():
-    pass
+@log_level_option
+@log_file_option
+@click.pass_context
+def file_events(ctx, log_level, log_file):
+    init_client(ctx, log_level, log_file)
 
 
 @file_events.command(cls=IncydrCommand)
@@ -195,13 +201,11 @@ field_option_map = {
 
 def _create_query(**kwargs):
     query = EventQuery(start_date=kwargs["start"], end_date=kwargs["end"])
-    include_no_risk_events = False
+    include_no_risk_events = kwargs["include_all"]
     for k, v in kwargs.items():
         if v:
             if k in ["start", "end", "include_all"]:
                 continue
-            elif k == "include_all":
-                include_no_risk_events = True
             elif k == "risk_score":
                 query = query.greater_than(field_option_map[k], v)
             else:

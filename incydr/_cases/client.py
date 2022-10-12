@@ -17,7 +17,7 @@ from incydr._cases.models import CreateCaseRequest
 from incydr._cases.models import QueryCasesRequest
 from incydr._cases.models import SortKeys
 from incydr._cases.models import UpdateCaseRequest
-from incydr._core.util import get_filename_from_content_disposition
+from incydr._core.utils import get_filename_from_content_disposition
 from incydr._file_events.models.event import FileEventV2
 from incydr.enums import SortDirection
 
@@ -237,7 +237,7 @@ class CasesV1:
         target.write_bytes(response.content)
         return target
 
-    def download_fileevent_csv(self, case_number: int, target_folder: Path) -> Path:
+    def download_file_event_csv(self, case_number: int, target_folder: Path) -> Path:
         """
         Downloads all file event data for a case in CSV format to specified target folder.
 
