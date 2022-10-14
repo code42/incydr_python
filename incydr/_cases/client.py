@@ -19,6 +19,7 @@ from incydr._cases.models import SortKeys
 from incydr._cases.models import UpdateCaseRequest
 from incydr._core.utils import get_filename_from_content_disposition
 from incydr._file_events.models.event import FileEventV2
+from incydr._queries.utils import MICROSECOND_FORMAT
 from incydr.enums import SortDirection
 
 
@@ -130,12 +131,22 @@ class CasesV1:
         * **name**: str - Name of a case on which to filter; will include partial matches.
         * **status**: [`CaseStatus`] - One or more case statuses on which to filter. Available values: `OPEN`, `CLOSED`
         * **page_num**: `int` - Page number for results, starting at 1.
-        * **page_size**: `int` - Max number of results to return for a page.
+        * **page_size**: `int` - Max number of results to return for a page. Defaults to client's `page_size` setting.
         * **sort_dir**: `SortDirection` - The direction on which to sort the response, based on the corresponding key.
         * **sort_key**: `SortKeys` - One or more values on which the response will be sorted.
 
         **Returns**: A [`CasesPage`][casespage-model] object.
         """
+
+        if created_at is not None:
+            if not isinstance(created_at, Tuple):
+                raise TypeError(
+                    f"created_at kwarg should be a Tuple[datetime, datetime] object"
+                    f", passed 'created_at={created_at}' of type: {type(created_at)}"
+                )
+            else:
+                created_at = f"{created_at[0].strftime(MICROSECOND_FORMAT)}/{created_at[1].strftime(MICROSECOND_FORMAT)}"
+
         data = QueryCasesRequest(
             assignee=assignee,
             createdAt=created_at,
@@ -144,7 +155,7 @@ class CasesV1:
             name=name,
             status=status,
             pgNum=page_num,
-            pgSize=page_size,
+            pgSize=page_size or self._parent.settings.page_size,
             srtDir=sort_dir,
             srtKey=sort_key,
         )
@@ -205,8 +216,9 @@ class CasesV1:
         **Returns**: A [`Case`][case-model] object with updated values from server.
         """
         data = UpdateCaseRequest(**case.dict())
+        print(data.dict())
         response = self._parent.session.put(
-            f"/v1/cases/{case.number}", json=data.dict(by_alias=True)
+            f"/v1/cases/{case.number}", json=data.dict()
         )
         return CaseDetail.parse_response(response)
 
@@ -231,7 +243,7 @@ class CasesV1:
             )
         response = self._parent.session.get(f"/v1/cases/{case_number}/export")
         filename = get_filename_from_content_disposition(
-            response, fallback=f"Case-{case_number}.csv"
+            response, fallback=f"Case-{case_number}.pdf"
         )
         target = folder / filename
         target.write_bytes(response.content)
@@ -256,7 +268,7 @@ class CasesV1:
             )
         response = self._parent.session.get(f"/v1/cases/{case_number}/fileevent/export")
         filename = get_filename_from_content_disposition(
-            response, fallback=f"Case-{case_number}.csv"
+            response, fallback=f"Case-{case_number}-file-events.csv"
         )
         target = folder / filename
         target.write_bytes(response.content)
@@ -326,17 +338,27 @@ class CasesV1:
         target.write_bytes(response.content)
         return target
 
-    def get_file_events(self, case_number: int) -> CaseFileEvents:
+    def get_file_events(
+        self, case_number: int, page_num: int = 1, page_size: int = None
+    ) -> CaseFileEvents:
         """
-        Gets file event details attached to a case.
+        Get abbreviated details for file events attached to a case.
 
         **Parameters**
 
-        * **case_number**: `int` Unique numeric identifier for the case.
+        * **case_number**: `int` - Unique numeric identifier for the case.
+        * **page_num**: `int` - Page number for results, starting at 1.
+        * **page_size**: `int` - Max number of results to return for a page. Defaults to client's `page_size` setting.
 
         **Returns**: A [`CaseFileEvents`][casefileevents-model] object containing the associated file events.
         """
-        r = self._parent.session.get(f"/v1/cases/{case_number}/fileevent")
+        params = {
+            "pgNum": page_num,
+            "pgSize": page_size or self._parent.settings.page_size,
+        }
+        r = self._parent.session.get(
+            f"/v1/cases/{case_number}/fileevent", params=params
+        )
         return CaseFileEvents.parse_response(r)
 
     def add_file_events_to_case(

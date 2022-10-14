@@ -15,7 +15,6 @@ from typing import Type
 from typing import TypeVar
 from typing import Union
 
-from click import echo
 from pydantic import BaseModel
 from pydantic import ValidationError
 
@@ -63,7 +62,8 @@ def read_models_from_csv(
             yield model(**row)  # noqa
         except ValidationError as err:
             error = CSVValidationError(
-                f"Bad data in row {reader.line_num} of {path}\n{str(err)}", row=i
+                f"Bad data in row {reader.line_num} of {path}\n{str(err)}",
+                row=reader.line_num,
             )
     if error:
         raise error
@@ -87,7 +87,8 @@ def read_dict_from_csv(
             yield row  # noqa
         except ValidationError as err:
             error = CSVValidationError(
-                f"Bad data in row {reader.line_num} of {path}\n{str(err)}", row=i
+                f"Bad data in row {reader.line_num} of {path}\n{str(err)}",
+                row=reader.line_num,
             )
     if error:
         raise error

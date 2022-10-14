@@ -1,3 +1,5 @@
+from incydr._alerts.models.alert import AlertDetails
+from incydr._alerts.models.response import AlertQueryPage
 from incydr._cases.models import Case
 from incydr._cases.models import CaseFileEvents
 from incydr._cases.models import CasesPage
@@ -33,6 +35,8 @@ from incydr._watchlists.models.responses import WatchlistsPage
 from incydr._watchlists.models.responses import WatchlistUser
 
 __all__ = [
+    "AlertDetails",
+    "AlertQueryPage",
     "Case",
     "CaseFileEvents",
     "CasesPage",
