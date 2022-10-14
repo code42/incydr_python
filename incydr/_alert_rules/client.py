@@ -7,7 +7,6 @@ from pydantic import parse_obj_as
 from requests import Response
 
 from incydr._alert_rules.models.request import GetRulesRequest
-from incydr._alert_rules.models.request import UserRequest
 from incydr._alert_rules.models.response import RuleDetails
 from incydr._alert_rules.models.response import RuleUsersList
 from incydr._user_risk_profiles.models import UserRiskProfile
@@ -128,77 +127,6 @@ class AlertRulesV2:
             return self._parent.session.post(
                 url="/v2/alert-rules/disable", json=rule_ids
             )
-
-    def add_users(self, rule_id: str, user_id: str, aliases: List[str]) -> Response:
-        """
-        Add users to an alert rule. Note that added users could become either included included or excluded from the rule, depending on the rule's configuration.
-
-        **Parameters**:
-
-        * **rule_id**: `str` (required) - The ID of the rule to update.
-        * **user_id**: `str` - Unique user ID.
-        * **aliases**: `List[str]` - A list of aliases associated with a given user.
-
-        **Returns**: A `requests.Response` indicating success.
-        """
-
-        # get aliases from User Risk Profile
-        if aliases == "ALL":
-            aliases = self._get_user_aliases(user_id)
-
-        if not isinstance(aliases, List):
-            aliases = [aliases]
-
-        request = [UserRequest(userIdFromAuthority=user_id, aliases=aliases).dict()]
-
-        return self._parent.session.post(
-            url=f"/v2/alert-rules/{rule_id}/users", json=request
-        )
-
-    def remove_users(self, rule_id: str, users: Union[str, List[str]]) -> Response:
-        """
-        Remove users from a rule. Note that removed users could become either included included or excluded from the rule, depending on the rule's configuration.
-
-        **Parameters**:
-
-        * **rule_id**: `str` (required) - The ID of the rule to update.
-        * **users**: `str`, `List[str]` (required) - A list of user IDs to remove from the rule.  Will also remove all associated aliases.
-
-        **Returns**: A `requests.Response` indicating success.
-        """
-
-        return self._parent.session.post(
-            url=f"/v2/alert-rules/{rule_id}/remove-users",
-            json=users if isinstance(users, List) else [users],
-        )
-
-    def remove_user_aliases(
-        self, rule_id: str, user_id: str, aliases: Union[str, List[str]]
-    ) -> Response:
-        """
-        Remove user aliases from a rule. Note that removed user aliases could become either included included or excluded from the rule, depending on the rule's configuration.
-
-        **Parameters**:
-
-        * **rule_id**: `str` (required) - The ID of the rule to update.
-        * **user_id**: `str` - Unique user ID.
-        * **aliases**: `List[str]` - A list of aliases associated with a given user.
-
-        **Returns**: A `requests.Response` indicating success.
-        """
-
-        # get aliases from User Risk Profile
-        if aliases == "ALL":
-            aliases = self._get_user_aliases(user_id)
-
-        if isinstance(aliases, str):
-            aliases = [aliases]
-
-        request = [UserRequest(userIdFromAuthority=user_id, aliases=aliases).dict()]
-
-        return self._parent.session.post(
-            url=f"/v2/alert-rules/{rule_id}/remove-user-aliases", json=request
-        )
 
     def remove_all_users(self, rule_id: str) -> Response:
         """
