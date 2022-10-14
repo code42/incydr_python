@@ -58,6 +58,41 @@
 * **LOW** = `"LOW"`
 * **NO_RISK_INDICATED** = `"NO_RISK_INDICATED"`
 
+## Cases
+
+### Cases Sort Keys
+
+::: incydr.enums.cases.SortKeys
+    :docstring:
+
+* **NAME** = `"name"`
+* **NUMBER** = `"number"`
+* **CREATED_AT** = `"createdAt"`
+* **UPDATED_AT** = `"updatedAt"`
+* **STATUS** = `"status"`
+* **ASSIGNEE_USERNAME** = `"assigneeUsername"`
+* **SUBJECT_USERNAME** = `"subjectUsername"`
+
+### Case Statuses
+
+::: incydr.enums.cases.CaseStatus
+    :docstring:
+
+* **CLOSED**: `"CLOSED"`
+* **OPEN**: `"OPEN"`
+
+## Devices
+
+### Devices Sort Keys
+
+::: incydr.enums.cases.SortKeys
+    :docstring:
+
+* **NAME** = `"name"`
+* **OS_HOSTNAME** = `"osHostname"`
+* **OS** = `"os"`
+* **LAST_CONNECTED** = `"lastConnected"`
+
 ## File Events
 
 ### Event Search Terms
