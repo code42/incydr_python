@@ -4,11 +4,12 @@ from datetime import datetime
 from enum import Enum
 from typing import List
 from typing import Optional
-from typing import Tuple
 
 from pydantic import BaseModel
+from pydantic import Extra
 from pydantic import Field
 
+from incydr._core.models import Model
 from incydr._core.models import ResponseModel
 from incydr.enums import SortDirection
 
@@ -94,9 +95,9 @@ class CasesPage(ResponseModel):
     total_count: int = Field(alias="totalCount")
 
 
-class QueryCasesRequest(BaseModel):
+class QueryCasesRequest(Model):
     assignee: Optional[str]
-    createdAt: Optional[Tuple[Optional[datetime], Optional[datetime]]]
+    createdAt: Optional[str]
     isAssigned: Optional[bool]
     lastModifiedBy: Optional[str]
     name: Optional[str]
@@ -107,7 +108,7 @@ class QueryCasesRequest(BaseModel):
     status: Optional[CaseStatus]
 
 
-class CreateCaseRequest(BaseModel):
+class CreateCaseRequest(Model):
     name: str = Field(max_length=50)
     assignee: Optional[str]
     description: Optional[str] = Field(max_length=250)
@@ -115,13 +116,16 @@ class CreateCaseRequest(BaseModel):
     subject: Optional[str]
 
 
-class UpdateCaseRequest(BaseModel):
+class UpdateCaseRequest(Model):
     name: Optional[str] = Field(description="The name of the case.", max_length=50)
     assignee: Optional[str]
     description: Optional[str] = Field(max_length=250)
     findings: Optional[str] = Field(max_length=30_000)
     subject: Optional[str]
     status: Optional[CaseStatus]
+
+    class Config:
+        extra = Extra.ignore
 
 
 class FileAvailability(Enum):
@@ -137,7 +141,7 @@ class RiskIndicator(BaseModel):
     weight: int
 
 
-class FileEvent(BaseModel):
+class FileEvent(Model):
     event_id: Optional[str] = Field(
         None,
         alias="eventId",

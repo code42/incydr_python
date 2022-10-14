@@ -12,7 +12,7 @@ from pydantic import root_validator
 from pydantic import StrictBool
 
 from incydr._core.models import Model
-from incydr._queries.util import parse_timestamp
+from incydr._queries.utils import parse_timestamp
 from incydr.enums.alerts import AlertState
 from incydr.enums.alerts import AlertTerm
 from incydr.enums.alerts import Operator
