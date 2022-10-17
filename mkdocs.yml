@@ -43,6 +43,7 @@ nav:
   - File Events: 'clients/file_events.md'
   - File Event Querying: 'clients/file_event_queries.md'
   - Legal Hold: 'clients/legal_hold.md'
+  - Trusted Activites: 'trusted_activities.md'
   - Users: 'clients/users.md'
   - User Risk Profiles: 'clients/user_risk_profiles.md'
   - Watchlists: 'clients/watchlists.md'

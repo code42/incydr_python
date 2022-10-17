@@ -19,6 +19,8 @@ from incydr._legal_hold.models import CustodianMembership
 from incydr._legal_hold.models import Matter
 from incydr._legal_hold.models import MatterMembership
 from incydr._legal_hold.models import Policy
+from incydr._trusted_activities.models import TrustedActivitiesPage
+from incydr._trusted_activities.models import TrustedActivity
 from incydr._user_risk_profiles.models import UserRiskProfile
 from incydr._user_risk_profiles.models import UserRiskProfilesPage
 from incydr._users.models import Role
@@ -54,6 +56,8 @@ __all__ = [
     "UsersPage",
     "Role",
     "UpdateRolesResponse",
+    "TrustedActivity",
+    "TrustedActivitiesPage",
     "DepartmentsPage",
     "DirectoryGroupsPage",
     "DirectoryGroup",

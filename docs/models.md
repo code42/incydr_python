@@ -156,6 +156,19 @@ available model methods.
 ::: incydr.models.UpdateRolesResponse
     :docstring:
 
+## Trusted Activities
+---
+
+### `TrustedActivity` model
+
+::: incydr.models.TrustedActivity
+    :docstring:
+
+### `TrustedActivitiesPage` model
+
+::: incydr.models.TrustedActivitiesPage
+    :docstring:
+
 ## Users
 ---
 
