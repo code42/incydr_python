@@ -17,7 +17,7 @@ from incydr._file_events.models.event import FileEventV2
 from incydr.cli.main import incydr
 from tests.test_file_events import TEST_EVENT_1
 
-TEST_CASE_NUMBER = 42
+TEST_CASE_NUMBER = "42"
 
 TEST_CASE_1 = {
     "number": 1,
@@ -39,7 +39,7 @@ TEST_CASE_1 = {
 }
 
 TEST_CASE_2 = {
-    "number": 2,
+    "number": 42,
     "name": "test_2",
     "createdAt": "2022-07-01T16:39:51.356082Z",
     "updatedAt": "2022-07-01T17:04:16.454497Z",
@@ -70,6 +70,27 @@ TEST_FILE_EVENT = {
 }
 
 
+@pytest.fixture
+def mock_case_delete(httpserver_auth):
+    httpserver_auth.expect_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}", method="DELETE"
+    ).respond_with_data()
+
+
+@pytest.fixture
+def mock_case_get(httpserver_auth):
+    httpserver_auth.expect_request(f"/v1/cases/{TEST_CASE_NUMBER}").respond_with_json(
+        TEST_CASE_2
+    )
+
+
+@pytest.fixture
+def mock_file_event_get(httpserver_auth):
+    httpserver_auth.expect_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/{TEST_EVENT_ID}", method="GET"
+    ).respond_with_json(TEST_EVENT_1)
+
+
 def test_create(httpserver_auth: HTTPServer):
     test_data = {
         "name": "test_name",
@@ -85,7 +106,7 @@ def test_create(httpserver_auth: HTTPServer):
     ).respond_with_json(test_response)
     c = Client()
     case = c.cases.v1.create(**test_data)
-    assert isinstance(case, Case)
+    assert isinstance(case, CaseDetail)
     assert case.name == test_data["name"]
     assert case.description == test_data["description"]
 
@@ -107,12 +128,11 @@ def test_create_raises_validation_error_when_param_constraint_exceeded(
         c.cases.v1.create(name="x", findings="x" * 30_001)
 
 
-def test_get_single_case(httpserver_auth: HTTPServer):
-    httpserver_auth.expect_request("/v1/cases/2").respond_with_json(TEST_CASE_2)
+def test_get_single_case(mock_case_get):
     c = Client()
-    case = c.cases.v1.get_case(2)
+    case = c.cases.v1.get_case(TEST_CASE_NUMBER)
     assert isinstance(case, CaseDetail)
-    assert case.number == 2
+    assert case.number == 42
     assert case.created_at == datetime.datetime.fromisoformat(
         TEST_CASE_2["createdAt"].replace("Z", "+00:00")
     )
@@ -194,10 +214,7 @@ def test_get_page_when_all_params_makes_expected_call(httpserver_auth: HTTPServe
     assert isinstance(page, CasesPage)
 
 
-def test_delete_makes_expected_api_call(httpserver_auth: HTTPServer):
-    httpserver_auth.expect_request(
-        f"/v1/cases/{TEST_CASE_NUMBER}", method="DELETE"
-    ).respond_with_data()
+def test_delete_makes_expected_api_call(mock_case_delete):
     c = Client()
     assert c.cases.v1.delete(TEST_CASE_NUMBER).status_code == 200
 
@@ -227,7 +244,7 @@ def test_iter_all_returns_expected_data(httpserver_auth: HTTPServer):
     for item in iterator:
         total += 1
         assert isinstance(item, Case)
-        assert item.json() == json.dumps(expected.pop(0))
+        assert json.loads(item.json()) == expected.pop(0)
     assert total == 3
 
 
@@ -290,7 +307,6 @@ def test_download_file_event_csv_returns_expected_data(
 def test_download_full_case_zip_returns_expected_data(
     httpserver_auth: HTTPServer, tmp_path
 ):
-    # TODO params
     data = "test-full-case-zip"
     params = {
         "files": True,
@@ -314,13 +330,12 @@ def test_download_file_for_event_returns_expected_data(
     httpserver_auth: HTTPServer, tmp_path
 ):
     data = "test-download-source-file"
-    event_id = "TEST-EVENT-ID"
     httpserver_auth.expect_request(
-        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/{event_id}/file", method="GET"
+        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/{TEST_EVENT_ID}/file", method="GET"
     ).respond_with_json(data)
     c = Client()
-    c.cases.v1.download_file_for_event(TEST_CASE_NUMBER, event_id, tmp_path)
-    f1 = tmp_path / f"Case-{TEST_CASE_NUMBER}-{event_id}-unknown-filename"
+    c.cases.v1.download_file_for_event(TEST_CASE_NUMBER, TEST_EVENT_ID, tmp_path)
+    f1 = tmp_path / f"Case-{TEST_CASE_NUMBER}-{TEST_EVENT_ID}-unknown-filename"
     f = open(f1)
     content = f.read()
     assert content == f'"{data}"'
@@ -369,11 +384,7 @@ def test_delete_file_events_from_case_returns_expected_data(
     )
 
 
-def test_get_file_event_detail_returns_expected_data(httpserver_auth: HTTPServer):
-    data = TEST_EVENT_1
-    httpserver_auth.expect_request(
-        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/{TEST_EVENT_ID}", method="GET"
-    ).respond_with_json(data)
+def test_get_file_event_detail_returns_expected_data(mock_file_event_get):
     c = Client()
     event = c.cases.v1.get_file_event_detail(TEST_CASE_NUMBER, TEST_EVENT_ID)
     assert isinstance(event, FileEventV2)
@@ -415,70 +426,274 @@ def test_create_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
     assert result.exit_code == 0
 
 
-def test_delete_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+def test_delete_makes_expected_sdk_call(runner, mock_case_delete):
     result = runner.invoke(incydr, ["cases", "delete", TEST_CASE_NUMBER])
-    pass
+    assert result.exit_code == 0
 
 
 def test_list_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+    query_1 = {"pgNum": 1, "pgSize": 100, "srtDir": "asc", "srtKey": "number"}
+    query_2 = {"pgNum": 2, "pgSize": 100, "srtDir": "asc", "srtKey": "number"}
+
+    test_case_3 = TEST_CASE_2.copy()
+    test_case_3["number"] = 3
+    test_case_3["name"] = "test_3"
+
+    data_1 = {"cases": [TEST_CASE_1, TEST_CASE_2], "totalCount": 2}
+    data_2 = {"cases": [test_case_3], "totalCount": 1}
+
+    httpserver_auth.expect_ordered_request(
+        "/v1/cases", method="GET", query_string=urlencode(query_1)
+    ).respond_with_json(data_1)
+    httpserver_auth.expect_ordered_request(
+        "/v1/cases", method="GET", query_string=urlencode(query_2)
+    ).respond_with_json(data_2)
+
     result = runner.invoke(incydr, ["cases", "list"])
-    pass
+    print(result)
+    assert result.exit_code == 0
 
 
-def test_show_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+def test_show_makes_expected_sdk_call(runner, mock_case_get):
     result = runner.invoke(incydr, ["cases", "show", TEST_CASE_NUMBER])
-    pass
+    assert result.exit_code == 0
 
 
-def test_bulk_update_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
-    pass
+def test_bulk_update_makes_expected_sdk_call(
+    runner, httpserver_auth: HTTPServer, tmp_path
+):  # TODO
+    data_1 = {
+        "name": "Test Case 1",
+        "assignee": "user-1",
+        "description": "test case 1",
+        "findings": "no findings",
+        "subject": "user-2",
+        "status": "OPEN",
+    }
+    data_2 = {
+        "name": "Test Case 2",
+        "assignee": "user-3",
+        "description": "test case 2",
+        "findings": "some findings",
+        "subject": "user-4",
+        "status": "CLOSED",
+    }
+
+    httpserver_auth.expect_request(
+        "/v1/cases/1", method="PUT", json=data_1
+    ).respond_with_json(TEST_CASE_1)
+    httpserver_auth.expect_request(
+        "/v1/cases/2", method="PUT", json=data_2
+    ).respond_with_json(TEST_CASE_2)
+
+    p = tmp_path / "event_ids.csv"
+    p.write_text(
+        "number,assignee,description,findings,name,status,subject\n"
+        "1,user-1,test case 1,no findings,Test Case 1,OPEN,user-2\n"
+        "2,user-3,test case 2,some findings,Test Case 2,CLOSED,user-4"
+    )
+
+    result = runner.invoke(incydr, ["cases", "bulk-update", str(p)])
+    assert result.exit_code == 0
 
 
-def test_download_summary_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
-    pass
+def test_download_summary_makes_expected_sdk_call(
+    runner, httpserver_auth: HTTPServer, tmp_path
+):
+    httpserver_auth.expect_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/export", method="GET"
+    ).respond_with_data()
+    result = runner.invoke(
+        incydr, ["cases", "download-summary", TEST_CASE_NUMBER, "--path", tmp_path]
+    )
+    assert result.exit_code == 0
 
 
-def test_download_cases_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
-    pass
+def test_download_case_when_default_params_makes_expected_sdk_call(
+    runner, httpserver_auth: HTTPServer, tmp_path
+):
+    params = {
+        "files": True,
+        "summary": True,
+        "fileEvents": True,
+    }
+    httpserver_auth.expect_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/export/full",
+        method="GET",
+        query_string=urlencode(params),
+    ).respond_with_data()
+    result = runner.invoke(
+        incydr, ["cases", "download-case", TEST_CASE_NUMBER, "--path", tmp_path]
+    )
+    assert result.exit_code == 0
 
 
-def test_download_events_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
-    pass
+def test_download_case_when_custom_params_makes_expected_sdk_call(
+    runner, httpserver_auth: HTTPServer, tmp_path
+):
+    params = {
+        "files": False,
+        "summary": True,
+        "fileEvents": False,
+    }
+    httpserver_auth.expect_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/export/full",
+        method="GET",
+        query_string=urlencode(params),
+    ).respond_with_data()
+    result = runner.invoke(
+        incydr,
+        [
+            "cases",
+            "download-case",
+            TEST_CASE_NUMBER,
+            "--path",
+            tmp_path,
+            "--no-source-files",
+            "--no-file-events",
+        ],
+    )
+    assert result.exit_code == 0
+
+
+def test_download_case_when_exclude_all_raises_bad_option_usage_error(
+    runner, httpserver_auth: HTTPServer
+):
+    result = runner.invoke(
+        incydr,
+        [
+            "cases",
+            "download-case",
+            TEST_CASE_NUMBER,
+            "--no-summary",
+            "--no-source-files",
+            "--no-file-events",
+        ],
+    )
+    assert result.exit_code == 2
+    assert "Cannot exclude all files from the case download." in result.output
+
+
+def test_download_events_makes_expected_sdk_call(
+    runner, httpserver_auth: HTTPServer, tmp_path
+):
+    httpserver_auth.expect_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/export", method="GET"
+    ).respond_with_data()
+    result = runner.invoke(
+        incydr, ["cases", "download-events", TEST_CASE_NUMBER, "--path", tmp_path]
+    )
+    assert result.exit_code == 0
 
 
 def test_download_source_file_makes_expected_sdk_call(
-    runner, httpserver_auth: HTTPServer
+    runner, httpserver_auth: HTTPServer, tmp_path
 ):
-    pass
+    httpserver_auth.expect_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/{TEST_EVENT_ID}/file", method="GET"
+    ).respond_with_data()
+
+    result = runner.invoke(
+        incydr,
+        [
+            "cases",
+            "download-source-file",
+            TEST_CASE_NUMBER,
+            TEST_EVENT_ID,
+            "--path",
+            tmp_path,
+        ],
+    )
+
+    assert result.exit_code == 0
 
 
-def test_show_file_event_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
-    pass
+def test_show_file_event_makes_expected_sdk_call(runner, mock_file_event_get):
+    result = runner.invoke(
+        incydr, ["cases", "file-events", "show", TEST_CASE_NUMBER, TEST_EVENT_ID]
+    )
+    assert result.exit_code == 0
 
 
 def test_list_file_events_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
-    pass
+    data = {"events": [TEST_FILE_EVENT], "totalCount": 1}
+    query = {"pgNum": 1, "pgSize": 100}
+    httpserver_auth.expect_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent",
+        method="GET",
+        query_string=urlencode(query),
+    ).respond_with_json(data)
+    result = runner.invoke(incydr, ["cases", "file-events", "list", TEST_CASE_NUMBER])
+    assert result.exit_code == 0
 
 
 def test_file_events_add_when_event_ids_list_makes_expected_sdk_call(
-    runner, httpserver_auth: HTTPServer
+    runner, httpserver_auth: HTTPServer, tmp_path
 ):
-    pass
+    event_ids = ["event-1", "event-2", "event-3"]
+
+    httpserver_auth.expect_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent",
+        method="POST",
+        json={"events": event_ids},
+    ).respond_with_data()
+    result = runner.invoke(
+        incydr, ["cases", "file-events", "add", TEST_CASE_NUMBER, ",".join(event_ids)]
+    )
+    assert result.exit_code == 0
 
 
 def test_file_events_add_when_csv_makes_expected_sdk_call(
-    runner, httpserver_auth: HTTPServer
+    runner, httpserver_auth: HTTPServer, tmp_path
 ):
-    pass
+    event_ids = ["event-1", "event-2", "event-3"]
+    p = tmp_path / "event_ids.csv"
+    p.write_text("\n".join(event_ids))
+
+    httpserver_auth.expect_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent",
+        method="POST",
+        json={"events": event_ids},
+    ).respond_with_data()
+    result = runner.invoke(
+        incydr, ["cases", "file-events", "add", TEST_CASE_NUMBER, str(p), "--csv"]
+    )
+    assert result.exit_code == 0
 
 
 def test_file_events_remove_when_event_ids_makes_expected_sdk_call(
     runner, httpserver_auth: HTTPServer
 ):
-    pass
+    httpserver_auth.expect_ordered_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/event-1",
+        method="DELETE",
+    ).respond_with_data()
+    httpserver_auth.expect_ordered_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/event-2",
+        method="DELETE",
+    ).respond_with_data()
+    result = runner.invoke(
+        incydr, ["cases", "file-events", "remove", TEST_CASE_NUMBER, "event-1,event-2"]
+    )
+
+    assert result.exit_code == 0
 
 
 def test_file_events_remove_when_csv_makes_expected_sdk_call(
-    runner, httpserver_auth: HTTPServer
+    runner, httpserver_auth: HTTPServer, tmp_path
 ):
-    pass
+    p = tmp_path / "event_ids.csv"
+    p.write_text("event-1\nevent-2")
+
+    httpserver_auth.expect_ordered_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/event-1",
+        method="DELETE",
+    ).respond_with_data()
+    httpserver_auth.expect_ordered_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/event-2",
+        method="DELETE",
+    ).respond_with_data()
+    result = runner.invoke(
+        incydr, ["cases", "file-events", "remove", TEST_CASE_NUMBER, str(p), "--csv"]
+    )
+    assert result.exit_code == 0

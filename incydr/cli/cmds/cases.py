@@ -179,6 +179,18 @@ def bulk_update(ctx: Context, csv: Path):
     Bulk update cases using a `.csv` file.
 
     Takes a single arg `CSV` which specifies the path to the file.
+    Requires a `number` column to identify the case by its `case_number`.
+
+    Valid CSV columns that correspond to mutable case fields include:
+
+    * `number` (REQUIRED) - Case number.
+    * `assignee` - User ID of the administrator assigned to the case.
+    * `description` - Brief optional description.
+    * `findings` - Markdown formatted text summarizing the findings for a case.
+    * `name` - Case name.
+    * `status` - One of `ARCHIVED`, `CLOSED` or `OPEN`.
+    * `subject` - User ID of the case subject.
+
     """
     client = ctx.obj()
     try:
@@ -241,8 +253,13 @@ def download_case(
 
     Use `download-events`, `download-source-file` and `download-summary` to download an individual case-related file outside of the ZIP.
     """
+    if all([no_source_files, no_summary, no_file_events]):
+        raise click.BadOptionUsage(
+            "--no-summary", "Cannot exclude all files from the case download."
+        )
+
     client = ctx.obj()
-    client.cases.v1.download_case(
+    client.cases.v1.download_full_case_zip(
         case_number,
         path,
         include_files=not no_source_files,
@@ -363,13 +380,13 @@ def add(ctx: Context, case_number: int, event_ids: Union[str, Path], csv: bool):
 @click.argument("event_ids")
 @csv_option
 @click.pass_context
-def remove(ctx: Context, case_number: int, event_ids: Union[str, Path], csv: bool):
+def remove(ctx: Context, case_number: int, event_ids: str, csv: bool):
     """
     Remove file events from a case specified by CASE_NUMBER.
 
     EVENT_IDS is a comma-delimited string of event IDs to add to the case:
 
-        add CASE_NUMBER EVENT_IDS
+        add CASE_NUMBER EVENT_IDSs
 
     To read the event IDs from a csv (single column, no header),
     pass the path to a csv along with the --csv flag:
@@ -377,9 +394,9 @@ def remove(ctx: Context, case_number: int, event_ids: Union[str, Path], csv: boo
         add CASE_NUMBER CSV_PATH --csv
     """
     client = ctx.obj()
-    client.cases.v1.delete_file_events_from_case(
-        case_number, _parse_event_ids(event_ids, csv)
-    )
+    ids = _parse_event_ids(event_ids, csv)
+    for id_ in ids:
+        client.cases.v1.delete_file_event_from_case(case_number, id_)
 
 
 def _parse_event_ids(event_ids, csv):
