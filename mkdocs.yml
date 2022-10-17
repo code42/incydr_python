@@ -1,5 +1,4 @@
 site_name: ""
-site_description: A next-generation python client for Incydr.
 site_url: https://developer.code42.com
 
 theme:
