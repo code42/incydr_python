@@ -24,7 +24,7 @@ jobs:
 
     - name: Build Release
       run: |
-          hatch -v build -t wheel:standard
+          hatch -v build -t wheel:standard -t sdist:standard
 
     - name: Set File Names and Release IDs
       run: |
