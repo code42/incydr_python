@@ -331,12 +331,12 @@ def test_get_roles_returns_expected_data(
     ).respond_with_json(roles_data)
 
     client = Client()
-    listOfRoles = client.users.v1.get_roles(user_id="user-1")
-    assert isinstance(listOfRoles, list)
-    assert isinstance(listOfRoles[0], Role)
-    assert isinstance(listOfRoles[1], Role)
-    assert listOfRoles[0].json() == json.dumps(TEST_USER_1_ROLE_1)
-    assert listOfRoles[1].json() == json.dumps(TEST_USER_1_ROLE_2)
+    roles = client.users.v1.get_roles(user_id="user-1")
+    assert isinstance(roles, list)
+    assert isinstance(roles[0], Role)
+    assert isinstance(roles[1], Role)
+    assert roles[0].json() == json.dumps(TEST_USER_1_ROLE_1)
+    assert roles[1].json() == json.dumps(TEST_USER_1_ROLE_2)
 
 
 def test_update_roles_returns_expected_data(

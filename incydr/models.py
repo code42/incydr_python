@@ -1,6 +1,8 @@
 from incydr._alert_rules.models.response import RuleDetails
 from incydr._alert_rules.models.response import RuleUser
 from incydr._alert_rules.models.response import RuleUsersList
+from incydr._alerts.models.alert import AlertDetails
+from incydr._alerts.models.response import AlertQueryPage
 from incydr._cases.models import Case
 from incydr._cases.models import CaseFileEvents
 from incydr._cases.models import CasesPage
@@ -14,6 +16,13 @@ from incydr._file_events.models.event import FileEventV2
 from incydr._file_events.models.response import FileEventsPage
 from incydr._file_events.models.response import SavedSearch
 from incydr._file_events.models.response import SavedSearchesPage
+from incydr._legal_hold.models import Custodian
+from incydr._legal_hold.models import CustodianMembership
+from incydr._legal_hold.models import Matter
+from incydr._legal_hold.models import MatterMembership
+from incydr._legal_hold.models import Policy
+from incydr._trusted_activities.models import TrustedActivitiesPage
+from incydr._trusted_activities.models import TrustedActivity
 from incydr._user_risk_profiles.models import UserRiskProfile
 from incydr._user_risk_profiles.models import UserRiskProfilesPage
 from incydr._users.models import Role
@@ -32,6 +41,8 @@ from incydr._watchlists.models.responses import WatchlistsPage
 from incydr._watchlists.models.responses import WatchlistUser
 
 __all__ = [
+    "AlertDetails",
+    "AlertQueryPage",
     "Case",
     "CaseFileEvents",
     "CasesPage",
@@ -49,6 +60,8 @@ __all__ = [
     "RuleUsersList",
     "RuleUser",
     "RuleDetails",
+    "TrustedActivity",
+    "TrustedActivitiesPage",
     "DepartmentsPage",
     "DirectoryGroupsPage",
     "DirectoryGroup",
@@ -62,6 +75,11 @@ __all__ = [
     "IncludedDepartment",
     "IncludedDirectoryGroupsList",
     "IncludedDirectoryGroup",
+    "Policy",
+    "Matter",
+    "Custodian",
+    "CustodianMembership",
+    "MatterMembership",
     "UserRiskProfilesPage",
     "UserRiskProfile",
 ]
