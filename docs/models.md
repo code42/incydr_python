@@ -14,6 +14,24 @@
 See [Pydantic documentation](https://pydantic-docs.helpmanual.io/usage/models/#model-properties) for full list of
 available model methods.
 
+## Alerts
+---
+
+### `AlertDetails` model
+
+::: incydr.models.AlertDetails
+    :docstring:
+
+### `AlertSummary` model
+
+::: incydr.models.AlertSummary
+    :docstring:
+
+### `AlertQueryPage` model
+
+::: incydr.models.AlertQueryPage
+    :docstring:
+
 ## Cases
 ---
 
@@ -136,6 +154,19 @@ available model methods.
 ### `UpdateRolesResponse` model
 
 ::: incydr.models.UpdateRolesResponse
+    :docstring:
+
+## Trusted Activities
+---
+
+### `TrustedActivity` model
+
+::: incydr.models.TrustedActivity
+    :docstring:
+
+### `TrustedActivitiesPage` model
+
+::: incydr.models.TrustedActivitiesPage
     :docstring:
 
 ## Users
