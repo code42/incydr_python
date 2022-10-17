@@ -20,3 +20,61 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        python -m pip install --upgrade hatch
+
+    - name: Build Release
+      run: |
+          hatch -v build -t wheel:standard -t sdist:standard
+
+    - name: Set File Names and Release IDs
+      run: |
+          src_file=( ./dist/*.tar.gz )
+          wheel_file=( ./dist/*.whl )
+          echo "RELEASE_ID=$(jq --raw-output '.release.id' $GITHUB_EVENT_PATH)" >> $GITHUB_ENV
+          echo "SOURCE_DIST_FILE=$(basename $src_file)" >> $GITHUB_ENV
+          echo "WHEEL_FILE=$(basename $wheel_file)" >> $GITHUB_ENV
+
+    - name: Set Upload Url
+      run: |
+          echo "UPLOAD_URL=https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets{?name,label}" >> $GITHUB_ENV
+
+    - name: Output Variables For Uploading
+      id: get_upload_vars
+      run: |
+          echo "Release ID: $RELEASE_ID"
+          echo "Source Dist File: $SOURCE_DIST_FILE"
+          echo "Source Dist Upload Url: $SOURCE_DIST_URL"
+          echo "Wheel File: $WHEEL_FILE"
+          echo "Upload Url: $UPLOAD_URL"
+          echo "::set-output name=source_dist_path::./dist/${SOURCE_DIST_FILE}"
+          echo "::set-output name=source_dist_name::${SOURCE_DIST_FILE}"
+          echo "::set-output name=wheel_path::./dist/${WHEEL_FILE}"
+          echo "::set-output name=wheel_name::./dist/${WHEEL_FILE}"
+          echo "::set-output name=upload_url::${UPLOAD_URL}"
+
+    - name: Upload Source Distribution to GitHub release
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_upload_vars.outputs.upload_url }}
+        asset_path: ${{ steps.get_upload_vars.outputs.source_dist_path }}
+        asset_name: ${{ steps.get_upload_vars.outputs.source_dist_name }}
+        asset_content_type: application/x-gzip
+
+    - name: Upload Wheel to GitHub Release
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_upload_vars.outputs.upload_url }}
+        asset_path: ${{ steps.get_upload_vars.outputs.wheel_path }}
+        asset_name: ${{ steps.get_upload_vars.outputs.wheel_name }}
+        asset_content_type: application/zip
+
+    - name: Publish Build to PyPI
+      env:
+        HATCH_INDEX_USER: '__token__'
+        HATCH_INDEX_AUTH: ${{ secrets.PYPI_ACCESS_TOKEN }}
+      run: |
+        hatch publish dist/*

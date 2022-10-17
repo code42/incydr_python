@@ -1,4 +1,5 @@
 from incydr._alerts.models.alert import AlertDetails
+from incydr._alerts.models.alert import AlertSummary
 from incydr._alerts.models.response import AlertQueryPage
 from incydr._audit_log.models import AuditEventsPage
 from incydr._cases.models import Case
@@ -19,6 +20,8 @@ from incydr._legal_hold.models import CustodianMembership
 from incydr._legal_hold.models import Matter
 from incydr._legal_hold.models import MatterMembership
 from incydr._legal_hold.models import Policy
+from incydr._trusted_activities.models import TrustedActivitiesPage
+from incydr._trusted_activities.models import TrustedActivity
 from incydr._user_risk_profiles.models import UserRiskProfile
 from incydr._user_risk_profiles.models import UserRiskProfilesPage
 from incydr._users.models import Role
@@ -38,6 +41,7 @@ from incydr._watchlists.models.responses import WatchlistUser
 
 __all__ = [
     "AlertDetails",
+    "AlertSummary",
     "AlertQueryPage",
     "Case",
     "CaseFileEvents",
@@ -53,6 +57,8 @@ __all__ = [
     "UsersPage",
     "Role",
     "UpdateRolesResponse",
+    "TrustedActivity",
+    "TrustedActivitiesPage",
     "DepartmentsPage",
     "DirectoryGroupsPage",
     "DirectoryGroup",

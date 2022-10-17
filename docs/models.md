@@ -22,6 +22,11 @@ available model methods.
 ::: incydr.models.AlertDetails
     :docstring:
 
+### `AlertSummary` model
+
+::: incydr.models.AlertSummary
+    :docstring:
+
 ### `AlertQueryPage` model
 
 ::: incydr.models.AlertQueryPage
@@ -156,6 +161,19 @@ available model methods.
 ### `UpdateRolesResponse` model
 
 ::: incydr.models.UpdateRolesResponse
+    :docstring:
+
+## Trusted Activities
+---
+
+### `TrustedActivity` model
+
+::: incydr.models.TrustedActivity
+    :docstring:
+
+### `TrustedActivitiesPage` model
+
+::: incydr.models.TrustedActivitiesPage
     :docstring:
 
 ## Users

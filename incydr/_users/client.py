@@ -7,7 +7,6 @@ from requests import Response
 
 from incydr._devices.models import DevicesPage
 from incydr._devices.models import QueryDevicesRequest
-from incydr._devices.models import SortKeys
 from incydr._users.models import MoveUserRequest
 from incydr._users.models import QueryUsersRequest
 from incydr._users.models import Role
@@ -16,6 +15,7 @@ from incydr._users.models import UpdateRolesResponse
 from incydr._users.models import User
 from incydr._users.models import UsersPage
 from incydr.enums import SortDirection
+from incydr.enums.devices import SortKeys
 
 
 class UsersV1:
