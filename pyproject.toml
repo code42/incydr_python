@@ -32,7 +32,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-Documentation = "https://github.com/unknown/incydr#readme"
+Documentation = "https://github.com/code42/incydr_python#readme"
 Issues = "https://github.com/code42/incydr_python/issues"
 Source = "https://github.com/code42/incydr_python/incydr"
 
