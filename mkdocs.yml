@@ -47,6 +47,7 @@ nav:
     - File Events: 'sdk/file_events.md'
     - File Event Queries: 'sdk/file_event_queries.md'
     - Legal Hold: 'sdk/legal_hold.md'
+    - Trusted Activites: 'trusted_activities.md'
     - Users: 'sdk/users.md'
     - User Risk Profiles: 'sdk/user_risk_profiles.md'
     - Watchlists: 'sdk/watchlists.md'
