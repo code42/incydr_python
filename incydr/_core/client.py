@@ -1,3 +1,5 @@
+import base64
+import json
 import logging
 import re
 from collections import deque
@@ -8,6 +10,7 @@ from requests_toolbelt.sessions import BaseUrlSession
 from requests_toolbelt.utils.dump import dump_response
 
 from incydr.__about__ import __version__
+from incydr._alerts.client import AlertsClient
 from incydr._cases.client import CasesClient
 from incydr._core.auth import APIClientAuth
 from incydr._core.settings import IncydrSettings
@@ -80,6 +83,7 @@ class Client:
 
         self._session.hooks["response"] = [response_hook]
 
+        self._alerts = AlertsClient(self)
         self._cases = CasesClient(self)
         self._customer = CustomerClient(self)
         self._departments = DepartmentsClient(self)
@@ -127,6 +131,20 @@ class Client:
             'https://api.us.code42.com/v1/users'
         """
         return self._session
+
+    @property
+    def tenant_id(self):
+        """Property returning the current tenant ID."""
+        token = self.session.auth.token_response.access_token.get_secret_value()
+        payload = token.encode("ascii").split(b".")[-2]
+        extra = len(payload) % 4
+        if extra > 0:
+            payload += b"=" * (4 - extra)
+        return json.loads(base64.urlsafe_b64decode(payload))["tenantUid"]
+
+    @property
+    def alerts(self):
+        return self._alerts
 
     @property
     def cases(self):

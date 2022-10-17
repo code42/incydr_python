@@ -1,4 +1,4 @@
-site_name: ""
+site_name: Code42 Developer Portal
 site_url: https://developer.code42.com
 
 theme:
@@ -38,6 +38,7 @@ nav:
     - Settings:
         - Configuration: 'sdk/settings.md'
         - Logging: 'sdk/logging.md'
+    - Alerts: 'alerts.md'
     - Cases: 'sdk/cases.md'
     - Customer: 'sdk/customer.md'
     - Departments: 'sdk/departments.md'
