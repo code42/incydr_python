@@ -38,6 +38,7 @@ available model methods.
 ### `AuditEventsPage` model
 
 ::: incydr.models.AuditEventsPage
+    :docstring:
 
 ## Cases
 ---
