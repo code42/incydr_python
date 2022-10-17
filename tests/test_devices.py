@@ -7,8 +7,8 @@ from pytest_httpserver import HTTPServer
 from incydr import Client
 from incydr._devices.models import Device
 from incydr._devices.models import DevicesPage
-from incydr._devices.models import SortKeys
 from incydr.enums import SortDirection
+from incydr.enums.devices import SortKeys
 
 TEST_DEVICE_1 = {
     "deviceId": "device-1",

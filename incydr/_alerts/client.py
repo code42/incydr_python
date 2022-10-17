@@ -116,7 +116,7 @@ class AlertsV1:
         **Parameters**:
 
         * **alert_id**: `str | List[str]` (required) - ID or list of IDs of the alert(s) to update.
-        * **state**: `AlertState` (required) - State to set alert(s) to.
+        * **state**: [`AlertState`][alert-state] (required) - State to set alert(s) to.
         * **note**: `str` - Optional note text.
 
         **Returns**: A `Response` object indicating success.

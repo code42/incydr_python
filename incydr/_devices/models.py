@@ -1,5 +1,4 @@
 from datetime import datetime
-from enum import Enum
 from typing import List
 from typing import Optional
 
@@ -8,13 +7,7 @@ from pydantic import Field
 
 from incydr._core.models import ResponseModel
 from incydr.enums import SortDirection
-
-
-class SortKeys(str, Enum):
-    NAME = "name"
-    OS_HOSTNAME = "osHostname"
-    OS = "os"
-    LAST_CONNECTED = "lastConnected"
+from incydr.enums.devices import SortKeys
 
 
 class Device(ResponseModel):

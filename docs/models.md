@@ -22,6 +22,11 @@ available model methods.
 ::: incydr.models.AlertDetails
     :docstring:
 
+### `AlertSummary` model
+
+::: incydr.models.AlertSummary
+    :docstring:
+
 ### `AlertQueryPage` model
 
 ::: incydr.models.AlertQueryPage

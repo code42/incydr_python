@@ -1,10 +1,10 @@
 from itertools import count
 from typing import Iterator
 
+from ..enums.devices import SortKeys
 from .models import Device
 from .models import DevicesPage
 from .models import QueryDevicesRequest
-from .models import SortKeys
 from incydr.enums import SortDirection
 
 
@@ -67,7 +67,7 @@ class DevicesV1:
         * **page_num**: `int` - Page number for results, starting at 1.
         * **page_size**: `int` - Max number of results to return per page.
         * **sort_dir**: `SortDirection` - 'asc' or 'desc'. The direction in which to sort the response based on the corresponding key. Defaults to 'asc'.
-        * **sort_key**: `SortKeys` - One or more values on which the response will be sorted. Defaults to device name.
+        * **sort_key**: [`SortKeys`][devices-sort-keys] - One or more values on which the response will be sorted. Defaults to device name.
 
         **Returns**: A ['DevicesPage'][devicespage-model] object.
         """
