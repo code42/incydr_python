@@ -27,7 +27,7 @@ class RuleType(_Enum):
     FED_COMPOSITE = "FED_COMPOSITE"
 
 
-class Severity(_Enum):
+class AlertSeverity(_Enum):
     """
     Possible severity values for an alert.
     """
@@ -68,4 +68,4 @@ class AlertTerm(_Enum):
     LAST_MODIFIED_TIME = "LastModifiedTime"
     LAST_MODIFIED_BY = "LastModifiedBy"
     RULE_ID = "RuleId"
-    SEVERITY = "Severity"
+    SEVERITY = "AlertSeverity"

@@ -13,17 +13,17 @@ from pydantic import StrictBool
 
 from incydr._core.models import Model
 from incydr._queries.utils import parse_timestamp
+from incydr.enums.alerts import AlertSeverity
 from incydr.enums.alerts import AlertState
 from incydr.enums.alerts import AlertTerm
 from incydr.enums.alerts import Operator
 from incydr.enums.alerts import RiskSeverity
-from incydr.enums.alerts import Severity
 
 
 _term_enum_map = {
     AlertTerm.STATE: AlertState,
     AlertTerm.RISK_SEVERITY: RiskSeverity,
-    AlertTerm.SEVERITY: Severity,
+    AlertTerm.SEVERITY: AlertSeverity,
 }
 
 
@@ -132,7 +132,7 @@ class AlertQuery(Model):
         **Parameters**:
 
         * **term**: `str` - The term which corresponds to an alert field. List of valid terms can be found in the
-            [`incydr.enums.alerts.AlertTerm`][alert-term-enum] enum object.
+            [`incydr.enums.alerts.AlertTerm`][alert-terms] enum object.
         * **values**: `str`, `List[str]` - The value(s) for the term to match.
         """
         if isinstance(values, (str, bool)):

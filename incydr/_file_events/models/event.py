@@ -6,7 +6,6 @@ from pydantic import Field
 
 from incydr._core.models import ResponseModel
 from incydr.enums.file_events import ReportType
-from incydr.enums.file_events import RiskSeverity
 
 
 class DestinationEmail(ResponseModel):
@@ -343,7 +342,7 @@ class Risk(ResponseModel):
         description="Sum of the weights for each risk indicator. This score is used to determine the overall risk severity of the event.",
         example=12,
     )
-    severity: Optional[RiskSeverity] = Field(
+    severity: Optional[str] = Field(
         description="The general risk assessment of the event, based on the numeric score.",
         example="CRITICAL",
     )

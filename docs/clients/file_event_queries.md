@@ -1,4 +1,4 @@
-# File Event Queries
+# Querying File Events
 
 ## EventQuery Class
 
@@ -19,7 +19,38 @@ from incydr import EventQuery
 
 The `EventQuery(start_date=None, end_date=None)` class takes a start date and/or an end date in various forms, including a timestamp string, a datetime object, or a number (float, int).
 
-The `start_date` param can also take a duration in the form of an ISO-duration string or a timedelta object (ex. Use `start_date=P7D` to filter for events which occurred in the last week).
+The `start_date` param can also take a duration (ex. filter for events which occurred in the last week) in the form of an ISO-duration string or a `datetime.timedelta` object.
+
+All of the following examples are valid `start_date` values.
+```python
+import datetime
+
+# Filter for events after September 10th, 2020
+start_str = "2020-09-10 11:12:13"  # string formatted as "%Y-%m-%d %H:%M:%S"
+
+start_datetime = datetime.datetime(2020, 9, 10, 11, 12, 13) # datetime object
+
+start_utc = 1599736333.0  # UTC timestamp
+
+# Filter for events that occurred in the last 7 days
+start_timedelta = datetime.timedelta(days=7)
+
+start_iso_duration = "P7D"
+```
+
+Additional filters can be attached to the query by using the [`EventQuery`](#eventquery-class) class methods.  Each of these methods takes a `str` term to filter on as their first argument,
+specifically an [`EventSearchTerm`](../../enums/#event-search-terms) which matches a file event field (ex: `'risk.severity'`).  If applicable the second argument is the value(s) to compare.
+
+The following operators are available for filtering:
+
+* `equals`
+* `not_equals`
+* `exists`
+* `does_not_exist`
+* `greater_than`
+* `less_than`
+
+More detailed documentation on these methods is available above in the [`EventQuery`](#eventquery-class) documentation.
 
 ```python
 # to create a query which filters events which have the file category of 'Document' or 'Audio' from the past 1 day
@@ -36,22 +67,26 @@ end_date = "2020-11-10 11:12:13"
 query = EventQuery(start_date, end_date).not_equals('event.action', 'file-created').greater_than('risk.score', 10)
 ```
 
-All operator methods take a term(str), which matches a file event field (ex: `'risk.severity'`), to filter on as their first arg.  If applicable the second arg is the value(s) to compare.
+To assist with the `equals()` and `not_equals()` methods, the following search terms have corresponding enum classes to specify valid filter values:
 
-The following operators are available for filtering:
-* `equals`
-* `not_equals`
-* `exists`
-* `does_not_exist`
-* `greater_than`
-* `less_than`
+* `file.category`: [`FileCategory`](../../enums/#file-categories)
+* `event.action`: [`EventAction`](../../enums/#event-actions)
+* `source.category`: [`SourceCategory`](../../enums/#source-destination-categories)
+* `destination.category`: [`DestinationCategory`](../../enums/#source-destination-categories)
+* `event.shareType`: [`ShareType`](../../enums/#share-types)
+* `report.type`: [`ReportType`](../../enums/#report-types)
+* `risk.indicators.name`: [`RiskIndicators`](../../enums/#risk-indicators)
+* `risk.severity`: [`RiskSeverity`](../../enums/#risk-severity)
+* `risk.trustReason`: [`TrustReason`](../../enums/#trust-reasons)
+
+For example, the [`EventAction`](../../enums/#event-actions) enum class provides all valid values for the `event.action` file event field.
 
 Pass the event query object to the `file_events.v2.search()` method to get the results.
 
 ## Saved Searches
 
 You can convert a saved search response object into an `EventQuery` to be used for searching using the
-`EventQuery.from_saved_search()` classmethod:
+`EventQuery.from_saved_search()` class method:
 
 ```python
 import incydr
