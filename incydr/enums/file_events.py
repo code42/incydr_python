@@ -411,7 +411,7 @@ class TrustReason(_Enum):
 
 
 class RiskSeverity(_Enum):
-    """Risk severity values available for filtering file events."""
+    """Possible Risk severity values."""
 
     CRITICAL = "CRITICAL"
     HIGH = "HIGH"
