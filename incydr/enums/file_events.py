@@ -1,7 +1,5 @@
 from incydr.enums import _Enum
 
-# TODO: QA request - expose query enums on documentation
-
 
 class Operator(_Enum):
     # all valid filter operators for querying file events
