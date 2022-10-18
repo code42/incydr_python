@@ -5,6 +5,13 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 -----
 
+The Incydr SDK is a Python client for interacting with the [Code42 Incydr API](https://developer.code42.com/api).
+
+It provides a thin wrapper around the [Requests](https://requests.readthedocs.io/en/latest/) HTTP library with
+helper clients that model Code42 data and validate requests with the help of [Pydantic](https://pydantic-docs.helpmanual.io).
+
+**This project is currently in BETA and subject to breaking changes prior to the 1.0 release.**
+
 **Table of Contents**
 
 - [Installation](#installation)
@@ -16,13 +23,15 @@
 pip install incydr
 ```
 
-## Hatch
+# Contributing
+
+## Install hatch
 
 ```console
 pip install hatch
 ```
 
-#### Style check
+#### Run style checks
 
 ```console
 hatch run style:check

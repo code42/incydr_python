@@ -12,14 +12,14 @@ from incydr._cases.models import Case
 from incydr._cases.models import CaseDetail
 from incydr._cases.models import CaseFileEvents
 from incydr._cases.models import CasesPage
-from incydr._cases.models import CaseStatus
 from incydr._cases.models import CreateCaseRequest
 from incydr._cases.models import QueryCasesRequest
-from incydr._cases.models import SortKeys
 from incydr._cases.models import UpdateCaseRequest
 from incydr._core.util import get_filename_from_content_disposition
 from incydr._file_events.models.event import FileEventV2
 from incydr.enums import SortDirection
+from incydr.enums.cases import CaseStatus
+from incydr.enums.cases import SortKeys
 
 
 class CasesV1:
@@ -128,11 +128,11 @@ class CasesV1:
         * **is_assigned**: `bool` - Filter cases with an assignee (`True`) or without (`False`).
         * **last_modified_by**: `str` - User UID of the user who most recently modified the case.
         * **name**: str - Name of a case on which to filter; will include partial matches.
-        * **status**: [`CaseStatus`] - One or more case statuses on which to filter. Available values: `OPEN`, `CLOSED`
+        * **status**: [`CaseStatus`][case-statuses] - One or more case statuses on which to filter. Available values: `OPEN`, `CLOSED`
         * **page_num**: `int` - Page number for results, starting at 1.
         * **page_size**: `int` - Max number of results to return for a page.
         * **sort_dir**: `SortDirection` - The direction on which to sort the response, based on the corresponding key.
-        * **sort_key**: `SortKeys` - One or more values on which the response will be sorted.
+        * **sort_key**: [`SortKeys`][cases-sort-keys] - One or more values on which the response will be sorted.
 
         **Returns**: A [`CasesPage`][casespage-model] object.
         """

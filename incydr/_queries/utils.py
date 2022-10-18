@@ -1,11 +1,13 @@
+from datetime import date
 from datetime import datetime
+from typing import Union
 
 MICROSECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 DATETIME_STR_FORMAT = "%Y-%m-%d %H:%M:%S"
 DATE_STR_FORMAT = "%Y-%m-%d"
 
 
-def parse_timestamp(timestamp):
+def parse_timestamp(timestamp: Union[str, int, float, datetime, date]):
     """Parse timestamp to milliseconds precision.
 
     Args:
@@ -22,6 +24,12 @@ def parse_timestamp(timestamp):
         try:
             timestamp = datetime.strptime(timestamp, DATETIME_STR_FORMAT)
         except ValueError:
-            timestamp = datetime.strptime(timestamp, DATE_STR_FORMAT)
+            try:
+                timestamp = datetime.strptime(timestamp, DATE_STR_FORMAT)
+            except ValueError:
+                raise ValueError(
+                    f"time data '{timestamp}' does not match format {DATETIME_STR_FORMAT} or {DATE_STR_FORMAT}"
+                )
+
     # parse datetime to string
     return f"{timestamp.strftime(MICROSECOND_FORMAT)[:-4]}Z"

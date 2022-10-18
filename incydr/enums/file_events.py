@@ -18,6 +18,10 @@ class Operator(_Enum):
 
 
 class EventSearchTerm(_Enum):
+    """
+    Search terms available to filtering file events.
+    """
+
     TIMESTAMP = "@timestamp"
     DESTINATION_ACCOUNT_NAME = "destination.accountName"
     DESTINATION_ACCOUNT_TYPE = "destination.accountType"
@@ -125,7 +129,7 @@ class EventSearchTerm(_Enum):
 
 
 class FileCategory(_Enum):
-    """file category _Enum values."""
+    """Available file categories for filtering file events."""
 
     AUDIO = "Audio"
     DOCUMENT = "Document"
@@ -142,7 +146,7 @@ class FileCategory(_Enum):
 
 
 class EventAction(_Enum):
-    """event action _Enum values."""
+    """Available event actions for filtering file events."""
 
     # Exposure Type in v1
     REMOVABLE_MEDIA_CREATED = "removable-media-created"
@@ -164,7 +168,7 @@ class EventAction(_Enum):
 
 
 class Category(_Enum):
-    """source and destination category _Enum values."""
+    """Source and destination categories available for filtering file events."""
 
     BUSINESS_TOOLS = "Business Tools"
     CLOUD_STORAGE = "Cloud Storage"
@@ -207,7 +211,7 @@ class Category(_Enum):
 
 
 class ShareType(_Enum):
-    """share type _Enum values."""
+    """Share types available for filtering file events."""
 
     PUBLIC_LINK_SHARE = "Anyone with the link"
     DOMAIN_SHARE = "Anyone in your organization"
@@ -215,14 +219,14 @@ class ShareType(_Enum):
 
 
 class ReportType(_Enum):
-    """report type _Enum values."""
+    """Report types available for filtering file events."""
 
     AD_HOC = "REPORT_TYPE_AD_HOC"
     SAVED = "REPORT_TYPE_SAVED"
 
 
 class RiskIndicators(_Enum):
-    """risk indicators _Enum values."""
+    """Risk indicator names available for filtering file events."""
 
     # Destinations
     ADOBE_UPLOAD = "Adobe upload"
@@ -393,7 +397,7 @@ class RiskIndicators(_Enum):
 
 
 class TrustReason(_Enum):
-    """trust reason _Enum values."""
+    """Trust reasons available for filtering file events."""
 
     TRUSTED_DOMAIN_BROWSER_URL = "Trusted browser URL"
     TRUSTED_BROWSER_URL_PATH = "Trusted specific URL path"
@@ -409,7 +413,7 @@ class TrustReason(_Enum):
 
 
 class RiskSeverity(_Enum):
-    """risk severity _Enum values."""
+    """Possible Risk severity values."""
 
     CRITICAL = "CRITICAL"
     HIGH = "HIGH"
@@ -419,6 +423,10 @@ class RiskSeverity(_Enum):
 
 
 class EventType(_Enum):
+    """
+    Event types available for filtering file events.
+    """
+
     CREATED = "CREATED"
     DELETED = "DELETED"
     DOWNLOADED = "DOWNLOADED"
