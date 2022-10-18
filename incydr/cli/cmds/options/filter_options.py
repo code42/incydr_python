@@ -87,16 +87,9 @@ risk_severity_option = click.option(
 )
 risk_score_option = click.option(
     "--risk-score",
-    default=None,
-    help="Filter results by risk scores greater than the provided value. The risk score is the sum of the weights for each risk indicator. This score is used to determine the overall risk severity of the event.",
-    cls=AdvancedQueryAndSavedSearchIncompatible,
-)
-include_all_option = click.option(
-    "--include-no-risk-events",
-    "include_all",
-    is_flag=True,
-    default=False,
-    help="Include all events in results, including those that have no risk associated with them.",
+    default=1,
+    help="Filter results by risk scores greater than the provided value. The risk score is the sum of the weights for each risk indicator. This score is used to determine the overall risk severity of the event.  "
+    "Defaults to 1.  Set to 0 to return all events, including those that have no risk associated with them.",
     cls=AdvancedQueryAndSavedSearchIncompatible,
 )
 
@@ -115,6 +108,7 @@ advanced_query_option = click.option(
         "e.g. '--advanced-query @query.json'. WARNING: Using advanced queries is incompatible with other query-"
         "building arguments.  Any additional filter options will be ignored."
     ),
+    cls=incompatible_with(["saved_search"]),
 )
 
 
@@ -133,5 +127,4 @@ def filter_options(f):
     f = risk_indicator_option(f)
     f = risk_severity_option(f)
     f = risk_score_option(f)
-    f = include_all_option(f)
     return f
