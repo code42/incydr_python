@@ -16,7 +16,6 @@ from incydr._directory_groups.models import DirectoryGroupsPage
 from incydr._file_events.models.event import FileEventV2
 from incydr._file_events.models.response import FileEventsPage
 from incydr._file_events.models.response import SavedSearch
-from incydr._file_events.models.response import SavedSearchesPage
 from incydr._legal_hold.models import Custodian
 from incydr._legal_hold.models import CustodianMembership
 from incydr._legal_hold.models import Matter
@@ -51,7 +50,6 @@ __all__ = [
     "Customer",
     "Device",
     "DevicesPage",
-    "SavedSearchesPage",
     "SavedSearch",
     "FileEventsPage",
     "FileEventV2",

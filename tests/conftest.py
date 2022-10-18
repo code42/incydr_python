@@ -1,4 +1,5 @@
 import pytest
+from click.testing import CliRunner
 from pytest_httpserver import HTTPServer
 
 TEST_SERVER_ADDRESS = "127.0.0.1:8042"
@@ -6,6 +7,11 @@ TEST_HOST = f"http://{TEST_SERVER_ADDRESS}"
 
 # dummy token with only one claim {"tenantUid": "abcd-1234"}
 TEST_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRVaWQiOiJhYmNkLTEyMzQifQ.QouLd4K4pEIphqMZNfY1RuchnltWeQvDOuDsUP69Zkc"
+
+
+@pytest.fixture(scope="session")
+def runner():
+    return CliRunner()
 
 
 @pytest.fixture(scope="session")

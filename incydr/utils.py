@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+from collections.abc import MutableMapping
 from csv import DictReader
 from csv import DictWriter
 from io import IOBase
 from itertools import chain
 from pathlib import Path
+from typing import Dict
 from typing import Generator
 from typing import Iterable
 from typing import List
+from typing import TextIO
 from typing import Type
 from typing import TypeVar
 from typing import Union
@@ -15,7 +18,20 @@ from typing import Union
 from pydantic import BaseModel
 from pydantic import ValidationError
 
+
 Model = TypeVar("Model", bound=BaseModel)
+
+
+# https://stackoverflow.com/questions/6027558/flatten-nested-dictionaries-compressing-keys
+def flatten(d, parent_key="", sep="."):
+    items = []
+    for k, v in d.items():
+        new_key = parent_key + sep + k if parent_key else k
+        if isinstance(v, MutableMapping):
+            items.extend(flatten(v, new_key, sep=sep).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
 
 
 class CSVValidationError(ValidationError):
@@ -54,7 +70,7 @@ def read_models_from_csv(
 
 def write_models_to_csv(
     models: Iterable[Model],
-    path: Union[str, Path, IOBase],
+    path: Union[str, Path, IOBase, TextIO],
     columns: List[str] = None,
 ):
     if columns:
@@ -70,3 +86,32 @@ def write_models_to_csv(
     writer.writeheader()
     for model in chain([first], models):
         writer.writerow(model.dict(by_alias=False, include=columns))
+
+
+def write_dict_to_csv(
+    models: List[Dict],
+    path: Union[str, Path, IOBase, TextIO] = None,
+    columns: str = None,
+):
+    if columns:
+        columns = [c.strip() for c in columns.split(",")]
+
+    models = iter(models)
+    first = next(models)
+
+    if columns:
+        first = {c: first[c] for c in columns}
+    first = flatten(first)
+
+    if isinstance(path, IOBase):
+        file = path
+    else:
+        path = Path(path)
+        file = path.open(mode="w", encoding="utf-8")
+
+    writer = DictWriter(file, fieldnames=list(first.keys()))
+    writer.writeheader()
+    for model in chain([first], models):
+        if columns:
+            model = {c: model[c] for c in columns}
+        writer.writerow(flatten(model))

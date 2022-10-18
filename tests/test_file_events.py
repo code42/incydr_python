@@ -1,5 +1,7 @@
+import json
 from datetime import datetime
 from datetime import timezone
+from typing import List
 
 import pytest
 from pytest_httpserver import HTTPServer
@@ -8,10 +10,10 @@ from incydr._core.client import Client
 from incydr._file_events.models.event import FileEventV2
 from incydr._file_events.models.response import FileEventsPage
 from incydr._file_events.models.response import SavedSearch
-from incydr._file_events.models.response import SavedSearchesPage
 from incydr._file_events.models.response import SearchFilter
 from incydr._file_events.models.response import SearchFilterGroup
 from incydr._queries.file_events import EventQuery
+from incydr.cli.main import incydr
 
 MICROSECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 TEST_EVENT_1 = {
@@ -432,14 +434,37 @@ TEST_SAVED_SEARCH_QUERY = {
     ],
     "pgNum": 1,
     "pgSize": 100,
-    "pgToken": None,
+    "pgToken": "",
     "srtDir": "asc",
     "srtKey": "event.id",
 }
 
+TEST_SAVED_SEARCH_ID = "saved-search-1"
+
+
+@pytest.fixture
+def mock_get_saved_search(httpserver_auth):
+    search_data = {"searches": [json.loads(TEST_SAVED_SEARCH_1.json())]}
+    httpserver_auth.expect_request(
+        f"/v2/file-events/saved-searches/{TEST_SAVED_SEARCH_ID}", method="GET"
+    ).respond_with_json(search_data)
+
+
+@pytest.fixture
+def mock_list_saved_searches(httpserver_auth):
+    search_data = {
+        "searches": [
+            json.loads(TEST_SAVED_SEARCH_1.json()),
+            json.loads(TEST_SAVED_SEARCH_2.json()),
+        ]
+    }
+    httpserver_auth.expect_request(
+        "/v2/file-events/saved-searches", method="GET"
+    ).respond_with_json(search_data)
+
 
 @pytest.mark.parametrize(
-    ("query, expected_query"),
+    "query, expected_query",
     [(TEST_EVENT_QUERY, TEST_DICT_QUERY)],
 )
 def test_search_sends_expected_query(
@@ -480,29 +505,311 @@ def test_search_returns_expected_data(httpserver_auth: HTTPServer):
     assert page.total_count == len(page.file_events)
 
 
-def test_get_all_saved_searches_returns_expected_data(httpserver_auth: HTTPServer):
-    search_data = SavedSearchesPage(
-        searches=[TEST_SAVED_SEARCH_1, TEST_SAVED_SEARCH_2]
-    ).json()
-    httpserver_auth.expect_request(
-        "/v2/file-events/saved-searches", method="GET"
-    ).respond_with_data(search_data)
-
+def test_list_saved_searches_returns_expected_data(mock_list_saved_searches):
     client = Client()
-    page = client.file_events.v2.get_all_saved_searches()
-    assert isinstance(page, SavedSearchesPage)
-    assert page.searches[0].json() == TEST_SAVED_SEARCH_1.json()
-    assert page.searches[1].json() == TEST_SAVED_SEARCH_2.json()
+    page = client.file_events.v2.list_saved_searches()
+    assert isinstance(page, List)
+    for item in page:
+        assert isinstance(item, SavedSearch)
+    assert page[0].json() == TEST_SAVED_SEARCH_1.json()
+    assert page[1].json() == TEST_SAVED_SEARCH_2.json()
 
 
-def test_get_saved_search_by_id_returns_expected_data(httpserver_auth: HTTPServer):
-    search_id = "saved-search-1"
-    search_data = SavedSearchesPage(searches=[TEST_SAVED_SEARCH_1]).json()
-    httpserver_auth.expect_request(
-        f"/v2/file-events/saved-searches/{search_id}", method="GET"
-    ).respond_with_data(search_data)
-
+def test_get_saved_search_returns_expected_data(mock_get_saved_search):
     client = Client()
-    search = client.file_events.v2.get_saved_search_by_id(search_id)
+    search = client.file_events.v2.get_saved_search(TEST_SAVED_SEARCH_ID)
     assert isinstance(search, SavedSearch)
     assert search.json() == TEST_SAVED_SEARCH_1.json()
+
+
+# ************************************************ CLI ************************************************
+
+
+def test_search_when_no_start_param_raises_bad_option_usage_exception(
+    runner, httpserver_auth: HTTPServer
+):
+    result = runner.invoke(
+        incydr,
+        [
+            "file-events",
+            "search",
+        ],
+    )
+    assert result.exit_code == 2
+    assert (
+        "--start option required if not using --saved-search or --advanced-query options."
+        in result.output
+    )
+
+
+def test_search_when_default_params_makes_expected_api_call(
+    runner, httpserver_auth: HTTPServer
+):
+    query = {
+        "groupClause": "AND",
+        "groups": [
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "@timestamp",
+                        "operator": "ON_OR_AFTER",
+                        "value": "2022-06-01T00:00:00.000Z",
+                    },
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "risk.score", "operator": "GREATER_THAN", "value": 1}
+                ],
+            },
+        ],
+        "pgNum": 1,
+        "pgSize": 100,
+        "pgToken": "",
+        "srtDir": "asc",
+        "srtKey": "event.id",
+    }
+
+    event_data = {
+        "fileEvents": [TEST_EVENT_1],
+        "nextPgToken": None,
+        "problems": None,
+        "totalCount": 2,
+    }
+
+    httpserver_auth.expect_request(
+        "/v2/file-events", method="POST", json=query
+    ).respond_with_json(event_data)
+
+    result = runner.invoke(
+        incydr,
+        [
+            "file-events",
+            "search",
+            "--start",
+            "2022-06-01",
+        ],
+    )
+    assert result.exit_code == 0
+
+
+def test_search_when_filter_params_makes_expected_api_call(
+    runner, httpserver_auth: HTTPServer
+):
+    query = {
+        "groupClause": "AND",
+        "groups": [
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "@timestamp",
+                        "operator": "ON_OR_AFTER",
+                        "value": "2022-06-01T00:00:00.000Z",
+                    },
+                    {
+                        "term": "@timestamp",
+                        "operator": "ON_OR_BEFORE",
+                        "value": "2022-08-10T00:00:00.000Z",
+                    },
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "event.action", "operator": "IS", "value": "file-created"}
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "user.email", "operator": "IS", "value": "foo@bar.com"}
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "file.hash.md5", "operator": "IS", "value": "foo"}
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "file.hash.sha256", "operator": "IS", "value": "bar"}
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "source.category",
+                        "operator": "IS",
+                        "value": "Coding Tools",
+                    }
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "destination.category",
+                        "operator": "IS",
+                        "value": "Web Hosting",
+                    }
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [{"term": "file.name", "operator": "IS", "value": "baz"}],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "file.directory",
+                        "operator": "IS",
+                        "value": "C://foo/bar.txt",
+                    }
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "file.category", "operator": "IS", "value": "Document"}
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "risk.indicators.name",
+                        "operator": "IS",
+                        "value": "Bitbucket upload",
+                    }
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "risk.severity", "operator": "IS", "value": "HIGH"}
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "risk.score", "operator": "GREATER_THAN", "value": 10}
+                ],
+            },
+        ],
+        "pgNum": 1,
+        "pgSize": 100,
+        "pgToken": "",
+        "srtDir": "asc",
+        "srtKey": "event.id",
+    }
+
+    event_data = {
+        "fileEvents": [TEST_EVENT_1],
+        "nextPgToken": None,
+        "problems": None,
+        "totalCount": 2,
+    }
+
+    httpserver_auth.expect_request(
+        "/v2/file-events", method="POST", json=query
+    ).respond_with_json(event_data)
+
+    result = runner.invoke(
+        incydr,
+        [
+            "file-events",
+            "search",
+            "--start",
+            "2022-06-01",
+            "--end",
+            "2022-08-10",
+            "--event-action",
+            "file-created",
+            "--username",
+            "foo@bar.com",
+            "--md5",
+            "foo",
+            "--sha256",
+            "bar",
+            "--source-category",
+            "Coding Tools",
+            "--destination-category",
+            "Web Hosting",
+            "--file-name",
+            "baz",
+            "--file-directory",
+            "C://foo/bar.txt",
+            "--file-category",
+            "Document",
+            "--risk-indicator",
+            "Bitbucket upload",
+            "--risk-severity",
+            "HIGH",
+            "--risk-score",
+            10,
+        ],
+    )
+    assert result.exit_code == 0
+
+
+def test_search_when_advanced_query_makes_expected_api_call(runner, httpserver_auth):
+    event_data = {
+        "fileEvents": [TEST_EVENT_1, TEST_EVENT_2],
+        "nextPgToken": None,
+        "problems": None,
+        "totalCount": 2,
+    }
+    httpserver_auth.expect_request(
+        "/v2/file-events", method="POST", json=TEST_DICT_QUERY
+    ).respond_with_json(event_data)
+
+    result = runner.invoke(
+        incydr,
+        [
+            "file-events",
+            "search",
+            "--advanced-query",
+            json.dumps(TEST_DICT_QUERY),
+        ],
+    )
+    assert result.exit_code == 0
+
+
+def test_search_when_saved_search_makes_expected_api_call(
+    runner, mock_get_saved_search, httpserver_auth
+):
+    event_data = {
+        "fileEvents": [TEST_EVENT_1, TEST_EVENT_2],
+        "nextPgToken": None,
+        "problems": None,
+        "totalCount": 2,
+    }
+    httpserver_auth.expect_request(
+        "/v2/file-events", method="POST", json=TEST_SAVED_SEARCH_QUERY
+    ).respond_with_json(event_data)
+
+    result = runner.invoke(
+        incydr, ["file-events", "search", "--saved-search", TEST_SAVED_SEARCH_ID]
+    )
+    assert result.exit_code == 0
+
+
+def test_show_saved_search_makes_expected_sdk_call(runner, mock_get_saved_search):
+    result = runner.invoke(
+        incydr,
+        ["file-events", "show-saved-search", TEST_SAVED_SEARCH_ID],
+    )
+
+    assert result.exit_code == 0
+
+
+def test_list_saved_searches_makes_expected_api_call(runner, mock_list_saved_searches):
+    result = runner.invoke(incydr, ["file-events", "list-saved-searches"])
+    assert result.exit_code == 0

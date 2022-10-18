@@ -1,9 +1,11 @@
+from typing import List
+
+from pydantic import parse_obj_as
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
 from .models.response import FileEventsPage
 from .models.response import SavedSearch
-from .models.response import SavedSearchesPage
 from incydr._queries.file_events import EventQuery
 
 
@@ -49,16 +51,16 @@ class FileEventsV2:
         query.page_token = page.next_pg_token
         return page
 
-    def get_all_saved_searches(self) -> SavedSearchesPage:
+    def list_saved_searches(self) -> List[SavedSearch]:
         """
         Get all saved searches.
 
-        **Returns**: A [`SavedSearchesPage`][savedsearchespage-model] object.
+        **Returns**: A list of [`SavedSearch`][savedsearch-model] objects.
         """
         response = self._parent.session.get("/v2/file-events/saved-searches")
-        return SavedSearchesPage.parse_response(response)
+        return parse_obj_as(List[SavedSearch], response.json()["searches"])
 
-    def get_saved_search_by_id(self, search_id: str) -> SavedSearch:
+    def get_saved_search(self, search_id: str) -> SavedSearch:
         """
         Get a single saved search.
 
@@ -74,8 +76,8 @@ class FileEventsV2:
 
         # the api response contains a page with a single search. Returns that single SavedSearch object.
         # the api will return a 404 if a no saved searches matching the id are found.
-        page = SavedSearchesPage.parse_response(response)
-        return page.searches[0]
+        page = parse_obj_as(List[SavedSearch], response.json()["searches"])
+        return page[0]
 
     def _mount_retry_adapter(self):
         """Sets custom Retry strategy for FFS url requests to gracefully handle being rate-limited on FFS queries."""

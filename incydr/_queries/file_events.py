@@ -14,7 +14,7 @@ from pydantic import validate_arguments
 
 from incydr._core.models import Model
 from incydr._file_events.models.response import SavedSearch
-from incydr._queries.util import parse_timestamp
+from incydr._queries.utils import parse_timestamp
 from incydr.enums.file_events import Category
 from incydr.enums.file_events import EventAction
 from incydr.enums.file_events import EventSearchTerm
@@ -36,23 +36,6 @@ _term_enum_map = {
     "risk.indicators.name": RiskIndicators,
     "risk.severity": RiskSeverity,
     "risk.trustReason": TrustReason,
-}
-
-file_category_extension_map = {
-    "AUDIO": FileCategory.AUDIO,
-    "DOCUMENT": FileCategory.DOCUMENT,
-    "EXECUTABLE": FileCategory.EXECUTABLE,
-    "IMAGE": FileCategory.IMAGE,
-    "PDF": FileCategory.PDF,
-    "PRESENTATION": FileCategory.PRESENTATION,
-    "SCRIPT": FileCategory.SCRIPT,
-    "SOURCE_CODE": FileCategory.SOURCE_CODE,
-    "SPREADSHEET": FileCategory.SPREADSHEET,
-    "VIDEO": FileCategory.VIDEO,
-    "VIRTUAL_DISK_IMAGE": FileCategory.VIRTUAL_DISK_IMAGE,
-    "ARCHIVE": FileCategory.ZIP,
-    "ZIP": FileCategory.ZIP,
-    "Zip": FileCategory.ZIP,
 }
 
 
@@ -83,17 +66,15 @@ class Filter(BaseModel):
                     f"`IS` and `IS_NOT` filters require a `str | int` value, got term={term}, operator={operator}, value={value}."
                 )
 
-        # catch additional enum terms
-        try:
-            value = file_category_extension_map[value]
-            values.update({"value": value})
-        except KeyError:
-            pass
-
         # check that value is a valid enum for that search term
         enum = _term_enum_map.get(term)
         if enum:
-            enum(value)
+            try:
+                values.update(
+                    {"value": enum[value.upper()]}
+                )  # check if enum name is passed as a value
+            except KeyError:
+                enum(value)
 
         return values
 
@@ -101,6 +82,16 @@ class Filter(BaseModel):
 class FilterGroup(BaseModel):
     filterClause: str = "AND"
     filters: Optional[List[Filter]]
+
+
+class Query(Model):
+    groupClause: str = "AND"
+    groups: Optional[List[FilterGroup]]
+    pgNum: int = 1
+    pgSize: int = 100
+    pgToken: Optional[str]
+    srtDir: str = "asc"
+    srtKey: EventSearchTerm = "event.id"
 
 
 class EventQuery(Model):
@@ -130,11 +121,15 @@ class EventQuery(Model):
         self,
         start_date: Union[datetime, timedelta, int, float, str] = None,
         end_date: Union[datetime, int, float, str] = None,
+        **kwargs,
     ):
-        groups = []
+        groups = kwargs.get("groups") or []
+
         if start_date or end_date:
             groups.append(_create_date_range_filter_group(start_date, end_date))
-        super().__init__(groups=groups)
+
+        kwargs["groups"] = groups
+        super().__init__(**kwargs)
 
     def equals(self, term: str, values: Union[str, List[str]]):
         """
@@ -286,6 +281,9 @@ class EventQuery(Model):
 
     @classmethod
     def from_saved_search(cls, saved_search: SavedSearch):
+        """
+        Create an `EventQuery` object from a `SavedSearch` response.
+        """
         query = cls()
         if saved_search.group_clause:
             query.group_clause = saved_search.group_clause

@@ -28,11 +28,12 @@ dependencies = [
   "rich",
   "pydantic[dotenv]",
   "isodate",
+  "typer",
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
-cli = ["typer"]
+cli = ["typer", "click"]
 
 [project.urls]
 Documentation = "https://github.com/unknown/incydr#readme"
@@ -61,10 +62,13 @@ dependencies = [
   "mkdocs-autorefs",
   "mkdocs-material",
   "mkautodoc",
+  "mkdocs-click",
 ]
 [tool.hatch.envs.docs.scripts]
 build = "mkdocs build"
 serve = "mkdocs serve"
+build-cli = "mkdocs build --config-file incydr/cli/mkdocs.yml"
+serve-cli = "mkdocs serve --config-file incydr/cli/mkdocs.yml"
 svg = "python docs/example_logging.py"
 
 [tool.hatch.envs.default]
