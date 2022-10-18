@@ -1,3 +1,6 @@
+from incydr._alert_rules.models.response import RuleDetails
+from incydr._alert_rules.models.response import RuleUser
+from incydr._alert_rules.models.response import RuleUsersList
 from incydr._alerts.models.alert import AlertDetails
 from incydr._alerts.models.alert import AlertSummary
 from incydr._alerts.models.response import AlertQueryPage
@@ -56,6 +59,9 @@ __all__ = [
     "UsersPage",
     "Role",
     "UpdateRolesResponse",
+    "RuleUsersList",
+    "RuleUser",
+    "RuleDetails",
     "TrustedActivity",
     "TrustedActivitiesPage",
     "DepartmentsPage",
