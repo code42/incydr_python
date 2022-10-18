@@ -302,14 +302,6 @@ class EventQuery(Model):
             query.sort_key = saved_search.srt_key
         return query
 
-    # @classmethod
-    # def from_string(cls, advanced_query: str):
-    #     """
-    #     Create an `EventQuery` object from a json string.
-    #     """
-    #     query = cls()
-    #     q = Query.parse_raw(str)
-
 
 def _create_date_range_filter_group(start_date, end_date):
     def _validate_duration_str(iso_duration_str):

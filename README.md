@@ -40,6 +40,12 @@ hatch run test:cov
 hatch run docs:serve
 ```
 
+#### Serve CLI docs locally
+
+```console
+hatch run docs:serve-cli
+```
+
 ## License
 
 `incydr` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.

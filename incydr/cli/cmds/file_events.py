@@ -83,22 +83,17 @@ def search(
     risk_indicator: Optional[RiskIndicators],
     risk_severity: Optional[RiskSeverity],
     risk_score: Optional[int],
-    include_all: Optional[bool],  # TODO - do we want this option
 ):
     """
     Search file events.
 
     Various options are provided to filter query results.  Use the `--saved-search` and `--advanced-query` options if the available filters don't satisfy your requirements.
 
+    Defaults to returning events with a risk score >= 1.  Add the `--risk-score 0` filter to return all events, including those with no risk associated with them.
+
     Results will be output to the console by default, use the `--output` option to send data to a server.
     """
     client = ctx.obj()
-
-    if saved_search and advanced_query:
-        raise BadOptionUsage(
-            "saved-search",
-            "--saved-search and --advanced-query options are incompatible.",
-        )
 
     if saved_search:
         saved_search = client.file_events.v2.get_saved_search(saved_search)
@@ -106,6 +101,11 @@ def search(
     elif advanced_query:
         query = EventQuery.parse_raw(advanced_query)
     else:
+        if not start:
+            raise BadOptionUsage(
+                "start",
+                "--start option required if not using --saved-search or --advanced-query options.",
+            )
         query = _create_query(
             start=start,
             end=end,
@@ -121,7 +121,6 @@ def search(
             risk_indicator=risk_indicator,
             risk_severity=risk_severity,
             risk_score=risk_score,
-            include_all=include_all,
         )
     events = client.session.post("/v2/file-events", json=query.dict())
     events = events.json()["fileEvents"]
@@ -195,19 +194,14 @@ field_option_map = {
 
 def _create_query(**kwargs):
     query = EventQuery(start_date=kwargs["start"], end_date=kwargs["end"])
-    include_no_risk_events = False
     for k, v in kwargs.items():
         if v:
             if k in ["start", "end", "include_all"]:
                 continue
-            elif k == "include_all":
-                include_no_risk_events = True
             elif k == "risk_score":
                 query = query.greater_than(field_option_map[k], v)
             else:
                 query = query.equals(field_option_map[k], v)
-    if not include_no_risk_events and not kwargs["risk_severity"]:
-        query = query.not_equals("risk.severity", RiskSeverity.NO_RISK_INDICATED)
     return query
 
 

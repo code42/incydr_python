@@ -525,6 +525,76 @@ def test_get_saved_search_returns_expected_data(mock_get_saved_search):
 # ************************************************ CLI ************************************************
 
 
+def test_search_when_no_start_param_raises_bad_option_usage_exception(
+    runner, httpserver_auth: HTTPServer
+):
+    result = runner.invoke(
+        incydr,
+        [
+            "file-events",
+            "search",
+        ],
+    )
+    assert result.exit_code == 2
+    assert (
+        "--start option required if not using --saved-search or --advanced-query options."
+        in result.output
+    )
+
+
+def test_search_when_default_params_makes_expected_api_call(
+    runner, httpserver_auth: HTTPServer
+):
+    query = {
+        "groupClause": "AND",
+        "groups": [
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "@timestamp",
+                        "operator": "ON_OR_AFTER",
+                        "value": "2022-06-01T00:00:00.000Z",
+                    },
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "risk.score", "operator": "GREATER_THAN", "value": 1}
+                ],
+            },
+        ],
+        "pgNum": 1,
+        "pgSize": 100,
+        "pgToken": "",
+        "srtDir": "asc",
+        "srtKey": "event.id",
+    }
+
+    event_data = {
+        "fileEvents": [TEST_EVENT_1],
+        "nextPgToken": None,
+        "problems": None,
+        "totalCount": 2,
+    }
+
+    httpserver_auth.expect_request(
+        "/v2/file-events", method="POST", json=query
+    ).respond_with_json(event_data)
+
+    result = runner.invoke(
+        incydr,
+        [
+            "file-events",
+            "search",
+            "--start",
+            "2022-06-01",
+        ],
+    )
+    assert result.exit_code == 0
+
+
 def test_search_when_filter_params_makes_expected_api_call(
     runner, httpserver_auth: HTTPServer
 ):

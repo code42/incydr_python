@@ -61,7 +61,7 @@ def try_get_logger_for_server(output, certs, ignore_cert_validation):
         port = output[2]
     else:
         raise BadOptionUsage(
-            "--output",
+            "output",
             "Error parsing output string.  Pass a string in the format PROTOCOL:HOSTNAME:PORT to output "
             "to the specified server endpoint, where format is either UDP, TCP or TLS_TCP.  Also accepts strings of the format HOSTNAME "
             "and HOSTNAME:PORT where port will default to 514 and protocol will default to UDP.",
