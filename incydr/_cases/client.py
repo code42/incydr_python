@@ -138,7 +138,7 @@ class CasesV1:
         """
 
         if created_at is not None:
-            if not isinstance(created_at, Tuple):
+            if not isinstance(created_at, (Tuple, list)):
                 raise TypeError(
                     f"created_at kwarg should be a Tuple[datetime, datetime] object"
                     f", passed 'created_at={created_at}' of type: {type(created_at)}"
