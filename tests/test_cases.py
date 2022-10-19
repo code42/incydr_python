@@ -32,6 +32,7 @@ TEST_CASE_1 = {
     "createdByUsername": None,
     "lastModifiedByUserUid": None,
     "lastModifiedByUsername": None,
+    "archivalTime": None,
 }
 
 TEST_CASE_2 = {
@@ -50,6 +51,7 @@ TEST_CASE_2 = {
     "createdByUsername": None,
     "lastModifiedByUserUid": "942564422882759874",
     "lastModifiedByUsername": "admin@example.com",
+    "archivalTime": None,
 }
 TEST_EVENT_ID = "0_147e9445-2f30"
 TEST_FILE_EVENT = {
