@@ -49,6 +49,7 @@ class Case(ResponseModel):
     * **created_by_username**: `str | None` Username of the user who created the case. json_alias=`createdByUsername`
     * **last_modified_by_user_id**: `str | None` User UID of the user who last modified the case. json_alias=`lastModifiedByUserUid`
     * **last_modified_by_username**: `str | None` Username of the user who last modified the case. json_alias=`lastModifiedByUsername`
+    * **archival_time**: `datetime` Time at which the case will be archived.
     """
 
     number: int = Field(allow_mutation=False, description="The identifier of the case.")
@@ -76,6 +77,7 @@ class Case(ResponseModel):
     last_modified_by_username: Optional[str] = Field(
         allow_mutation=False, alias="lastModifiedByUsername"
     )
+    archival_time: Optional[datetime] = Field(allow_mutation=False, alias="archivalTime")
 
     class Config:
         validate_assignment = True
