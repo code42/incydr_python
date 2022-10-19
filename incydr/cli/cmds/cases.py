@@ -14,6 +14,7 @@ from typer import echo
 from typer import Typer
 
 from incydr._cases.models import CaseDetail
+from incydr._cases.models import UpdateCaseRequest
 from incydr._file_events.models.event import FileEventV2
 from incydr.cli import console
 from incydr.cli import init_client
@@ -172,6 +173,55 @@ def show(ctx: Context, case_number: int, format_: SingleFormat):
 
 
 @cases.command(cls=IncydrCommand)
+@click.argument("case_number")
+@click.option(
+    "--assignee",
+    default=None,
+    help="User ID of the administrator assigned to the case.",
+)
+@click.option("--description", default=None, help="Brief optional description.")
+@click.option(
+    "--findings",
+    default=None,
+    help="Markdown formatted text summarizing the findings for a case.",
+)
+@click.option("--name", default=None, help="Case name.")
+@click.option(
+    "--status", default=None, help="Case status. One of `ARCHIVED`, `CLOSED` or `OPEN`."
+)
+@click.option("--subject", default=None, help="User ID of the case subject.")
+@click.pass_context
+def update(
+    ctx: Context,
+    case_number: str,
+    assignee: Optional[str] = None,
+    description: Optional[str] = None,
+    findings: Optional[str] = None,
+    name: Optional[str] = None,
+    status: Optional[str] = None,
+    subject: Optional[str] = None,
+):
+    """
+    Update a single case. Pass the updated value for a field to the corresponding command option.
+    """
+    if not any([assignee, description, findings, name, status, subject]):
+        raise click.UsageError(
+            "At least one command option must be provided to update a case.  Use `cases update --help` to see available options."
+        )
+
+    client = ctx.obj()
+    data = UpdateCaseRequest(
+        assignee=assignee,
+        description=description,
+        findings=findings,
+        name=name,
+        status=status,
+        subject=subject,
+    )
+    client.session.put(f"/v1/cases/{case_number}", json=data.dict())
+
+
+@cases.command(cls=IncydrCommand)
 @click.argument("csv")
 @click.pass_context
 def bulk_update(ctx: Context, csv: Path):
@@ -188,7 +238,7 @@ def bulk_update(ctx: Context, csv: Path):
     * `description` - Brief optional description.
     * `findings` - Markdown formatted text summarizing the findings for a case.
     * `name` - Case name.
-    * `status` - One of `ARCHIVED`, `CLOSED` or `OPEN`.
+    * `status` - Case status. One of `ARCHIVED`, `CLOSED` or `OPEN`.
     * `subject` - User ID of the case subject.
 
     """

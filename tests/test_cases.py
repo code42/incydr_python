@@ -394,7 +394,7 @@ def test_get_file_event_detail_returns_expected_data(mock_file_event_get):
 # ************************************************ CLI ************************************************
 
 
-def test_create_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+def test_cli_create_makes_expected_call(runner, httpserver_auth: HTTPServer):
     test_data = {
         "name": "test_name",
         "description": "test_description",
@@ -427,12 +427,12 @@ def test_create_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
     assert result.exit_code == 0
 
 
-def test_delete_makes_expected_sdk_call(runner, mock_case_delete):
+def test_cli_delete_makes_expected_call(runner, mock_case_delete):
     result = runner.invoke(incydr, ["cases", "delete", TEST_CASE_NUMBER])
     assert result.exit_code == 0
 
 
-def test_list_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+def test_cli_list_makes_expected_call(runner, httpserver_auth: HTTPServer):
     query_1 = {"pgNum": 1, "pgSize": 100, "srtDir": "asc", "srtKey": "number"}
     query_2 = {"pgNum": 2, "pgSize": 100, "srtDir": "asc", "srtKey": "number"}
 
@@ -455,14 +455,62 @@ def test_list_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
     assert result.exit_code == 0
 
 
-def test_show_makes_expected_sdk_call(runner, mock_case_get):
+def test_cli_show_makes_expected_call(runner, mock_case_get):
     result = runner.invoke(incydr, ["cases", "show", TEST_CASE_NUMBER])
     assert result.exit_code == 0
 
 
-def test_bulk_update_makes_expected_sdk_call(
+def test_cli_update_when_no_params_raises_error(runner, httpserver_auth: HTTPServer):
+    result = runner.invoke(incydr, ["cases", "update", TEST_CASE_NUMBER])
+    assert result.exit_code == 2
+    assert (
+        "At least one command option must be provided to update a case."
+        in result.output
+    )
+
+
+def test_cli_update_when_all_params_makes_expected_call(
+    runner, httpserver_auth: HTTPServer
+):
+    data = {
+        "name": "TestCase",
+        "assignee": "test-assignee",
+        "description": "test-desc",
+        "findings": "test-finding",
+        "subject": "test-42",
+        "status": "CLOSED",
+    }
+    httpserver_auth.expect_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}", method="PUT", json=data
+    ).respond_with_data()
+    result = runner.invoke(
+        incydr,
+        [
+            "cases",
+            "update",
+            TEST_CASE_NUMBER,
+            "--assignee",
+            "test-assignee",
+            "--description",
+            "test-desc",
+            "--findings",
+            "test-finding",
+            "--name",
+            "TestCase",
+            "--status",
+            "CLOSED",
+            "--subject",
+            "test-42",
+        ],
+    )
+    print(result)
+    print(result.output)
+    assert result.exit_code == 0
+
+
+def test_cli_bulk_update_makes_expected_call(
     runner, httpserver_auth: HTTPServer, tmp_path
-):  # TODO
+):
     data_1 = {
         "name": "Test Case 1",
         "assignee": "user-1",
@@ -498,7 +546,7 @@ def test_bulk_update_makes_expected_sdk_call(
     assert result.exit_code == 0
 
 
-def test_download_summary_makes_expected_sdk_call(
+def test_cli_download_summary_makes_expected_call(
     runner, httpserver_auth: HTTPServer, tmp_path
 ):
     httpserver_auth.expect_request(
@@ -510,7 +558,7 @@ def test_download_summary_makes_expected_sdk_call(
     assert result.exit_code == 0
 
 
-def test_download_case_when_default_params_makes_expected_sdk_call(
+def test_cli_download_case_when_default_params_makes_expected_call(
     runner, httpserver_auth: HTTPServer, tmp_path
 ):
     params = {
@@ -529,7 +577,7 @@ def test_download_case_when_default_params_makes_expected_sdk_call(
     assert result.exit_code == 0
 
 
-def test_download_case_when_custom_params_makes_expected_sdk_call(
+def test_cli_download_case_when_custom_params_makes_expected_call(
     runner, httpserver_auth: HTTPServer, tmp_path
 ):
     params = {
@@ -557,7 +605,7 @@ def test_download_case_when_custom_params_makes_expected_sdk_call(
     assert result.exit_code == 0
 
 
-def test_download_case_when_exclude_all_raises_bad_option_usage_error(
+def test_cli_download_case_when_exclude_all_raises_bad_option_usage_error(
     runner, httpserver_auth: HTTPServer
 ):
     result = runner.invoke(
@@ -575,7 +623,7 @@ def test_download_case_when_exclude_all_raises_bad_option_usage_error(
     assert "Cannot exclude all files from the case download." in result.output
 
 
-def test_download_events_makes_expected_sdk_call(
+def test_cli_download_events_makes_expected_call(
     runner, httpserver_auth: HTTPServer, tmp_path
 ):
     httpserver_auth.expect_request(
@@ -587,7 +635,7 @@ def test_download_events_makes_expected_sdk_call(
     assert result.exit_code == 0
 
 
-def test_download_source_file_makes_expected_sdk_call(
+def test_cli_download_source_file_makes_expected_call(
     runner, httpserver_auth: HTTPServer, tmp_path
 ):
     httpserver_auth.expect_request(
@@ -609,14 +657,15 @@ def test_download_source_file_makes_expected_sdk_call(
     assert result.exit_code == 0
 
 
-def test_show_file_event_makes_expected_sdk_call(runner, mock_file_event_get):
+def test_cli_show_file_event_makes_expected_call(runner, mock_file_event_get):
     result = runner.invoke(
         incydr, ["cases", "file-events", "show", TEST_CASE_NUMBER, TEST_EVENT_ID]
     )
+    print(result.output)
     assert result.exit_code == 0
 
 
-def test_list_file_events_makes_expected_sdk_call(runner, httpserver_auth: HTTPServer):
+def test_cli_list_file_events_makes_expected_call(runner, httpserver_auth: HTTPServer):
     data = {"events": [TEST_FILE_EVENT], "totalCount": 1}
     query = {"pgNum": 1, "pgSize": 100}
     httpserver_auth.expect_request(
@@ -628,7 +677,7 @@ def test_list_file_events_makes_expected_sdk_call(runner, httpserver_auth: HTTPS
     assert result.exit_code == 0
 
 
-def test_file_events_add_when_event_ids_list_makes_expected_sdk_call(
+def test_cli_file_events_add_when_event_ids_list_makes_expected_call(
     runner, httpserver_auth: HTTPServer, tmp_path
 ):
     event_ids = ["event-1", "event-2", "event-3"]
@@ -644,7 +693,7 @@ def test_file_events_add_when_event_ids_list_makes_expected_sdk_call(
     assert result.exit_code == 0
 
 
-def test_file_events_add_when_csv_makes_expected_sdk_call(
+def test_cli_file_events_add_when_csv_makes_expected_call(
     runner, httpserver_auth: HTTPServer, tmp_path
 ):
     event_ids = ["event-1", "event-2", "event-3"]
@@ -662,7 +711,7 @@ def test_file_events_add_when_csv_makes_expected_sdk_call(
     assert result.exit_code == 0
 
 
-def test_file_events_remove_when_event_ids_makes_expected_sdk_call(
+def test_cli_file_events_remove_when_event_ids_makes_expected_call(
     runner, httpserver_auth: HTTPServer
 ):
     httpserver_auth.expect_ordered_request(
@@ -680,7 +729,7 @@ def test_file_events_remove_when_event_ids_makes_expected_sdk_call(
     assert result.exit_code == 0
 
 
-def test_file_events_remove_when_csv_makes_expected_sdk_call(
+def test_cli_file_events_remove_when_csv_makes_expected_call(
     runner, httpserver_auth: HTTPServer, tmp_path
 ):
     p = tmp_path / "event_ids.csv"
