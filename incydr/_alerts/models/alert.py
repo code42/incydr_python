@@ -136,7 +136,7 @@ class AlertSummary(Model):
     * **type**: `RuleType` Rule type that generated the alert.
     * **id**: `str` The unique id of the alert.
     * **created_at**: `datetime` The timestamp when the alert was created.
-    * **state**: `AlertState` The current state of the alert.
+    * **state**: [`AlertState`][alert-state] The current state of the alert.
     * **state_last_modified_by**: `str` The actor who last modified the alert state.
     * **state_last_modified_at**: `datetime` The timestamp when the alert state was last modified.
     * **name**: `str` The name of the alert.  Same as the name of the rule that triggered it.
@@ -144,8 +144,8 @@ class AlertSummary(Model):
     * **actor**: `str` The user who triggered the alert.
     * **actor_id**: `str` The user id who triggered the alert, if it is available.
     * **target**: `str` Unused legacy property.
-    * **severity**: `Severity` Indicates static rule severity of the alert. (Deprecated)
-    * **risk_severity**: `RiskSeverity` Indicates event risk severity of the alert.
+    * **severity**: [`AlertSeverity`][alert-severity] Indicates static rule severity of the alert. (Deprecated)
+    * **risk_severity**: [`RiskSeverity`][risk-severity] Indicates event risk severity of the alert.
     * **rule_id**: `str` The unique id corresponding to the rule which triggered the alert.
     * **watchlists**: `str` Watchlists the actor is on at the time of the alert (if any).
     """

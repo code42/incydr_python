@@ -1,5 +1,10 @@
+from incydr._alert_rules.models.response import RuleDetails
+from incydr._alert_rules.models.response import RuleUser
+from incydr._alert_rules.models.response import RuleUsersList
 from incydr._alerts.models.alert import AlertDetails
+from incydr._alerts.models.alert import AlertSummary
 from incydr._alerts.models.response import AlertQueryPage
+from incydr._audit_log.models import AuditEventsPage
 from incydr._cases.models import Case
 from incydr._cases.models import CaseFileEvents
 from incydr._cases.models import CasesPage
@@ -39,6 +44,7 @@ from incydr._watchlists.models.responses import WatchlistUser
 
 __all__ = [
     "AlertDetails",
+    "AlertSummary",
     "AlertQueryPage",
     "Case",
     "CaseFileEvents",
@@ -54,6 +60,9 @@ __all__ = [
     "UsersPage",
     "Role",
     "UpdateRolesResponse",
+    "RuleUsersList",
+    "RuleUser",
+    "RuleDetails",
     "TrustedActivity",
     "TrustedActivitiesPage",
     "DepartmentsPage",
@@ -69,6 +78,7 @@ __all__ = [
     "IncludedDepartment",
     "IncludedDirectoryGroupsList",
     "IncludedDirectoryGroup",
+    "AuditEventsPage",
     "Policy",
     "Matter",
     "Custodian",

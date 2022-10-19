@@ -226,7 +226,7 @@ class Watchlist(ResponseModel):
     **Fields**:
 
     * **description**: `str` - Optional description for a custom watchlist.
-    * **list_type**: `WatchlistType` - The watchlist type.
+    * **list_type**: [`WatchlistType`][watchlist-types] - The watchlist type.
     * **stats**: `WatchlistStats` - Watchlist membership information.  Includes `included_user_count`, `included_department_count`, `included_directory_groups_count`, and `excluded_users_count`.
     * **tenant_id**: `str` - A unique tenant ID.
     * **title**: `str` - Title for a custom watchlist.

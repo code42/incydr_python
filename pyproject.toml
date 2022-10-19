@@ -54,7 +54,7 @@ check-no-diff = "pre-commit run --all-files"
 dependencies = [
   "mkdocs-autorefs",
   "mkdocs-material",
-  "mkautodoc"
+  "mkautodoc",
 ]
 [tool.hatch.envs.docs.scripts]
 build = "mkdocs build"
@@ -74,8 +74,8 @@ dependencies = [
   "pytest-httpserver",
 ]
 [tool.hatch.envs.test.scripts]
-cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=incydr --cov=tests"
-cov-report = "pytest --cov-report=xml:coverage.xml --cov-config=pyproject.toml --cov=incydr --cov=tests"
+cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=incydr"
+cov-report = "pytest --cov-report=xml:coverage.xml --cov-config=pyproject.toml --cov=incydr"
 no-cov = "cov --no-cov"
 
 [tool.coverage.run]

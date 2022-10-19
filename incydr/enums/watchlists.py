@@ -2,6 +2,10 @@ from incydr.enums import _Enum
 
 
 class WatchlistType(_Enum):
+    """
+    Available watchlist types.
+    """
+
     WATCHLIST_TYPE_UNSPECIFIED = "WATCHLIST_TYPE_UNSPECIFIED"
     CONTRACT_EMPLOYEE = "CONTRACT_EMPLOYEE"
     DEPARTING_EMPLOYEE = "DEPARTING_EMPLOYEE"
