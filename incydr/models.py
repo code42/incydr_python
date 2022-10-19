@@ -4,6 +4,7 @@ from incydr._alert_rules.models.response import RuleUsersList
 from incydr._alerts.models.alert import AlertDetails
 from incydr._alerts.models.alert import AlertSummary
 from incydr._alerts.models.response import AlertQueryPage
+from incydr._audit_log.models import AuditEventsPage
 from incydr._cases.models import Case
 from incydr._cases.models import CaseFileEvents
 from incydr._cases.models import CasesPage
@@ -75,6 +76,7 @@ __all__ = [
     "IncludedDepartment",
     "IncludedDirectoryGroupsList",
     "IncludedDirectoryGroup",
+    "AuditEventsPage",
     "Policy",
     "Matter",
     "Custodian",

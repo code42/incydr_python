@@ -12,6 +12,7 @@ from requests_toolbelt.utils.dump import dump_response
 from incydr.__about__ import __version__
 from incydr._alert_rules.client import AlertRulesClient
 from incydr._alerts.client import AlertsClient
+from incydr._audit_log.client import AuditLogClient
 from incydr._cases.client import CasesClient
 from incydr._core.auth import APIClientAuth
 from incydr._core.settings import IncydrSettings
@@ -87,6 +88,7 @@ class Client:
 
         self._alerts = AlertsClient(self)
         self._alert_rules = AlertRulesClient(self)
+        self._audit_log = AuditLogClient(self)
         self._cases = CasesClient(self)
         self._customer = CustomerClient(self)
         self._departments = DepartmentsClient(self)
@@ -148,6 +150,12 @@ class Client:
 
     @property
     def alerts(self):
+        """
+        Property returning an [`AlertsClient`](../alerts) for interacting with
+        `/v*/alerts` API endpoints.
+        Usage:
+            >>> client.alerts.v1.get_page()
+        """
         return self._alerts
 
     @property
@@ -161,6 +169,16 @@ class Client:
 
         """
         return self._alert_rules
+
+    @property
+    def audit_log(self):
+        """
+        Property returning an [`AuditLogClient`](../audit_log) for interacting with
+        `/v*/audit` API endpoints.
+        Usage:
+            >>> client.audit_log.v1.get_page()
+        """
+        return self._audit_log
 
     @property
     def cases(self):

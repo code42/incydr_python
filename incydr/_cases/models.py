@@ -3,11 +3,12 @@ from __future__ import annotations
 from datetime import datetime
 from typing import List
 from typing import Optional
-from typing import Tuple
 
 from pydantic import BaseModel
+from pydantic import Extra
 from pydantic import Field
 
+from incydr._core.models import Model
 from incydr._core.models import ResponseModel
 from incydr.enums import SortDirection
 from incydr.enums.cases import CaseStatus
@@ -33,7 +34,7 @@ class Case(ResponseModel):
     * **created_by_username**: `str | None` Username of the user who created the case. json_alias=`createdByUsername`
     * **last_modified_by_user_id**: `str | None` User UID of the user who last modified the case. json_alias=`lastModifiedByUserUid`
     * **last_modified_by_username**: `str | None` Username of the user who last modified the case. json_alias=`lastModifiedByUsername`
-    * **archival_time**: `datetime` Date on which the case will be archived.
+    * **archival_time**: `datetime` Time at which the case will be archived.
     """
 
     number: int = Field(allow_mutation=False, description="The identifier of the case.")
@@ -96,9 +97,9 @@ class CasesPage(ResponseModel):
     total_count: int = Field(alias="totalCount")
 
 
-class QueryCasesRequest(BaseModel):
+class QueryCasesRequest(Model):
     assignee: Optional[str]
-    createdAt: Optional[Tuple[Optional[datetime], Optional[datetime]]]
+    createdAt: Optional[str]
     isAssigned: Optional[bool]
     lastModifiedBy: Optional[str]
     name: Optional[str]
@@ -109,7 +110,7 @@ class QueryCasesRequest(BaseModel):
     status: Optional[CaseStatus]
 
 
-class CreateCaseRequest(BaseModel):
+class CreateCaseRequest(Model):
     name: str = Field(max_length=50)
     assignee: Optional[str]
     description: Optional[str] = Field(max_length=250)
@@ -117,7 +118,7 @@ class CreateCaseRequest(BaseModel):
     subject: Optional[str]
 
 
-class UpdateCaseRequest(BaseModel):
+class UpdateCaseRequest(Model):
     name: Optional[str] = Field(description="The name of the case.", max_length=50)
     assignee: Optional[str]
     description: Optional[str] = Field(max_length=250)
@@ -125,13 +126,16 @@ class UpdateCaseRequest(BaseModel):
     subject: Optional[str]
     status: Optional[CaseStatus]
 
+    class Config:
+        extra = Extra.ignore
+
 
 class RiskIndicator(BaseModel):
     name: str
     weight: int
 
 
-class FileEvent(BaseModel):
+class FileEvent(Model):
     event_id: Optional[str] = Field(
         None,
         alias="eventId",
