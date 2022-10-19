@@ -6,12 +6,12 @@ from pytest_httpserver import HTTPServer
 
 from incydr import Client
 from incydr._devices.models import DevicesPage
-from incydr._devices.models import SortKeys
 from incydr._users.models import Role
 from incydr._users.models import UpdateRolesResponse
 from incydr._users.models import User
 from incydr._users.models import UsersPage
 from incydr.enums import SortDirection
+from incydr.enums.devices import SortKeys
 
 TEST_USER_1 = {
     "legacyUserId": "legacyUserId-1",

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
 from typing import List
 from typing import Optional
 
@@ -12,21 +11,9 @@ from pydantic import Field
 from incydr._core.models import Model
 from incydr._core.models import ResponseModel
 from incydr.enums import SortDirection
-
-
-class CaseStatus(str, Enum):
-    CLOSED = "CLOSED"
-    OPEN = "OPEN"
-
-
-class SortKeys(str, Enum):
-    NAME = "name"
-    NUMBER = "number"
-    CREATED_AT = "createdAt"
-    UPDATED_AT = "updatedAt"
-    STATUS = "status"
-    ASSIGNEE_USERNAME = "assigneeUsername"
-    SUBJECT_USERNAME = "subjectUsername"
+from incydr.enums.cases import CaseStatus
+from incydr.enums.cases import FileAvailability
+from incydr.enums.cases import SortKeys
 
 
 class Case(ResponseModel):
@@ -77,7 +64,9 @@ class Case(ResponseModel):
     last_modified_by_username: Optional[str] = Field(
         allow_mutation=False, alias="lastModifiedByUsername"
     )
-    archival_time: Optional[datetime] = Field(allow_mutation=False, alias="archivalTime")
+    archival_time: Optional[datetime] = Field(
+        allow_mutation=False, alias="archivalTime"
+    )
 
     class Config:
         validate_assignment = True
@@ -128,14 +117,6 @@ class UpdateCaseRequest(Model):
 
     class Config:
         extra = Extra.ignore
-
-
-class FileAvailability(Enum):
-    error = "ERROR"
-    exact_file_available = "EXACT_FILE_AVAILABLE"
-    no_file_available = "NO_FILE_AVAILABLE"
-    pending = "PENDING"
-    recent_file_available = "RECENT_FILE_AVAILABLE"
 
 
 class RiskIndicator(BaseModel):

@@ -10,7 +10,9 @@ from requests_toolbelt.sessions import BaseUrlSession
 from requests_toolbelt.utils.dump import dump_response
 
 from incydr.__about__ import __version__
+from incydr._alert_rules.client import AlertRulesClient
 from incydr._alerts.client import AlertsClient
+from incydr._audit_log.client import AuditLogClient
 from incydr._cases.client import CasesClient
 from incydr._core.auth import APIClientAuth
 from incydr._core.settings import IncydrSettings
@@ -20,6 +22,7 @@ from incydr._devices.client import DevicesClient
 from incydr._directory_groups.client import DirectoryGroupsClient
 from incydr._file_events.client import FileEventsClient
 from incydr._legal_hold.client import LegalHoldClient
+from incydr._trusted_activities.client import TrustedActivitiesClient
 from incydr._user_risk_profiles.client import UserRiskProfiles
 from incydr._users.client import UsersClient
 from incydr._watchlists.client import WatchlistsClient
@@ -84,6 +87,8 @@ class Client:
         self._session.hooks["response"] = [response_hook]
 
         self._alerts = AlertsClient(self)
+        self._alert_rules = AlertRulesClient(self)
+        self._audit_log = AuditLogClient(self)
         self._cases = CasesClient(self)
         self._customer = CustomerClient(self)
         self._departments = DepartmentsClient(self)
@@ -91,11 +96,22 @@ class Client:
         self._directory_groups = DirectoryGroupsClient(self)
         self._file_events = FileEventsClient(self)
         self._legal_hold = LegalHoldClient(self)
+        self._trusted_activities = TrustedActivitiesClient(self)
         self._users = UsersClient(self)
         self._user_risk_profiles = UserRiskProfiles(self)
         self._watchlists = WatchlistsClient(self)
 
         self._session.auth.refresh()
+
+    @property
+    def tenant_id(self):
+        """Property returning the current tenant ID."""
+        token = self.session.auth.token_response.access_token.get_secret_value()
+        payload = token.encode("ascii").split(b".")[-2]
+        extra = len(payload) % 4
+        if extra > 0:
+            payload += b"=" * (4 - extra)
+        return json.loads(base64.urlsafe_b64decode(payload))["tenantUid"]
 
     @property
     def request_history(self):
@@ -133,18 +149,36 @@ class Client:
         return self._session
 
     @property
-    def tenant_id(self):
-        """Property returning the current tenant ID."""
-        token = self.session.auth.token_response.access_token.get_secret_value()
-        payload = token.encode("ascii").split(b".")[-2]
-        extra = len(payload) % 4
-        if extra > 0:
-            payload += b"=" * (4 - extra)
-        return json.loads(base64.urlsafe_b64decode(payload))["tenantUid"]
+    def alerts(self):
+        """
+        Property returning an [`AlertsClient`](../alerts) for interacting with
+        `/v*/alerts` API endpoints.
+        Usage:
+            >>> client.alerts.v1.get_page()
+        """
+        return self._alerts
 
     @property
-    def alerts(self):
-        return self._alerts
+    def alert_rules(self):
+        """
+        Property returning a [`AlertRules`](../alert_rules) for interacting with `/v*/alert-rules` and `/v*/alerts/rules* API endpoints.
+
+        Usage:
+
+            >>> client.alert_rules.v1.add_users(rule_id='test', users=['user-id-1', 'user-id-2'])
+
+        """
+        return self._alert_rules
+
+    @property
+    def audit_log(self):
+        """
+        Property returning an [`AuditLogClient`](../audit_log) for interacting with
+        `/v*/audit` API endpoints.
+        Usage:
+            >>> client.audit_log.v1.get_page()
+        """
+        return self._audit_log
 
     @property
     def cases(self):
@@ -227,6 +261,19 @@ class Client:
 
         """
         return self._legal_hold
+
+    @property
+    def trusted_activities(self):
+        """
+        Property returning a [`TrustedActivitiesClient`](../trusted_activities) for interacting with
+        `/v*/trusted-activities` API endpoints.
+
+        Usage:
+
+            >>> client.trusted_activities.v2.get_page()
+
+        """
+        return self._trusted_activities
 
     @property
     def users(self):

@@ -126,7 +126,7 @@ class WatchlistsV1:
 
         **Parameters**:
 
-        * **watchlist_type**: `WatchlistType` (required) - Type of the watchlist to create.
+        * **watchlist_type**: [`WatchlistType`][watchlist-types] (required) - Type of the watchlist to create.
         * **title**: The required title for a custom watchlist.
         * **description**: The optional description for a custom watchlist.
 
@@ -506,7 +506,7 @@ class WatchlistsV1:
 
         **Parameters**:
 
-        * **name**: `str`, `WatchlistType` (required) - A `WatchlistType` or in the case of `CUSTOM` watchlists, the watchlist `title`.
+        * **name**: `str`, [`WatchlistType`][watchlist-types] (required) - A `WatchlistType` or in the case of `CUSTOM` watchlists, the watchlist `title`.
 
         **Returns**: A watchlist ID (`str`).
         """

@@ -13,7 +13,7 @@ def parse_timestamp(timestamp: Union[str, int, float, datetime, date]):
     Args:
         timestamp (str or int or float or datetime): A POSIX timestamp.
 
-    Returns:
+    **Returns**:
         (str): A str representing the given timestamp. Example output looks like
         '2020-03-25T15:29:04.465Z'.
     """
