@@ -34,6 +34,7 @@ nav:
     - Configuration: 'settings.md'
     - Logging: 'logging.md'
   - Alerts: 'clients/alerts.md'
+  - Alert Rules: 'alert_rules.md'
   - Alert Querying: 'clients/alert_queries.md'
   - Audit Log: 'clients/audit_log.md'
   - Cases: 'clients/cases.md'

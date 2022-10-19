@@ -32,6 +32,23 @@ available model methods.
 ::: incydr.models.AlertQueryPage
     :docstring:
 
+## Alert Rules
+---
+
+### `RuleUser` model
+
+::: incydr.models.RuleUser
+    :docstring:
+
+### `RuleUsersList` model
+
+::: incydr.models.RuleUsersList
+    :docstring:
+
+### `RuleDetails` model
+
+::: incydr.models.RuleDetails
+
 ## Audit Log
 ---
 
