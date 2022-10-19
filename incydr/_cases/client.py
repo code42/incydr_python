@@ -215,7 +215,6 @@ class CasesV1:
         **Returns**: A [`Case`][case-model] object with updated values from server.
         """
         data = UpdateCaseRequest(**case.dict())
-        print(data.dict())
         response = self._parent.session.put(
             f"/v1/cases/{case.number}", json=data.dict()
         )
