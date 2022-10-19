@@ -49,6 +49,14 @@ available model methods.
 
 ::: incydr.models.RuleDetails
 
+## Audit Log
+---
+
+### `AuditEventsPage` model
+
+::: incydr.models.AuditEventsPage
+    :docstring:
+
 ## Cases
 ---
 
