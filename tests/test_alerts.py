@@ -6,6 +6,9 @@ from incydr import Client
 from incydr._alerts.models.response import AlertDetails
 from incydr._alerts.models.response import AlertQueryPage
 from incydr._alerts.models.response import AlertSummary
+from incydr.cli.main import incydr
+
+TEST_ALERT_ID = "000-42-code"
 
 TEST_ALERTS_RESPONSE = {
     "type$": "ALERT_QUERY_RESPONSE",
@@ -196,7 +199,7 @@ def test_alert_add_note(httpserver_auth: HTTPServer):
     }
     httpserver_auth.expect_request(
         "/v1/alerts/add-note", method="POST", json=expected
-    ).respond_with_data("", status=200)
+    ).respond_with_data()
 
     client = Client()
     response = client.alerts.v1.add_note("1234", "test")
@@ -212,7 +215,7 @@ def test_alert_change_state(httpserver_auth: HTTPServer):
     }
     httpserver_auth.expect_request(
         "/v1/alerts/update-state", method="POST", json=expected
-    ).respond_with_data("", status=200)
+    ).respond_with_data()
 
     client = Client()
     response = client.alerts.v1.change_state(alert_ids=["1234"], state="PENDING")
@@ -228,8 +231,216 @@ def test_alert_change_state_single(httpserver_auth: HTTPServer):
     }
     httpserver_auth.expect_request(
         "/v1/alerts/update-state", method="POST", json=expected
-    ).respond_with_data("", status=200)
+    ).respond_with_data()
 
     client = Client()
     response = client.alerts.v1.change_state(alert_ids="1234", state="PENDING")
     assert response.status_code == 200
+
+
+# ************************************************ CLI ************************************************
+
+
+def test_search_when_no_start_or_on_param_raises_bad_option_usage_exception(
+    runner, httpserver_auth: HTTPServer
+):
+    result = runner.invoke(
+        incydr,
+        [
+            "alerts",
+            "search",
+        ],
+    )
+    assert result.exit_code == 2
+    assert (
+        "--start or --on options are required if not using the --advanced-query option."
+        in result.output
+    )
+
+
+def test_cli_alerts_search_when_default_params_makes_expected_api_call(
+    httpserver_auth: HTTPServer, runner
+):
+    query = {
+        "tenantId": "abcd-1234",
+        "groupClause": "AND",
+        "groups": [
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "CreatedAt",
+                        "operator": "ON_OR_AFTER",
+                        "value": "2022-06-01T00:00:00.000Z",
+                    },
+                ],
+            },
+        ],
+        "pgNum": 0,
+        "pgSize": 100,
+        "srtDirection": "DESC",
+        "srtKey": "CreatedAt",
+    }
+
+    data = {
+        "alerts": [TEST_ALERTS_RESPONSE],
+        "totalCount": 1,
+        "problems": None,
+    }
+
+    httpserver_auth.expect_request(
+        "/v1/alerts/query-alerts", method="POST", json=query
+    ).respond_with_json(data)
+
+    result = runner.invoke(
+        incydr,
+        [
+            "alerts",
+            "search",
+            "--start",
+            "2022-06-01",
+        ],
+    )
+    assert result.exit_code == 0
+
+
+def test_cli_alerts_search_when_custom_params_makes_expected_api_call(
+    httpserver_auth: HTTPServer, runner
+):
+    pass
+
+
+def test_cli_alerts_search_when_advanced_query_makes_expected_api_call(
+    httpserver_auth: HTTPServer, runner
+):
+    pass
+
+
+def test_cli_alerts_show_makes_expected_call(httpserver_auth: HTTPServer, runner):
+    expected = {"alertIds": [TEST_ALERT_ID]}
+    httpserver_auth.expect_request(
+        "/v1/alerts/query-details", method="POST", json=expected
+    ).respond_with_json(TEST_ALERT_DETAILS_RESPONSE)
+
+    result = runner.invoke(incydr, ["alerts", "show", TEST_ALERT_ID])
+    print(result)
+    print(result.output)
+    assert result.exit_code == 0
+
+
+def test_cli_alerts_add_note_makes_expected_call(httpserver_auth: HTTPServer, runner):
+    expected = {
+        "tenantId": "abcd-1234",
+        "alertId": TEST_ALERT_ID,
+        "note": "test",
+    }
+    httpserver_auth.expect_request(
+        "/v1/alerts/add-note", method="POST", json=expected
+    ).respond_with_data()
+
+    result = runner.invoke(incydr, ["alerts", "add-note", TEST_ALERT_ID, "test"])
+
+    assert result.exit_code == 0
+
+
+def test_cli_update_state_when_alert_ids_list_makes_expected_call(
+    httpserver_auth: HTTPServer, runner
+):
+    expected = {
+        "tenantId": "abcd-1234",
+        "alertIds": ["1234", "abcd", "foo", "bar"],
+        "state": "PENDING",
+        "note": None,
+    }
+    httpserver_auth.expect_request(
+        "/v1/alerts/update-state", method="POST", json=expected
+    ).respond_with_data()
+
+    result = runner.invoke(
+        incydr, ["alerts", "update-state", ",".join(expected["alertIds"]), "PENDING"]
+    )
+
+    assert result.exit_code == 0
+
+
+def test_cli_update_state_when_csv_input_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, tmp_path
+):
+    p = tmp_path / "event_ids.csv"
+    p.write_text("1234\nabcd\nfoo\nbar")
+
+    expected = {
+        "tenantId": "abcd-1234",
+        "alertIds": ["1234", "abcd", "foo", "bar"],
+        "state": "PENDING",
+        "note": None,
+    }
+    httpserver_auth.expect_request(
+        "/v1/alerts/update-state", method="POST", json=expected
+    ).respond_with_data()
+
+    result = runner.invoke(
+        incydr, ["alerts", "update-state", str(p), "PENDING", "--csv"]
+    )
+
+    assert result.exit_code == 0
+
+
+def test_cli_bulk_update_state_when_note_column_makes_expected_calls(
+    httpserver_auth: HTTPServer, runner, tmp_path
+):
+    data_1 = {
+        "tenantId": "abcd-1234",
+        "alertIds": ["1234"],
+        "state": "RESOLVED",
+        "note": None,
+    }
+    data_2 = {
+        "tenantId": "abcd-1234",
+        "alertIds": ["abcd"],
+        "state": "PENDING",
+        "note": "test note",
+    }
+
+    httpserver_auth.expect_request(
+        "/v1/alerts/update-state", method="POST", json=data_1
+    ).respond_with_data()
+    httpserver_auth.expect_request(
+        "/v1/alerts/update-state", method="POST", json=data_2
+    ).respond_with_data()
+
+    p = tmp_path / "alerts.csv"
+    p.write_text("alert_id,state,note\n1234,RESOLVED,\nabcd,PENDING,test note")
+
+    result = runner.invoke(incydr, ["alerts", "bulk-update-state", str(p)])
+    assert result.exit_code == 0
+
+
+def test_cli_bulk_update_state_when_no_note_column_makes_expected_calls(
+    httpserver_auth: HTTPServer, runner, tmp_path
+):
+    data_1 = {
+        "tenantId": "abcd-1234",
+        "alertIds": ["1234"],
+        "state": "RESOLVED",
+        "note": None,
+    }
+    data_2 = {
+        "tenantId": "abcd-1234",
+        "alertIds": ["abcd"],
+        "state": "PENDING",
+        "note": None,
+    }
+
+    httpserver_auth.expect_request(
+        "/v1/alerts/update-state", method="POST", json=data_1
+    ).respond_with_data()
+    httpserver_auth.expect_request(
+        "/v1/alerts/update-state", method="POST", json=data_2
+    ).respond_with_data()
+
+    p = tmp_path / "alerts.csv"
+    p.write_text("alert_id,state\n1234,RESOLVED\nabcd,PENDING")
+
+    result = runner.invoke(incydr, ["alerts", "bulk-update-state", str(p)])
+    assert result.exit_code == 0

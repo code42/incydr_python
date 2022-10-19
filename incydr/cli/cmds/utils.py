@@ -1,3 +1,4 @@
+import functools
 import itertools
 import json
 import sys
@@ -8,6 +9,7 @@ from typer import echo
 
 from incydr.cli import console
 from incydr.cli import render
+from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.logger import try_get_logger_for_server
 from incydr.utils import Model
@@ -125,3 +127,32 @@ def user_lookup(client, value):
         return users[0].user_id
         # else return ID
     return value
+
+
+def output_single_format(
+    result: Model, render_func, format_=SingleFormat.rich, use_rich=True
+):
+    if format_ == SingleFormat.rich and use_rich:
+        render_func(result)
+
+    elif format_ == SingleFormat.json:
+        console.print_json(result.json())
+
+    else:
+        echo(result.json())
+
+
+# Drop in replacements for getattr() and setattr() that account for nested attributes
+# specified by dot notation
+
+# See https://stackoverflow.com/questions/31174295/getattr-and-setattr-on-nested-objects/31174427?noredirect=1#comment86638618_31174427
+def rgetattr(obj, attr, *args):
+    def _getattr(obj, attr):
+        return getattr(obj, attr, *args)
+
+    return functools.reduce(_getattr, [obj] + attr.split("."))
+
+
+def rsetattr(obj, attr, val):
+    pre, _, post = attr.rpartition(".")
+    return setattr(rgetattr(obj, pre) if pre else obj, post, val)
