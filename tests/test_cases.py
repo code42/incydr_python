@@ -56,6 +56,7 @@ TEST_CASE_2 = {
     "description": "description_2",
     "findings": "## Title\n\n- item a\n- item b\n\n**Bolded**\n_Italicized_",
 }
+
 TEST_EVENT_ID = "0_147e9445-2f30"
 TEST_FILE_EVENT = {
     "eventId": TEST_EVENT_ID,

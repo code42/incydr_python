@@ -139,7 +139,7 @@ class CasesV1:
         """
 
         if created_at is not None:
-            if not isinstance(created_at, Tuple):
+            if not isinstance(created_at, (Tuple, list)):
                 raise TypeError(
                     f"created_at kwarg should be a Tuple[datetime, datetime] object"
                     f", passed 'created_at={created_at}' of type: {type(created_at)}"
@@ -216,7 +216,6 @@ class CasesV1:
         **Returns**: A [`Case`][case-model] object with updated values from server.
         """
         data = UpdateCaseRequest(**case.dict())
-        print(data.dict())
         response = self._parent.session.put(
             f"/v1/cases/{case.number}", json=data.dict()
         )
