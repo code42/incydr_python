@@ -120,7 +120,8 @@ def test_cli_list_when_default_params_makes_expected_call(
     data_1 = {
         "directory_groups": [
             {"groupId": "group-42", "name": "Sales"},
-            {"groupId": "group-43", "name": "Research and Development"},
+            {"groupId": "group-43", "name": "Marketing"},
+            {"groupId": "group-44", "name": "Research and Development"},
         ],
         "totalCount": 2,
     }
@@ -130,7 +131,6 @@ def test_cli_list_when_default_params_makes_expected_call(
     ).respond_with_json(data_1)
 
     result = runner.invoke(incydr, ["directory-groups", "list"])
-
     assert result.exit_code == 0
 
 

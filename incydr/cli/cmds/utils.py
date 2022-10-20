@@ -1,3 +1,4 @@
+import itertools
 import json
 import sys
 from typing import Iterable
@@ -16,6 +17,15 @@ from incydr.utils import write_models_to_csv
 # CLI - specific utils.py file to avoid circular imports
 
 
+# See https://stackoverflow.com/questions/661603/how-do-i-know-if-a-generator-is-empty-from-the-start
+def peek(iterable):
+    try:
+        first = next(iterable)
+    except StopIteration:
+        return None
+    return itertools.chain([first], iterable)
+
+
 def output_response_format(
     results,
     title: str,
@@ -28,7 +38,8 @@ def output_response_format(
     if format_ is None:
         format_ = TableFormat.table
 
-    if not any(results):
+    results = peek(results)
+    if results is None:
         echo("No results found.")
         return
 
@@ -63,7 +74,8 @@ def output_models_format(
     if not format_:
         format_ = TableFormat.table
 
-    if not any(models):
+    models = peek(models)
+    if models is None:
         echo("No results found.")
         return
 
@@ -91,7 +103,8 @@ def output_format_logger(
     ignore_cert_validation: Optional[bool] = None,
 ):
 
-    if not any(results):
+    results = peek(results)
+    if results is None:
         return
 
     logger = try_get_logger_for_server(output, certs, ignore_cert_validation)
@@ -100,3 +113,5 @@ def output_format_logger(
         if columns:
             result = {c: result[c] for c in columns}
         logger.info(json.dumps(result))
+
+

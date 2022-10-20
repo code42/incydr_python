@@ -31,7 +31,7 @@ class DirectoryGroupsV1:
         self._parent = parent
 
     def get_page(
-        self, page_num: int = 1, page_size=None, name=None
+        self, page_num: int = 0, page_size=None, name=None
     ) -> DirectoryGroupsPage:
         """
         Get a page of directory groups. Retrieves directory group information that has been pushed to Code42 from SCIM or User Directory Sync.
