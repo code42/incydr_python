@@ -1,13 +1,15 @@
-site_name: Incydr SDK
-site_description: A next-generation python client for Incydr.
+site_name: Code42 Developer Portal
 site_url: https://developer.code42.com
 
 theme:
-    name: 'material'
-    favicon: favicon.ico
-    logo: favicon.ico
+    name: material
+    favicon: images/favicon.ico
+    logo: images/logo_developers.svg
     features:
         - navigation.sections
+        - navigation.tabs
+        - navigation.tabs.sticky
+        - navigation.instant
         - navigation.tracking
         - content.code.annotate
     palette:
@@ -29,28 +31,37 @@ edit_uri: ""
 
 nav:
   - Introduction: 'index.md'
-  - Client: 'client.md'
-  - Settings:
-    - Configuration: 'settings.md'
-    - Logging: 'logging.md'
-  - Alerts: 'clients/alerts.md'
-  - Alert Rules: 'alert_rules.md'
-  - Alert Querying: 'clients/alert_queries.md'
-  - Audit Log: 'clients/audit_log.md'
-  - Cases: 'clients/cases.md'
-  - Customer: 'clients/customer.md'
-  - Departments: 'clients/departments.md'
-  - Devices: 'clients/devices.md'
-  - Directory Groups: 'clients/directory_groups.md'
-  - File Events: 'clients/file_events.md'
-  - File Event Querying: 'clients/file_event_queries.md'
-  - Legal Hold: 'clients/legal_hold.md'
-  - Trusted Activites: 'clients/trusted_activities.md'
-  - Users: 'clients/users.md'
-  - User Risk Profiles: 'clients/user_risk_profiles.md'
-  - Watchlists: 'clients/watchlists.md'
-  - Enums: 'enums.md'
-  - Models: 'models.md'
+  - API Reference: 'api-reference.md'
+  - SDK:
+    - Introduction: 'sdk/index.md'
+    - Client: 'sdk/client.md'
+    - Settings:
+        - Configuration: 'sdk/settings.md'
+        - Logging: 'sdk/logging.md'
+    - Alerts: 'sdk/clients/alerts.md'
+    - Alert Rules: 'sdk/clients/alert_rules.md'
+    - Alert Querying: 'sdk/clients/alert_queries.md'
+    - Audit Log: 'sdk/clients/audit_log.md'
+    - Cases: 'sdk/clients/cases.md'
+    - Customer: 'sdk/clients/customer.md'
+    - Departments: 'sdk/clients/departments.md'
+    - Devices: 'sdk/clients/devices.md'
+    - Directory Groups: 'sdk/clients/directory_groups.md'
+    - File Events: 'sdk/clients/file_events.md'
+    - File Event Queries: 'sdk/clients/file_event_queries.md'
+    - Legal Hold: 'sdk/clients/legal_hold.md'
+    - Trusted Activites: 'sdk/clients/trusted_activities.md'
+    - Users: 'sdk/clients/users.md'
+    - User Risk Profiles: 'sdk/clients/user_risk_profiles.md'
+    - Watchlists: 'sdk/clients/watchlists.md'
+    - Enums: 'sdk/enums.md'
+    - Models: 'sdk/models.md'
+  - CLI:
+      - Commands: 'cli/commands.md'
+  - Guides:
+    - Microsoft Sentinel:
+      - Data Collector API: 'guides/azure-sentinel-data-collector.md'
+      - Log Analytics Agent: 'guides/azure-sentinel-log-analytics.md'
 
 markdown_extensions:
   - pymdownx.critic
