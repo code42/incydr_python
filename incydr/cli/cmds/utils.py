@@ -52,6 +52,7 @@ def output_response_format(
             echo(json.dumps(result))
 
 
+# WARNING: CSV output will not work for nested objects
 def output_models_format(
     models: Iterable[Model],
     title: str,
@@ -70,7 +71,6 @@ def output_models_format(
         with console.pager():
             render.table(models, columns=columns, title=title)
 
-    # doesn't work for nested objects
     elif format_ == TableFormat.csv:
         write_models_to_csv(models, sys.stdout, columns=columns)
 
