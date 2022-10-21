@@ -14,7 +14,7 @@ from pydantic import validate_arguments
 
 from incydr._core.models import Model
 from incydr._file_events.models.response import SavedSearch
-from incydr._queries.utils import parse_timestamp
+from incydr._queries.utils import parse_timestamp_to_millisecond_str
 from incydr.enums.file_events import Category
 from incydr.enums.file_events import EventAction
 from incydr.enums.file_events import EventSearchTerm
@@ -329,7 +329,7 @@ def _create_date_range_filter_group(start_date, end_date):
                 Filter(
                     term=EventSearchTerm.TIMESTAMP,
                     operator=Operator.ON_OR_AFTER,
-                    value=parse_timestamp(start_date),
+                    value=parse_timestamp_to_millisecond_str(start_date),
                 )
             )
 
@@ -338,7 +338,7 @@ def _create_date_range_filter_group(start_date, end_date):
                 Filter(
                     term=EventSearchTerm.TIMESTAMP,
                     operator=Operator.ON_OR_BEFORE,
-                    value=parse_timestamp(end_date),
+                    value=parse_timestamp_to_millisecond_str(end_date),
                 )
             )
     return FilterGroup(filters=filters)

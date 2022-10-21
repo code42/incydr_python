@@ -3,6 +3,7 @@ from itertools import chain
 from typing import Iterable
 from typing import Set
 
+from click import BadOptionUsage
 from pydantic import BaseModel
 from rich.table import Table
 
@@ -43,7 +44,14 @@ def table_json(results: Iterable, columns: Set[str] = None, title=None):
     models = iter(results)
     first = next(models)
     if columns:
-        first = {c: first[c] for c in columns}
+        try:
+            first = {c: first[c] for c in columns}
+        except KeyError as e:
+            raise BadOptionUsage(
+                e.args[0],
+                f"'{e.args[0]}' is not a valid column name.  Valid column names include: "
+                f"{list(first.keys())}",
+            )
     header = first.keys()
     tbl = Table(*header, title=title)
     for model in chain([first], models):

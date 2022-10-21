@@ -1,12 +1,14 @@
 import datetime
 from pathlib import Path
 
+import pytest
 from pytest_httpserver import HTTPServer
 
 from incydr import Client
 from incydr._audit_log.models import AuditEventsPage
+from incydr.cli.main import incydr
 
-Test_Audit_Log_1 = {
+TEST_AL_ENTRY_1 = {
     "type$": "audit_log::logged_in/1",
     "actorId": "898209175991065670",
     "actorName": "whiteoak_ffs_user2@code42.com",
@@ -16,12 +18,12 @@ Test_Audit_Log_1 = {
     "actorType": "UNKNOWN",
 }
 
-Test_Audit_Log_2 = {
+TEST_AL_ENTRY_2 = {
     "type$": "audit_log::federation_metadata_updated/1",
     "actorId": "thwlhuOyiq2svbdcqfmm2demndi",
     "actorName": "SYSTEM",
-    "actorAgent": "null",
-    "actorIpAddress": "null",
+    "actorAgent": None,
+    "actorIpAddress": None,
     "timestamp": "2022-09-28T19:57:10.072Z",
     "actorType": "SYSTEM",
     "federationId": "1034183599256332463",
@@ -31,26 +33,64 @@ Test_Audit_Log_2 = {
 }
 
 
-def test_get_page_when_default_params_returns_expected_data(
-    httpserver_auth: HTTPServer,
-):
+@pytest.fixture
+def mock_search(httpserver_auth: HTTPServer):
     audit_events_data = {
         "events": [
-            Test_Audit_Log_1,
-            Test_Audit_Log_2,
+            TEST_AL_ENTRY_1,
+            TEST_AL_ENTRY_2,
         ],
         "pagination_range_start_index": 0,
         "pagination_range_end_index": 2,
     }
-    httpserver_auth.expect_request("/v1/audit/search-audit-log").respond_with_json(
-        audit_events_data
-    )
+    data = {
+        "actorIds": None,
+        "actorIpAddresses": None,
+        "actorNames": None,
+        "dateRange": {"endTime": None, "startTime": None},
+        "eventTypes": None,
+        "pageNum": 0,
+        "pageSize": 100,
+        "resourceIds": None,
+        "userTypes": None,
+    }
+    httpserver_auth.expect_request(
+        "/v1/audit/search-audit-log", method="POST", json=data
+    ).respond_with_json(audit_events_data)
 
+
+@pytest.fixture
+def mock_export(httpserver_auth: HTTPServer):
+    audit_events_data = {
+        "events": [
+            TEST_AL_ENTRY_1,
+            TEST_AL_ENTRY_2,
+        ],
+        "pagination_range_start_index": 0,
+        "pagination_range_end_index": 2,
+    }
+    data = {
+        "actorIds": None,
+        "actorIpAddresses": None,
+        "actorNames": None,
+        "dateRange": {"endTime": None, "startTime": None},
+        "eventTypes": None,
+        "pageNum": 0,
+        "pageSize": 0,
+        "resourceIds": None,
+        "userTypes": None,
+    }
+    httpserver_auth.expect_request(
+        "/v1/audit/search-results-export", method="POST", json=data
+    ).respond_with_json(audit_events_data)
+
+
+def test_get_page_when_default_params_returns_expected_data(mock_search):
     client = Client()
     page = client.audit_log.v1.get_page()
     assert isinstance(page, AuditEventsPage)
-    assert page.events[0] == Test_Audit_Log_1
-    assert page.events[1] == Test_Audit_Log_2
+    assert page.events[0] == TEST_AL_ENTRY_1
+    assert page.events[1] == TEST_AL_ENTRY_2
     assert page.pagination_range_end_index == len(page.events) == 2
 
 
@@ -59,8 +99,8 @@ def test_get_page_when_all_params_returns_expected_data(
 ):
     audit_events_data = {
         "events": [
-            Test_Audit_Log_1,
-            Test_Audit_Log_2,
+            TEST_AL_ENTRY_1,
+            TEST_AL_ENTRY_2,
         ],
         "pagination_range_start_index": 0,
         "pagination_range_end_index": 2,
@@ -75,7 +115,7 @@ def test_get_page_when_all_params_returns_expected_data(
         page_num=1,
         page_size=100,
         actor_ids=["898209175991065670", "thwlhuOyiq2svbdcqfmm2demndi"],
-        actor_ip_addresses=["50.93.255.223, 64.252.71.111", "null"],
+        actor_ip_addresses=["50.93.255.223, 64.252.71.111", "None"],
         actor_names=["whiteoak_ffs_user2@code42.com", "SYSTEM"],
         start_time=datetime.datetime.strptime("09/19/18 13:55:26", "%m/%d/%y %H:%M:%S"),
         end_time=datetime.datetime.strptime("10/03/23 13:14:46", "%m/%d/%y %H:%M:%S"),
@@ -84,31 +124,17 @@ def test_get_page_when_all_params_returns_expected_data(
         user_types=["UNKNOWN", "SYSTEM"],
     )
     assert isinstance(page, AuditEventsPage)
-    assert page.events[0] == Test_Audit_Log_1
-    assert page.events[1] == Test_Audit_Log_2
+    assert page.events[0] == TEST_AL_ENTRY_1
+    assert page.events[1] == TEST_AL_ENTRY_2
     assert page.pagination_range_end_index == len(page.events) == 2
 
 
-def test_search_events_when_default_params_returns_expected_data(
-    httpserver_auth: HTTPServer,
-):
-    audit_events_data = {
-        "events": [
-            Test_Audit_Log_1,
-            Test_Audit_Log_2,
-        ],
-        "pagination_range_start_index": 0,
-        "pagination_range_end_index": 2,
-    }
-    httpserver_auth.expect_request("/v1/audit/search-results-export").respond_with_json(
-        audit_events_data
-    )
-
+def test_search_events_when_default_params_returns_expected_data(mock_export):
     client = Client()
     page = client.audit_log.v1.search_events()
     assert isinstance(page, AuditEventsPage)
-    assert page.events[0] == Test_Audit_Log_1
-    assert page.events[1] == Test_Audit_Log_2
+    assert page.events[0] == TEST_AL_ENTRY_1
+    assert page.events[1] == TEST_AL_ENTRY_2
     assert page.pagination_range_end_index == len(page.events) == 2
 
 
@@ -151,3 +177,155 @@ def test_download_events_when_default_params_makes_expected_calls(
     response = client.audit_log.v1.download_events(Path.cwd())
 
     assert isinstance(response, Path)
+
+
+# ************************************************ CLI ************************************************
+
+
+def test_cli_search_when_default_params_makes_expected_call(runner, mock_search):
+    result = runner.invoke(incydr, ["audit-log", "search"])
+    assert result.exit_code == 0
+
+
+def test_cli_search_when_custom_params_makes_expected_call(
+    runner, httpserver_auth: HTTPServer
+):
+    audit_events_data = {
+        "events": [
+            TEST_AL_ENTRY_1,
+            TEST_AL_ENTRY_2,
+        ],
+        "pagination_range_start_index": 0,
+        "pagination_range_end_index": 2,
+    }
+    data = {
+        "actorIds": ["foo", "bar"],
+        "actorIpAddresses": ["foo1", "bar1"],
+        "actorNames": ["foo2", "bar2"],
+        "dateRange": {"endTime": 1666314001.0, "startTime": 1662786000.0},
+        "eventTypes": ["foo3", "bar3"],
+        "pageNum": 0,
+        "pageSize": 100,
+        "resourceIds": ["foo4", "bar4"],
+        "userTypes": ["USER"],
+    }
+    httpserver_auth.expect_request(
+        "/v1/audit/search-audit-log", method="POST", json=data
+    ).respond_with_json(audit_events_data)
+
+    result = runner.invoke(
+        incydr,
+        [
+            "audit-log",
+            "search",
+            "--start",
+            "2022-09-10",
+            "--end",
+            "2022-10-20 20:00:01",
+            "--actor-ids",
+            "foo,bar",
+            "--actor-ip-addresses",
+            "foo1,bar1",
+            "--actor-names",
+            "foo2,bar2",
+            "--event-types",
+            "foo3,bar3",
+            "--resource-ids",
+            "foo4,bar4",
+            "--user-types",
+            "USER",
+        ],
+    )
+    assert result.exit_code == 0
+
+
+def test_cli_list_when_default_params_makes_expected_call(runner, mock_export):
+    result = runner.invoke(incydr, ["audit-log", "list"])
+    assert result.exit_code == 0
+
+
+def test_cli_list_when_custom_params_makes_expected_call(
+    runner, httpserver_auth: HTTPServer
+):
+    audit_events_data = {
+        "events": [
+            TEST_AL_ENTRY_1,
+            TEST_AL_ENTRY_2,
+        ],
+        "pagination_range_start_index": 0,
+        "pagination_range_end_index": 2,
+    }
+    data = {
+        "actorIds": ["foo", "bar"],
+        "actorIpAddresses": ["foo1", "bar1"],
+        "actorNames": ["foo2", "bar2"],
+        "dateRange": {"endTime": 1666314001.0, "startTime": 1662786000.0},
+        "eventTypes": ["foo3", "bar3"],
+        "pageNum": 0,
+        "pageSize": 0,
+        "resourceIds": ["foo4", "bar4"],
+        "userTypes": ["USER"],
+    }
+    httpserver_auth.expect_request(
+        "/v1/audit/search-results-export", method="POST", json=data
+    ).respond_with_json(audit_events_data)
+
+    result = runner.invoke(
+        incydr,
+        [
+            "audit-log",
+            "list",
+            "--start",
+            "2022-09-10",
+            "--end",
+            "2022-10-20 20:00:01",
+            "--actor-ids",
+            "foo,bar",
+            "--actor-ip-addresses",
+            "foo1,bar1",
+            "--actor-names",
+            "foo2,bar2",
+            "--event-types",
+            "foo3,bar3",
+            "--resource-ids",
+            "foo4,bar4",
+            "--user-types",
+            "USER",
+        ],
+    )
+    assert result.exit_code == 0
+
+
+def test_cli_list_when_download_makes_expected_call(
+    runner, httpserver_auth: HTTPServer, tmp_path
+):
+    export_event_data = {
+        "downloadToken": "r_MltMkE_hFAUJA0EKsGe2F9GefX1NuIo3GtjRxSLVI="
+    }
+    data = {
+        "actorIds": None,
+        "actorIpAddresses": None,
+        "actorNames": None,
+        "dateRange": {"endTime": None, "startTime": None},
+        "eventTypes": None,
+        "resourceIds": None,
+        "userTypes": None,
+    }
+    httpserver_auth.expect_request(
+        "/v1/audit/export", method="POST", json=data
+    ).respond_with_json(export_event_data)
+
+    redeem_events_data = {
+        "events": [],
+        "pagination_range_start_index": 0,
+        "pagination_range_end_index": 0,
+    }
+
+    httpserver_auth.expect_request(
+        "/v1/audit/redeemDownloadToken", query_string=export_event_data
+    ).respond_with_json(redeem_events_data)
+
+    result = runner.invoke(
+        incydr, ["audit-log", "list", "--download", "--path", tmp_path]
+    )
+    assert result.exit_code == 0

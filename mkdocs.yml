@@ -58,6 +58,8 @@ nav:
     - Models: 'sdk/models.md'
   - CLI:
       - Introduction: 'cli/index.md'
+      - Alerts: 'cli/alerts.md'
+      - Audit Log: 'cli/audit_log.md'
       - Cases: 'cli/cases.md'
       - Departments: 'cli/departments.md'
       - Directory Groups: 'cli/directory_groups.md'

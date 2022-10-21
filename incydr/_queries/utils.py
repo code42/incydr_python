@@ -7,8 +7,11 @@ DATETIME_STR_FORMAT = "%Y-%m-%d %H:%M:%S"
 DATE_STR_FORMAT = "%Y-%m-%d"
 
 
-def parse_timestamp(timestamp: Union[str, int, float, datetime, date]):
-    """Parse timestamp to milliseconds precision.
+def parse_timestamp_to_millisecond_str(
+    timestamp: Union[str, int, float, datetime, date]
+):
+    """
+    Parse int/float/str/datetime timestamp to string milliseconds precision.
 
     Args:
         timestamp (str or int or float or datetime): A POSIX timestamp.
@@ -21,15 +24,31 @@ def parse_timestamp(timestamp: Union[str, int, float, datetime, date]):
     if isinstance(timestamp, (int, float)):
         timestamp = datetime.utcfromtimestamp(timestamp)
     elif isinstance(timestamp, str):
-        try:
-            timestamp = datetime.strptime(timestamp, DATETIME_STR_FORMAT)
-        except ValueError:
-            try:
-                timestamp = datetime.strptime(timestamp, DATE_STR_FORMAT)
-            except ValueError:
-                raise ValueError(
-                    f"time data '{timestamp}' does not match format {DATETIME_STR_FORMAT} or {DATE_STR_FORMAT}"
-                )
+        timestamp = parse_str_to_datetime(timestamp)
 
     # parse datetime to string
     return f"{timestamp.strftime(MICROSECOND_FORMAT)[:-4]}Z"
+
+
+def parse_timestamp_to_posix_timestamp(timestamp: Union[str, datetime]):
+    """
+    Parse POSIX timestamp from str in DATE or DATETIME format or datetime obj.
+    """
+    date_time = (
+        timestamp
+        if isinstance(timestamp, datetime)
+        else parse_str_to_datetime(timestamp)
+    )
+    return date_time.timestamp()
+
+
+def parse_str_to_datetime(timestamp: str):
+    try:
+        return datetime.strptime(timestamp, DATETIME_STR_FORMAT)
+    except ValueError:
+        try:
+            return datetime.strptime(timestamp, DATE_STR_FORMAT)
+        except ValueError:
+            raise ValueError(
+                f"time data '{timestamp}' does not match format {DATETIME_STR_FORMAT} or {DATE_STR_FORMAT}"
+            )
