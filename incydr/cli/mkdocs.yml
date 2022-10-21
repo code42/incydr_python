@@ -29,6 +29,7 @@ edit_uri: ""
 
 nav:
   - Introduction: 'index.md'
+  - Cases: 'cases.md'
   - File Events: 'file_events.md'
 
 markdown_extensions:
@@ -36,10 +37,10 @@ markdown_extensions:
   - admonition
   - codehilite:
       css_class: highlight
+  - attr_list
   - mkautodoc
   - mkdocs-click
   - tables
-  - attr_list
   - md_in_html
   - toc:
       permalink: true

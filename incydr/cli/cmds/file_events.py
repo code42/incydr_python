@@ -55,6 +55,7 @@ def render_search(search_: SavedSearch):
 @log_file_option
 @click.pass_context
 def file_events(ctx, log_level, log_file):
+    """View and manage file events."""
     init_client(ctx, log_level, log_file)
 
 

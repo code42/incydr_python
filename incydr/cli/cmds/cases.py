@@ -49,6 +49,7 @@ path_option = click.option(
 @log_file_option
 @click.pass_context
 def cases(ctx, log_level, log_file):
+    """View and manage cases."""
     init_client(ctx, log_level, log_file)
 
 
