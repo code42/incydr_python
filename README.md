@@ -12,6 +12,8 @@ helper clients that model Code42 data and validate requests with the help of [Py
 
 **This project is currently in BETA and subject to breaking changes prior to the 1.0 release.**
 
+Documentation during the beta can be found at https://code42.github.io/incydr_python
+
 **Table of Contents**
 
 - [Installation](#installation)
