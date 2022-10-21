@@ -36,7 +36,7 @@ dynamic = ["version"]
 cli = ["typer", "click"]
 
 [project.urls]
-Documentation = "https://github.com/unknown/incydr#readme"
+Documentation = "https://github.com/code42/incydr_python#readme"
 Issues = "https://github.com/code42/incydr_python/issues"
 Source = "https://github.com/code42/incydr_python/incydr"
 
@@ -69,6 +69,7 @@ build = "mkdocs build"
 serve = "mkdocs serve"
 build-cli = "mkdocs build --config-file incydr/cli/mkdocs.yml"
 serve-cli = "mkdocs serve --config-file incydr/cli/mkdocs.yml"
+publish = "mkdocs gh-deploy --force"
 svg = "python docs/example_logging.py"
 
 [tool.hatch.envs.default]
