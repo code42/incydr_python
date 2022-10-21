@@ -31,17 +31,29 @@ class UsersV1:
     def __init__(self, parent):
         self._parent = parent
 
-    def get_user(self, user_id: str) -> User:
+    def get_user(self, user_id: str = None, username: str = None) -> User:
         """
-        Get a single user.
+        Get a single user. At least one parameter is required.
 
         **Parameters:**
 
-        * **user_id**: `str` (required) - The unique ID for the user.
+        * **user_id**: `str` - The unique ID for the user.
+        * **username**: `str`- The username for the user.  Performs an additional lookup to first get user ID.  Ignored if user_id is also passed.
 
         **Returns**: A [`User`][user-model] object representing the user.
 
         """
+        if not any([user_id, username]):
+            raise ValueError(
+                "At least one parameter, user_id or username, is required for get_user()."
+            )
+
+        if not user_id:
+            users = self.get_page(username=username).users
+            if len(users) < 1:
+                raise ValueError(f"User with username '{username}' not found.")
+            return users[0]
+
         response = self._parent.session.get(f"/v1/users/{user_id}")
         return User.parse_response(response)
 

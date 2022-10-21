@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from urllib.parse import urlencode
 
+import pytest
 from pytest_httpserver import HTTPServer
 
 from incydr import Client
@@ -167,6 +168,33 @@ def test_get_user_returns_expected_data(httpserver_auth: HTTPServer):
     )
     assert user.modification_date == datetime.fromisoformat(
         TEST_USER_1["modificationDate"].replace("Z", "+00:00")
+    )
+
+
+def test_get_user_when_username_performs_get_page_lookup_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
+    query_1 = {
+        "username": "foo@bar.com",
+        "page": 1,
+        "pageSize": 100,
+    }
+    data_1 = {"users": [TEST_USER_1], "totalCount": 1}
+    httpserver_auth.expect_request(
+        "/v1/users", method="GET", query_string=urlencode(query_1)
+    ).respond_with_json(data_1)
+
+    client = Client()
+    client.users.v1.get_user(username="foo@bar.com")
+
+
+def test_get_user_when_no_params_raises_error(httpserver_auth: HTTPServer):
+    client = Client()
+    with pytest.raises(ValueError) as err:
+        client.users.v1.get_user()
+    assert (
+        "At least one parameter, user_id or username, is required for get_user()."
+        in str(err.value)
     )
 
 

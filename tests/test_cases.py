@@ -16,6 +16,8 @@ from incydr._cases.models import FileEvent
 from incydr._file_events.models.event import FileEventV2
 from incydr.cli.main import incydr
 from tests.test_file_events import TEST_EVENT_1
+from tests.test_users import TEST_USER_1
+from tests.test_users import TEST_USER_2
 
 TEST_CASE_NUMBER = "42"
 
@@ -90,6 +92,36 @@ def mock_file_event_get(httpserver_auth):
     httpserver_auth.expect_request(
         f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/{TEST_EVENT_ID}", method="GET"
     ).respond_with_json(TEST_EVENT_1)
+
+
+@pytest.fixture
+def mock_user_lookup(httpserver_auth):
+    query_1 = {
+        "username": "foo@bar.com",
+        "page": 1,
+        "pageSize": 100,
+    }
+    query_2 = {
+        "username": "baz@bar.com",
+        "page": 1,
+        "pageSize": 100,
+    }
+    data_1 = {"users": [TEST_USER_1], "totalCount": 1}
+    httpserver_auth.expect_request(
+        "/v1/users", method="GET", query_string=urlencode(query_1)
+    ).respond_with_json(data_1)
+
+    data_2 = {"users": [TEST_USER_2], "totalCount": 1}
+    httpserver_auth.expect_request(
+        "/v1/users", method="GET", query_string=urlencode(query_2)
+    ).respond_with_json(data_2)
+    httpserver_auth.expect_request("/v1/oauth", method="POST").respond_with_json(
+        dict(
+            token_type="bearer",
+            expires_in=900,
+            access_token="abcd-1234",
+        )
+    )
 
 
 def test_create(httpserver_auth: HTTPServer):
@@ -427,6 +459,41 @@ def test_cli_create_makes_expected_call(runner, httpserver_auth: HTTPServer):
     assert result.exit_code == 0
 
 
+def test_cli_create_when_usernames_specified_performs_additional_lookup_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_user_lookup
+):
+    test_data = {
+        "name": "test_name",
+        "description": "test_description",
+        "subject": "user-1",
+        "assignee": "user-2",
+        "findings": "test_findings",
+    }
+    test_response = TEST_CASE_1.copy()
+    test_response.update(test_data)
+    httpserver_auth.expect_request(
+        uri="/v1/cases", method="POST", json=test_data
+    ).respond_with_json(test_response)
+
+    result = runner.invoke(
+        incydr,
+        [
+            "cases",
+            "create",
+            "test_name",
+            "--description",
+            "test_description",
+            "--subject",
+            "foo@bar.com",
+            "--assignee",
+            "baz@bar.com",
+            "--findings",
+            "test_findings",
+        ],
+    )
+    assert result.exit_code == 0
+
+
 def test_cli_delete_makes_expected_call(runner, mock_case_delete):
     result = runner.invoke(incydr, ["cases", "delete", TEST_CASE_NUMBER])
     assert result.exit_code == 0
@@ -451,7 +518,6 @@ def test_cli_list_makes_expected_call(runner, httpserver_auth: HTTPServer):
     ).respond_with_json(data_2)
 
     result = runner.invoke(incydr, ["cases", "list"])
-    print(result)
     assert result.exit_code == 0
 
 
@@ -503,8 +569,36 @@ def test_cli_update_when_all_params_makes_expected_call(
             "test-42",
         ],
     )
-    print(result)
-    print(result.output)
+    assert result.exit_code == 0
+
+
+def test_cli_update_when_usernames_specified_performs_additional_lookup_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_user_lookup
+):
+    test_data = {
+        "name": None,
+        "assignee": "user-2",
+        "description": None,
+        "findings": None,
+        "subject": "user-1",
+        "status": None,
+    }
+    httpserver_auth.expect_request(
+        uri=f"/v1/cases/{TEST_CASE_NUMBER}", method="PUT", json=test_data
+    ).respond_with_data()
+
+    result = runner.invoke(
+        incydr,
+        [
+            "cases",
+            "update",
+            TEST_CASE_NUMBER,
+            "--subject",
+            "foo@bar.com",
+            "--assignee",
+            "baz@bar.com",
+        ],
+    )
     assert result.exit_code == 0
 
 

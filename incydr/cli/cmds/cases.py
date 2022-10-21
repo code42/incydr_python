@@ -25,6 +25,7 @@ from incydr.cli.cmds.options.output_options import single_format_option
 from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
+from incydr.cli.cmds.options.utils import user_lookup
 from incydr.cli.cmds.utils import output_models_format
 from incydr.cli.cmds.utils import output_response_format
 from incydr.cli.core import IncydrCommand
@@ -86,8 +87,18 @@ def render_file_event(event: FileEventV2):
 @cases.command(cls=IncydrCommand)
 @click.argument("name")
 @click.option("--description", help="Case description.", default=None)
-@click.option("--subject", help="UserID of the subject of the case.", default=None)
-@click.option("--assignee", help="UserID of the assignee of the case.", default=None)
+@click.option(
+    "--subject",
+    help="User of the subject of the case.  Takes a user ID or a username.  Performs an additional lookup if username is passed.",
+    default=None,
+    callback=user_lookup,
+)
+@click.option(
+    "--assignee",
+    help="User of the assignee of the case. Takes a user ID or a username.  Performs an additional lookup if username is passed.",
+    default=None,
+    callback=user_lookup,
+)
 @click.option(
     "--findings", help="Markdown formatted details of case notes.", default=None
 )
@@ -178,7 +189,8 @@ def show(ctx: Context, case_number: int, format_: SingleFormat):
 @click.option(
     "--assignee",
     default=None,
-    help="User ID of the administrator assigned to the case.",
+    help="The administrator assigned to the case. Takes a user ID or a username.  Performs an additional lookup if username is passed.",
+    callback=user_lookup,
 )
 @click.option("--description", default=None, help="Brief optional description.")
 @click.option(
@@ -190,7 +202,12 @@ def show(ctx: Context, case_number: int, format_: SingleFormat):
 @click.option(
     "--status", default=None, help="Case status. One of `ARCHIVED`, `CLOSED` or `OPEN`."
 )
-@click.option("--subject", default=None, help="User ID of the case subject.")
+@click.option(
+    "--subject",
+    default=None,
+    help="The case subject. Takes a user ID or a username.  Performs an additional lookup if username is passed.",
+    callback=user_lookup,
+)
 @click.pass_context
 def update(
     ctx: Context,
@@ -222,6 +239,7 @@ def update(
     client.session.put(f"/v1/cases/{case_number}", json=data.dict())
 
 
+# TODO: do we want to allow usernames for bulk commands, would double the number of lookups
 @cases.command(cls=IncydrCommand)
 @click.argument("csv")
 @click.pass_context
