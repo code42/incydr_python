@@ -28,6 +28,7 @@ from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.options.utils import user_lookup
 from incydr.cli.cmds.utils import output_models_format
 from incydr.cli.cmds.utils import output_response_format
+from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
 from incydr.utils import CSVValidationError
@@ -278,88 +279,79 @@ def bulk_update(ctx: Context, csv: Path):
 @cases.command(cls=IncydrCommand)
 @click.argument("case_number")
 @path_option
-@click.pass_context
-def download_summary(ctx: Context, case_number: int, path: str):
-    """
-    Download a case summary in PDF format to the specified target folder.  Use `download-case` to download all files related to the case.
-    """
-    client = ctx.obj()
-    client.cases.v1.download_summary_pdf(case_number, path)
-
-
-@cases.command(cls=IncydrCommand)
-@click.argument("case_number")
-@path_option
 @click.option(
-    "--no-source-files",
+    "--summary",
     is_flag=True,
     default=False,
-    help="Exclude source files from the ZIP",
+    help="Download a case summary in PDF format.",
 )
 @click.option(
-    "--no-summary",
+    "--file-events",
+    "events",
     is_flag=True,
     default=False,
-    help="Exclude the case summary PDF from the ZIP.",
+    help="Download all file event data for a case in CSV format.",
 )
 @click.option(
-    "--no-file-events",
+    "--source-files",
     is_flag=True,
     default=False,
-    help="Exclude the file events CSV from the ZIP.",
+    help="Download the source files for file events associated with a case.",
+)
+@click.option(
+    "--source-file",
+    default=None,
+    help="Download a source file for a specific event. Takes the event ID. Incompatible with other download options.",
+    cls=incompatible_with(["summary", "file_events", "source_files"]),
 )
 @click.pass_context
-def download_case(
+def download(
     ctx: Context,
     case_number: int,
     path: str,
-    no_source_files: bool,
-    no_summary: bool,
-    no_file_events: bool,
+    summary: bool = None,
+    events: bool = None,
+    source_files: bool = None,
+    source_file: str = None,
 ):
     """
-    Download full export of a case in ZIP format to the specified target folder.
+    Download one or more files related to a case to the specified target folder.
 
-    Use `download-events`, `download-source-file` and `download-summary` to download an individual case-related file outside of the ZIP.
+    Defaults to downloading all files if no options are passed.
+
+    If more than one file is specified the download will be in ZIP format.
     """
-    if all([no_source_files, no_summary, no_file_events]):
-        raise click.BadOptionUsage(
-            "--no-summary", "Cannot exclude all files from the case download."
-        )
-
     client = ctx.obj()
+
+    # download source file for specific event
+    if source_file:
+        client.cases.v1.download_file_for_event(case_number, source_file, path)
+        return
+
+    flags = [summary, events, source_files]
+
+    # if only only summary or only file-events flag is passed
+    if sum(bool(flag) for flag in flags) == 1:
+        if summary:
+            client.cases.v1.download_summary_pdf(case_number, path)
+            return
+        if events:
+            client.cases.v1.download_file_event_csv(case_number, path)
+            return
+
+    # Default to downloading all files if no flags are passed
+    if not any(flags):
+        summary = True
+        events = True
+        source_files = True
+
     client.cases.v1.download_full_case_zip(
         case_number,
         path,
-        include_files=not no_source_files,
-        include_summary=not no_summary,
-        include_file_events=not no_file_events,
+        include_files=source_files,
+        include_summary=summary,
+        include_file_events=events,
     )
-
-
-@cases.command(cls=IncydrCommand)
-@click.argument("case_number")
-@path_option
-@click.pass_context
-def download_events(ctx: Context, case_number: int, path: str):
-    """
-    Downloads all file event data for a case in CSV format to specified target folder.  Use `download-case` to download all files related to the case.
-    """
-    client = ctx.obj()
-    client.cases.v1.download_file_event_csv(case_number, path)
-
-
-@cases.command(cls=IncydrCommand)
-@click.argument("case_number")
-@click.argument("event_id")
-@path_option
-@click.pass_context
-def download_source_file(ctx: Context, case_number: int, event_id: str, path: str):
-    """
-    Download the source file (if captured) from a file event attached to a case. Use `download-case` to download all files related to the case.
-    """
-    client = ctx.obj()
-    client.cases.v1.download_file_for_event(case_number, event_id, path)
 
 
 @cases.group(cls=IncydrGroup)

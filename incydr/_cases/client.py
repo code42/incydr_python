@@ -205,7 +205,7 @@ class CasesV1:
 
         **Parameters**
 
-        * **case**: [`Case`][case-model] The modified case objct.
+        * **case**: [`Case`][case-model] The modified case object.
 
         Usage example:
 

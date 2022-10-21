@@ -647,7 +647,7 @@ def test_cli_download_summary_makes_expected_call(
         f"/v1/cases/{TEST_CASE_NUMBER}/export", method="GET"
     ).respond_with_data()
     result = runner.invoke(
-        incydr, ["cases", "download-summary", TEST_CASE_NUMBER, "--path", tmp_path]
+        incydr, ["cases", "download", TEST_CASE_NUMBER, "--path", tmp_path, "--summary"]
     )
     assert result.exit_code == 0
 
@@ -666,7 +666,7 @@ def test_cli_download_case_when_default_params_makes_expected_call(
         query_string=urlencode(params),
     ).respond_with_data()
     result = runner.invoke(
-        incydr, ["cases", "download-case", TEST_CASE_NUMBER, "--path", tmp_path]
+        incydr, ["cases", "download", TEST_CASE_NUMBER, "--path", tmp_path]
     )
     assert result.exit_code == 0
 
@@ -675,7 +675,7 @@ def test_cli_download_case_when_custom_params_makes_expected_call(
     runner, httpserver_auth: HTTPServer, tmp_path
 ):
     params = {
-        "files": False,
+        "files": True,
         "summary": True,
         "fileEvents": False,
     }
@@ -688,33 +688,15 @@ def test_cli_download_case_when_custom_params_makes_expected_call(
         incydr,
         [
             "cases",
-            "download-case",
+            "download",
             TEST_CASE_NUMBER,
             "--path",
             tmp_path,
-            "--no-source-files",
-            "--no-file-events",
+            "--source-files",
+            "--summary",
         ],
     )
     assert result.exit_code == 0
-
-
-def test_cli_download_case_when_exclude_all_raises_bad_option_usage_error(
-    runner, httpserver_auth: HTTPServer
-):
-    result = runner.invoke(
-        incydr,
-        [
-            "cases",
-            "download-case",
-            TEST_CASE_NUMBER,
-            "--no-summary",
-            "--no-source-files",
-            "--no-file-events",
-        ],
-    )
-    assert result.exit_code == 2
-    assert "Cannot exclude all files from the case download." in result.output
 
 
 def test_cli_download_events_makes_expected_call(
@@ -724,7 +706,8 @@ def test_cli_download_events_makes_expected_call(
         f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/export", method="GET"
     ).respond_with_data()
     result = runner.invoke(
-        incydr, ["cases", "download-events", TEST_CASE_NUMBER, "--path", tmp_path]
+        incydr,
+        ["cases", "download", TEST_CASE_NUMBER, "--path", tmp_path, "--file-events"],
     )
     assert result.exit_code == 0
 
@@ -740,8 +723,9 @@ def test_cli_download_source_file_makes_expected_call(
         incydr,
         [
             "cases",
-            "download-source-file",
+            "download",
             TEST_CASE_NUMBER,
+            "--source-file",
             TEST_EVENT_ID,
             "--path",
             tmp_path,

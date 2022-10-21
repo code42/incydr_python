@@ -26,19 +26,7 @@
 
 ::: mkdocs-click
     :module: incydr.cli.cmds.cases
-    :command: download_case
-
-::: mkdocs-click
-    :module: incydr.cli.cmds.cases
-    :command: download_events
-
-::: mkdocs-click
-    :module: incydr.cli.cmds.cases
-    :command: download_summary
-
-::: mkdocs-click
-    :module: incydr.cli.cmds.cases
-    :command: download_source_file
+    :command: download
 
 ::: mkdocs-click
     :module: incydr.cli.cmds.cases
