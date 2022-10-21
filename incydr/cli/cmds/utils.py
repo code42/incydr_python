@@ -17,8 +17,10 @@ from incydr.utils import write_models_to_csv
 # CLI - specific utils.py file to avoid circular imports
 
 
-# See https://stackoverflow.com/questions/661603/how-do-i-know-if-a-generator-is-empty-from-the-start
 def peek(iterable):
+    # See https://stackoverflow.com/questions/661603/how-do-i-know-if-a-generator-is-empty-from-the-start
+    # Note: this does not work for empty iterators
+    # empty iterator: one which yields nothing (different from yielding None)
     try:
         first = next(iterable)
     except StopIteration:
@@ -38,8 +40,7 @@ def output_response_format(
     if format_ is None:
         format_ = TableFormat.table
 
-    results = peek(results)
-    if results is None:
+    if not any(results):
         echo("No results found.")
         return
 
@@ -103,8 +104,8 @@ def output_format_logger(
     ignore_cert_validation: Optional[bool] = None,
 ):
 
-    results = peek(results)
-    if results is None:
+    if not any(results):
+        echo("No results found.")
         return
 
     logger = try_get_logger_for_server(output, certs, ignore_cert_validation)
@@ -113,5 +114,3 @@ def output_format_logger(
         if columns:
             result = {c: result[c] for c in columns}
         logger.info(json.dumps(result))
-
-
