@@ -282,15 +282,9 @@ def test_cli_alerts_search_when_default_params_makes_expected_api_call(
         "srtKey": "CreatedAt",
     }
 
-    data = {
-        "alerts": [TEST_ALERTS_RESPONSE],
-        "totalCount": 1,
-        "problems": None,
-    }
-
     httpserver_auth.expect_request(
         "/v1/alerts/query-alerts", method="POST", json=query
-    ).respond_with_json(data)
+    ).respond_with_json(TEST_ALERTS_RESPONSE)
 
     result = runner.invoke(
         incydr,

@@ -1,3 +1,4 @@
+import json
 from typing import Optional
 
 import click
@@ -9,6 +10,7 @@ from rich.progress import track
 from rich.table import Table
 
 from incydr._alerts.models.alert import AlertDetails
+from incydr._alerts.models.alert import AlertSummary
 from incydr._queries.alerts import AlertQuery
 from incydr.cli import console
 from incydr.cli.cmds.options.alert_filter_options import advanced_query_option
@@ -117,6 +119,11 @@ def search(
     # TODO: should we use iter_all here?
     alerts_ = client.session.post("/v1/alerts/query-alerts", json=query.dict())
     alerts_ = alerts_.json()["alerts"]
+
+    # TODO: with outputting refactor
+    # this is definitely not a permanent fix.  Not all alert objects contain all the keys possible.
+    # This converts the first alert to a dict with all fields so that CSV output knows about all of them
+    alerts_ = [json.loads(AlertSummary.parse_obj(alerts_[0]).json())] + alerts_[1:]
 
     if output:
         output_format_logger(alerts_, output, columns, certs, ignore_cert_validation)
