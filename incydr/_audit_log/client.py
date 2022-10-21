@@ -8,7 +8,7 @@ from incydr._audit_log.models import DateRange
 from incydr._audit_log.models import QueryAuditLogRequest
 from incydr._audit_log.models import QueryExportRequest
 from incydr._audit_log.models import UserTypes
-from incydr._core.util import get_filename_from_content_disposition
+from incydr._core.utils import get_filename_from_content_disposition
 
 
 class AuditLogClient:

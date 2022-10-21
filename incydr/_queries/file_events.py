@@ -14,7 +14,7 @@ from pydantic import validate_arguments
 
 from incydr._core.models import Model
 from incydr._file_events.models.response import SavedSearch
-from incydr._queries.util import parse_timestamp
+from incydr._queries.utils import parse_timestamp
 from incydr.enums.file_events import Category
 from incydr.enums.file_events import EventAction
 from incydr.enums.file_events import EventSearchTerm
