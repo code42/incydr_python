@@ -41,7 +41,7 @@ app = Typer()
 
 path_option = click.option(
     "--path",
-    help="The file path where to save the PDF. Defaults to the current directory.",
+    help="The file path where to save the file. Defaults to the current directory.",
     default=os.getcwd(),
 )
 
