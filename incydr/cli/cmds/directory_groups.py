@@ -3,6 +3,9 @@ from typing import Optional
 import click
 from click import Context
 
+from incydr.cli import init_client
+from incydr.cli import log_file_option
+from incydr.cli import log_level_option
 from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.utils import output_models_format
@@ -11,8 +14,12 @@ from incydr.cli.core import IncydrGroup
 
 
 @click.group(cls=IncydrGroup)
-def directory_groups():
-    pass
+@log_level_option
+@log_file_option
+@click.pass_context
+def directory_groups(ctx, log_level, log_file):
+    """View directory groups."""
+    init_client(ctx, log_level, log_file)
 
 
 # Did not provide columns option because there are only two columns [groupId, name]
