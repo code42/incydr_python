@@ -317,8 +317,6 @@ def test_cli_alerts_show_makes_expected_call(httpserver_auth: HTTPServer, runner
     ).respond_with_json(TEST_ALERT_DETAILS_RESPONSE)
 
     result = runner.invoke(incydr, ["alerts", "show", TEST_ALERT_ID])
-    print(result)
-    print(result.output)
     assert result.exit_code == 0
 
 

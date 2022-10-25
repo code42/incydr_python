@@ -12,7 +12,7 @@ from rich.table import Table
 from incydr._alerts.models.alert import AlertDetails
 from incydr._alerts.models.alert import AlertSummary
 from incydr._queries.alerts import AlertQuery
-from incydr.cli import console
+from incydr.cli import console, log_level_option, init_client, log_file_option
 from incydr.cli.cmds.options.alert_filter_options import advanced_query_option
 from incydr.cli.cmds.options.alert_filter_options import filter_options
 from incydr.cli.cmds.options.output_options import columns_option
@@ -32,11 +32,9 @@ from incydr.utils import read_dict_from_csv
 
 
 def render_alert(alert: AlertDetails):
-    print("rendering alert")
     field_table = Table.grid(padding=(0, 1), expand=False)
     field_table.title = f"Alert {alert.id}"
     alert_dict = flatten(alert.dict(by_alias=False))
-    print(alert_dict.items())
     for name, _field in alert_dict.items():
         if name == "id":
             continue
@@ -54,8 +52,12 @@ def render_alert(alert: AlertDetails):
 
 
 @click.group(cls=IncydrGroup)
-def alerts():
-    pass
+@log_level_option
+@log_file_option
+@click.pass_context
+def alerts(ctx, log_level, log_file):
+    """View and manage alerts."""
+    init_client(ctx, log_level, log_file)
 
 
 @alerts.command(cls=IncydrCommand)
@@ -219,10 +221,7 @@ def bulk_update_state(ctx: Context, csv: str):
     for row in track(
         read_dict_from_csv(csv), description="Updating cases...", transient=True
     ):
-        try:
-            note = row["note"] if row["note"] else None
-        except KeyError:
-            note = None
+        note = row.get("note")
         client.alerts.v1.change_state(row["alert_id"], row["state"], note)
 
 
