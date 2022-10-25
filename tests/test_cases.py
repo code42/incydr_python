@@ -227,7 +227,7 @@ def test_iter_all_returns_expected_data(httpserver_auth: HTTPServer):
     for item in iterator:
         total += 1
         assert isinstance(item, Case)
-        assert item.json() == json.dumps(expected.pop(0))
+        assert json.loads(item.json()) == json.loads(json.dumps(expected.pop(0)))
     assert total == 3
 
 
