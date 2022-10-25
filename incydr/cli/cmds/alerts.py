@@ -12,7 +12,10 @@ from rich.table import Table
 from incydr._alerts.models.alert import AlertDetails
 from incydr._alerts.models.alert import AlertSummary
 from incydr._queries.alerts import AlertQuery
-from incydr.cli import console, log_level_option, init_client, log_file_option
+from incydr.cli import console
+from incydr.cli import init_client
+from incydr.cli import log_file_option
+from incydr.cli import log_level_option
 from incydr.cli.cmds.options.alert_filter_options import advanced_query_option
 from incydr.cli.cmds.options.alert_filter_options import filter_options
 from incydr.cli.cmds.options.output_options import columns_option
@@ -139,7 +142,7 @@ def search(
         )
 
 
-# TODO - single or multiple alerts for show details?
+# Future enhancement: add functionality to show human-readable summaries for multiple alerts
 @alerts.command(cls=IncydrCommand)
 @click.pass_context
 @single_format_option

@@ -807,7 +807,9 @@ def test_cli_search_when_saved_search_makes_expected_api_call(
     assert result.exit_code == 0
 
 
-def test_cli_show_saved_search_makes_expected_sdk_call(httpserver_auth: HTTPServer, runner, mock_get_saved_search):
+def test_cli_show_saved_search_makes_expected_sdk_call(
+    httpserver_auth: HTTPServer, runner, mock_get_saved_search
+):
     result = runner.invoke(
         incydr,
         ["file-events", "show-saved-search", TEST_SAVED_SEARCH_ID],
