@@ -1,3 +1,4 @@
+import itertools
 import json
 import sys
 from typing import Iterable
@@ -14,6 +15,17 @@ from incydr.utils import write_dict_to_csv
 from incydr.utils import write_models_to_csv
 
 # CLI - specific utils.py file to avoid circular imports
+
+
+def peek(iterable):
+    # See https://stackoverflow.com/questions/661603/how-do-i-know-if-a-generator-is-empty-from-the-start
+    # Note: this does not work for empty iterators
+    # empty iterator: one which yields nothing (different from yielding None)
+    try:
+        first = next(iterable)
+    except StopIteration:
+        return None
+    return itertools.chain([first], iterable)
 
 
 def output_response_format(
@@ -52,6 +64,7 @@ def output_response_format(
             echo(json.dumps(result))
 
 
+# WARNING: CSV output will not work for nested objects
 def output_models_format(
     models: Iterable[Model],
     title: str,
@@ -62,7 +75,8 @@ def output_models_format(
     if not format_:
         format_ = TableFormat.table
 
-    if not any(models):
+    models = peek(models)
+    if models is None:
         echo("No results found.")
         return
 
@@ -70,7 +84,6 @@ def output_models_format(
         with console.pager():
             render.table(models, columns=columns, title=title)
 
-    # doesn't work for nested objects
     elif format_ == TableFormat.csv:
         write_models_to_csv(models, sys.stdout, columns=columns)
 
@@ -92,6 +105,7 @@ def output_format_logger(
 ):
 
     if not any(results):
+        echo("No results found.")
         return
 
     logger = try_get_logger_for_server(output, certs, ignore_cert_validation)

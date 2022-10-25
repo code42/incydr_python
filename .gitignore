@@ -19,6 +19,7 @@ dist/
 
 # Documentation builds
 site/
+docs/build/
 
 # Unit test / coverage reports
 htmlcov/
