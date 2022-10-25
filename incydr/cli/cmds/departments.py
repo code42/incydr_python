@@ -6,6 +6,9 @@ from click import Context
 from click import echo
 
 from incydr.cli import console
+from incydr.cli import init_client
+from incydr.cli import log_file_option
+from incydr.cli import log_level_option
 from incydr.cli import render
 from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
@@ -15,8 +18,12 @@ from incydr.utils import write_dict_to_csv
 
 
 @click.group(cls=IncydrGroup)
-def departments():
-    pass
+@log_level_option
+@log_file_option
+@click.pass_context
+def departments(ctx, log_level, log_file):
+    """View departments."""
+    init_client(ctx, log_level, log_file)
 
 
 @departments.command("list", cls=IncydrCommand)

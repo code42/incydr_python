@@ -16,7 +16,6 @@ from incydr.cli.core import IncydrGroup
 @click.pass_context
 def incydr(ctx, log_level, log_file):
     init_client(ctx, log_level, log_file)
-    pass
 
 
 incydr.add_command(departments)
