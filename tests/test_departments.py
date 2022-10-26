@@ -96,6 +96,7 @@ def test_cli_list_when_default_params_makes_expected_call(
     ).respond_with_json(data_1)
 
     result = runner.invoke(incydr, ["departments", "list", "-f", "csv"])
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -114,5 +115,5 @@ def test_cli_list_when_custom_params_makes_expected_call(
     ).respond_with_json(data_1)
 
     result = runner.invoke(incydr, ["departments", "list", "--name", "test"])
-
+    httpserver_auth.check()
     assert result.exit_code == 0

@@ -263,6 +263,7 @@ def bulk_update(ctx: Context, csv: Path):
 
     """
     client = ctx.obj()
+    username_cache = {}
     try:
         for case in track(
             read_models_from_csv(CaseDetail, csv),
@@ -270,9 +271,21 @@ def bulk_update(ctx: Context, csv: Path):
             transient=True,
         ):
             if case.assignee:
-                case.assignee = user_lookup(client, case.assignee)
+                if "@" in case.assignee:
+                    try:
+                        case.assignee = username_cache[case.assignee]
+                    except KeyError:
+                        username_cache[case.assignee] = user_lookup(
+                            client, case.assignee
+                        )
+                        case.assignee = username_cache[case.assignee]
             if case.subject:
-                case.subject = user_lookup(client, case.subject)
+                if "@" in case.subject:
+                    try:
+                        case.subject = username_cache[case.subject]
+                    except KeyError:
+                        username_cache[case.subject] = user_lookup(client, case.subject)
+                        case.subject = username_cache[case.subject]
             client.cases.v1.update(case)
     except CSVValidationError as err:
         console.print(f"[red]Error:[/red] {err.msg}")

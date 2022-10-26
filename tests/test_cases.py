@@ -456,6 +456,7 @@ def test_cli_create_makes_expected_call(runner, httpserver_auth: HTTPServer):
             "test_findings",
         ],
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -491,11 +492,15 @@ def test_cli_create_when_usernames_specified_performs_additional_lookup_makes_ex
             "test_findings",
         ],
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
-def test_cli_delete_makes_expected_call(runner, mock_case_delete):
+def test_cli_delete_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_case_delete
+):
     result = runner.invoke(incydr, ["cases", "delete", TEST_CASE_NUMBER])
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -518,16 +523,21 @@ def test_cli_list_makes_expected_call(runner, httpserver_auth: HTTPServer):
     ).respond_with_json(data_2)
 
     result = runner.invoke(incydr, ["cases", "list"])
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
-def test_cli_show_makes_expected_call(runner, mock_case_get):
+def test_cli_show_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_case_get
+):
     result = runner.invoke(incydr, ["cases", "show", TEST_CASE_NUMBER])
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
 def test_cli_update_when_no_params_raises_error(runner, httpserver_auth: HTTPServer):
     result = runner.invoke(incydr, ["cases", "update", TEST_CASE_NUMBER])
+    httpserver_auth.check()
     assert result.exit_code == 2
     assert (
         "At least one command option must be provided to update a case."
@@ -569,6 +579,7 @@ def test_cli_update_when_all_params_makes_expected_call(
             "test-42",
         ],
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -599,6 +610,7 @@ def test_cli_update_when_usernames_specified_performs_additional_lookup_makes_ex
             "baz@bar.com",
         ],
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -637,6 +649,7 @@ def test_cli_bulk_update_makes_expected_call(
     )
 
     result = runner.invoke(incydr, ["cases", "bulk-update", str(p)])
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -652,7 +665,7 @@ def test_cli_bulk_update_when_usernames_makes_user_lookup(
         "status": "OPEN",
     }
 
-    httpserver_auth.expect_ordered_request(
+    httpserver_auth.expect_request(
         "/v1/cases/1", method="PUT", json=data_1
     ).respond_with_json(TEST_CASE_1)
 
@@ -663,6 +676,52 @@ def test_cli_bulk_update_when_usernames_makes_user_lookup(
     )
 
     result = runner.invoke(incydr, ["cases", "bulk-update", str(p)])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_bulk_update_when_multiple_same_usernames_makes_single_user_lookup_and_caches_id(
+    httpserver_auth: HTTPServer, runner, tmp_path
+):
+    query_1 = {
+        "username": "foo@bar.com",
+        "page": 1,
+        "pageSize": 100,
+    }
+    data_1 = {"users": [TEST_USER_1], "totalCount": 1}
+    httpserver_auth.expect_oneshot_request(
+        "/v1/users", method="GET", query_string=urlencode(query_1)
+    ).respond_with_json(data_1)
+
+    httpserver_auth.expect_request("/v1/oauth", method="POST").respond_with_json(
+        dict(
+            token_type="bearer",
+            expires_in=900,
+            access_token="abcd-1234",
+        )
+    )
+
+    data_1 = {
+        "name": "Test Case 1",
+        "assignee": "user-1",
+        "description": "test case 1",
+        "findings": "no findings",
+        "subject": "user-1",
+        "status": "OPEN",
+    }
+
+    httpserver_auth.expect_request(
+        "/v1/cases/1", method="PUT", json=data_1
+    ).respond_with_json(TEST_CASE_1)
+
+    p = tmp_path / "event_ids.csv"
+    p.write_text(
+        "number,assignee,description,findings,name,status,subject\n"
+        "1,foo@bar.com,test case 1,no findings,Test Case 1,OPEN,foo@bar.com\n"
+    )
+
+    result = runner.invoke(incydr, ["cases", "bulk-update", str(p)])
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -675,6 +734,7 @@ def test_cli_download_summary_makes_expected_call(
     result = runner.invoke(
         incydr, ["cases", "download", TEST_CASE_NUMBER, "--path", tmp_path, "--summary"]
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -694,6 +754,7 @@ def test_cli_download_case_when_default_params_makes_expected_call(
     result = runner.invoke(
         incydr, ["cases", "download", TEST_CASE_NUMBER, "--path", tmp_path]
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -722,6 +783,7 @@ def test_cli_download_case_when_custom_params_makes_expected_call(
             "--summary",
         ],
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -735,6 +797,7 @@ def test_cli_download_events_makes_expected_call(
         incydr,
         ["cases", "download", TEST_CASE_NUMBER, "--path", tmp_path, "--file-events"],
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -757,15 +820,17 @@ def test_cli_download_source_file_makes_expected_call(
             tmp_path,
         ],
     )
-
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
-def test_cli_show_file_event_makes_expected_call(runner, mock_file_event_get):
+def test_cli_show_file_event_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_file_event_get
+):
     result = runner.invoke(
         incydr, ["cases", "file-events", "show", TEST_CASE_NUMBER, TEST_EVENT_ID]
     )
-    print(result.output)
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -778,6 +843,7 @@ def test_cli_list_file_events_makes_expected_call(runner, httpserver_auth: HTTPS
         query_string=urlencode(query),
     ).respond_with_json(data)
     result = runner.invoke(incydr, ["cases", "file-events", "list", TEST_CASE_NUMBER])
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -794,6 +860,7 @@ def test_cli_file_events_add_when_event_ids_list_makes_expected_call(
     result = runner.invoke(
         incydr, ["cases", "file-events", "add", TEST_CASE_NUMBER, ",".join(event_ids)]
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -812,6 +879,7 @@ def test_cli_file_events_add_when_csv_makes_expected_call(
     result = runner.invoke(
         incydr, ["cases", "file-events", "add", TEST_CASE_NUMBER, str(p), "--csv"]
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -829,7 +897,7 @@ def test_cli_file_events_remove_when_event_ids_makes_expected_call(
     result = runner.invoke(
         incydr, ["cases", "file-events", "remove", TEST_CASE_NUMBER, "event-1,event-2"]
     )
-
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -850,4 +918,5 @@ def test_cli_file_events_remove_when_csv_makes_expected_call(
     result = runner.invoke(
         incydr, ["cases", "file-events", "remove", TEST_CASE_NUMBER, str(p), "--csv"]
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
