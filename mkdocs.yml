@@ -68,13 +68,14 @@ nav:
       - Log Analytics Agent: 'guides/azure-sentinel-log-analytics.md'
 
 markdown_extensions:
+  - attr_list
+  - mkdocs-click
   - pymdownx.critic
   - admonition
   - codehilite:
       css_class: highlight
   - mkautodoc
   - tables
-  - attr_list
   - md_in_html
   - toc:
       permalink: true

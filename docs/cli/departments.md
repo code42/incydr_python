@@ -2,4 +2,4 @@
 
 ::: mkdocs-click
     :module: incydr.cli.cmds.departments
-    :command: list
+    :command: list_
