@@ -57,7 +57,11 @@ nav:
     - Enums: 'sdk/enums.md'
     - Models: 'sdk/models.md'
   - CLI:
-      - Commands: 'cli/commands.md'
+      - Introduction: 'cli/index.md'
+      - Cases: 'cli/cases.md'
+      - Departments: 'cli/departments.md'
+      - Directory Groups: 'cli/directory_groups.md'
+      - File Events: 'cli/file_events.md'
   - Guides:
     - Microsoft Sentinel:
       - Data Collector API: 'guides/azure-sentinel-data-collector.md'
