@@ -1,12 +1,10 @@
-def user_lookup(ctx, param, value):
+from incydr.cli.cmds.utils import user_lookup
+
+
+def user_lookup_callback(ctx, param, value):
     if not value:
         return
+    # only call user_lookup if username to prevent unnecessary client inits with obj()
     if "@" in str(value):
-        # assume username/email was passed
-        client = ctx.obj()
-        users = client.users.v1.get_page(username=value).users
-        if len(users) < 1:
-            raise ValueError(f"User with username '{value}' not found.")
-        return users[0].user_id
-    # else return ID
+        return user_lookup(ctx.obj(), value)
     return value

@@ -25,9 +25,10 @@ from incydr.cli.cmds.options.output_options import single_format_option
 from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
-from incydr.cli.cmds.options.utils import user_lookup
+from incydr.cli.cmds.options.utils import user_lookup_callback
 from incydr.cli.cmds.utils import output_models_format
 from incydr.cli.cmds.utils import output_response_format
+from incydr.cli.cmds.utils import user_lookup
 from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
@@ -92,13 +93,13 @@ def render_file_event(event: FileEventV2):
     "--subject",
     help="User of the subject of the case.  Takes a user ID or a username.  Performs an additional lookup if username is passed.",
     default=None,
-    callback=user_lookup,
+    callback=user_lookup_callback,
 )
 @click.option(
     "--assignee",
     help="User of the assignee of the case. Takes a user ID or a username.  Performs an additional lookup if username is passed.",
     default=None,
-    callback=user_lookup,
+    callback=user_lookup_callback,
 )
 @click.option(
     "--findings", help="Markdown formatted details of case notes.", default=None
@@ -191,7 +192,7 @@ def show(ctx: Context, case_number: int, format_: SingleFormat):
     "--assignee",
     default=None,
     help="The administrator assigned to the case. Takes a user ID or a username.  Performs an additional lookup if username is passed.",
-    callback=user_lookup,
+    callback=user_lookup_callback,
 )
 @click.option("--description", default=None, help="Brief optional description.")
 @click.option(
@@ -207,7 +208,7 @@ def show(ctx: Context, case_number: int, format_: SingleFormat):
     "--subject",
     default=None,
     help="The case subject. Takes a user ID or a username.  Performs an additional lookup if username is passed.",
-    callback=user_lookup,
+    callback=user_lookup_callback,
 )
 @click.pass_context
 def update(
@@ -240,7 +241,6 @@ def update(
     client.session.put(f"/v1/cases/{case_number}", json=data.dict())
 
 
-# TODO: do we want to allow usernames for bulk commands, would double the number of lookups
 @cases.command(cls=IncydrCommand)
 @click.argument("csv")
 @click.pass_context
@@ -254,12 +254,12 @@ def bulk_update(ctx: Context, csv: Path):
     Valid CSV columns that correspond to mutable case fields include:
 
     * `number` (REQUIRED) - Case number.
-    * `assignee` - User ID of the administrator assigned to the case.
+    * `assignee` - User ID or username of the administrator assigned to the case. Performs an additional lookup if username is passed.
     * `description` - Brief optional description.
     * `findings` - Markdown formatted text summarizing the findings for a case.
     * `name` - Case name.
     * `status` - Case status. One of `ARCHIVED`, `CLOSED` or `OPEN`.
-    * `subject` - User ID of the case subject.
+    * `subject` - User ID or username of the case subject. Performs an additional lookup if username is passed.
 
     """
     client = ctx.obj()
@@ -269,6 +269,10 @@ def bulk_update(ctx: Context, csv: Path):
             description="Updating cases...",
             transient=True,
         ):
+            if case.assignee:
+                case.assignee = user_lookup(client, case.assignee)
+            if case.subject:
+                case.subject = user_lookup(client, case.subject)
             client.cases.v1.update(case)
     except CSVValidationError as err:
         console.print(f"[red]Error:[/red] {err.msg}")

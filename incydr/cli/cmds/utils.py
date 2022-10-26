@@ -114,3 +114,14 @@ def output_format_logger(
         if columns:
             result = {c: result[c] for c in columns}
         logger.info(json.dumps(result))
+
+
+def user_lookup(client, value):
+    if "@" in str(value):
+        # assume username/email was passed
+        users = client.users.v1.get_page(username=value).users
+        if len(users) < 1:
+            raise ValueError(f"User with username '{value}' not found.")
+        return users[0].user_id
+        # else return ID
+    return value

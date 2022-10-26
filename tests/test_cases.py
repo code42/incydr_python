@@ -640,6 +640,32 @@ def test_cli_bulk_update_makes_expected_call(
     assert result.exit_code == 0
 
 
+def test_cli_bulk_update_when_usernames_makes_user_lookup(
+    httpserver_auth: HTTPServer, mock_user_lookup, runner, tmp_path
+):
+    data_1 = {
+        "name": "Test Case 1",
+        "assignee": "user-1",
+        "description": "test case 1",
+        "findings": "no findings",
+        "subject": "user-2",
+        "status": "OPEN",
+    }
+
+    httpserver_auth.expect_ordered_request(
+        "/v1/cases/1", method="PUT", json=data_1
+    ).respond_with_json(TEST_CASE_1)
+
+    p = tmp_path / "event_ids.csv"
+    p.write_text(
+        "number,assignee,description,findings,name,status,subject\n"
+        "1,foo@bar.com,test case 1,no findings,Test Case 1,OPEN,baz@bar.com\n"
+    )
+
+    result = runner.invoke(incydr, ["cases", "bulk-update", str(p)])
+    assert result.exit_code == 0
+
+
 def test_cli_download_summary_makes_expected_call(
     runner, httpserver_auth: HTTPServer, tmp_path
 ):
