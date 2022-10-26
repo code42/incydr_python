@@ -41,7 +41,7 @@ class DirectoryGroupsV1:
 
         * **page_num**: `int` - Page number for results, starting at 1.
         * **page_size**: `int` - Max number of results to return for a page.
-        * **user_id**: `str` - Matches directory groups whose name is like the given value.
+        * **name**: `str` - Matches directory groups whose name is like the given value.
 
         **Returns**: A [`DirectoryGroupsPage`][directorygroupspage-model] object.
         """

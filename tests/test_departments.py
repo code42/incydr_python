@@ -4,6 +4,7 @@ from pytest_httpserver import HTTPServer
 
 from incydr import Client
 from incydr._departments.models import DepartmentsPage
+from incydr.cli.main import incydr
 
 
 def test_get_page_when_default_params_returns_expected_data(
@@ -72,3 +73,46 @@ def test_iter_all_returns_expected_data(httpserver_auth: HTTPServer):
         total += 1
         assert item == expected.pop(0)
     assert total == 3
+
+
+# ************************************************ CLI ************************************************
+
+
+def test_cli_list_when_default_params_makes_expected_call(
+    httpserver_auth: HTTPServer, runner
+):
+    query_1 = {
+        "page": 1,
+        "page_size": 100,
+    }
+
+    data_1 = {
+        "departments": ["Sales", "Research and Development", "Marketing", "RDO"],
+        "totalCount": 2,
+    }
+
+    httpserver_auth.expect_ordered_request(
+        "/v1/departments", method="GET", query_string=urlencode(query_1)
+    ).respond_with_json(data_1)
+
+    result = runner.invoke(incydr, ["departments", "list", "-f", "csv"])
+    assert result.exit_code == 0
+
+
+def test_cli_list_when_custom_params_makes_expected_call(
+    httpserver_auth: HTTPServer, runner
+):
+    query_1 = {"page": 1, "page_size": 100, "name": "test"}
+
+    data_1 = {
+        "departments": ["Sales", "Research and Development"],
+        "totalCount": 2,
+    }
+
+    httpserver_auth.expect_ordered_request(
+        "/v1/departments", method="GET", query_string=urlencode(query_1)
+    ).respond_with_json(data_1)
+
+    result = runner.invoke(incydr, ["departments", "list", "--name", "test"])
+
+    assert result.exit_code == 0

@@ -6,6 +6,7 @@ from pytest_httpserver import HTTPServer
 from incydr._core.client import Client
 from incydr._directory_groups.models import DirectoryGroup
 from incydr._directory_groups.models import DirectoryGroupsPage
+from incydr.cli.main import incydr
 
 
 def test_get_page_when_default_params_returns_expected_data(
@@ -103,3 +104,53 @@ def test_iter_all_returns_expected_data(httpserver_auth: HTTPServer):
         assert isinstance(item, DirectoryGroup)
         assert item.json() == json.dumps(expected.pop(0))
     assert total == 3
+
+
+# ************************************************ CLI ************************************************
+
+
+def test_cli_list_when_default_params_makes_expected_call(
+    httpserver_auth: HTTPServer, runner
+):
+    query_1 = {
+        "page": 1,
+        "page_size": 100,
+    }
+
+    data_1 = {
+        "directory_groups": [
+            {"groupId": "group-42", "name": "Sales"},
+            {"groupId": "group-43", "name": "Marketing"},
+            {"groupId": "group-44", "name": "Research and Development"},
+        ],
+        "totalCount": 2,
+    }
+
+    httpserver_auth.expect_ordered_request(
+        "/v1/directory-groups", method="GET", query_string=urlencode(query_1)
+    ).respond_with_json(data_1)
+
+    result = runner.invoke(incydr, ["directory-groups", "list"])
+    assert result.exit_code == 0
+
+
+def test_cli_list_when_custom_params_makes_expected_call(
+    httpserver_auth: HTTPServer, runner
+):
+    query_1 = {"page": 1, "page_size": 100, "name": "test"}
+
+    data_1 = {
+        "directory_groups": [
+            {"groupId": "group-42", "name": "Sales"},
+            {"groupId": "group-43", "name": "Research and Development"},
+        ],
+        "totalCount": 2,
+    }
+
+    httpserver_auth.expect_ordered_request(
+        "/v1/directory-groups", method="GET", query_string=urlencode(query_1)
+    ).respond_with_json(data_1)
+
+    result = runner.invoke(incydr, ["directory-groups", "list", "--name", "test"])
+
+    assert result.exit_code == 0

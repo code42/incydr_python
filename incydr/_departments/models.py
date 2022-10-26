@@ -27,6 +27,6 @@ class DepartmentsPage(ResponseModel):
 
 
 class GetPageRequest(BaseModel):
-    page: int = (1,)
+    page: int = 1
     page_size: int = None
     name: str = None
