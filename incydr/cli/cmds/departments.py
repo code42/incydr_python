@@ -43,8 +43,6 @@ def list_(ctx: Context, format_: TableFormat, name: Optional[str] = None):
     client = ctx.obj()
     deps = list(client.departments.v1.iter_all(name=name))
 
-    # TODO: output is an array of strings
-
     if not any(deps):
         echo("No results found.")
         return
