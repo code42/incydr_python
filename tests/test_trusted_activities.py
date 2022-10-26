@@ -22,12 +22,11 @@ TEST_TRUSTED_ACTIVITY_1 = {
     "activityId": "1234",
     "description": None,
     "principalType": None,
-    "activityType": None,
+    "type": "DOMAIN",
     "updateTime": None,
     "updatedByPrincipalId": "123",
     "updatedByPrincipalName": "Indiscreet User",
     "value": "Onedrive",
-    "type": "DOMAIN",
 }
 
 TEST_TRUSTED_ACTIVITY_2 = {
@@ -42,7 +41,7 @@ TEST_TRUSTED_ACTIVITY_2 = {
     "activityId": "1324",
     "description": "This is a description",
     "principalType": "API_KEY",
-    "activityType": "SLACK",
+    "type": "SLACK",
     "updateTime": None,
     "updatedByPrincipalId": "999",
     "updatedByPrincipalName": "John Debuyer",
@@ -170,7 +169,7 @@ def test_add_domain_when_default_params_returns_expected_data(
     test_response = TEST_TRUSTED_ACTIVITY_1.copy()
     test_response.update(test_data)
 
-    test_response.update({"activityType": activity_type})
+    test_response.update({"type": activity_type})
 
     httpserver_auth.expect_request(
         uri="/v2/trusted-activities", method="POST", json=test_data
@@ -188,7 +187,7 @@ def test_add_domain_when_default_params_returns_expected_data(
     )
 
     assert isinstance(trusted_activity, TrustedActivity)
-    assert trusted_activity.activity_type == activity_type
+    assert trusted_activity.type == activity_type
     assert trusted_activity.value == domain
     assert trusted_activity.description == test_data["description"]
     assert trusted_activity.activity_action_groups == activity_action_groups
@@ -235,7 +234,7 @@ def test_add_url_path_when_default_params_returns_expected_data(
     test_response = TEST_TRUSTED_ACTIVITY_1.copy()
     test_response.update(test_data)
 
-    test_response.update({"activityType": activity_type})
+    test_response.update({"type": activity_type})
 
     httpserver_auth.expect_request(
         uri="/v2/trusted-activities", method="POST", json=test_data
@@ -247,7 +246,7 @@ def test_add_url_path_when_default_params_returns_expected_data(
     )
 
     assert isinstance(trusted_activity, TrustedActivity)
-    assert trusted_activity.activity_type == activity_type
+    assert trusted_activity.type == activity_type
     assert trusted_activity.value == url
     assert trusted_activity.description == test_data["description"]
     assert trusted_activity.activity_action_groups == activity_action_groups
@@ -270,7 +269,7 @@ def test_create_trusted_activity_slack_when_default_params_returns_expected_data
     test_response = TEST_TRUSTED_ACTIVITY_1.copy()
     test_response.update(test_data)
 
-    test_response.update({"activityType": activity_type})
+    test_response.update({"type": activity_type})
 
     httpserver_auth.expect_request(
         uri="/v2/trusted-activities", method="POST", json=test_data
@@ -282,7 +281,7 @@ def test_create_trusted_activity_slack_when_default_params_returns_expected_data
     )
 
     assert isinstance(trusted_activity, TrustedActivity)
-    assert trusted_activity.activity_type == activity_type
+    assert trusted_activity.type == activity_type
     assert trusted_activity.value == workspace_name
     assert trusted_activity.description == test_data["description"]
     assert trusted_activity.activity_action_groups == activity_action_groups
@@ -314,7 +313,7 @@ def test_add_account_name_when_default_params_returns_expected_data(
 
     test_response = TEST_TRUSTED_ACTIVITY_1.copy()
     test_response.update(test_data)
-    test_response.update({"activityType": activity_type})
+    test_response.update({"type": activity_type})
 
     httpserver_auth.expect_request(
         uri="/v2/trusted-activities", method="POST", json=test_data
@@ -329,7 +328,7 @@ def test_add_account_name_when_default_params_returns_expected_data(
     )
 
     assert isinstance(trusted_activity, TrustedActivity)
-    assert trusted_activity.activity_type == activity_type
+    assert trusted_activity.type == activity_type
     assert trusted_activity.value == account_name
     assert trusted_activity.description == test_data["description"]
     assert trusted_activity.activity_action_groups == activity_action_groups
@@ -371,7 +370,7 @@ def test_add_git_repository_when_default_params_returns_expected_data(
     test_response = TEST_TRUSTED_ACTIVITY_1.copy()
     test_response.update(test_data)
 
-    test_response.update({"activityType": activity_type})
+    test_response.update({"type": activity_type})
 
     httpserver_auth.expect_request(
         uri="/v2/trusted-activities", method="POST", json=test_data
@@ -383,7 +382,7 @@ def test_add_git_repository_when_default_params_returns_expected_data(
     )
 
     assert isinstance(trusted_activity, TrustedActivity)
-    assert trusted_activity.activity_type == activity_type
+    assert trusted_activity.type == activity_type
     assert trusted_activity.value == git_uri
     assert trusted_activity.description == test_data["description"]
     assert trusted_activity.activity_action_groups == activity_action_groups

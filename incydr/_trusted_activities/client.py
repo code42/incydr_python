@@ -372,18 +372,22 @@ class TrustedActivitiesV2:
     def update(self, trusted_activity: TrustedActivity) -> TrustedActivity:
         """
         Updates a trusted activity.
-        Valid updatable fields: description, value, activity_type, activity_action_group
+        The following fields can be updated:
+
+        * `description`: A description of the trusted activity.
+        * `value`: The value of the trusted activity, where the value is, for example, the domain name, or the slack workspace name.
+        * `type`: The type of the trusted activity.  One of [`ActivityType`][activity-types].
+        * `activity_action_group`: The list of activity actions associated with the activity.
 
         **Parameters**
 
-        * **activity_id** `int` (required) - Unique numeric identifier for the trusted activity.
         * **trusted_activity**: [`TrustedActivity`][trustedactivity-model] (required) - The modified trusted activity object.
 
         Usage example:
 
             >>> activity = client.trusted_activities.get_trusted_activity(2)
             >>> activity.description = "New description"
-            >>> client.trusted_activities.v2.update(2, activity)
+            >>> client.trusted_activities.v2.update(activity)
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object with updated values from server.
         """
