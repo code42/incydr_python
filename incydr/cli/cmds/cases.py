@@ -425,7 +425,7 @@ def add(ctx: Context, case_number: int, event_ids: Union[str, Path], csv: bool):
 
         add CASE_NUMBER EVENT_IDS
 
-    To read the event IDs from a csv (single column, no header),
+    To read the event IDs from a csv (single 'event_id' column),
     pass the path to a csv along with the --csv flag:
 
         add CASE_NUMBER CSV_PATH --csv
@@ -449,7 +449,7 @@ def remove(ctx: Context, case_number: int, event_ids: str, csv: bool):
 
         add CASE_NUMBER EVENT_IDSs
 
-    To read the event IDs from a csv (single column, no header),
+    To read the event IDs from a csv (single 'event_id' column),
     pass the path to a csv along with the --csv flag:
 
         add CASE_NUMBER CSV_PATH --csv
@@ -464,7 +464,7 @@ def _parse_event_ids(event_ids, csv):
     if csv:
         ids = []
         for row in track(
-            read_dict_from_csv(event_ids, field_names=["event_id"]),
+            read_dict_from_csv(event_ids),
             description="Reading event IDs...",
             transient=True,
         ):

@@ -776,7 +776,7 @@ def test_cli_file_events_add_when_csv_makes_expected_call(
 ):
     event_ids = ["event-1", "event-2", "event-3"]
     p = tmp_path / "event_ids.csv"
-    p.write_text("\n".join(event_ids))
+    p.write_text("event_id\n" + "\n".join(event_ids))
 
     httpserver_auth.expect_request(
         f"/v1/cases/{TEST_CASE_NUMBER}/fileevent",
@@ -811,7 +811,7 @@ def test_cli_file_events_remove_when_csv_makes_expected_call(
     runner, httpserver_auth: HTTPServer, tmp_path
 ):
     p = tmp_path / "event_ids.csv"
-    p.write_text("event-1\nevent-2")
+    p.write_text("event_id\nevent-1\nevent-2")
 
     httpserver_auth.expect_ordered_request(
         f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/event-1",
