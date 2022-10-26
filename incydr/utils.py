@@ -78,20 +78,11 @@ def read_dict_from_csv(
         path = Path(path)
         file = path.open(mode="r", encoding="utf-8")
     reader = DictReader(file, fieldnames=field_names)
-    error = None
     for row in reader:
         for key, val in row.items():
             if val == "":
                 row[key] = None
-        try:
-            yield row  # noqa
-        except ValidationError as err:
-            error = CSVValidationError(
-                f"Bad data in row {reader.line_num} of {path}\n{str(err)}",
-                row=reader.line_num,
-            )
-    if error:
-        raise error
+        yield row  # noqa
 
 
 def write_models_to_csv(
