@@ -2,7 +2,6 @@ import json
 from datetime import datetime
 from urllib.parse import urlencode
 
-import pytest
 from pytest_httpserver import HTTPServer
 
 from incydr import Client
@@ -152,7 +151,7 @@ TEST_USER_ROLE_UPDATE = {
 }
 
 
-def test_get_user_returns_expected_data(httpserver_auth: HTTPServer):
+def test_get_user_when_user_id_returns_expected_data(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request(
         uri="/v1/users/user-1", method="GET"
     ).respond_with_json(TEST_USER_1)
@@ -185,17 +184,7 @@ def test_get_user_when_username_performs_get_page_lookup_returns_expected_data(
     ).respond_with_json(data_1)
 
     client = Client()
-    client.users.v1.get_user(username="foo@bar.com")
-
-
-def test_get_user_when_no_params_raises_error(httpserver_auth: HTTPServer):
-    client = Client()
-    with pytest.raises(ValueError) as err:
-        client.users.v1.get_user()
-    assert (
-        "At least one parameter, user_id or username, is required for get_user()."
-        in str(err.value)
-    )
+    client.users.v1.get_user("foo@bar.com")
 
 
 def test_get_page_when_default_query_params_returns_expected_data(
