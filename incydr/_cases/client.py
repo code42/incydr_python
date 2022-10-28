@@ -201,6 +201,7 @@ class CasesV1:
     def update(self, case: Case):
         """
         Updates a case.
+        Valid updatable fields: name, assignee, description, findings, subject, status
 
         **Parameters**
 
