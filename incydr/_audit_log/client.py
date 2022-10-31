@@ -212,7 +212,7 @@ class AuditLogV1:
 
         **Parameters:**
 
-        * **target_folder**: `Path, str` - A string or `pathlib.Path` object that represents the folder
+        * **target_folder**: `Path, str` (required) - A string or `pathlib.Path` object that represents the folder
         which the file will be saved to.
         * **actor_ids**: `List[str]`, `str` - Finds events whose actor_id is one of the given ids.
         * **actor_ip_addresses**: `List[str]`, `str` - Finds events whose actor_ip_address is one of the given IP addresses.
