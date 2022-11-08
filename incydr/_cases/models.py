@@ -37,9 +37,11 @@ class Case(ResponseModel):
     * **archival_time**: `datetime` Time at which the case will be archived.
     """
 
-    number: int = Field(allow_mutation=False, description="The identifier of the case.")
-    name: str
-    created_at: datetime = Field(allow_mutation=False, alias="createdAt")
+    number: Optional[int] = Field(
+        allow_mutation=False, description="The identifier of the case."
+    )
+    name: Optional[str]
+    created_at: Optional[datetime] = Field(allow_mutation=False, alias="createdAt")
     updated_at: Optional[datetime] = Field(allow_mutation=False, alias="updatedAt")
     subject: Optional[str]
     subject_username: Optional[str] = Field(alias="subjectUsername")

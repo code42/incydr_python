@@ -151,7 +151,7 @@ TEST_USER_ROLE_UPDATE = {
 }
 
 
-def test_get_user_returns_expected_data(httpserver_auth: HTTPServer):
+def test_get_user_when_user_id_returns_expected_data(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request(
         uri="/v1/users/user-1", method="GET"
     ).respond_with_json(TEST_USER_1)
@@ -168,6 +168,23 @@ def test_get_user_returns_expected_data(httpserver_auth: HTTPServer):
     assert user.modification_date == datetime.fromisoformat(
         TEST_USER_1["modificationDate"].replace("Z", "+00:00")
     )
+
+
+def test_get_user_when_username_performs_get_page_lookup_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
+    query_1 = {
+        "username": "foo@bar.com",
+        "page": 1,
+        "pageSize": 100,
+    }
+    data_1 = {"users": [TEST_USER_1], "totalCount": 1}
+    httpserver_auth.expect_request(
+        "/v1/users", method="GET", query_string=urlencode(query_1)
+    ).respond_with_json(data_1)
+
+    client = Client()
+    client.users.v1.get_user("foo@bar.com")
 
 
 def test_get_page_when_default_query_params_returns_expected_data(

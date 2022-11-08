@@ -199,7 +199,7 @@ class CasesV1:
             if len(page.cases) < page_size:
                 break
 
-    def update(self, case: Case):
+    def update(self, case: Union[Case, CaseDetail]):
         """
         Updates a case.
 

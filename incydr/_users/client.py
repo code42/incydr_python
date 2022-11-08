@@ -31,18 +31,26 @@ class UsersV1:
     def __init__(self, parent):
         self._parent = parent
 
-    def get_user(self, user_id: str) -> User:
+    def get_user(self, user: str) -> User:
         """
         Get a single user.
 
         **Parameters:**
 
-        * **user_id**: `str` (required) - The unique ID for the user.
+        * **user**: `str` - The unique ID for the user or the username for the user.
 
         **Returns**: A [`User`][user-model] object representing the user.
-
         """
-        response = self._parent.session.get(f"/v1/users/{user_id}")
+
+        # if username, lookup with get page api
+        if "@" in user:
+            users = self.get_page(username=user).users
+            if len(users) < 1:
+                raise ValueError(f"User with username '{user}' not found.")
+            return users[0]
+
+        # if user ID, use GET api
+        response = self._parent.session.get(f"/v1/users/{user}")
         return User.parse_response(response)
 
     def get_page(
