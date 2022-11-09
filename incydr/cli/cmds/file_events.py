@@ -1,3 +1,4 @@
+import json
 from typing import Optional
 
 import click
@@ -11,6 +12,8 @@ from typer import echo
 from incydr._file_events.models.response import SavedSearch
 from incydr._queries.file_events import EventQuery
 from incydr.cli import console
+from incydr.cli import render
+from incydr.cli.cmds.utils import output_format_logger
 from incydr.cli.cmds.options.filter_options import advanced_query_option
 from incydr.cli.cmds.options.filter_options import filter_options
 from incydr.cli.cmds.options.filter_options import saved_search_option
@@ -20,12 +23,12 @@ from incydr.cli.cmds.options.output_options import single_format_option
 from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
-from incydr.cli.cmds.utils import output_format_logger
 from incydr.cli.cmds.utils import output_response_format
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
 from incydr.enums.file_events import RiskIndicators
 from incydr.enums.file_events import RiskSeverity
+from incydr.models import FileEventV2
 
 
 def render_search(search_: SavedSearch):
@@ -122,18 +125,39 @@ def search(
             risk_severity=risk_severity,
             risk_score=risk_score,
         )
-    events = client.session.post("/v2/file-events", json=query.dict())
-    events = events.json()["fileEvents"]
+
+    query.page_size = 10000
+
+    # skip pydantic modeling when output will just be json
+    if output or format_ in ("json", "raw-json"):
+
+        def yield_all_events(q: EventQuery):
+            while q.page_token is not None:
+                response = client.session.post("/v2/file-events", json=q.dict())
+                yield from response.json()["fileEvents"]
+
+    else:
+
+        def yield_all_events(q: EventQuery):
+            while q.page_token is not None:
+                yield from client.file_events.v2.search(q).file_events
+
+    events = yield_all_events(query)
+
     if output:
         output_format_logger(events, output, columns, certs, ignore_cert_validation)
-    else:
-        output_response_format(
-            events,
-            "File Events",
-            format_,
-            columns,
-            client.settings.use_rich,
-        )
+        return
+
+    if format_ == "csv":
+        render.csv(FileEventV2, events, columns=columns, flat=True)
+    if format_ == "table" or format_ is None:
+        render.table(FileEventV2, events, columns=columns, flat=False)
+    if format_ == "json":
+        for event in events:
+            console.print_json(data=event)
+    if format_ == "raw-json":
+        for event in events:
+            print(json.dumps(event))
 
 
 @file_events.command(cls=IncydrCommand)
