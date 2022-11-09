@@ -15,6 +15,7 @@ from incydr.cli.cmds.departments import departments
 from incydr.cli.cmds.directory_groups import directory_groups
 from incydr.cli.cmds.file_events import file_events
 from incydr.cli.cmds.user_risk_profiles import user_risk_profiles
+from incydr.cli.cmds.users import users
 from incydr.cli.core import IncydrGroup
 
 if platform.system() in ("Darwin", "Linux"):
@@ -39,6 +40,7 @@ incydr.add_command(directory_groups)
 incydr.add_command(file_events)
 incydr.add_command(cases, name="cases")
 incydr.add_command(user_risk_profiles)
+incydr.add_command(users)
 
 if __name__ == "__main__":
     try:

@@ -65,6 +65,7 @@ nav:
       - Directory Groups: 'cli/directory_groups.md'
       - File Events: 'cli/file_events.md'
       - User Risk Profiles: 'cli/user_risk_profiles.md'
+      - Users: 'cli/users.md'
   - Guides:
     - Microsoft Sentinel:
       - Data Collector API: 'guides/azure-sentinel-data-collector.md'
