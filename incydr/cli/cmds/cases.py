@@ -347,7 +347,7 @@ def download(
 
     flags = [summary, events, source_files]
 
-    # if only only summary or only file-events flag is passed
+    # if only summary or only file-events flag is passed
     if sum(bool(flag) for flag in flags) == 1:
         if summary:
             client.cases.v1.download_summary_pdf(case_number, path)
