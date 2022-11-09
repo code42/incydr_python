@@ -4,13 +4,13 @@ import sys
 from typing import Iterable
 from typing import Optional
 
+from pydantic import BaseModel
 from typer import echo
 
 from incydr.cli import console
 from incydr.cli import render
 from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.logger import try_get_logger_for_server
-from incydr.utils import Model
 from incydr.utils import write_dict_to_csv
 from incydr.utils import write_models_to_csv
 
@@ -66,7 +66,7 @@ def output_response_format(
 
 # WARNING: CSV output will not work for nested objects
 def output_models_format(
-    models: Iterable[Model],
+    models: Iterable[BaseModel],
     title: str,
     format_: TableFormat = TableFormat.table,
     columns: Optional[str] = None,
