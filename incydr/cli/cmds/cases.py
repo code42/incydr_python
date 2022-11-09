@@ -33,7 +33,6 @@ from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
 from incydr.utils import CSVValidationError
-from incydr.utils import flatten
 from incydr.utils import read_dict_from_csv
 from incydr.utils import read_models_from_csv
 
