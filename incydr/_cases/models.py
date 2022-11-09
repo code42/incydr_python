@@ -16,7 +16,7 @@ from incydr.enums.cases import FileAvailability
 from incydr.enums.cases import SortKeys
 
 
-class Case(ResponseModel):
+class Case(ResponseModel, validate_assignment=True):
     """A model representing an Incydr Case.
 
     **Fields**:
@@ -65,9 +65,6 @@ class Case(ResponseModel):
     archival_time: Optional[datetime] = Field(
         allow_mutation=False, alias="archivalTime"
     )
-
-    class Config:
-        validate_assignment = True
 
 
 class CaseDetail(Case):
@@ -120,16 +117,13 @@ class CreateCaseRequest(Model):
     subject: Optional[str]
 
 
-class UpdateCaseRequest(Model):
+class UpdateCaseRequest(Model, extra=Extra.ignore):
     name: Optional[str] = Field(description="The name of the case.", max_length=50)
     assignee: Optional[str]
     description: Optional[str] = Field(max_length=250)
     findings: Optional[str] = Field(max_length=30_000)
     subject: Optional[str]
     status: Optional[CaseStatus]
-
-    class Config:
-        extra = Extra.ignore
 
 
 class RiskIndicator(BaseModel):
