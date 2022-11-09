@@ -22,7 +22,7 @@ from pydantic import ValidationError
 Model = TypeVar("Model", bound=BaseModel)
 
 
-# https://stackoverflow.com/questions/6027558/flatten-nested-dictionaries-compressing-keys
+# See https://stackoverflow.com/questions/6027558/flatten-nested-dictionaries-compressing-keys
 def flatten(d, parent_key="", sep="."):
     items = []
     for k, v in d.items():

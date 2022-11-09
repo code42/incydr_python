@@ -71,3 +71,11 @@ def output_options(f):
     f = certs_option(f)
     f = ignore_cert_validation_option(f)
     return f
+
+
+# TODO: A robust output function:
+# must handle generators and arrays distinctly
+# must account for models and dictionaries (or one should be decided on as the set pattern)
+# for CSVs:
+# must be able to flatten fields via dot notation
+# must be aware of all possible fields for the model ahead of time

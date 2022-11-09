@@ -525,7 +525,7 @@ def test_get_saved_search_returns_expected_data(mock_get_saved_search):
 # ************************************************ CLI ************************************************
 
 
-def test_search_when_no_start_param_raises_bad_option_usage_exception(
+def test_cli_search_when_no_start_param_raises_bad_option_usage_exception(
     runner, httpserver_auth: HTTPServer
 ):
     result = runner.invoke(
@@ -542,7 +542,7 @@ def test_search_when_no_start_param_raises_bad_option_usage_exception(
     )
 
 
-def test_search_when_default_params_makes_expected_api_call(
+def test_cli_search_when_default_params_makes_expected_api_call(
     runner, httpserver_auth: HTTPServer
 ):
     query = {
@@ -596,7 +596,7 @@ def test_search_when_default_params_makes_expected_api_call(
     assert result.exit_code == 0
 
 
-def test_search_when_filter_params_makes_expected_api_call(
+def test_cli_search_when_filter_params_makes_expected_api_call(
     runner, httpserver_auth: HTTPServer
 ):
     query = {
@@ -761,7 +761,9 @@ def test_search_when_filter_params_makes_expected_api_call(
     assert result.exit_code == 0
 
 
-def test_search_when_advanced_query_makes_expected_api_call(runner, httpserver_auth):
+def test_cli_search_when_advanced_query_makes_expected_api_call(
+    runner, httpserver_auth
+):
     event_data = {
         "fileEvents": [TEST_EVENT_1, TEST_EVENT_2],
         "nextPgToken": None,
@@ -785,7 +787,7 @@ def test_search_when_advanced_query_makes_expected_api_call(runner, httpserver_a
     assert result.exit_code == 0
 
 
-def test_search_when_saved_search_makes_expected_api_call(
+def test_cli_search_when_saved_search_makes_expected_api_call(
     runner, mock_get_saved_search, httpserver_auth
 ):
     event_data = {
@@ -805,7 +807,7 @@ def test_search_when_saved_search_makes_expected_api_call(
     assert result.exit_code == 0
 
 
-def test_show_saved_search_makes_expected_sdk_call(
+def test_cli_show_saved_search_makes_expected_sdk_call(
     httpserver_auth: HTTPServer, runner, mock_get_saved_search
 ):
     result = runner.invoke(
@@ -816,7 +818,7 @@ def test_show_saved_search_makes_expected_sdk_call(
     assert result.exit_code == 0
 
 
-def test_list_saved_searches_makes_expected_api_call(
+def test_cli_list_saved_searches_makes_expected_api_call(
     httpserver_auth: HTTPServer, runner, mock_list_saved_searches
 ):
     result = runner.invoke(incydr, ["file-events", "list-saved-searches"])
