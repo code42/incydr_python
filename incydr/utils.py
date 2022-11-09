@@ -159,13 +159,21 @@ def get_fields(
         yield from fields
     else:
         for i in include:
+            found = False
             if "*" in i:
                 pattern = i.replace("*", "")
                 for f in fields:
                     if f.startswith(pattern):
+                        found = True
                         yield f
             elif i in fields:
+                found = True
                 yield i
+            if not found:
+                raise ValueError(
+                    f"'{i}' is not a valid field path for model: {model.__name__}",
+                    list(fields),
+                )
 
 
 class CSVValidationError(Exception):

@@ -1,3 +1,4 @@
+import pytest
 from pydantic import BaseModel
 from pydantic import Field
 
@@ -58,7 +59,20 @@ def test_get_fields():
             flat=False,
             include=["child_model", "string_field", "int_field"],
         )
-    )
+    ) == ["child_model", "string_field", "int_field"]
+
+    with pytest.raises(ValueError) as err:
+        list(get_fields(ParentTestModel, include=["not_valid"]))
+    assert err.value.args[1] == ["string_field", "int_field", "child_model"]
+
+    with pytest.raises(ValueError) as err2:
+        list(get_fields(ParentTestModel, flat=True, include=["not_valid.*"]))
+    assert err2.value.args[1] == [
+        "string_field",
+        "int_field",
+        "child_model.string_field",
+        "child_model.int_field",
+    ]
 
 
 def test_iter_model_formatted():
