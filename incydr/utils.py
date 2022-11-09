@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from csv import DictReader
 from csv import DictWriter
 from io import IOBase
@@ -7,7 +8,6 @@ from itertools import repeat
 from pathlib import Path
 from typing import Dict
 from typing import Generator
-from typing import Callable
 from typing import Iterable
 from typing import List
 from typing import TextIO
@@ -16,9 +16,9 @@ from typing import Union
 
 from pydantic import BaseModel
 from pydantic import ValidationError
-from rich.console import group
-from rich.console import Group
 from rich.console import ConsoleRenderable
+from rich.console import Group
+from rich.console import group
 from rich.panel import Panel
 from rich.text import Text
 
@@ -52,7 +52,7 @@ def iter_model_formatted(
     model: BaseModel,
     include: List[str] = None,
     flat: bool = False,
-    render: Union[str, Callable] = None,
+    render: str = None,
 ):
     """
     Iterates through the fields of a Model (with optional flattening of sub-models), yielding (name, value) pairs.
@@ -60,20 +60,15 @@ def iter_model_formatted(
     Accepts a list of field names to filter by (if flat=True, `include` list must be flattened dot-notation names).
 
     Will automatically attempt to "render" the field values in the following order:
-       - if `render` arg is a callable, it will be called on each value provided
        - if `render` arg is a string, it will look in the "extra" section of the pydantic model's Field Info for that
           name (expects a callable to be there)
-       - if value is of a type that the model has a `json_encoder` for, it will use that
-       - otherwise it will simply call `str()` on the value
+       - if value is of a type that the model has a `json_encoder` for, it will use that encoder
+       - otherwise will leave the value unchanged
     """
     fields = get_fields(model.__class__, include=include, flat=flat)
     for name in fields:
         path = name.split(".")
         value, field = model_field_getter(model, path)
-        if callable(render):
-            value = render(value)
-            yield name, value
-            continue
         field_renderer = None if not field else field.field_info.extra.get(render)
         if render and field_renderer:
             value = field_renderer(value)
