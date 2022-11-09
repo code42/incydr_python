@@ -7,6 +7,7 @@ from typing import Optional
 from pydantic import BaseModel
 from pydantic import Extra
 from pydantic import Field
+from rich.markdown import Markdown
 
 from incydr._core.models import Model
 from incydr._core.models import ResponseModel
@@ -79,7 +80,7 @@ class CaseDetail(Case):
     """
 
     description: Optional[str]
-    findings: Optional[str]
+    findings: Optional[str] = Field(table=Markdown)
 
 
 class CasesPage(ResponseModel):
