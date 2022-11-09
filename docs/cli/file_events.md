@@ -1,3 +1,5 @@
+# File Events Commands
+
 ::: mkdocs-click
     :module: incydr.cli.cmds.file_events
     :command: search

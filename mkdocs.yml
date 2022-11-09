@@ -57,20 +57,25 @@ nav:
     - Enums: 'sdk/enums.md'
     - Models: 'sdk/models.md'
   - CLI:
-      - Commands: 'cli/commands.md'
+      - Introduction: 'cli/index.md'
+      - Cases: 'cli/cases.md'
+      - Departments: 'cli/departments.md'
+      - Directory Groups: 'cli/directory_groups.md'
+      - File Events: 'cli/file_events.md'
   - Guides:
     - Microsoft Sentinel:
       - Data Collector API: 'guides/azure-sentinel-data-collector.md'
       - Log Analytics Agent: 'guides/azure-sentinel-log-analytics.md'
 
 markdown_extensions:
+  - attr_list
+  - mkdocs-click
   - pymdownx.critic
   - admonition
   - codehilite:
       css_class: highlight
   - mkautodoc
   - tables
-  - attr_list
   - md_in_html
   - toc:
       permalink: true

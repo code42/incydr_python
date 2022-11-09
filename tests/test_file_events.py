@@ -592,6 +592,7 @@ def test_search_when_default_params_makes_expected_api_call(
             "2022-06-01",
         ],
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -756,6 +757,7 @@ def test_search_when_filter_params_makes_expected_api_call(
             10,
         ],
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -779,6 +781,7 @@ def test_search_when_advanced_query_makes_expected_api_call(runner, httpserver_a
             json.dumps(TEST_DICT_QUERY),
         ],
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -798,18 +801,24 @@ def test_search_when_saved_search_makes_expected_api_call(
     result = runner.invoke(
         incydr, ["file-events", "search", "--saved-search", TEST_SAVED_SEARCH_ID]
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
-def test_show_saved_search_makes_expected_sdk_call(runner, mock_get_saved_search):
+def test_show_saved_search_makes_expected_sdk_call(
+    httpserver_auth: HTTPServer, runner, mock_get_saved_search
+):
     result = runner.invoke(
         incydr,
         ["file-events", "show-saved-search", TEST_SAVED_SEARCH_ID],
     )
-
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
-def test_list_saved_searches_makes_expected_api_call(runner, mock_list_saved_searches):
+def test_list_saved_searches_makes_expected_api_call(
+    httpserver_auth: HTTPServer, runner, mock_list_saved_searches
+):
     result = runner.invoke(incydr, ["file-events", "list-saved-searches"])
+    httpserver_auth.check()
     assert result.exit_code == 0
