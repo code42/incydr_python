@@ -14,9 +14,8 @@ from incydr.cli import console
 from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
-from incydr.cli import render
 from incydr.cli.cmds.options.event_filter_options import advanced_query_option
-from incydr.cli.cmds.options.event_filter_options import filter_options
+from incydr.cli.cmds.options.event_filter_options import event_filter_options
 from incydr.cli.cmds.options.event_filter_options import saved_search_option
 from incydr.cli.cmds.options.output_options import columns_option
 from incydr.cli.cmds.options.output_options import output_options
@@ -68,7 +67,7 @@ def file_events(ctx, log_level, log_file):
 @output_options
 @advanced_query_option
 @saved_search_option
-@filter_options
+@event_filter_options
 @click.pass_context
 def search(
     ctx: Context,

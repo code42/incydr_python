@@ -112,7 +112,7 @@ advanced_query_option = click.option(
 )
 
 
-def filter_options(f):
+def event_filter_options(f):
     f = start_option(f)
     f = end_option(f)
     f = event_action_option(f)

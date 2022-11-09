@@ -506,21 +506,10 @@ def test_cli_delete_makes_expected_call(
 
 def test_cli_list_makes_expected_call(runner, httpserver_auth: HTTPServer):
     query_1 = {"pgNum": 1, "pgSize": 100, "srtDir": "asc", "srtKey": "number"}
-    query_2 = {"pgNum": 2, "pgSize": 100, "srtDir": "asc", "srtKey": "number"}
-
-    test_case_3 = TEST_CASE_2.copy()
-    test_case_3["number"] = 3
-    test_case_3["name"] = "test_3"
-
-    data_1 = {"cases": [TEST_CASE_1, TEST_CASE_2], "totalCount": 2}
-    data_2 = {"cases": [test_case_3], "totalCount": 1}
-
+    data_1 = {"cases": [TEST_CASE_1, TEST_CASE_2], "totalCount": 3}
     httpserver_auth.expect_ordered_request(
         "/v1/cases", method="GET", query_string=urlencode(query_1)
     ).respond_with_json(data_1)
-    httpserver_auth.expect_ordered_request(
-        "/v1/cases", method="GET", query_string=urlencode(query_2)
-    ).respond_with_json(data_2)
 
     result = runner.invoke(incydr, ["cases", "list"])
     httpserver_auth.check()
@@ -537,7 +526,6 @@ def test_cli_show_makes_expected_call(
 
 def test_cli_update_when_no_params_raises_error(runner, httpserver_auth: HTTPServer):
     result = runner.invoke(incydr, ["cases", "update", TEST_CASE_NUMBER])
-    httpserver_auth.check()
     assert result.exit_code == 2
     assert (
         "At least one command option must be provided to update a case."

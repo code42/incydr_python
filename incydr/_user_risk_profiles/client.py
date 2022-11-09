@@ -2,14 +2,37 @@ from datetime import datetime
 from itertools import count
 from typing import Iterator
 from typing import List
+from typing import Union
 
 from requests import Response
 
+from incydr._queries.utils import DATE_STR_FORMAT
 from incydr._user_risk_profiles.models import Date
 from incydr._user_risk_profiles.models import QueryUserRiskProfilesRequest
 from incydr._user_risk_profiles.models import UpdateUserRiskProfileRequest
 from incydr._user_risk_profiles.models import UserRiskProfile
 from incydr._user_risk_profiles.models import UserRiskProfilesPage
+
+
+class DateParseError(Exception):
+    """An error raised when the date data cannot be parsed."""
+
+    def __init__(self, date):
+        super().__init__(
+            f"Error parsing time data. Date '{date}' does not match format {DATE_STR_FORMAT}."
+        )
+
+
+class UserRiskProfiles:
+    def __init__(self, parent):
+        self._parent = parent
+        self._v1 = None
+
+    @property
+    def v1(self):
+        if self._v1 is None:
+            self._v1 = UserRiskProfilesV1(self._parent)
+        return self._v1
 
 
 class UserRiskProfilesV1:
@@ -149,8 +172,8 @@ class UserRiskProfilesV1:
         self,
         user_id: str,
         notes: str = None,
-        start_date: datetime = None,
-        end_date: datetime = None,
+        start_date: Union[datetime, str] = None,
+        end_date: Union[datetime, str] = None,
     ) -> UserRiskProfile:
         """
         Updates a user risk profile.
@@ -158,28 +181,18 @@ class UserRiskProfilesV1:
         **Parameters**
 
         * **notes**: `str` - Additional notes for the user risk profile.
-        * **start_date**: `datetime` - The starting date for the user. Pass an empty string to clear the field.
-        * **end_date**: `datetime` - The departure date for the user.  Pass an empty string to clear the field.
+        * **start_date**: `datetime` - The starting date for the user. Accepts a datetime object or a string in the format yyyy-MM-dd (UTC) format. Pass an empty string to clear the field.
+        * **end_date**: `datetime` - The departure date for the user.  Accepts a datetime object or a string in the format yyyy-MM-dd (UTC) format.  Pass an empty string to clear the field.
 
         **Returns**: A [`UserRiskProfile`][userriskprofile-model] object.
         """
         paths = []
         if start_date is not None:
             paths += ["startDate"]
-            start_date = (
-                None
-                if start_date == ""
-                else Date(
-                    day=start_date.day, month=start_date.month, year=start_date.year
-                )
-            )
+            start_date = None if start_date == "" else _create_date(start_date)
         if end_date is not None:
             paths += ["endDate"]
-            end_date = (
-                None
-                if end_date == ""
-                else Date(day=end_date.day, month=end_date.month, year=end_date.year)
-            )
+            end_date = None if end_date == "" else _create_date(end_date)
         if notes is not None:
             paths += ["notes"]
             if notes == "":
@@ -196,9 +209,14 @@ class UserRiskProfilesV1:
         )
         return UserRiskProfile.parse_response(response)
 
+    # TODO: should people be able to add more than 1 alias
     def add_cloud_aliases(self, user_id: str, cloud_aliases: List[str]) -> Response:
         """
         Add cloud aliases to a user risk profile.
+
+        A cloud alias is the username an employee uses to access cloud services such as Google Drive or Box.
+        Adding a cloud alias allows Incydr to link a user's cloud activity with their Code42 username.
+        Each user has a default cloud alias of their Code42 username. You can add one additional alias.
 
         **Parameters:**
 
@@ -236,13 +254,10 @@ class UserRiskProfilesV1:
         )
 
 
-class UserRiskProfiles:
-    def __init__(self, parent):
-        self._parent = parent
-        self._v1 = None
-
-    @property
-    def v1(self):
-        if self._v1 is None:
-            self._v1 = UserRiskProfilesV1(self._parent)
-        return self._v1
+def _create_date(date: Union[datetime, str]):
+    if not isinstance(date, datetime):
+        try:
+            date = datetime.strptime(date, DATE_STR_FORMAT)
+        except ValueError:
+            raise DateParseError(date)
+    return Date(day=date.day, month=date.month, year=date.year)
