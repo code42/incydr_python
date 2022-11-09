@@ -266,10 +266,6 @@ class AcquiredFrom(Model):
     )
 
 
-def render_destination(destination):
-    ...
-
-
 class Destination(Model):
     account_name: Optional[str] = Field(
         alias="accountName",
