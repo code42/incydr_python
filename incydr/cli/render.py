@@ -1,6 +1,6 @@
 import os
-import sys
 import platform
+import sys
 from csv import DictWriter
 from datetime import datetime
 from itertools import chain
@@ -9,14 +9,13 @@ from typing import Set
 from typing import Type
 
 from pydantic import BaseModel
-from rich.table import Table
 from rich.console import RenderableType
+from rich.table import Table
 
-from incydr.utils import get_fields
 from incydr.cli import console
+from incydr.utils import get_fields
 from incydr.utils import iter_model_formatted
 from incydr.utils import model_as_card
-from incydr._core.models import Model
 
 if platform.system() in ("Darwin", "Linux"):
     os.environ["MANPAGER"] = "less -S"
@@ -36,8 +35,8 @@ def date_time(dt: datetime):
 
 
 def table(
-    model: Type[Model],
-    models: Iterable[Model],
+    model: Type[BaseModel],
+    models: Iterable[BaseModel],
     columns: list[str] = None,
     title=None,
     flat=False,
@@ -49,7 +48,7 @@ def table(
     for m in models:
         values = []
         row_width = 0
-        for name, value in iter_model_formatted(
+        for _name, value in iter_model_formatted(
             m, include=headers, flat=flat, render="table"
         ):
             if isinstance(value, BaseModel):
@@ -66,7 +65,7 @@ def table(
     console.width = max_width
     tbl.width = max_width
     with console.pager():
-        console.print(tbl, soft_wrap=False)
+        console.print(tbl, crop=False, soft_wrap=False, overflow="fold")
 
 
 def table_json(results: Iterable, columns: Set[str] = None, title=None):
@@ -88,8 +87,8 @@ def table_json(results: Iterable, columns: Set[str] = None, title=None):
 
 
 def csv(
-    model: Type[Model],
-    models: Iterable[Model],
+    model: Type[BaseModel],
+    models: Iterable[BaseModel],
     columns: list[str] = None,
     flat: bool = False,
 ):
