@@ -7,7 +7,6 @@ from click import Context
 from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.table import Table
-from typer import echo
 
 from incydr._file_events.models.response import SavedSearch
 from incydr._queries.file_events import EventQuery
@@ -27,6 +26,7 @@ from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.utils import output_format_logger
 from incydr.cli.cmds.utils import output_response_format
+from incydr.cli.cmds.utils import output_single_format
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
 from incydr.enums.file_events import RiskIndicators
@@ -177,14 +177,7 @@ def show_saved_search(ctx: Context, search_id: str, format_: SingleFormat):
     """
     client = ctx.obj()
     saved_search = client.file_events.v2.get_saved_search(search_id)
-    if format_ == SingleFormat.rich and client.settings.use_rich:
-        render_search(saved_search)
-
-    elif format_ == SingleFormat.json:
-        console.print_json(saved_search.json())
-
-    else:
-        echo(saved_search.json())
+    output_single_format(saved_search, render_search, format_, client.settings.use_rich)
 
 
 @file_events.command(cls=IncydrCommand)
@@ -227,7 +220,7 @@ def _create_query(**kwargs):
     query = EventQuery(start_date=kwargs["start"], end_date=kwargs["end"])
     for k, v in kwargs.items():
         if v:
-            if k in ["start", "end", "include_all"]:
+            if k in ["start", "end"]:
                 continue
             elif k == "risk_score":
                 query = query.greater_than(field_option_map[k], v)

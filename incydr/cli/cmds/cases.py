@@ -28,6 +28,7 @@ from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.options.utils import user_lookup_callback
 from incydr.cli.cmds.utils import output_models_format
 from incydr.cli.cmds.utils import output_response_format
+from incydr.cli.cmds.utils import output_single_format
 from incydr.cli.cmds.utils import user_lookup
 from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
@@ -175,14 +176,7 @@ def show(ctx: Context, case_number: int, format_: SingleFormat):
     """
     client = ctx.obj()
     case = client.cases.v1.get_case(case_number)
-    if format_ == SingleFormat.rich and client.settings.use_rich:
-        render_case(case)
-
-    elif format_ == SingleFormat.json:
-        console.print_json(case.json())
-
-    else:
-        echo(case.json())
+    output_single_format(case, render_case, format_, client.settings.use_rich)
 
 
 @cases.command(cls=IncydrCommand)

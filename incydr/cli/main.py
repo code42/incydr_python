@@ -5,6 +5,7 @@ from incydr.cli import console
 from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
+from incydr.cli.cmds.alerts import alerts
 from incydr.cli.cmds.cases import cases
 from incydr.cli.cmds.departments import departments
 from incydr.cli.cmds.directory_groups import directory_groups
@@ -20,6 +21,7 @@ def incydr(ctx, log_level, log_file):
     init_client(ctx, log_level, log_file)
 
 
+incydr.add_command(alerts)
 incydr.add_command(departments)
 incydr.add_command(directory_groups)
 incydr.add_command(file_events)
