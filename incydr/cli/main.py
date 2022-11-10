@@ -1,3 +1,6 @@
+import os
+import platform
+
 import click
 from requests.exceptions import HTTPError
 
@@ -11,6 +14,12 @@ from incydr.cli.cmds.departments import departments
 from incydr.cli.cmds.directory_groups import directory_groups
 from incydr.cli.cmds.file_events import file_events
 from incydr.cli.core import IncydrGroup
+
+if platform.system() in ("Darwin", "Linux"):
+    os.environ["MANPAGER"] = "less -S"
+else:
+    ...
+    # TODO: figure out Windows pager to use
 
 
 @click.group(cls=IncydrGroup)
