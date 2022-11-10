@@ -5,35 +5,31 @@ from typing import Union
 
 import click
 from requests.exceptions import HTTPError
-from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.progress import track
-from rich.table import Table
 from typer import Context
-from typer import echo
 from typer import Typer
 
+from incydr._cases.models import Case
 from incydr._cases.models import CaseDetail
-from incydr._cases.models import UpdateCaseRequest
-from incydr._file_events.models.event import FileEventV2
+from incydr._cases.models import FileEvent
 from incydr.cli import console
 from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
+from incydr.cli import render
+from incydr.cli.cmds.options.output_options import SingleFormat
+from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.options.output_options import columns_option
 from incydr.cli.cmds.options.output_options import single_format_option
-from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
-from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.options.utils import user_lookup_callback
-from incydr.cli.cmds.utils import output_models_format
-from incydr.cli.cmds.utils import output_response_format
-from incydr.cli.cmds.utils import output_single_format
 from incydr.cli.cmds.utils import user_lookup
-from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
+from incydr.cli.core import incompatible_with
 from incydr.utils import CSVValidationError
+from incydr.utils import model_as_card
 from incydr.utils import read_dict_from_csv
 from incydr.utils import read_models_from_csv
 
@@ -54,36 +50,6 @@ path_option = click.option(
 def cases(ctx, log_level, log_file):
     """View and manage cases."""
     init_client(ctx, log_level, log_file)
-
-
-def render_case(case: CaseDetail):
-    field_table = Table.grid(padding=(0, 1), expand=False)
-    field_table.title = f"Case {case.number}"
-    for name, _field in case.__fields__.items():
-        if name == "number":
-            continue
-        if name == "findings" and case.findings is not None:
-            field_table.add_row(
-                Panel(
-                    Markdown(case.findings, justify="left"),
-                    title="Findings",
-                    width=80,
-                )
-            )
-        else:
-            field_table.add_row(f"{name} = {getattr(case, name)}")
-    console.print(Panel.fit(field_table))
-
-
-def render_file_event(event: FileEventV2):
-    field_table = Table.grid(padding=(0, 1), expand=False)
-    field_table.title = f"File Event {event.event.id}"
-    event_dict = event.dict()
-    for name, _field in event_dict.items():
-        if name == "event.id":
-            continue
-        field_table.add_row(f"{name} = {event_dict[name]}")
-    console.print(Panel.fit(field_table))
 
 
 @cases.command(cls=IncydrCommand)
@@ -126,9 +92,9 @@ def create(
             description=description,
         )
         if client.settings.use_rich:
-            render_case(case)
+            console.print(Panel.fit(model_as_card(case)))
         else:
-            echo(case.json())
+            console.print(case.json(), highlight=False)
     except HTTPError as err:
         console.print(f"[red]Error:[/red] {err.response.text}")
 
@@ -163,7 +129,19 @@ def list_(
         format_ = TableFormat.table
     client = ctx.obj()
     cases = client.cases.v1.iter_all()
-    output_models_format(cases, "Cases", format_, columns, client.settings.use_rich)
+    if format_ == TableFormat.table:
+        render.table(Case, cases, columns=columns)
+
+    elif format_ == TableFormat.csv:
+        render.csv(Case, cases, columns=columns)
+
+    elif format_ == TableFormat.json:
+        for case in cases:
+            console.print_json(case.json())
+
+    else:
+        for case in cases:
+            console.print(case.json(), highlight=False)
 
 
 @cases.command(cls=IncydrCommand)
@@ -176,7 +154,14 @@ def show(ctx: Context, case_number: int, format_: SingleFormat):
     """
     client = ctx.obj()
     case = client.cases.v1.get_case(case_number)
-    output_single_format(case, render_case, format_, client.settings.use_rich)
+    if format_ == SingleFormat.rich and client.settings.use_rich:
+        console.print(Panel.fit(model_as_card(case), title="Case", width=120))
+
+    elif format_ == SingleFormat.json:
+        console.print_json(case.json())
+
+    else:
+        console.print(case.json(), highlight=False)
 
 
 @cases.command(cls=IncydrCommand)
@@ -223,15 +208,21 @@ def update(
         )
 
     client = ctx.obj()
-    data = UpdateCaseRequest(
-        assignee=assignee,
-        description=description,
-        findings=findings,
-        name=name,
-        status=status,
-        subject=subject,
-    )
-    client.session.put(f"/v1/cases/{case_number}", json=data.dict())
+    case = client.cases.v1.get_case(case_number)
+    if assignee:
+        case.assignee = user_lookup(client, assignee)
+    if description:
+        case.description = description
+    if findings:
+        case.findings = findings
+    if name:
+        case.name = name
+    if status:
+        case.status = status
+    if subject:
+        case.subject = user_lookup(client, subject)
+    updated_case = client.cases.v1.update(case)
+    console.print(Panel.fit(model_as_card(updated_case), title="Case Updated"))
 
 
 @cases.command(cls=IncydrCommand)
@@ -385,13 +376,13 @@ def show_file_event(
     event = client.cases.v1.get_file_event_detail(case_number, event_id)
 
     if format_ == SingleFormat.rich and client.settings.use_rich:
-        render_file_event(event)
+        console.print(Panel.fit(model_as_card(event)))
 
     elif format_ == SingleFormat.json:
         console.print_json(event.json())
 
     else:
-        echo(event.json())
+        console.print(event.json(), highlight=False)
 
 
 @file_events.command("list", cls=IncydrCommand)
@@ -406,15 +397,35 @@ def list_file_events(
     List file events attached to a case.
     """
     client = ctx.obj()
-    events = client.cases.v1.get_file_events(case_number).dict()["events"]
+    response = client.cases.v1.get_file_events(case_number)
 
-    output_response_format(
-        events,
-        f"Case {case_number}: File Events",
-        format_,
-        columns,
-        client.settings.use_rich,
-    )
+    columns = columns or [
+        "event_timestamp",
+        "file_name",
+        "file_path",
+        "file_availability",
+        "risk_indicators",
+        "risk_score",
+        "event_id",
+    ]
+    if format_ == TableFormat.table:
+        render.table(
+            FileEvent,
+            response.events,
+            title=f"Case {case_number}: File Events",
+            columns=columns,
+        )
+
+    elif format_ == TableFormat.csv:
+        render.csv(FileEvent, response.events, columns=columns)
+
+    elif format_ == TableFormat.json:
+        for event in response.events:
+            console.print_json(event.json())
+
+    else:
+        for event in response.events:
+            console.print(event.json(), highlight=False)
 
 
 csv_option = click.option(
