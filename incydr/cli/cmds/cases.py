@@ -78,7 +78,7 @@ def render_case(case: CaseDetail):
 def render_file_event(event: FileEventV2):
     field_table = Table.grid(padding=(0, 1), expand=False)
     field_table.title = f"File Event {event.event.id}"
-    event_dict = flatten(event.dict())
+    event_dict = event.dict()
     for name, _field in event_dict.items():
         if name == "event.id":
             continue

@@ -30,14 +30,13 @@ from incydr.cli.cmds.utils import output_single_format
 from incydr.cli.cmds.utils import rgetattr
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
-from incydr.utils import flatten
 from incydr.utils import read_dict_from_csv
 
 
 def render_alert(alert: AlertDetails):
     field_table = Table.grid(padding=(0, 1), expand=False)
     field_table.title = f"Alert {alert.id}"
-    alert_dict = flatten(alert.dict(by_alias=False))
+    alert_dict = alert.dict(by_alias=False)
     for name, _field in alert_dict.items():
         if name == "id":
             continue
