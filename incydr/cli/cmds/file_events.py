@@ -100,6 +100,7 @@ def search(
 
     Results will be output to the console by default, use the `--output` option to send data to a server.
     """
+    # TODO: checkpointing
     client = ctx.obj()
 
     if saved_search:

@@ -9,6 +9,7 @@ from incydr._audit_log.models import QueryAuditLogRequest
 from incydr._audit_log.models import QueryExportRequest
 from incydr._audit_log.models import UserTypes
 from incydr._core.utils import get_filename_from_content_disposition
+from incydr._queries.utils import parse_timestamp_to_posix_timestamp
 
 
 class AuditLogClient:
@@ -135,7 +136,6 @@ class AuditLogV1:
             resource_ids=resource_ids,
             user_types=user_types,
         )
-
         response = self._parent.session.post(
             "/v1/audit/search-results-export", json=request.dict()
         )
@@ -251,7 +251,6 @@ class AuditLogV1:
             raise ValueError(
                 f"`target_folder` argument must resolve to a folder: {target_folder}"
             )
-
         export_response = self._parent.session.post(
             "/v1/audit/export", json=data.dict()
         )
@@ -283,9 +282,9 @@ def _build_query_request(
 ):
     date_range = DateRange()
     if start_time:
-        date_range.startTime = start_time.timestamp()
+        date_range.startTime = parse_timestamp_to_posix_timestamp(start_time)
     if end_time:
-        date_range.endTime = end_time.timestamp()
+        date_range.endTime = parse_timestamp_to_posix_timestamp(end_time)
 
     request = QueryAuditLogRequest(
         actorIds=[actor_ids] if isinstance(actor_ids, str) else actor_ids,
