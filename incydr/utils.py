@@ -6,15 +6,18 @@ from io import IOBase
 from itertools import chain
 from itertools import repeat
 from pathlib import Path
+from typing import Any
 from typing import Dict
 from typing import Generator
 from typing import Iterable
 from typing import List
 from typing import TextIO
+from typing import Tuple
 from typing import Type
 from typing import Union
 
 from pydantic import BaseModel
+from pydantic.fields import ModelField
 from pydantic import ValidationError
 from rich.console import ConsoleRenderable
 from rich.console import Group
@@ -23,7 +26,9 @@ from rich.panel import Panel
 from rich.text import Text
 
 
-def model_field_getter(model: BaseModel, path: list[str]):
+def get_field_value_and_info(
+    model: BaseModel, path: list[str]
+) -> Tuple[Any, ModelField]:
     """
     Traverse a pydantic model and its sub-models to retrieve both the value and `ModelField` data for a given attribute
     path.
@@ -40,7 +45,7 @@ def model_field_getter(model: BaseModel, path: list[str]):
 
 
     >>> model = Parent(child=Child())
-    >>> value, field = model_field_getter(model, path=["child", "field_1"])
+    >>> value, field = get_field_value_and_info(model, path=["child", "field_1"])
 
     The `value` var would contain the string "example", and `field` would be the Field object for `Child.field_1`, where
     the 'extra_data' would be accessible in `field.field_info.extra`.
@@ -72,7 +77,7 @@ def iter_model_formatted(
     fields = get_fields(model.__class__, include=include, flat=flat)
     for name in fields:
         path = name.split(".")
-        value, field = model_field_getter(model, path)
+        value, field = get_field_value_and_info(model, path)
         field_renderer = None if not field else field.field_info.extra.get(render)
         if render and field_renderer:
             value = field_renderer(value)

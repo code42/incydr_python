@@ -5,7 +5,7 @@ from pydantic import Field
 from incydr.utils import flatten_fields
 from incydr.utils import get_fields
 from incydr.utils import iter_model_formatted
-from incydr.utils import model_field_getter
+from incydr.utils import get_field_value_and_info
 
 
 class ChildTestModel(BaseModel):
@@ -149,10 +149,12 @@ def test_model_field_getter():
         int_field=0,
         child_model=ChildTestModel(string_field="child_test", int_field=1),
     )
-    value, field = model_field_getter(model, ["int_field"])
+    value, field = get_field_value_and_info(model, ["int_field"])
     assert value == 0
     assert "table" in field.field_info.extra
 
-    child_value, child_field = model_field_getter(model, ["child_model", "int_field"])
+    child_value, child_field = get_field_value_and_info(
+        model, ["child_model", "int_field"]
+    )
     assert child_value == 1
     assert "table" in child_field.field_info.extra
