@@ -17,9 +17,9 @@ from typing import Type
 from typing import Union
 
 from pydantic import BaseModel
+from pydantic import ValidationError
 from pydantic.fields import ModelField
 from pydantic.fields import SHAPE_SINGLETON
-from pydantic import ValidationError
 from rich.console import ConsoleRenderable
 from rich.console import Group
 from rich.console import group

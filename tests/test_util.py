@@ -3,9 +3,9 @@ from pydantic import BaseModel
 from pydantic import Field
 
 from incydr.utils import flatten_fields
+from incydr.utils import get_field_value_and_info
 from incydr.utils import get_fields
 from incydr.utils import iter_model_formatted
-from incydr.utils import get_field_value_and_info
 
 
 class ChildTestModel(BaseModel):
