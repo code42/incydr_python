@@ -18,6 +18,7 @@ from typing import Union
 
 from pydantic import BaseModel
 from pydantic.fields import ModelField
+from pydantic.fields import SHAPE_SINGLETON
 from pydantic import ValidationError
 from rich.console import ConsoleRenderable
 from rich.console import Group
@@ -89,14 +90,35 @@ def iter_model_formatted(
         yield name, value
 
 
-def list_as_panel(items, sep=None, title=None):
+def list_as_panel(items, sep=None, title=None, expand=True) -> Panel:
     """
     Renders a list of items as a `rich.panel.Panel`. If `sep` is provided will add a separator between each item (useful
     for rendering list of models that have multiple values.
+
+    Examples:
+        >>> from rich import print
+        >>> print(list_as_panel(["one", "two", "three", "four"]))
+        ╭───────╮
+        │ one   │
+        │ two   │
+        │ three │
+        │ four  │
+        ╰───────╯
+
+        >>> print(list_as_panel(["one", "two", "three", "four"], sep="---", title="example"))
+        ╭─ example ─╮
+        │ one       │
+        │ ---       │
+        │ two       │
+        │ ---       │
+        │ three     │
+        │ ---       │
+        │ four      │
+        ╰───────────╯
     """
     if sep:
         items = list(chain(*zip(items, repeat(sep))))[:-1]
-    return Panel(Group(*items), title=title)
+    return Panel(Group(*items), title=title, expand=expand)
 
 
 @group()
@@ -106,15 +128,19 @@ def model_as_card(model):
     is a list of items, it renders it as a separate panel.
     """
     for name, value in iter_model_formatted(model, flat=True, render="table"):
+        # rendering list fields takes some special handling
         if isinstance(value, list):
             if not len(value):
                 yield f"{name}: []"
+            # since a list of models can contain many values for each "item" in the list, we want to wrap the models
+            # with a separator to make it readable and easily distinguish where each model begins/ends.
             elif isinstance(value[0], BaseModel):
                 yield list_as_panel(
                     [model_as_card(v) for v in value], title=name, sep="---"
                 )
             else:
                 yield list_as_panel(value, title=name)
+        # this should only be true when a model field has a "table" extra renderer defined
         elif isinstance(value, ConsoleRenderable):
             yield Panel.fit(value, title=name)
         else:
@@ -138,7 +164,9 @@ def flatten_fields(model: Type[BaseModel]) -> Generator[str, None, None]:
     flatten_fields(Parent) would yield: ['field', 'child.field_1', 'child.field_2']
     """
     for name, field in model.__fields__.items():
-        if issubclass(field.type_, BaseModel) and field.shape == 1:
+        # the field.shape tells us if the field contains a single `BaseModel` or something like a `List[BaseModel]`
+        # we can only traverse singleton models when flattening
+        if issubclass(field.type_, BaseModel) and field.shape == SHAPE_SINGLETON:
             for child_name in flatten_fields(field.type_):
                 yield f"{name}.{child_name}"
         else:
