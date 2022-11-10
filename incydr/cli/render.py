@@ -64,6 +64,9 @@ def table(
 
     console.width = max_width
     tbl.width = max_width
+    if not tbl.rows:
+        console.print("No results found.")
+        return
     with console.pager():
         console.print(tbl, crop=False, soft_wrap=False, overflow="fold")
 
@@ -92,6 +95,13 @@ def csv(
     columns: list[str] = None,
     flat: bool = False,
 ):
+    models = iter(models)
+    try:
+        first = next(models)
+        models = chain([first], models)
+    except StopIteration:
+        console.print("No results found.")
+        return
     headers = list(get_fields(model, columns, flat=flat))
     writer = DictWriter(sys.stdout, fieldnames=headers, extrasaction="ignore")
 

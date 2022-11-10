@@ -31,7 +31,7 @@ def model_field_getter(model: BaseModel, path: list[str]):
     For example, given the following model hierarchy:
 
         class Child(BaseModel):
-            field_1: str = Field("value", extra_data=1)
+            field_1: str = Field("example", extra_data=1)
             field_2: int = Field(1)
 
         class Parent(BaseModel):
@@ -39,7 +39,11 @@ def model_field_getter(model: BaseModel, path: list[str]):
             child: Child
 
 
-    model_field_getter(Parent(child=Child()),
+    >>> model = Parent(child=Child())
+    >>> value, field = model_field_getter(model, path=["child", "field_1"])
+
+    The `value` var would contain the string "example", and `field` would be the Field object for `Child.field_1`, where
+    the 'extra_data' would be accessible in `field.field_info.extra`.
     """
     for p in path[:-1]:
         model = getattr(model, p)
@@ -155,13 +159,21 @@ def get_fields(
         yield from fields
     else:
         for i in include:
+            found = False
             if "*" in i:
                 pattern = i.replace("*", "")
                 for f in fields:
                     if f.startswith(pattern):
+                        found = True
                         yield f
             elif i in fields:
+                found = True
                 yield i
+            if not found:
+                raise ValueError(
+                    f"'{i}' is not a valid field path for model: {model.__name__}",
+                    list(fields),
+                )
 
 
 class CSVValidationError(Exception):

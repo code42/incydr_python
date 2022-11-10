@@ -111,7 +111,7 @@ class AlertsV1:
         self, alert_ids: Union[str, List[str]], state: AlertState, note: str = None
     ) -> requests.Response:
         """
-        Change the state of an alert (and optionally add note indicating reason for change in the same request).
+        Change the state of a set of alerts (and optionally add note indicating reason for change in the same request).
 
         **Parameters**:
 

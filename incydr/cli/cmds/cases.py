@@ -28,12 +28,12 @@ from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.options.utils import user_lookup_callback
 from incydr.cli.cmds.utils import output_models_format
 from incydr.cli.cmds.utils import output_response_format
+from incydr.cli.cmds.utils import output_single_format
 from incydr.cli.cmds.utils import user_lookup
 from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
 from incydr.utils import CSVValidationError
-from incydr.utils import flatten
 from incydr.utils import read_dict_from_csv
 from incydr.utils import read_models_from_csv
 
@@ -78,7 +78,7 @@ def render_case(case: CaseDetail):
 def render_file_event(event: FileEventV2):
     field_table = Table.grid(padding=(0, 1), expand=False)
     field_table.title = f"File Event {event.event.id}"
-    event_dict = flatten(event.dict())
+    event_dict = event.dict()
     for name, _field in event_dict.items():
         if name == "event.id":
             continue
@@ -176,14 +176,7 @@ def show(ctx: Context, case_number: int, format_: SingleFormat):
     """
     client = ctx.obj()
     case = client.cases.v1.get_case(case_number)
-    if format_ == SingleFormat.rich and client.settings.use_rich:
-        render_case(case)
-
-    elif format_ == SingleFormat.json:
-        console.print_json(case.json())
-
-    else:
-        echo(case.json())
+    output_single_format(case, render_case, format_, client.settings.use_rich)
 
 
 @cases.command(cls=IncydrCommand)
