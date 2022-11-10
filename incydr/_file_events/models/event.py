@@ -5,6 +5,7 @@ from typing import Optional
 from pydantic import Field
 
 from incydr._core.models import Model
+from incydr._core.models import ResponseModel
 from incydr.enums.file_events import ReportType
 
 
@@ -561,7 +562,7 @@ class Git(Model):
     repository_user: Optional[str] = Field(None, alias="repositoryUser")
 
 
-class FileEventV2(Model):
+class FileEventV2(ResponseModel):
     """
     **Fields**:
 
