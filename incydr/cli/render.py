@@ -1,8 +1,7 @@
-import os
-import platform
 import sys
 from csv import DictWriter
 from datetime import datetime
+from io import TextIOWrapper
 from itertools import chain
 from typing import Iterable
 from typing import Set
@@ -16,12 +15,6 @@ from incydr.cli import console
 from incydr.utils import get_fields
 from incydr.utils import iter_model_formatted
 from incydr.utils import model_as_card
-
-if platform.system() in ("Darwin", "Linux"):
-    os.environ["MANPAGER"] = "less -S"
-else:
-    ...
-    # TODO: figure out Windows pager to use
 
 
 def date(dt: datetime):
@@ -94,6 +87,7 @@ def csv(
     models: Iterable[BaseModel],
     columns: list[str] = None,
     flat: bool = False,
+    file: TextIOWrapper = sys.stdout,
 ):
     models = iter(models)
     try:
@@ -103,7 +97,7 @@ def csv(
         console.print("No results found.")
         return
     headers = list(get_fields(model, columns, flat=flat))
-    writer = DictWriter(sys.stdout, fieldnames=headers, extrasaction="ignore")
+    writer = DictWriter(file, fieldnames=headers, extrasaction="ignore")
 
     writer.writeheader()
     for m in models:
