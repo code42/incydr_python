@@ -202,7 +202,7 @@ def test_cli_search_when_custom_params_makes_expected_call(
         "actorIds": ["foo", "bar"],
         "actorIpAddresses": ["foo1", "bar1"],
         "actorNames": ["foo2", "bar2"],
-        "dateRange": {"endTime": 1666314001.0, "startTime": 1662786000.0},
+        "dateRange": {"endTime": 1666296001.0, "startTime": 1662768000.0},
         "eventTypes": ["foo3", "bar3"],
         "pageNum": 0,
         "pageSize": 100,
@@ -239,8 +239,11 @@ def test_cli_search_when_custom_params_makes_expected_call(
     assert result.exit_code == 0
 
 
-def test_cli_list_when_default_params_makes_expected_call(runner, mock_export):
+def test_cli_list_when_default_params_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_export
+):
     result = runner.invoke(incydr, ["audit-log", "list"])
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -259,7 +262,7 @@ def test_cli_list_when_custom_params_makes_expected_call(
         "actorIds": ["foo", "bar"],
         "actorIpAddresses": ["foo1", "bar1"],
         "actorNames": ["foo2", "bar2"],
-        "dateRange": {"endTime": 1666314001.0, "startTime": 1662786000.0},
+        "dateRange": {"endTime": 1666296001.0, "startTime": 1662768000.0},
         "eventTypes": ["foo3", "bar3"],
         "pageNum": 0,
         "pageSize": 0,
@@ -293,6 +296,7 @@ def test_cli_list_when_custom_params_makes_expected_call(
             "USER",
         ],
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
@@ -328,4 +332,5 @@ def test_cli_list_when_download_makes_expected_call(
     result = runner.invoke(
         incydr, ["audit-log", "list", "--download", "--path", tmp_path]
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
