@@ -15,9 +15,9 @@ from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
-from incydr.cli.cmds.options.filter_options import advanced_query_option
-from incydr.cli.cmds.options.filter_options import filter_options
-from incydr.cli.cmds.options.filter_options import saved_search_option
+from incydr.cli.cmds.options.event_filter_options import advanced_query_option
+from incydr.cli.cmds.options.event_filter_options import filter_options
+from incydr.cli.cmds.options.event_filter_options import saved_search_option
 from incydr.cli.cmds.options.output_options import columns_option
 from incydr.cli.cmds.options.output_options import output_options
 from incydr.cli.cmds.options.output_options import single_format_option

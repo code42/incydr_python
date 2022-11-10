@@ -130,7 +130,7 @@ def user_lookup(client, value):
 
 
 def output_single_format(
-    result: Model, render_func, format_=SingleFormat.rich, use_rich=True
+    result: BaseModel, render_func, format_=SingleFormat.rich, use_rich=True
 ):
     if format_ == SingleFormat.rich and use_rich:
         render_func(result)
