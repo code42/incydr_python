@@ -15,6 +15,8 @@ from incydr.enums import SortDirection
 from incydr.enums.cases import CaseStatus
 from incydr.enums.cases import FileAvailability
 from incydr.enums.cases import SortKeys
+from incydr.utils import list_as_panel
+from incydr.utils import model_as_card
 
 
 class Case(ResponseModel, validate_assignment=True):
@@ -172,6 +174,9 @@ class FileEvent(Model):
         None,
         alias="riskIndicators",
         description="List of risk indicators identified for this event. If more than one risk indicator applies to this event, the sum of all indicators determines the total risk score.",
+        table=lambda _list: list_as_panel([model_as_card(m) for m in _list])
+        if len(_list)
+        else "None",
     )
     risk_score: Optional[int] = Field(
         None,
