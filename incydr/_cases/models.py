@@ -82,7 +82,7 @@ class CaseDetail(Case):
     """
 
     description: Optional[str]
-    findings: Optional[str] = Field(table=Markdown)
+    findings: Optional[str] = Field(table=lambda f: f if f is None else Markdown(f))
 
 
 class CasesPage(ResponseModel):

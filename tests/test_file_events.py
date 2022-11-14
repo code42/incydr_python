@@ -136,6 +136,14 @@ TEST_EVENT_1 = {
         "trusted": False,
         "trustReason": None,
     },
+    "git": {
+        "event_id": "1234",
+        "last_commit_hash": "abcd-1234",
+        "repository_email": "gituser@example.com",
+        "repository_endpoint_path": "/test/repo",
+        "repository_uri": "git@example.com",
+        "repository_user": "Git User",
+    },
 }
 
 TEST_EVENT_2 = {
