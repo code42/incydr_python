@@ -2,7 +2,6 @@ from typing import Optional
 
 import click
 from click import Context
-from click import echo
 from requests import HTTPError
 from rich.panel import Panel
 from rich.progress import track
@@ -118,7 +117,7 @@ def show(ctx: Context, user: str, format_: SingleFormat):
     elif format_ == SingleFormat.json:
         console.print_json(profile.json())
     else:  # format == "raw-json"
-        echo(profile.json())
+        console.print(profile.json(), highlight=False)
 
 
 @user_risk_profiles.command(cls=IncydrCommand)
