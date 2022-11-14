@@ -1,4 +1,7 @@
-class ServerProtocol:
+from enum import Enum
+
+
+class ServerProtocol(str, Enum):
     TCP = "TCP"
     UDP = "UDP"
     TLS_TCP = "TLS-TCP"

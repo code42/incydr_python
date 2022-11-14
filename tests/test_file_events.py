@@ -84,6 +84,7 @@ TEST_EVENT_1 = {
         },
         "tabs": [],
         "domains": [],
+        "user": {"email": ["test@example.com"]},
     },
     "destination": {
         "category": "Cloud Storage",
@@ -224,6 +225,7 @@ TEST_EVENT_2 = {
             "volume_name": [],
         },
         "tabs": [],
+        "user": {"email": ["test@example.com"]},
     },
     "destination": {
         "account_name": None,
@@ -280,6 +282,7 @@ TEST_EVENT_QUERY = (
     .equals("user.email", ["test@code42.com", "john.doe@code42.com"])
     .equals("file.category", "SourceCode")
 )
+TEST_EVENT_QUERY.page_size = 10000
 TEST_SAVED_SEARCH_1 = SavedSearch(
     api_version=2,
     columns=None,
@@ -399,7 +402,7 @@ TEST_DICT_QUERY = {
         },
     ],
     "pgNum": 1,
-    "pgSize": 100,
+    "pgSize": 10000,
     "pgToken": "",
     "srtDir": "asc",
     "srtKey": "event.id",
@@ -433,7 +436,7 @@ TEST_SAVED_SEARCH_QUERY = {
         },
     ],
     "pgNum": 1,
-    "pgSize": 100,
+    "pgSize": 10000,
     "pgToken": "",
     "srtDir": "asc",
     "srtKey": "event.id",
@@ -566,7 +569,7 @@ def test_cli_search_when_default_params_makes_expected_api_call(
             },
         ],
         "pgNum": 1,
-        "pgSize": 100,
+        "pgSize": 10000,
         "pgToken": "",
         "srtDir": "asc",
         "srtKey": "event.id",
@@ -705,7 +708,7 @@ def test_cli_search_when_filter_params_makes_expected_api_call(
             },
         ],
         "pgNum": 1,
-        "pgSize": 100,
+        "pgSize": 10000,
         "pgToken": "",
         "srtDir": "asc",
         "srtKey": "event.id",

@@ -25,7 +25,7 @@ table_format_option = click.option(
     "format_",
     type=TableFormat,
     help="Format to print result. If environment has INCYDR_USE_RICH=false set, defaults to 'raw-json'",
-    default=None,
+    default=TableFormat.table,
 )
 single_format_option = click.option(
     "--format",
