@@ -18,6 +18,7 @@ from incydr.cli.cmds.options.profile_filter_options import profile_filter_option
 from incydr.cli.cmds.options.utils import user_lookup_callback
 from incydr.cli.cmds.utils import output_models_format
 from incydr.cli.cmds.utils import user_lookup
+from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
 from incydr.utils import read_dict_from_csv
@@ -107,27 +108,66 @@ def show(ctx: Context, user):
 @click.option(
     "--notes", default=None, help="Update the optional notes on a user's profile."
 )
+@click.option(
+    "--clear-start-date",
+    is_flag=True,
+    default=False,
+    help="Clear the start date on a user's profile. Incompatible with --start-date.",
+    cls=incompatible_with("start_date"),
+)
+@click.option(
+    "--clear-end-date",
+    is_flag=True,
+    default=False,
+    help="Clear the end date on a user's profile. Incompatible with --end-date.",
+    cls=incompatible_with("end_date"),
+)
+@click.option(
+    "--clear-notes",
+    is_flag=True,
+    default=False,
+    help="Clear the notes on a user's profile. Incompatible with --notes.",
+    cls=incompatible_with("notes"),
+)
 @click.pass_context
-def update(ctx: Context, user, start_date=None, end_date=None, notes=None):
+def update(
+    ctx: Context,
+    user,
+    start_date=None,
+    end_date=None,
+    notes=None,
+    clear_start_date=None,
+    clear_end_date=None,
+    clear_notes=None,
+):
     """
     Update a user risk profile.
 
     Accepts a user ID or a username.  Performs an additional lookup if a username is passed.
     """
-    # TODO: pass 'CLEAR' to clear field?
-    if not any([start_date, end_date, notes]):
+    if not any(
+        [start_date, end_date, notes, clear_start_date, clear_end_date, clear_notes]
+    ):
         raise click.UsageError(
-            "At least one of --start-date, --end-date, or --notes is required to update a user risk profile."
+            "At least one of --start-date, --end-date, or --notes, or one of their corresponding clear flags, "
+            "is required to update a user risk profile."
         )
 
     client = ctx.obj()
+
+    if clear_start_date:
+        start_date = ""
+    if clear_end_date:
+        end_date = ""
+    if clear_notes:
+        notes = ""
+
     try:
         client.user_risk_profiles.v1.update(user, notes, start_date, end_date)
     except DateParseError as err:
         raise err
 
 
-# TODO: add_cloud_alias() or add_alias()
 @user_risk_profiles.command(cls=IncydrCommand)
 @click.argument("user", callback=user_lookup_callback)
 @click.argument("cloud-alias")
@@ -160,7 +200,6 @@ def remove_cloud_alias(ctx: Context, user, cloud_alias):
     client.user_risk_profiles.v1.delete_cloud_aliases(user, cloud_alias)
 
 
-# TODO, do we want 'bulk' to be a subcommand group
 @user_risk_profiles.command(cls=IncydrCommand)
 @click.argument("csv")
 @click.pass_context

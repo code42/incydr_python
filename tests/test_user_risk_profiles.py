@@ -310,7 +310,7 @@ def test_cli_update_when_no_options_raises_usage_error(
     result = runner.invoke(incydr, ["user-risk-profiles", "update", TEST_USER_ID])
     assert result.exit_code == 2
     assert (
-        "At least one of --start-date, --end-date, or --notes is required to update a user risk profile."
+        "At least one of --start-date, --end-date, or --notes, or one of their corresponding clear flags, is required to update a user risk profile."
         in str(result.output)
     )
 
