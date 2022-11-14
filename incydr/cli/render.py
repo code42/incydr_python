@@ -55,12 +55,12 @@ def table(
             max_width = row_width + header_padding
         tbl.add_row(*values)
 
-    console.width = max_width
-    tbl.width = max_width
     if not tbl.rows:
         console.print("No results found.")
         return
     with console.pager():
+        console.width = max_width
+        tbl.width = max_width
         console.print(tbl, crop=False, soft_wrap=False, overflow="fold")
 
 
