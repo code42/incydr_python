@@ -10,7 +10,8 @@ from typing import Type
 
 from click import BadOptionUsage
 from pydantic import BaseModel
-from rich.console import RenderableType, ConsoleRenderable, RichCast
+from rich.console import ConsoleRenderable
+from rich.console import RichCast
 from rich.table import Table
 
 from incydr.cli import console

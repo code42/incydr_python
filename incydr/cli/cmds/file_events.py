@@ -14,6 +14,7 @@ from incydr.cli import console
 from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
+from incydr.cli import render
 from incydr.cli.cmds.options.event_filter_options import advanced_query_option
 from incydr.cli.cmds.options.event_filter_options import event_filter_options
 from incydr.cli.cmds.options.event_filter_options import saved_search_option
@@ -164,7 +165,7 @@ def search(
             console.print_json(data=event)
     if format_ == "raw-json":
         for event in events:
-            print(json.dumps(event))
+            console.print(json.dumps(event), highlight=False)
 
 
 @file_events.command(cls=IncydrCommand)

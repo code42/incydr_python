@@ -24,7 +24,7 @@ table_format_option = click.option(
     "-f",
     "format_",
     type=TableFormat,
-    help="Format to print result. If environment has INCYDR_USE_RICH=false set, defaults to 'raw-json'",
+    help="Format to print result. One of 'table', 'json', 'raw-json', or 'csv. If environment has INCYDR_USE_RICH=false set, defaults to 'raw-json', else defaults to 'table'.",
     default=TableFormat.table,
 )
 single_format_option = click.option(
@@ -33,7 +33,7 @@ single_format_option = click.option(
     "format_",
     default="rich",
     type=SingleFormat,
-    help="Format to print result. If environment has INCYDR_USE_RICH=false set, defaults to 'raw-json'",
+    help="Format to print result. One of 'rich', 'json', or 'raw-json'. If environment has INCYDR_USE_RICH=false set, defaults to 'raw-json', else defaults to 'rich'.",
 )
 
 columns_option = click.option(

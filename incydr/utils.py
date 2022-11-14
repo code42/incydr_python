@@ -88,7 +88,11 @@ def iter_model_formatted(
     fields = get_fields(model.__class__, include=include, flat=flat)
     for name in fields:
         path = name.split(".")
-        value, field = get_field_value_and_info(model, path)
+        # TODO: bugfix
+        try:
+            value, field = get_field_value_and_info(model, path)
+        except AttributeError:
+            continue
         field_renderer = None if not field else field.field_info.extra.get(render)
         if render and field_renderer:
             value = field_renderer(value)

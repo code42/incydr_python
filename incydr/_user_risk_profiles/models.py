@@ -5,6 +5,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 from pydantic import Field
+from rich.markdown import Markdown
 
 from incydr._core.models import ResponseModel
 
@@ -82,7 +83,11 @@ class UserRiskProfile(ResponseModel):
         description="The Code42 username of the user's manager.",
         alias="managerUsername",
     )
-    notes: Optional[str] = Field(None, description="Notes about the user.")
+    notes: Optional[str] = Field(
+        None,
+        description="Notes about the user.",
+        table=lambda f: f if f is None else Markdown(f),
+    )
     region: Optional[str] = Field(None, description="The user's region (state).")
     start_date: Optional[Date] = Field(None, alias="startDate")
     support_user: Optional[bool] = Field(

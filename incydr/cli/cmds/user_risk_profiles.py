@@ -4,23 +4,28 @@ import click
 from click import Context
 from click import echo
 from requests import HTTPError
+from rich.panel import Panel
 from rich.progress import track
 
 from incydr._user_risk_profiles.client import DateParseError
+from incydr._user_risk_profiles.models import UserRiskProfile
 from incydr.cli import console
 from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
+from incydr.cli import render
 from incydr.cli.cmds.options.output_options import columns_option
+from incydr.cli.cmds.options.output_options import single_format_option
+from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.options.profile_filter_options import profile_filter_options
 from incydr.cli.cmds.options.utils import user_lookup_callback
-from incydr.cli.cmds.utils import output_models_format
 from incydr.cli.cmds.utils import user_lookup
 from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
+from incydr.utils import model_as_card
 from incydr.utils import read_dict_from_csv
 
 
@@ -71,16 +76,34 @@ def list_(
         deleted=deleted,
         support_user=support_user,
     )
-    # TODO with output formatter
-    output_models_format(
-        profiles, "User Risk Profiles", format_, columns, client.settings.use_rich
-    )
+
+    columns = columns or [
+        "username",
+        "user_id",
+        "display_name",
+        "cloud_aliases",
+        "active",
+        "start_date",
+        "end_date",
+    ]
+
+    if format_ == TableFormat.csv:
+        render.csv(UserRiskProfile, profiles, columns=columns, flat=True)
+    elif format_ == TableFormat.table:
+        render.table(UserRiskProfile, profiles, columns=columns, flat=False)
+    elif format_ == TableFormat.json:
+        for p in profiles:
+            console.print_json(p.json())
+    else:  # format == "raw-json"/TableFormat.raw_json
+        for p in profiles:
+            console.print(p.json(), highlight=False)
 
 
 @user_risk_profiles.command(cls=IncydrCommand)
 @click.argument("user", callback=user_lookup_callback)
+@single_format_option
 @click.pass_context
-def show(ctx: Context, user):
+def show(ctx: Context, user: str, format_: SingleFormat):
     """
     Show details for a user risk profile.
 
@@ -88,9 +111,14 @@ def show(ctx: Context, user):
     """
     client = ctx.obj()
     profile = client.user_risk_profiles.v1.get_user_risk_profile(user)
-    # TODO with output formatter, UserRiskProfile model
-    # tmp:
-    echo(profile.json())
+    if format_ == SingleFormat.rich and client.settings.use_rich:
+        console.print(
+            Panel.fit(model_as_card(profile), title=f"Risk Profile {profile.username}")
+        )
+    elif format_ == SingleFormat.json:
+        console.print_json(profile.json())
+    else:  # format == "raw-json"
+        echo(profile.json())
 
 
 @user_risk_profiles.command(cls=IncydrCommand)
