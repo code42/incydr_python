@@ -44,7 +44,7 @@ class CasesV1:
         assignee: str = None,
         description: str = None,
         findings: str = None,
-    ) -> Case:
+    ) -> CaseDetail:
         """
         Create a case.
 
@@ -91,7 +91,7 @@ class CasesV1:
             case_number = case_number.number
         return self._parent.session.delete(f"/v1/cases/{case_number}")
 
-    def get_case(self, case_number: int) -> Case:
+    def get_case(self, case_number: int) -> CaseDetail:
         """
         Get a single case.
 

@@ -7,6 +7,7 @@ from typing import Optional
 from pydantic import BaseModel
 from pydantic import Extra
 from pydantic import Field
+from rich.markdown import Markdown
 
 from incydr._core.models import Model
 from incydr._core.models import ResponseModel
@@ -14,9 +15,11 @@ from incydr.enums import SortDirection
 from incydr.enums.cases import CaseStatus
 from incydr.enums.cases import FileAvailability
 from incydr.enums.cases import SortKeys
+from incydr.utils import list_as_panel
+from incydr.utils import model_as_card
 
 
-class Case(ResponseModel):
+class Case(ResponseModel, validate_assignment=True):
     """A model representing an Incydr Case.
 
     **Fields**:
@@ -66,9 +69,6 @@ class Case(ResponseModel):
         allow_mutation=False, alias="archivalTime"
     )
 
-    class Config:
-        validate_assignment = True
-
 
 class CaseDetail(Case):
     """A model representing the full details of Incydr Case.
@@ -82,7 +82,7 @@ class CaseDetail(Case):
     """
 
     description: Optional[str]
-    findings: Optional[str]
+    findings: Optional[str] = Field(table=lambda f: f if f is None else Markdown(f))
 
 
 class CasesPage(ResponseModel):
@@ -120,16 +120,13 @@ class CreateCaseRequest(Model):
     subject: Optional[str]
 
 
-class UpdateCaseRequest(Model):
+class UpdateCaseRequest(Model, extra=Extra.ignore):
     name: Optional[str] = Field(description="The name of the case.", max_length=50)
     assignee: Optional[str]
     description: Optional[str] = Field(max_length=250)
     findings: Optional[str] = Field(max_length=30_000)
     subject: Optional[str]
     status: Optional[CaseStatus]
-
-    class Config:
-        extra = Extra.ignore
 
 
 class RiskIndicator(BaseModel):
@@ -177,6 +174,9 @@ class FileEvent(Model):
         None,
         alias="riskIndicators",
         description="List of risk indicators identified for this event. If more than one risk indicator applies to this event, the sum of all indicators determines the total risk score.",
+        table=lambda _list: list_as_panel([model_as_card(m) for m in _list])
+        if len(_list)
+        else "None",
     )
     risk_score: Optional[int] = Field(
         None,

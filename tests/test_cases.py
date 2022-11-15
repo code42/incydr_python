@@ -548,17 +548,33 @@ def test_cli_update_when_no_params_raises_error(runner, httpserver_auth: HTTPSer
 def test_cli_update_when_all_params_makes_expected_call(
     runner, httpserver_auth: HTTPServer
 ):
+    test_case = {
+        "number": TEST_CASE_NUMBER,
+        "name": "orig-name",
+        "assignee": "orig-assignee",
+        "description": "orig-description",
+        "findings": "orig-finding",
+        "subject": "orig-subject",
+        "status": "OPEN",
+    }
     data = {
         "name": "TestCase",
         "assignee": "test-assignee",
         "description": "test-desc",
         "findings": "test-finding",
-        "subject": "test-42",
+        "subject": "test-subject",
         "status": "CLOSED",
     }
+    updated_case = test_case.copy()
+    updated_case["status"] = "CLOSED"
+    updated_case["assignee"] = "test-assignee"
+    updated_case["subject"] = "test-subject"
+    httpserver_auth.expect_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}", method="GET"
+    ).respond_with_json(test_case)
     httpserver_auth.expect_request(
         f"/v1/cases/{TEST_CASE_NUMBER}", method="PUT", json=data
-    ).respond_with_data()
+    ).respond_with_json(updated_case)
     result = runner.invoke(
         incydr,
         [
@@ -576,7 +592,7 @@ def test_cli_update_when_all_params_makes_expected_call(
             "--status",
             "CLOSED",
             "--subject",
-            "test-42",
+            "test-subject",
         ],
     )
     httpserver_auth.check()
@@ -586,17 +602,33 @@ def test_cli_update_when_all_params_makes_expected_call(
 def test_cli_update_when_usernames_specified_performs_additional_lookup_makes_expected_call(
     httpserver_auth: HTTPServer, runner, mock_user_lookup
 ):
+    test_case = {
+        "number": 42,
+        "name": "test",
+        "description": None,
+        "assignee": "user-a",
+        "subject": "user-b",
+        "findings": None,
+        "status": "OPEN",
+    }
     test_data = {
-        "name": None,
+        "name": "test",
         "assignee": "user-2",
         "description": None,
         "findings": None,
         "subject": "user-1",
-        "status": None,
+        "status": "OPEN",
     }
+    test_updated_case = test_case.copy()
+    test_updated_case["assignee"] = "user-2"
+    test_updated_case["subject"] = "user-1"
+
+    httpserver_auth.expect_request(
+        uri=f"/v1/cases/{TEST_CASE_NUMBER}", method="GET"
+    ).respond_with_json(test_case)
     httpserver_auth.expect_request(
         uri=f"/v1/cases/{TEST_CASE_NUMBER}", method="PUT", json=test_data
-    ).respond_with_data()
+    ).respond_with_json(test_updated_case)
 
     result = runner.invoke(
         incydr,
