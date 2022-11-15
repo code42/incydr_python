@@ -3,14 +3,16 @@ from typing import Optional
 import click
 from click import Context
 
+from incydr.cli import console
 from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
-from incydr.cli.cmds.options.output_options import table_format_option
+from incydr.cli import render
 from incydr.cli.cmds.options.output_options import TableFormat
-from incydr.cli.cmds.utils import output_models_format
+from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
+from incydr.models import DirectoryGroup
 
 
 @click.group(cls=IncydrGroup)
@@ -39,6 +41,13 @@ def list_(ctx: Context, format_: TableFormat, name: Optional[str] = None):
         format_ = TableFormat.table
     client = ctx.obj()
     groups = client.directory_groups.v1.iter_all(name=name)
-    output_models_format(
-        groups, "Directory Groups", format_, None, client.settings.use_rich
-    )
+    if format_ == TableFormat.table:
+        render.table(DirectoryGroup, groups)
+    elif format_ == TableFormat.csv:
+        render.csv(DirectoryGroup, groups)
+    elif format_ == TableFormat.json:
+        for group in groups:
+            console.print_json(group.json())
+    else:
+        for group in groups:
+            console.print(group.json(), highlight=False)
