@@ -54,7 +54,10 @@ def get_field_value_and_info(
     for p in path[:-1]:
         next_model = getattr(model, p)
         if next_model is None:
-            model = model.__fields__[p].type_()
+            model_type = model.__fields__[p].type_
+            model = model_type.construct(
+                **{field: None for field in model_type.__fields__}
+            )
         else:
             model = next_model
     value = getattr(model, path[-1])
