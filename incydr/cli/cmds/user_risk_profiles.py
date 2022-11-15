@@ -20,6 +20,7 @@ from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.options.profile_filter_options import profile_filter_options
 from incydr.cli.cmds.options.utils import user_lookup_callback
+from incydr.cli.cmds.users import users
 from incydr.cli.cmds.utils import user_lookup
 from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
@@ -28,16 +29,16 @@ from incydr.utils import model_as_card
 from incydr.utils import read_dict_from_csv
 
 
-@click.group(cls=IncydrGroup)
+@users.group(cls=IncydrGroup)
 @log_level_option
 @log_file_option
 @click.pass_context
-def user_risk_profiles(ctx, log_level, log_file):
+def risk_profiles(ctx, log_level, log_file):
     """View and manage user risk profiles."""
     init_client(ctx, log_level, log_file)
 
 
-@user_risk_profiles.command("list", cls=IncydrCommand)
+@risk_profiles.command("list", cls=IncydrCommand)
 @table_format_option
 @columns_option
 @profile_filter_options
@@ -98,7 +99,7 @@ def list_(
             console.print(p.json(), highlight=False)
 
 
-@user_risk_profiles.command(cls=IncydrCommand)
+@risk_profiles.command(cls=IncydrCommand)
 @click.argument("user", callback=user_lookup_callback)
 @single_format_option
 @click.pass_context
@@ -120,7 +121,7 @@ def show(ctx: Context, user: str, format_: SingleFormat):
         console.print(profile.json(), highlight=False)
 
 
-@user_risk_profiles.command(cls=IncydrCommand)
+@risk_profiles.command(cls=IncydrCommand)
 @click.argument("user", callback=user_lookup_callback)
 @click.option(
     "--start-date",
@@ -195,7 +196,7 @@ def update(
         raise err
 
 
-@user_risk_profiles.command(cls=IncydrCommand)
+@risk_profiles.command(cls=IncydrCommand)
 @click.argument("user", callback=user_lookup_callback)
 @click.argument("cloud-alias")
 @click.pass_context
@@ -213,7 +214,7 @@ def add_cloud_alias(ctx: Context, user, cloud_alias):
     client.user_risk_profiles.v1.add_cloud_alias(user, cloud_alias)
 
 
-@user_risk_profiles.command(cls=IncydrCommand)
+@risk_profiles.command(cls=IncydrCommand)
 @click.argument("user", callback=user_lookup_callback)
 @click.argument("cloud-alias")
 @click.pass_context
@@ -227,7 +228,7 @@ def remove_cloud_alias(ctx: Context, user, cloud_alias):
     client.user_risk_profiles.v1.delete_cloud_alias(user, cloud_alias)
 
 
-@user_risk_profiles.command(cls=IncydrCommand)
+@risk_profiles.command(cls=IncydrCommand)
 @click.argument("csv")
 @click.pass_context
 def bulk_add_cloud_aliases(ctx: Context, csv):
@@ -262,7 +263,7 @@ def bulk_add_cloud_aliases(ctx: Context, csv):
         console.print(f"[red]Error:[/red] {err.response.text}")
 
 
-@user_risk_profiles.command(cls=IncydrCommand)
+@risk_profiles.command(cls=IncydrCommand)
 @click.argument("csv")
 @click.pass_context
 def bulk_remove_cloud_aliases(ctx: Context, csv):

@@ -255,7 +255,7 @@ def test_cli_list_makes_expected_call(httpserver_auth: HTTPServer, runner):
         "/v1/user-risk-profiles", method="GET", query_string=urlencode(query_1)
     ).respond_with_json(user_risk_profile_data_1)
 
-    result = runner.invoke(incydr, ["user-risk-profiles", "list"])
+    result = runner.invoke(incydr, ["users", "risk-profiles", "list"])
     httpserver_auth.check()
     assert result.exit_code == 0
 
@@ -264,7 +264,7 @@ def test_cli_list_makes_expected_call(httpserver_auth: HTTPServer, runner):
 def test_cli_show_makes_expected_call(
     httpserver_auth: HTTPServer, runner, user, mock_get_profile, mock_user_lookup
 ):
-    result = runner.invoke(incydr, ["user-risk-profiles", "show", user])
+    result = runner.invoke(incydr, ["users", "risk-profiles", "show", user])
     httpserver_auth.check()
     assert result.exit_code == 0
 
@@ -276,7 +276,8 @@ def test_cli_update_when_all_params_makes_expected_call(
     result = runner.invoke(
         incydr,
         [
-            "user-risk-profiles",
+            "users",
+            "risk-profiles",
             "update",
             user,
             "--start-date",
@@ -298,7 +299,8 @@ def test_cli_update_when_incorrect_date_format_raises_date_parse_exception(
     httpserver_auth: HTTPServer, runner, date_option, date_input
 ):
     result = runner.invoke(
-        incydr, ["user-risk-profiles", "update", TEST_USER_ID, date_option, date_input]
+        incydr,
+        ["users", "risk-profiles", "update", TEST_USER_ID, date_option, date_input],
     )
     assert result.exit_code == 1
     assert isinstance(result.exception, DateParseError)
@@ -307,7 +309,7 @@ def test_cli_update_when_incorrect_date_format_raises_date_parse_exception(
 def test_cli_update_when_no_options_raises_usage_error(
     httpserver_auth: HTTPServer, runner
 ):
-    result = runner.invoke(incydr, ["user-risk-profiles", "update", TEST_USER_ID])
+    result = runner.invoke(incydr, ["users", "risk-profiles", "update", TEST_USER_ID])
     assert result.exit_code == 2
     assert (
         "At least one of --start-date, --end-date, or --notes, or one of their corresponding clear flags, is required to update a user risk profile."
@@ -326,7 +328,7 @@ def test_cli_add_cloud_alias_makes_expected_call(
     ).respond_with_json(TEST_USER_RISK_PROFILE_1)
 
     result = runner.invoke(
-        incydr, ["user-risk-profiles", "add-cloud-alias", user, "test-alias"]
+        incydr, ["users", "risk-profiles", "add-cloud-alias", user, "test-alias"]
     )
     assert result.exit_code == 0
 
@@ -342,7 +344,7 @@ def test_cli_remove_cloud_alias_makes_expected_call(
     ).respond_with_json(TEST_USER_RISK_PROFILE_1)
 
     result = runner.invoke(
-        incydr, ["user-risk-profiles", "remove-cloud-alias", user, "test-alias"]
+        incydr, ["users", "risk-profiles", "remove-cloud-alias", user, "test-alias"]
     )
     assert result.exit_code == 0
 
@@ -372,6 +374,6 @@ def test_cli_bulk_update_cloud_aliases_when_user_id_or_username_makes_expected_c
     p.write_text(
         "user,cloud_alias\ntest-user-id,test-alias-1\nfoo@bar.com,test-alias-2\n"
     )
-    result = runner.invoke(incydr, ["user-risk-profiles", command, str(p)])
+    result = runner.invoke(incydr, ["users", "risk-profiles", command, str(p)])
     httpserver_auth.check()
     assert result.exit_code == 0

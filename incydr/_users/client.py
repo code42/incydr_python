@@ -18,6 +18,18 @@ from incydr.enums import SortDirection
 from incydr.enums.devices import SortKeys
 
 
+class UsersClient:
+    def __init__(self, parent):
+        self._parent = parent
+        self._v1 = None
+
+    @property
+    def v1(self):
+        if self._v1 is None:
+            self._v1 = UsersV1(self._parent)
+        return self._v1
+
+
 class UsersV1:
     """Client for `/v1/users` endpoints.
 
@@ -228,15 +240,3 @@ class UsersV1:
 
         """
         return self._parent.session.post(f"/v1/users/{user_id}/deactivate")
-
-
-class UsersClient:
-    def __init__(self, parent):
-        self._parent = parent
-        self._v1 = None
-
-    @property
-    def v1(self):
-        if self._v1 is None:
-            self._v1 = UsersV1(self._parent)
-        return self._v1
