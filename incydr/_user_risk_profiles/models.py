@@ -32,7 +32,7 @@ class UserRiskProfile(ResponseModel):
     **Fields**:
 
     * **active**: `bool` - Whether the user is active.
-    * **cloud_aliases**: `List[str]` - List of cloud aliases for the user.
+    * **cloud_alias**: `List[str]` - List of cloud aliases for the user.
     * **country**: `str` - The user's country.
     * **deleted**: `bool` - Whether the user has been deleted.
     * **department**: `str` - The user's department.

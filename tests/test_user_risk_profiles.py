@@ -205,34 +205,34 @@ def test_update_when_default_params_returns_expected_data(mock_update_profile):
     assert user_risk_profile.json() == json.dumps(TEST_USER_RISK_PROFILE_2)
 
 
-def test_add_cloud_aliases_when_default_params_returns_expected_data(
+def test_add_cloud_alias_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     httpserver_auth.expect_request(
         f"/v1/user-risk-profiles/{TEST_USER_ID}/add-cloud-aliases",
         method="POST",
-        json={"userId": TEST_USER_ID, "cloudAliases": ["alias_one", "alias_two"]},
+        json={"userId": TEST_USER_ID, "cloudAliases": ["alias_one"]},
     ).respond_with_json(TEST_USER_RISK_PROFILE_2)
 
     client = Client()
-    response = client.user_risk_profiles.v1.add_cloud_aliases(
-        TEST_USER_ID, ["alias_one", "alias_two"]
-    )
+    response = client.user_risk_profiles.v1.add_cloud_alias(TEST_USER_ID, "alias_one")
 
     assert isinstance(response, Response)
     assert response.status_code == 200
 
 
-def test_delete_cloud_aliases_when_default_params_returns_expected_data(
+def test_delete_cloud_alias_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     httpserver_auth.expect_request(
-        f"/v1/user-risk-profiles/{TEST_USER_ID}/delete-cloud-aliases"
+        f"/v1/user-risk-profiles/{TEST_USER_ID}/delete-cloud-aliases",
+        method="POST",
+        json={"userId": TEST_USER_ID, "cloudAliases": ["alias_one"]},
     ).respond_with_json(TEST_USER_RISK_PROFILE_2)
 
     client = Client()
-    response = client.user_risk_profiles.v1.delete_cloud_aliases(
-        TEST_USER_ID, ["alias_one", "two"]
+    response = client.user_risk_profiles.v1.delete_cloud_alias(
+        TEST_USER_ID, "alias_one"
     )
 
     assert isinstance(response, Response)

@@ -210,7 +210,7 @@ def add_cloud_alias(ctx: Context, user, cloud_alias):
     Each user has a default cloud alias of their Code42 username. You can add one additional alias.
     """
     client = ctx.obj()
-    client.user_risk_profiles.v1.add_cloud_aliases(user, cloud_alias)
+    client.user_risk_profiles.v1.add_cloud_alias(user, cloud_alias)
 
 
 @user_risk_profiles.command(cls=IncydrCommand)
@@ -224,7 +224,7 @@ def remove_cloud_alias(ctx: Context, user, cloud_alias):
     Accepts a user ID or a username.  Performs an additional lookup if a username is passed.
     """
     client = ctx.obj()
-    client.user_risk_profiles.v1.delete_cloud_aliases(user, cloud_alias)
+    client.user_risk_profiles.v1.delete_cloud_alias(user, cloud_alias)
 
 
 @user_risk_profiles.command(cls=IncydrCommand)
@@ -256,7 +256,7 @@ def bulk_add_cloud_aliases(ctx: Context, csv):
                         client, row["user"]
                     )
 
-            client.user_risk_profiles.v1.add_cloud_aliases(user, row["cloud_alias"])
+            client.user_risk_profiles.v1.add_cloud_alias(user, row["cloud_alias"])
 
     except HTTPError as err:
         console.print(f"[red]Error:[/red] {err.response.text}")
@@ -286,7 +286,7 @@ def bulk_remove_cloud_aliases(ctx: Context, csv):
             if user and "@" in user:
                 user = user_lookup(client, row["user"])
 
-            client.user_risk_profiles.v1.delete_cloud_aliases(user, row["cloud_alias"])
+            client.user_risk_profiles.v1.delete_cloud_alias(user, row["cloud_alias"])
 
     except HTTPError as err:
         console.print(f"[red]Error:[/red] {err.response.text}")

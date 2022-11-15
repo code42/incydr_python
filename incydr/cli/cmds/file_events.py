@@ -156,14 +156,14 @@ def search(
         output_format_logger(events, output, columns, certs, ignore_cert_validation)
         return
 
-    if format_ == "csv":
+    if format_ == TableFormat.csv:
         render.csv(FileEventV2, events, columns=columns, flat=True)
-    if format_ == "table" or format_ is None:
+    elif format_ == TableFormat.table:
         render.table(FileEventV2, events, columns=columns, flat=False)
-    if format_ == "json":
+    elif format_ == TableFormat.json:
         for event in events:
             console.print_json(data=event)
-    if format_ == "raw-json":
+    else:  # format_ == "raw-json"/TableFormat.raw_json
         for event in events:
             console.print(json.dumps(event), highlight=False)
 

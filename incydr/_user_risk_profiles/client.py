@@ -1,7 +1,6 @@
 from datetime import datetime
 from itertools import count
 from typing import Iterator
-from typing import List
 from typing import Union
 
 from requests import Response
@@ -209,8 +208,7 @@ class UserRiskProfilesV1:
         )
         return UserRiskProfile.parse_response(response)
 
-    # TODO: should people be able to add more than 1 alias
-    def add_cloud_aliases(self, user_id: str, cloud_aliases: List[str]) -> Response:
+    def add_cloud_alias(self, user_id: str, cloud_alias: str) -> Response:
         """
         Add cloud aliases to a user risk profile.
 
@@ -220,37 +218,32 @@ class UserRiskProfilesV1:
 
         **Parameters:**
 
-        * **user_id**: `str` - The unique ID of the user to add cloud aliases.
-        * **cloud_aliases**: `str | List[str]` - A string or list of strings representing the cloud aliases to add to the user risk profile.
+        * **user_id**: `str` - User ID of the profile to update.
+        * **cloud_alias**: `str` - The new cloud alias to add to the user risk profile.
 
         **Returns**: A `requests.Response` indicating success.
         """
-        if not isinstance(cloud_aliases, List):
-            cloud_aliases = [cloud_aliases]
 
         return self._parent.session.post(
             f"/v1/user-risk-profiles/{user_id}/add-cloud-aliases",
-            json={"userId": user_id, "cloudAliases": cloud_aliases},
+            json={"userId": user_id, "cloudAliases": [cloud_alias]},
         )
 
-    def delete_cloud_aliases(self, user_id: str, cloud_aliases: List[str]) -> Response:
+    def delete_cloud_alias(self, user_id: str, cloud_alias: str) -> Response:
         """
-        Delete cloud aliases from a user risk profile.
+        Delete a cloud alias from a user risk profile.
 
         **Parameters:**
 
-        * **user_id**: `str` - The unique ID of the user to add cloud aliases.
-        * **cloud_aliases**: `str | List[str]` - A string or list of strings representing the cloud aliases to delete
-            from the user risk profile.
+        * **user_id**: `str` - User ID of the profile to update.
+        * **cloud_alias**: `str` - The cloud alias to remove from the user risk profile.
 
         **Returns**: A `requests.Response` indicating success.
         """
-        if not isinstance(cloud_aliases, List):
-            cloud_aliases = [cloud_aliases]
 
         return self._parent.session.post(
             f"/v1/user-risk-profiles/{user_id}/delete-cloud-aliases",
-            json={"userId": user_id, "cloudAliases": cloud_aliases},
+            json={"userId": user_id, "cloudAliases": [cloud_alias]},
         )
 
 
