@@ -52,19 +52,6 @@ class WatchlistsV1:
         self._watchlist_type_id_map = {}
         self._uri = "/v1/watchlists"
 
-    # @property
-    # def watchlist_type_id_map(self):
-    #     """Map watchlist types to IDs, if they exist."""
-    #     if not self._watchlist_type_id_map:
-    #         self._watchlist_type_id_map = {}
-    #         watchlists = self.get_page(page_size=100).watchlists
-    #         for item in watchlists:
-    #             if item.list_type == "CUSTOM":
-    #                 # store title for custom lists instead of list_type
-    #                 self._watchlist_type_id_map[item.title] = item.watchlist_id
-    #             self._watchlist_type_id_map[item.list_type] = item.watchlist_id
-    #     return self._watchlist_type_id_map
-
     def get_page(
         self, page_num: int = 1, page_size: int = None, user_id: str = None
     ) -> WatchlistsPage:

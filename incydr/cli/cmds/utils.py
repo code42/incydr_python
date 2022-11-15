@@ -119,6 +119,11 @@ def output_format_logger(
 
 
 def user_lookup(client, value):
+    """
+    Returns the user ID for a given username, or returns the value unchanged if not a username.
+
+    Used with the `user_lookup_callback` method on user args.
+    """
     if "@" in str(value):
         # assume username/email was passed
         users = client.users.v1.get_page(username=value).users
@@ -142,11 +147,14 @@ def output_single_format(
         echo(result.json())
 
 
-# Drop in replacements for getattr() and setattr() that account for nested attributes
-# specified by dot notation
-
-# See https://stackoverflow.com/questions/31174295/getattr-and-setattr-on-nested-objects/31174427?noredirect=1#comment86638618_31174427
+# TODO: these methods can be removed once the alerts outputting is refactored
 def rgetattr(obj, attr, *args):
+    """
+    Drop in replacements for getattr() and setattr() that account for nested attributes specified by dot notation
+
+    See https://stackoverflow.com/questions/31174295/getattr-and-setattr-on-nested-objects/31174427?noredirect=1#comment86638618_31174427
+    """
+
     def _getattr(obj, attr):
         return getattr(obj, attr, *args)
 
