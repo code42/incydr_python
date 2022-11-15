@@ -52,7 +52,11 @@ def get_field_value_and_info(
     the 'extra_data' would be accessible in `field.field_info.extra`.
     """
     for p in path[:-1]:
-        model = getattr(model, p)
+        next_model = getattr(model, p)
+        if next_model is None:
+            model = model.__fields__[p].type_()
+        else:
+            model = next_model
     value = getattr(model, path[-1])
     field = model.__fields__.get(path[-1])
     return value, field
