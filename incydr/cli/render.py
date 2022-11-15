@@ -4,11 +4,12 @@ from datetime import datetime
 from io import TextIOWrapper
 from itertools import chain
 from typing import Iterable
+from typing import List
 from typing import Set
 from typing import Type
 
 from pydantic import BaseModel
-from rich.console import RenderableType
+from rich.console import RenderableType, ConsoleRenderable, RichCast
 from rich.table import Table
 
 from incydr.cli import console
@@ -30,7 +31,7 @@ def date_time(dt: datetime):
 def table(
     model: Type[BaseModel],
     models: Iterable[BaseModel],
-    columns: list[str] = None,
+    columns: List[str] = None,
     title=None,
     flat=False,
 ):
@@ -46,7 +47,7 @@ def table(
         ):
             if isinstance(value, BaseModel):
                 value = model_as_card(value)
-            elif not isinstance(value, RenderableType):
+            elif not isinstance(value, (ConsoleRenderable, RichCast, str)):
                 value = str(value)
             value_size = console.measure(value).maximum
             row_width += value_size
@@ -85,7 +86,7 @@ def table_json(results: Iterable, columns: Set[str] = None, title=None):
 def csv(
     model: Type[BaseModel],
     models: Iterable[BaseModel],
-    columns: list[str] = None,
+    columns: List[str] = None,
     flat: bool = False,
     file: TextIOWrapper = sys.stdout,
 ):
