@@ -53,6 +53,9 @@ def get_field_value_and_info(
     """
     for p in path[:-1]:
         next_model = getattr(model, p)
+        # if a child model is Optional and _not_ present, we can inspect the parent field data to get the missing child
+        # class and use that to "construct" an empty version of the model, so child fields will still return valid
+        # field_info, but the value will be `None` for every field on "missing" child models.
         if next_model is None:
             model_type = model.__fields__[p].type_
             model = model_type.construct(
