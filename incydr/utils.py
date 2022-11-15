@@ -28,7 +28,7 @@ from rich.text import Text
 
 
 def get_field_value_and_info(
-    model: BaseModel, path: list[str]
+    model: BaseModel, path: List[str]
 ) -> Tuple[Any, ModelField]:
     """
     Traverse a pydantic model and its sub-models to retrieve both the value and `ModelField` data for a given attribute
@@ -184,7 +184,7 @@ def flatten_fields(model: Type[BaseModel]) -> Generator[str, None, None]:
 
 
 def get_fields(
-    model: Type[BaseModel], include: list[str] = None, flat: bool = False
+    model: Type[BaseModel], include: List[str] = None, flat: bool = False
 ) -> Generator[str, None, None]:
     """
     Yields fields from a model.

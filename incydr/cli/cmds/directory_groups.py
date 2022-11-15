@@ -8,8 +8,8 @@ from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
-from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.options.output_options import table_format_option
+from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
 from incydr.models import DirectoryGroup

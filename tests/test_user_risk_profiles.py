@@ -2,12 +2,18 @@ import datetime
 import json
 from urllib.parse import urlencode
 
+import pytest
 from pytest_httpserver import HTTPServer
 from requests import Response
 
 from incydr import Client
+from incydr._user_risk_profiles.client import DateParseError
 from incydr._user_risk_profiles.models import UserRiskProfile
 from incydr._user_risk_profiles.models import UserRiskProfilesPage
+from incydr.cli.main import incydr
+from tests.test_users import TEST_USER_1
+
+TEST_USER_ID = "user-1"
 
 TEST_USER_RISK_PROFILE_1 = {
     "active": True,
@@ -33,7 +39,7 @@ TEST_USER_RISK_PROFILE_1 = {
     "supportUser": None,
     "tenantId": None,
     "title": None,
-    "userId": "1",
+    "userId": TEST_USER_ID,
     "username": None,
 }
 
@@ -61,18 +67,70 @@ TEST_USER_RISK_PROFILE_2 = {
     "username": "C424",
 }
 
+user_input = pytest.mark.parametrize("user", [TEST_USER_ID, "foo@bar.com"])
+
+
+@pytest.fixture
+def mock_user_lookup(httpserver_auth):
+    query_1 = {
+        "username": "foo@bar.com",
+        "page": 1,
+        "pageSize": 100,
+    }
+
+    data_1 = {"users": [TEST_USER_1], "totalCount": 1}
+    httpserver_auth.expect_request(
+        "/v1/users", method="GET", query_string=urlencode(query_1)
+    ).respond_with_json(data_1)
+
+    httpserver_auth.expect_request("/v1/oauth", method="POST").respond_with_json(
+        dict(
+            token_type="bearer",
+            expires_in=900,
+            access_token="abcd-1234",
+        )
+    )
+
+
+@pytest.fixture
+def mock_get_profile(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request(
+        f"/v1/user-risk-profiles/{TEST_USER_ID}"
+    ).respond_with_json(TEST_USER_RISK_PROFILE_1)
+
+
+@pytest.fixture
+def mock_update_profile(httpserver_auth: HTTPServer):
+    query = {"paths": ["startDate", "endDate", "notes"]}
+    data = {
+        "endDate": {
+            "year": 2022,
+            "month": 8,
+            "day": 2,
+        },
+        "notes": "These are new notes",
+        "startDate": {
+            "year": 2020,
+            "month": 9,
+            "day": 1,
+        },
+    }
+    httpserver_auth.expect_request(
+        f"/v1/user-risk-profiles/{TEST_USER_ID}",
+        method="PATCH",
+        query_string=urlencode(query, doseq=True),
+        json=data,
+    ).respond_with_json(TEST_USER_RISK_PROFILE_2)
+
 
 def test_get_single_user_risk_profile_when_default_params_returns_expected_data(
-    httpserver_auth: HTTPServer,
+    mock_get_profile,
 ):
-    httpserver_auth.expect_request("/v1/user-risk-profiles/2").respond_with_json(
-        TEST_USER_RISK_PROFILE_2
-    )
     client = Client()
-    user_risk_profile = client.user_risk_profiles.v1.get_user_risk_profile("2")
+    user_risk_profile = client.user_risk_profiles.v1.get_user_risk_profile(TEST_USER_ID)
     assert isinstance(user_risk_profile, UserRiskProfile)
-    assert user_risk_profile.user_id == "2"
-    assert user_risk_profile.json() == json.dumps(TEST_USER_RISK_PROFILE_2)
+    assert user_risk_profile.user_id == TEST_USER_ID
+    assert user_risk_profile.json() == json.dumps(TEST_USER_RISK_PROFILE_1)
 
 
 def test_get_page_when_default_params_returns_expected_data(
@@ -122,7 +180,6 @@ def test_iter_all_when_default_params_returns_expected_data(
     httpserver_auth.expect_request(
         "/v1/user-risk-profiles", method="GET", query_string=urlencode(query_2)
     ).respond_with_json(user_risk_profile_data_2)
-
     client = Client()
     iterator = client.user_risk_profiles.v1.iter_all(page_size=2)
     total_user_risk_profiles = 0
@@ -135,69 +192,186 @@ def test_iter_all_when_default_params_returns_expected_data(
     assert total_user_risk_profiles == 2
 
 
-def test_update_when_default_params_returns_expected_data(httpserver_auth: HTTPServer):
-    query = {"paths": ["startDate", "endDate", "notes"]}
-    data = {
-        "endDate": {
-            "year": 2020,
-            "month": 9,
-            "day": 1,
-        },
-        "notes": "These are new notes",
-        "startDate": {
-            "year": 2022,
-            "month": 8,
-            "day": 2,
-        },
-    }
-    httpserver_auth.expect_request(
-        "/v1/user-risk-profiles/2",
-        method="PATCH",
-        query_string=urlencode(query, doseq=True),
-        json=data,
-    ).respond_with_json(TEST_USER_RISK_PROFILE_2)
-
+def test_update_when_default_params_returns_expected_data(mock_update_profile):
     client = Client()
     user_risk_profile = client.user_risk_profiles.v1.update(
-        "2",
+        TEST_USER_ID,
         notes="These are new notes",
-        start_date=datetime.datetime(
-            2022, 8, 2, 13, 11, 7, 803762, tzinfo=datetime.timezone.utc
-        ),
-        end_date=datetime.datetime(
-            2020, 9, 1, 13, 11, 7, 803762, tzinfo=datetime.timezone.utc
-        ),
+        start_date=datetime.datetime(2020, 9, 1, tzinfo=datetime.timezone.utc),
+        end_date=datetime.datetime(2022, 8, 2, tzinfo=datetime.timezone.utc),
     )
 
     assert isinstance(user_risk_profile, UserRiskProfile)
     assert user_risk_profile.json() == json.dumps(TEST_USER_RISK_PROFILE_2)
 
 
-def test_add_cloud_aliases_when_default_params_returns_expected_data(
+def test_add_cloud_alias_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     httpserver_auth.expect_request(
-        "/v1/user-risk-profiles/2/add-cloud-aliases"
+        f"/v1/user-risk-profiles/{TEST_USER_ID}/add-cloud-aliases",
+        method="POST",
+        json={"userId": TEST_USER_ID, "cloudAliases": ["alias_one"]},
     ).respond_with_json(TEST_USER_RISK_PROFILE_2)
 
     client = Client()
-    response = client.user_risk_profiles.v1.add_cloud_aliases("2", ["alias_one", "two"])
+    response = client.user_risk_profiles.v1.add_cloud_alias(TEST_USER_ID, "alias_one")
 
     assert isinstance(response, Response)
     assert response.status_code == 200
 
 
-def test_delete_cloud_aliases_when_default_params_returns_expected_data(
+def test_delete_cloud_alias_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     httpserver_auth.expect_request(
-        "/v1/user-risk-profiles/2/delete-cloud-aliases"
+        f"/v1/user-risk-profiles/{TEST_USER_ID}/delete-cloud-aliases",
+        method="POST",
+        json={"userId": TEST_USER_ID, "cloudAliases": ["alias_one"]},
     ).respond_with_json(TEST_USER_RISK_PROFILE_2)
 
     client = Client()
-    response = client.user_risk_profiles.v1.delete_cloud_aliases(
-        "2", ["alias_one", "two"]
+    response = client.user_risk_profiles.v1.delete_cloud_alias(
+        TEST_USER_ID, "alias_one"
     )
 
     assert isinstance(response, Response)
     assert response.status_code == 200
+
+
+# ************************************************ CLI ************************************************
+
+
+def test_cli_list_makes_expected_call(httpserver_auth: HTTPServer, runner):
+    query_1 = {
+        "page_num": 1,
+        "page_size": 100,
+    }
+    user_risk_profile_data_1 = {
+        "userRiskProfiles": [TEST_USER_RISK_PROFILE_1, TEST_USER_RISK_PROFILE_2],
+        "totalCount": 2,
+    }
+    httpserver_auth.expect_request(
+        "/v1/user-risk-profiles", method="GET", query_string=urlencode(query_1)
+    ).respond_with_json(user_risk_profile_data_1)
+
+    result = runner.invoke(incydr, ["user-risk-profiles", "list"])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+@user_input
+def test_cli_show_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, user, mock_get_profile, mock_user_lookup
+):
+    result = runner.invoke(incydr, ["user-risk-profiles", "show", user])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+@user_input
+def test_cli_update_when_all_params_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, user, mock_user_lookup, mock_update_profile
+):
+    result = runner.invoke(
+        incydr,
+        [
+            "user-risk-profiles",
+            "update",
+            user,
+            "--start-date",
+            "2020-09-01",
+            "--end-date",
+            "2022-08-02",
+            "--notes",
+            "These are new notes",
+        ],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+@pytest.mark.parametrize(
+    "date_option,date_input", [("--start-date", "2022-02-30"), ("--end-date", "1-1")]
+)
+def test_cli_update_when_incorrect_date_format_raises_date_parse_exception(
+    httpserver_auth: HTTPServer, runner, date_option, date_input
+):
+    result = runner.invoke(
+        incydr, ["user-risk-profiles", "update", TEST_USER_ID, date_option, date_input]
+    )
+    assert result.exit_code == 1
+    assert isinstance(result.exception, DateParseError)
+
+
+def test_cli_update_when_no_options_raises_usage_error(
+    httpserver_auth: HTTPServer, runner
+):
+    result = runner.invoke(incydr, ["user-risk-profiles", "update", TEST_USER_ID])
+    assert result.exit_code == 2
+    assert (
+        "At least one of --start-date, --end-date, or --notes, or one of their corresponding clear flags, is required to update a user risk profile."
+        in str(result.output)
+    )
+
+
+@user_input
+def test_cli_add_cloud_alias_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, user, mock_user_lookup
+):
+    httpserver_auth.expect_request(
+        f"/v1/user-risk-profiles/{TEST_USER_ID}/add-cloud-aliases",
+        method="POST",
+        json={"userId": TEST_USER_ID, "cloudAliases": ["test-alias"]},
+    ).respond_with_json(TEST_USER_RISK_PROFILE_1)
+
+    result = runner.invoke(
+        incydr, ["user-risk-profiles", "add-cloud-alias", user, "test-alias"]
+    )
+    assert result.exit_code == 0
+
+
+@user_input
+def test_cli_remove_cloud_alias_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, user, mock_user_lookup
+):
+    httpserver_auth.expect_request(
+        f"/v1/user-risk-profiles/{TEST_USER_ID}/delete-cloud-aliases",
+        method="POST",
+        json={"userId": TEST_USER_ID, "cloudAliases": ["test-alias"]},
+    ).respond_with_json(TEST_USER_RISK_PROFILE_1)
+
+    result = runner.invoke(
+        incydr, ["user-risk-profiles", "remove-cloud-alias", user, "test-alias"]
+    )
+    assert result.exit_code == 0
+
+
+@pytest.mark.parametrize(
+    "url_path,command",
+    [
+        ("add-cloud-aliases", "bulk-add-cloud-aliases"),
+        ("delete-cloud-aliases", "bulk-remove-cloud-aliases"),
+    ],
+)
+def test_cli_bulk_update_cloud_aliases_when_user_id_or_username_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, tmp_path, mock_user_lookup, url_path, command
+):
+    httpserver_auth.expect_request(
+        f"/v1/user-risk-profiles/test-user-id/{url_path}",
+        method="POST",
+        json={"userId": "test-user-id", "cloudAliases": ["test-alias-1"]},
+    ).respond_with_json(TEST_USER_RISK_PROFILE_1)
+    httpserver_auth.expect_request(
+        f"/v1/user-risk-profiles/{TEST_USER_ID}/{url_path}",
+        method="POST",
+        json={"userId": TEST_USER_ID, "cloudAliases": ["test-alias-2"]},
+    ).respond_with_json(TEST_USER_RISK_PROFILE_2)
+
+    p = tmp_path / "user_aliases.csv"
+    p.write_text(
+        "user,cloud_alias\ntest-user-id,test-alias-1\nfoo@bar.com,test-alias-2\n"
+    )
+    result = runner.invoke(incydr, ["user-risk-profiles", command, str(p)])
+    httpserver_auth.check()
+    assert result.exit_code == 0

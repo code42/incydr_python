@@ -18,16 +18,16 @@ from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
-from incydr.cli.cmds.options.output_options import SingleFormat
-from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.options.output_options import columns_option
 from incydr.cli.cmds.options.output_options import single_format_option
+from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
+from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.options.utils import user_lookup_callback
 from incydr.cli.cmds.utils import user_lookup
+from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
-from incydr.cli.core import incompatible_with
 from incydr.utils import CSVValidationError
 from incydr.utils import model_as_card
 from incydr.utils import read_dict_from_csv
@@ -57,13 +57,13 @@ def cases(ctx, log_level, log_file):
 @click.option("--description", help="Case description.", default=None)
 @click.option(
     "--subject",
-    help="User of the subject of the case.  Takes a user ID or a username.  Performs an additional lookup if username is passed.",
+    help="User of the subject of the case.  Takes a user ID or a username.  Performs an additional lookup if a username is passed.",
     default=None,
     callback=user_lookup_callback,
 )
 @click.option(
     "--assignee",
-    help="User of the assignee of the case. Takes a user ID or a username.  Performs an additional lookup if username is passed.",
+    help="User of the assignee of the case. Takes a user ID or a username.  Performs an additional lookup if a username is passed.",
     default=None,
     callback=user_lookup_callback,
 )
@@ -169,7 +169,7 @@ def show(ctx: Context, case_number: int, format_: SingleFormat):
 @click.option(
     "--assignee",
     default=None,
-    help="The administrator assigned to the case. Takes a user ID or a username.  Performs an additional lookup if username is passed.",
+    help="The administrator assigned to the case. Takes a user ID or a username.  Performs an additional lookup if a username is passed.",
     callback=user_lookup_callback,
 )
 @click.option("--description", default=None, help="Brief optional description.")
@@ -185,7 +185,7 @@ def show(ctx: Context, case_number: int, format_: SingleFormat):
 @click.option(
     "--subject",
     default=None,
-    help="The case subject. Takes a user ID or a username.  Performs an additional lookup if username is passed.",
+    help="The case subject. Takes a user ID or a username.  Performs an additional lookup if a username is passed.",
     callback=user_lookup_callback,
 )
 @click.pass_context
@@ -238,12 +238,12 @@ def bulk_update(ctx: Context, csv: Path):
     Valid CSV columns that correspond to mutable case fields include:
 
     * `number` (REQUIRED) - Case number.
-    * `assignee` - User ID or username of the administrator assigned to the case. Performs an additional lookup if username is passed.
+    * `assignee` - User ID or username of the administrator assigned to the case. Performs an additional lookup if a username is passed.
     * `description` - Brief optional description.
     * `findings` - Markdown formatted text summarizing the findings for a case.
     * `name` - Case name.
     * `status` - Case status. One of `ARCHIVED`, `CLOSED` or `OPEN`.
-    * `subject` - User ID or username of the case subject. Performs an additional lookup if username is passed.
+    * `subject` - User ID or username of the case subject. Performs an additional lookup if a username is passed.
 
     """
     client = ctx.obj()
@@ -254,22 +254,22 @@ def bulk_update(ctx: Context, csv: Path):
             description="Updating cases...",
             transient=True,
         ):
-            if case.assignee:
-                if "@" in case.assignee:
-                    try:
-                        case.assignee = username_cache[case.assignee]
-                    except KeyError:
-                        username_cache[case.assignee] = user_lookup(
-                            client, case.assignee
-                        )
-                        case.assignee = username_cache[case.assignee]
-            if case.subject:
-                if "@" in case.subject:
-                    try:
-                        case.subject = username_cache[case.subject]
-                    except KeyError:
-                        username_cache[case.subject] = user_lookup(client, case.subject)
-                        case.subject = username_cache[case.subject]
+            if case.assignee and "@" in case.assignee:
+                assignee = username_cache.get(case.assignee)
+                if not assignee:
+                    assignee = username_cache[case.assignee] = user_lookup(
+                        client, case.assignee
+                    )
+                case.assignee = assignee
+
+            if case.subject and "@" in case.subject:
+                subject = username_cache.get(case.subject)
+                if not subject:
+                    subject = username_cache[case.subject] = user_lookup(
+                        client, case.subject
+                    )
+                case.subject = subject
+
             client.cases.v1.update(case)
     except CSVValidationError as err:
         console.print(f"[red]Error:[/red] {err.msg}")

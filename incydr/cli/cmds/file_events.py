@@ -16,7 +16,7 @@ from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
 from incydr.cli.cmds.options.event_filter_options import advanced_query_option
-from incydr.cli.cmds.options.event_filter_options import filter_options
+from incydr.cli.cmds.options.event_filter_options import event_filter_options
 from incydr.cli.cmds.options.event_filter_options import saved_search_option
 from incydr.cli.cmds.options.output_options import columns_option
 from incydr.cli.cmds.options.output_options import output_options
@@ -68,7 +68,7 @@ def file_events(ctx, log_level, log_file):
 @output_options
 @advanced_query_option
 @saved_search_option
-@filter_options
+@event_filter_options
 @click.pass_context
 def search(
     ctx: Context,
@@ -156,16 +156,16 @@ def search(
         output_format_logger(events, output, columns, certs, ignore_cert_validation)
         return
 
-    if format_ == "csv":
+    if format_ == TableFormat.csv:
         render.csv(FileEventV2, events, columns=columns, flat=True)
-    if format_ == "table" or format_ is None:
+    elif format_ == TableFormat.table:
         render.table(FileEventV2, events, columns=columns, flat=False)
-    if format_ == "json":
+    elif format_ == TableFormat.json:
         for event in events:
             console.print_json(data=event)
-    if format_ == "raw-json":
+    else:  # format_ == "raw-json"/TableFormat.raw_json
         for event in events:
-            print(json.dumps(event))
+            console.print(json.dumps(event), highlight=False)
 
 
 @file_events.command(cls=IncydrCommand)
