@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pytest
 from pydantic import BaseModel
 from pydantic import Field
@@ -8,18 +10,28 @@ from incydr.utils import get_fields
 from incydr.utils import iter_model_formatted
 
 
+class GrandChildTestModel(BaseModel):
+    string_field: Optional[str] = Field(table=lambda x: str(x))
+
+
 class ChildTestModel(BaseModel):
-    string_field: str
-    int_field: int = Field(table=lambda x: str(x + 1), csv=lambda x: str(x + 2))
+    string_field: Optional[str]
+    int_field: Optional[int] = Field(
+        table=lambda x: str(x + 1) if isinstance(x, int) else x,
+        csv=lambda x: str(x + 2) if isinstance(x, int) else x,
+    )
+    grand_child: Optional[GrandChildTestModel]
 
     class Config:
         json_encoders = {int: lambda i: str(float(i))}
 
 
 class ParentTestModel(BaseModel):
-    string_field: str
-    int_field: int = Field(table=lambda x: str(x + 1), csv=lambda x: str(x + 2))
-    child_model: ChildTestModel
+    string_field: Optional[str]
+    int_field: Optional[int] = Field(
+        table=lambda x: str(x + 1), csv=lambda x: str(x + 2)
+    )
+    child_model: Optional[ChildTestModel]
 
     class Config:
         json_encoders = {int: lambda i: str(float(i))}
@@ -31,6 +43,7 @@ def test_flatten():
         "int_field",
         "child_model.string_field",
         "child_model.int_field",
+        "child_model.grand_child.string_field",
     ]
 
 
@@ -45,14 +58,21 @@ def test_get_fields():
         "int_field",
         "child_model.string_field",
         "child_model.int_field",
+        "child_model.grand_child.string_field",
     ]
     assert list(get_fields(ParentTestModel, flat=True, include=["child_model.*"])) == [
         "child_model.string_field",
         "child_model.int_field",
+        "child_model.grand_child.string_field",
     ]
     assert list(
         get_fields(ParentTestModel, flat=True, include=["child_model.*", "int_field"])
-    ) == ["child_model.string_field", "child_model.int_field", "int_field"]
+    ) == [
+        "child_model.string_field",
+        "child_model.int_field",
+        "child_model.grand_child.string_field",
+        "int_field",
+    ]
     assert list(
         get_fields(
             ParentTestModel,
@@ -72,6 +92,7 @@ def test_get_fields():
         "int_field",
         "child_model.string_field",
         "child_model.int_field",
+        "child_model.grand_child.string_field",
     ]
 
 
@@ -85,7 +106,10 @@ def test_iter_model_formatted():
     assert list(iter_model_formatted(model, include=None, render=None)) == [
         ("string_field", "test"),
         ("int_field", "0.0"),
-        ("child_model", ChildTestModel(string_field="child_test", int_field=1)),
+        (
+            "child_model",
+            ChildTestModel(string_field="child_test", int_field=1, grand_child=None),
+        ),
     ]
 
     # default behavior when model is flattened
@@ -94,6 +118,7 @@ def test_iter_model_formatted():
         ("int_field", "0.0"),
         ("child_model.string_field", "child_test"),
         ("child_model.int_field", "1.0"),
+        ("child_model.grand_child.string_field", None),
     ]
 
     # default behavior with 'include' filters
@@ -118,7 +143,10 @@ def test_iter_model_formatted():
     assert list(iter_model_formatted(model, include=None, render="table")) == [
         ("string_field", "test"),
         ("int_field", "1"),
-        ("child_model", ChildTestModel(string_field="child_test", int_field=1)),
+        (
+            "child_model",
+            ChildTestModel(string_field="child_test", int_field=1, grand_child=None),
+        ),
     ]
 
     # render string should apply to child models when flattened
@@ -129,6 +157,7 @@ def test_iter_model_formatted():
         ("int_field", "1"),
         ("child_model.string_field", "child_test"),
         ("child_model.int_field", "2"),
+        ("child_model.grand_child.string_field", "None"),
     ]
 
     # render string with 'include' filters and flattened
@@ -140,10 +169,11 @@ def test_iter_model_formatted():
         ("int_field", "1"),
         ("child_model.string_field", "child_test"),
         ("child_model.int_field", "2"),
+        ("child_model.grand_child.string_field", "None"),
     ]
 
 
-def test_model_field_getter():
+def test_get_field_value_and_info():
     model = ParentTestModel(
         string_field="test",
         int_field=0,
@@ -158,3 +188,16 @@ def test_model_field_getter():
     )
     assert child_value == 1
     assert "table" in child_field.field_info.extra
+
+    empty_child_model = ParentTestModel(string_field="test", int_field=0)
+    child_value, child_field = get_field_value_and_info(
+        empty_child_model, ["child_model", "int_field"]
+    )
+    assert child_value is None
+    assert "table" in child_field.field_info.extra
+
+    grandchild_value, grandchild_field = get_field_value_and_info(
+        empty_child_model, ["child_model", "grand_child", "string_field"]
+    )
+    assert grandchild_value is None
+    assert "table" in grandchild_field.field_info.extra
