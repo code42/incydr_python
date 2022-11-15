@@ -95,7 +95,7 @@ def test_cli_list_when_default_params_makes_expected_call(
         "/v1/departments", method="GET", query_string=urlencode(query_1)
     ).respond_with_json(data_1)
 
-    result = runner.invoke(incydr, ["departments", "list", "-f", "csv"])
+    result = runner.invoke(incydr, ["departments", "list", "-f", "json"])
     httpserver_auth.check()
     assert result.exit_code == 0
 

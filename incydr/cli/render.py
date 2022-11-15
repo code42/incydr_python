@@ -1,28 +1,22 @@
-import os
-import platform
 import sys
 from csv import DictWriter
 from datetime import datetime
+from io import TextIOWrapper
 from itertools import chain
 from typing import Iterable
+from typing import List
 from typing import Set
 from typing import Type
 
 from click import BadOptionUsage
 from pydantic import BaseModel
-from rich.console import RenderableType
+from rich.console import RenderableType, ConsoleRenderable, RichCast
 from rich.table import Table
 
 from incydr.cli import console
 from incydr.utils import get_fields
 from incydr.utils import iter_model_formatted
 from incydr.utils import model_as_card
-
-if platform.system() in ("Darwin", "Linux"):
-    os.environ["MANPAGER"] = "less -S"
-else:
-    ...
-    # TODO: figure out Windows pager to use
 
 
 def date(dt: datetime):
@@ -38,7 +32,7 @@ def date_time(dt: datetime):
 def table(
     model: Type[BaseModel],
     models: Iterable[BaseModel],
-    columns: list[str] = None,
+    columns: List[str] = None,
     title=None,
     flat=False,
 ):
@@ -54,7 +48,7 @@ def table(
         ):
             if isinstance(value, BaseModel):
                 value = model_as_card(value)
-            elif not isinstance(value, RenderableType):
+            elif not isinstance(value, (ConsoleRenderable, RichCast, str)):
                 value = str(value)
             value_size = console.measure(value).maximum
             row_width += value_size
@@ -63,12 +57,12 @@ def table(
             max_width = row_width + header_padding
         tbl.add_row(*values)
 
-    console.width = max_width
-    tbl.width = max_width
     if not tbl.rows:
         console.print("No results found.")
         return
     with console.pager():
+        console.width = max_width
+        tbl.width = max_width
         console.print(tbl, crop=False, soft_wrap=False, overflow="fold")
 
 
@@ -100,8 +94,9 @@ def table_json(results: Iterable, columns: Set[str] = None, title=None):
 def csv(
     model: Type[BaseModel],
     models: Iterable[BaseModel],
-    columns: list[str] = None,
+    columns: List[str] = None,
     flat: bool = False,
+    file: TextIOWrapper = sys.stdout,
 ):
     models = iter(models)
     try:
@@ -111,7 +106,7 @@ def csv(
         console.print("No results found.")
         return
     headers = list(get_fields(model, columns, flat=flat))
-    writer = DictWriter(sys.stdout, fieldnames=headers, extrasaction="ignore")
+    writer = DictWriter(file, fieldnames=headers, extrasaction="ignore")
 
     writer.writeheader()
     for m in models:

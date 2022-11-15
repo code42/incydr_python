@@ -13,7 +13,7 @@ class DepartmentsPage(ResponseModel):
 
     **Fields**:
 
-    * **directory_groups**: `List[str]` - The list of `n` department names retrieved by the query, where `n=page_size`.
+    * **departments**: `List[str]` - The list of `n` department names retrieved by the query, where `n=page_size`.
     * **total_count**: `int` - Total count of departments retrieved by the query.
     """
 
