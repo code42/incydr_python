@@ -92,6 +92,7 @@ def test_get_fields():
         "int_field",
         "child_model.string_field",
         "child_model.int_field",
+        "child_model.grand_child.string_field",
     ]
 
 
