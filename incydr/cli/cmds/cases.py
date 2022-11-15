@@ -210,7 +210,7 @@ def update(
     client = ctx.obj()
     case = client.cases.v1.get_case(case_number)
     if assignee:
-        case.assignee = user_lookup(client, assignee)
+        case.assignee = assignee
     if description:
         case.description = description
     if findings:
@@ -220,7 +220,7 @@ def update(
     if status:
         case.status = status
     if subject:
-        case.subject = user_lookup(client, subject)
+        case.subject = subject
     updated_case = client.cases.v1.update(case)
     console.print(Panel.fit(model_as_card(updated_case), title="Case Updated"))
 
