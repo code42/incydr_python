@@ -43,9 +43,9 @@ def list_(ctx: Context, format_: TableFormat, name: Optional[str] = None):
     groups = client.directory_groups.v1.iter_all(name=name)
     if format_ == TableFormat.table:
         render.table(DirectoryGroup, groups)
-    if format_ == TableFormat.csv:
+    elif format_ == TableFormat.csv:
         render.csv(DirectoryGroup, groups)
-    if format_ == TableFormat.json:
+    elif format_ == TableFormat.json:
         for group in groups:
             console.print_json(group.json())
     else:

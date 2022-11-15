@@ -48,7 +48,7 @@ def list_(ctx: Context, format_: SingleFormat, name: Optional[str] = None):
 
     if format_ == SingleFormat.rich:
         console.print(list_as_panel(deps, expand=False, title="Departments"))
-    if format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json:
         console.print_json(data=deps)
-    if format_ == SingleFormat.raw_json:
+    else:
         console.print(json.dumps(deps), highlight=False)
