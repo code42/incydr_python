@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import List
 from typing import Optional
 
-from pydantic import constr
+import rich.box
 from pydantic import Field
 from pydantic import constr
 from pydantic import validator
@@ -65,7 +65,12 @@ class Note(Model):
         example="exampleUsername",
     )
     message: Optional[str] = Field(
-        None, description="The note itself.", example="This is a note."
+        None,
+        description="The note itself.",
+        example="This is a note.",
+        table=lambda note: Panel(Markdown(note), width=120, box=rich.box.MINIMAL)
+        if note
+        else note,
     )
 
 
@@ -222,6 +227,12 @@ class AlertSummary(Model):
         None,
         description="Watchlists the actor is on at the time of the alert.",
         example=[],
+        table=lambda watchlists: "\n".join((w.name or w.type) for w in watchlists)
+        if watchlists
+        else watchlists,
+        csv=lambda watchlists: "|".join((w.name or w.type) for w in watchlists)
+        if watchlists
+        else watchlists,
     )
 
 
