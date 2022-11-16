@@ -10,6 +10,7 @@ from typing import Type
 
 from click import BadOptionUsage
 from pydantic import BaseModel
+from rich.console import Console
 from rich.console import ConsoleRenderable
 from rich.console import RichCast
 from rich.table import Table
@@ -30,6 +31,13 @@ def date_time(dt: datetime):
     return dt.isoformat(sep=" ")[:16] + " UTC"
 
 
+def measure_renderable(r: ConsoleRenderable):
+    # the console.measure() method limits the max measurement size to the current size of the console
+    # so to get the _actual_ size that a table would occupy with no wrapping, we need to make a large
+    # console object
+    return Console(width=100_000).measure(r).maximum
+
+
 def table(
     model: Type[BaseModel],
     models: Iterable[BaseModel],
@@ -38,12 +46,9 @@ def table(
     flat=False,
 ):
     headers = list(get_fields(model, include=columns, flat=flat))
-    header_padding = len(headers) * 3
-    max_width = 0
     tbl = Table(*headers, title=title, show_lines=True)
     for m in models:
         values = []
-        row_width = 0
         for _name, value in iter_model_formatted(
             m, include=headers, flat=flat, render="table"
         ):
@@ -51,19 +56,15 @@ def table(
                 value = model_as_card(value)
             elif not isinstance(value, (ConsoleRenderable, RichCast, str)):
                 value = str(value)
-            value_size = console.measure(value).maximum
-            row_width += value_size
             values.append(value)
-        if row_width + header_padding > max_width:
-            max_width = row_width + header_padding
         tbl.add_row(*values)
 
     if not tbl.rows:
         console.print("No results found.")
         return
     with console.pager():
-        console.width = max_width
-        tbl.width = max_width
+        # expand console and table so no values get truncated due to size of console, since we're using a pager
+        console.width = tbl.width = measure_renderable(tbl)
         console.print(tbl, crop=False, soft_wrap=False, overflow="fold")
 
 
