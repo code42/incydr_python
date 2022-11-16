@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+import json
 from datetime import datetime
 from typing import List
 from typing import Optional
 
 from pydantic import constr
 from pydantic import Field
+from pydantic import constr
+from pydantic import validator
+from rich.markdown import Markdown
+from rich.panel import Panel
 
 from incydr._core.models import Model
 
@@ -31,11 +36,16 @@ class Observation(Model):
         description="The type of observation data recorded.",
         example="FedCloudSharePermissions",
     )
-    data: Optional[str] = Field(
+    data: Optional[dict] = Field(
         None,
         description="The JSON formatted observation data rolled into one aggregation.",
         example='{"type$":"OBSERVED_CLOUD_SHARE_ACTIVITY","id":"exampleId","sources":["OneDrive"],"exposureTypes":["PublicLinkShare"],"firstActivityAt":"2020-02-19T01:50:00.0000000Z","lastActivityAt":"2020-02-19T01:55:00.0000000Z","fileCount":2,"totalFileSize":200,"fileCategories":[{"type$":"OBSERVED_FILE_CATEGORY","category":"Document","fileCount":2,"totalFileSize":53,"isSignificant":false}],"outsideTrustedDomainsEmailsCount":0,"outsideTrustedDomainsTotalDomainCount":0,"outsideTrustedDomainsTotalDomainCountTruncated":false}',
+        table=lambda data: json.dumps(data, indent=2),
     )
+
+    @validator("data", pre=True)
+    def parse_data_json(cls, value):
+        return json.loads(value) if value else None
 
 
 class Note(Model):
