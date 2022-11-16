@@ -16,6 +16,7 @@ from typing import Tuple
 from typing import Type
 from typing import Union
 
+import rich.box
 from pydantic import BaseModel
 from pydantic import ValidationError
 from pydantic.fields import ModelField
@@ -100,7 +101,9 @@ def iter_model_formatted(
         yield name, value
 
 
-def list_as_panel(items, sep=None, title=None, expand=True) -> Panel:
+def list_as_panel(
+    items, sep=None, title=None, expand=True, box=rich.box.ROUNDED
+) -> Panel:
     """
     Renders a list of items as a `rich.panel.Panel`. If `sep` is provided will add a separator between each item (useful
     for rendering list of models that have multiple values.
@@ -128,7 +131,7 @@ def list_as_panel(items, sep=None, title=None, expand=True) -> Panel:
     """
     if sep:
         items = list(chain(*zip(items, repeat(sep))))[:-1]
-    return Panel(Group(*items), title=title, expand=expand)
+    return Panel(Group(*items), title=title, expand=expand, box=box)
 
 
 @group()
