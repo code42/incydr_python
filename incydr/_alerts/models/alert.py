@@ -6,8 +6,8 @@ from typing import List
 from typing import Optional
 
 import rich.box
-from pydantic import Field
 from pydantic import constr
+from pydantic import Field
 from pydantic import validator
 from rich.markdown import Markdown
 from rich.panel import Panel
@@ -44,7 +44,7 @@ class Observation(Model):
     )
 
     @validator("data", pre=True)
-    def parse_data_json(cls, value):
+    def parse_data_json(cls, value):  # noqa
         return json.loads(value) if value else None
 
 

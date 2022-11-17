@@ -15,12 +15,12 @@ from incydr.cli import log_level_option
 from incydr.cli import render
 from incydr.cli.cmds.options.alert_filter_options import advanced_query_option
 from incydr.cli.cmds.options.alert_filter_options import filter_options
-from incydr.cli.cmds.options.output_options import SingleFormat
-from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.options.output_options import columns_option
 from incydr.cli.cmds.options.output_options import output_options
 from incydr.cli.cmds.options.output_options import single_format_option
+from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
+from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.utils import output_format_logger
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
