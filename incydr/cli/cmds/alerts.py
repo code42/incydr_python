@@ -1,21 +1,18 @@
-import json
 from typing import Optional
 
 import click
 from click import BadOptionUsage
 from click import Context
-from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.progress import track
-from rich.table import Table
 
-from incydr._alerts.models.alert import AlertDetails
 from incydr._alerts.models.alert import AlertSummary
 from incydr._queries.alerts import AlertQuery
 from incydr.cli import console
 from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
+from incydr.cli import render
 from incydr.cli.cmds.options.alert_filter_options import advanced_query_option
 from incydr.cli.cmds.options.alert_filter_options import filter_options
 from incydr.cli.cmds.options.output_options import columns_option
@@ -25,32 +22,10 @@ from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.utils import output_format_logger
-from incydr.cli.cmds.utils import output_response_format
-from incydr.cli.cmds.utils import output_single_format
-from incydr.cli.cmds.utils import rgetattr
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
+from incydr.utils import model_as_card
 from incydr.utils import read_dict_from_csv
-
-
-def render_alert(alert: AlertDetails):
-    field_table = Table.grid(padding=(0, 1), expand=False)
-    field_table.title = f"Alert {alert.id}"
-    alert_dict = alert.dict(by_alias=False)
-    for name, _field in alert_dict.items():
-        if name == "id":
-            continue
-        if name == "note.message" and alert.note.message is not None:
-            field_table.add_row(
-                Panel(
-                    Markdown(alert.note.message, justify="left"),
-                    title="Notes",
-                    width=80,
-                )
-            )
-        else:
-            field_table.add_row(f"{name} = {rgetattr(alert, name)}")
-    console.print(Panel.fit(field_table))
 
 
 @click.group(cls=IncydrGroup)
@@ -117,28 +92,41 @@ def search(
         )
 
     client = ctx.obj()
-    if not query.tenant_id:
-        query.tenant_id = client.tenant_id
-
-    # TODO: should we use iter_all here?
-    alerts_ = client.session.post("/v1/alerts/query-alerts", json=query.dict())
-    alerts_ = alerts_.json()["alerts"]
-
-    # TODO: with outputting refactor
-    # this is definitely not a permanent fix.  Not all alert objects contain all the keys possible.
-    # This converts the first alert to a dict with all fields so that CSV output knows about all of them
-    alerts_ = [json.loads(AlertSummary.parse_obj(alerts_[0]).json())] + alerts_[1:]
+    alert_summaries = client.alerts.v1.iter_all(query)
 
     if output:
-        output_format_logger(alerts_, output, columns, certs, ignore_cert_validation)
-    else:
-        output_response_format(
-            alerts_,
-            "Alerts",
-            format_,
+        output_format_logger(
+            (a.dict() for a in alert_summaries),
+            output,
             columns,
-            client.settings.use_rich,
+            certs,
+            ignore_cert_validation,
         )
+        return
+    if format_ == TableFormat.table:
+        if not columns:
+            columns = [
+                "created_at",
+                "risk_severity",
+                "state",
+                "actor",
+                "actor_id",
+                "name",
+                "description",
+                "watchlists",
+                "state_last_modified_by",
+                "state_last_modified_at",
+                "id",
+            ]
+        render.table(AlertSummary, alert_summaries, columns=columns, flat=False)
+    elif format_ == TableFormat.csv:
+        render.csv(AlertSummary, alert_summaries, columns=columns, flat=True)
+    elif format_ == TableFormat.json:
+        for alert in alert_summaries:
+            console.print_json(alert.json())
+    else:
+        for alert in alert_summaries:
+            console.print(alert.json(), highlight=False)
 
 
 # Future enhancement: add functionality to show human-readable summaries for multiple alerts
@@ -152,7 +140,12 @@ def show(ctx: Context, alert_id: str, format_: SingleFormat):
     """
     client = ctx.obj()
     alert = client.alerts.v1.get_details(alert_id)[0]
-    output_single_format(alert, render_alert, format_, client.settings.use_rich)
+    if format_ == SingleFormat.rich:
+        console.print(Panel.fit(model_as_card(alert)))
+    elif format_ == SingleFormat.json:
+        console.print_json(alert.json())
+    else:
+        console.print(alert.json(), highlight=False)
 
 
 @alerts.command(cls=IncydrCommand)
@@ -165,6 +158,7 @@ def add_note(ctx: Context, alert_id: str, note: str):
     """
     client = ctx.obj()
     client.alerts.v1.add_note(alert_id, note)
+    console.print("Note added.")
 
 
 @alerts.command(cls=IncydrCommand)
@@ -201,6 +195,7 @@ def update_state(
     alert_ids = _parse_alert_ids(alert_ids, csv)
     client = ctx.obj()
     client.alerts.v1.change_state(alert_ids, state, note)
+    console.print("State changed.")
 
 
 @alerts.command(cls=IncydrCommand)
@@ -211,7 +206,7 @@ def bulk_update_state(ctx: Context, csv: str):
     Bulk update multiple alerts to different states using a CSV file.
 
     Takes a single arg `CSV` which specifies the path to the file.
-    Requires an `alert_id` column to identify the alerst by its ID.
+    Requires an `alert_id` column to identify the alerts by its ID.
 
     Valid CSV columns include:
 

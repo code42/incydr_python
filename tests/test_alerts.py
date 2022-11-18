@@ -1,3 +1,6 @@
+import json
+from datetime import datetime
+
 import pytest
 from pytest_httpserver import HTTPServer
 
@@ -189,6 +192,73 @@ def test_alert_detail_query_single(httpserver_auth: HTTPServer):
     response = client.alerts.v1.get_details("123")
     assert isinstance(response, list)
     assert isinstance(response[0], AlertDetails)
+
+
+def test_alert_detail_query_more_than_page_limit(httpserver_auth: HTTPServer):
+    alert_ids = [str(i) for i in range(1, 251)]
+    page_1_ids = alert_ids[:100]
+    page_2_ids = alert_ids[100:200]
+    page_3_ids = alert_ids[200:]
+    expected_page_1 = {"alertIds": page_1_ids}
+    expected_page_2 = {"alertIds": page_2_ids}
+    expected_page_3 = {"alertIds": page_3_ids}
+    response_page_1 = {
+        "alerts": [
+            json.loads(
+                AlertDetails(
+                    id=i,
+                    tenantId="1234",
+                    type="alert",
+                    createdAt=datetime.now(),
+                    state="OPEN",
+                ).json()
+            )
+            for i in page_1_ids
+        ]
+    }
+    response_page_2 = {
+        "alerts": [
+            json.loads(
+                AlertDetails(
+                    id=i,
+                    tenantId="1234",
+                    type="alert",
+                    createdAt=datetime.now(),
+                    state="OPEN",
+                ).json()
+            )
+            for i in page_2_ids
+        ]
+    }
+    response_page_3 = {
+        "alerts": [
+            json.loads(
+                AlertDetails(
+                    id=i,
+                    tenantId="1234",
+                    type="alert",
+                    createdAt=datetime.now(),
+                    state="OPEN",
+                ).json()
+            )
+            for i in page_3_ids
+        ]
+    }
+    httpserver_auth.expect_request(
+        "/v1/alerts/query-details", method="POST", json=expected_page_1
+    ).respond_with_json(response_page_1)
+    httpserver_auth.expect_request(
+        "/v1/alerts/query-details", method="POST", json=expected_page_2
+    ).respond_with_json(response_page_2)
+    httpserver_auth.expect_request(
+        "/v1/alerts/query-details", method="POST", json=expected_page_3
+    ).respond_with_json(response_page_3)
+
+    client = Client()
+    response = client.alerts.v1.get_details(alert_ids)
+    assert isinstance(response, list)
+    assert isinstance(response[0], AlertDetails)
+    assert len(response) == 250
 
 
 def test_alert_add_note(httpserver_auth: HTTPServer):
