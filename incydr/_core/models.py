@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from csv import DictReader
 from datetime import datetime
 from datetime import timedelta
+from json import JSONDecodeError
 
 import requests
+from boltons.jsonutils import JSONLIterator
 from pydantic import BaseModel
 from pydantic import PrivateAttr
+from pydantic import root_validator
 from pydantic import SecretStr
 from pydantic import ValidationError
 
@@ -74,6 +78,23 @@ class Model(BaseModel):
             exclude_none=exclude_none,
         )
 
+    @classmethod
+    def parse_json_lines(cls, file):
+        num = 1
+        try:
+            for line in JSONLIterator(file):
+                try:
+                    yield cls(**line)
+                    num += 1
+                except ValidationError as v_err:
+                    raise ValueError(
+                        f"Error parsing object on line {num}: {str(v_err)}"
+                    )
+        except JSONDecodeError:
+            raise ValueError(
+                f"Unable to parse line {num}. Expecting JSONLines format: https://jsonlines.org"
+            )
+
     class Config:
         allow_population_by_field_name = True
         use_enum_values = True
@@ -102,3 +123,60 @@ class AuthResponse(ResponseModel):
         return (datetime.utcnow() - self._init_time) > timedelta(
             seconds=self.expires_in
         )
+
+
+class CSVModel(BaseModel, allow_population_by_field_name=True, extra="allow"):
+    """
+    Pydantic model class enables multiple aliases to be assigned to a single field value. If the field is required
+    then at least one of the aliases must be supplied or validation will fail.
+
+    Useful when parsing CSV data from multiple sources where the expected column header names might vary.
+
+    For example, if a CSV requires a "user" column, which could either be a username or ID:
+
+        class UserCSV(CSVModel):
+            user: str = Field(csv_aliases=["user_id", "userId", "username"])
+            department: Optional[str]
+
+    Then a CSV could have any of the columns "username", "user_id", or "userId" and the "user" field will be populated
+    with the value of that column.
+
+    If a CSV file has multiple alias columns pointing to the same field (e.g. "username" and "userId"), the field will
+    be populated by priority of the order of the `csv_aliases` list definition. So in the example above, a CSV that
+    has both "username" and "userId" columns, the `model.user` field will be the "userId" CSV value. But because the
+    model also allows extra values, "username" will still be accessible on the model at `model.username`.
+    """
+
+    @root_validator(pre=True)
+    def _alias_validator(cls, values):  # noqa
+        for name, field in cls.__fields__.items():
+            aliases = field.field_info.extra.get("csv_aliases", [])
+            for alias in aliases:
+                if alias in values and values[alias]:
+                    values[name] = values[alias]
+                    break
+            else:  # no break
+                if field.required:
+                    raise ValueError(
+                        f"'{name}' required. Valid column aliases: {aliases}"
+                    )
+
+        return values
+
+    @classmethod
+    def parse_csv(cls, file):
+        first_line = next(file)
+        headers = first_line.strip().split(",")
+        try:
+            cls(**{key: "value" for key in headers})
+        except ValidationError as err:
+            msg = err.errors()[0]["msg"]
+            raise ValueError(f"CSV header missing column: {msg}")
+
+        reader = DictReader(file, fieldnames=headers, restkey="extra")
+        for row in reader:
+            try:
+                yield cls(**row)
+            except ValidationError as err:
+                msg = err.errors()[0]["msg"]
+                raise ValueError(f"Missing data on CSV row {reader.line_num}: {msg}")
