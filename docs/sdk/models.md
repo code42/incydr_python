@@ -202,6 +202,11 @@ available model methods.
 ::: incydr.models.UsersPage
     :docstring:
 
+### `Role` model
+
+:::incydr.models.Role
+    :docstring:
+
 ## User Risk Profiles
 ---
 

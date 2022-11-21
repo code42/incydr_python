@@ -7,8 +7,8 @@ from rich.panel import Panel
 from rich.progress import track
 
 from incydr._devices.models import Device
-from incydr._users.models import Role
 from incydr._users.models import User
+from incydr._users.models import UserRole
 from incydr.cli import console
 from incydr.cli import init_client
 from incydr.cli import log_file_option
@@ -167,9 +167,9 @@ def list_roles(ctx: Context, user: str, format_: TableFormat, columns: str = Non
     roles = client.users.v1.get_roles(user)
 
     if format_ == TableFormat.csv:
-        render.csv(Role, roles, columns=columns, flat=True)
+        render.csv(UserRole, roles, columns=columns, flat=True)
     elif format_ == TableFormat.table:
-        render.table(Role, roles, columns=columns, flat=False)
+        render.table(UserRole, roles, columns=columns, flat=False)
     elif format_ == TableFormat.json:
         for item in roles:
             console.print_json(item.json())
