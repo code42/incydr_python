@@ -419,13 +419,19 @@ def list_file_events(
     elif format_ == TableFormat.csv:
         render.csv(FileEvent, response.events, columns=columns)
 
-    elif format_ == TableFormat.json:
-        for event in response.events:
-            console.print_json(event.json())
-
     else:
-        for event in response.events:
-            console.print(event.json(), highlight=False)
+        printed = False
+        if format_ == TableFormat.json:
+            for event in response.events:
+                printed = True
+                console.print_json(event.json())
+
+        else:  # raw-json
+            for event in response.events:
+                printed = True
+                click.echo(event.json())
+        if not printed:
+            console.print("No results found.")
 
 
 csv_option = click.option(

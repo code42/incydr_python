@@ -83,12 +83,18 @@ def list_(
         render.csv(User, users_, columns=columns, flat=True)
     elif format_ == TableFormat.table:
         render.table(User, users_, columns=columns, flat=False)
-    elif format_ == TableFormat.json:
-        for item in users_:
-            console.print_json(item.json())
-    else:  # format == "raw-json"/TableFormat.raw_json
-        for item in users_:
-            console.print(item.json(), highlight=False)
+    else:
+        printed = False
+        if format_ == TableFormat.json:
+            for item in users_:
+                printed = True
+                console.print_json(item.json())
+        else:  # raw-json
+            for item in users_:
+                printed = True
+                click.echo(item.json())
+        if not printed:
+            console.print("No results found.")
 
 
 @users.command(cls=IncydrCommand)
