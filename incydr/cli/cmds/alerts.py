@@ -179,17 +179,17 @@ def update_state(
     """
     Update multiple alerts to the same state.
 
-    Changes the state of all alerts specified in ALERT-IDS to the indicated STATE.
+    Changes the state of all alerts specified in `ALERT-IDS` to the indicated `STATE`,
+    where `STATE` is one of `OPEN`, `RESOLVED`, `IN_PROGRESS` or `PENDING`
 
-    * ALERT-IDS is a comma-delimited list of alert IDs.
-    * STATE is one of OPEN, RESOLVED, IN_PROGRESS or PENDING
+    `ALERT-IDS` is a comma-delimited list of alert IDs.
 
         alerts update-state ALERT_IDS STATE
 
     To read alert event IDs from a csv (single column, no header),
     pass the path to a csv along with the --csv flag:
 
-        add CASE_NUMBER CSV_PATH STATE --csv
+        alerts update-state CSV_PATH STATE --csv
 
     """
     alert_ids = _parse_alert_ids(alert_ids, csv)
