@@ -22,9 +22,9 @@ from incydr._watchlists.models.responses import WatchlistUser
 from incydr.cli.main import incydr
 from incydr.enums.watchlists import WatchlistType
 from incydr.exceptions import WatchlistNotFoundError
+from tests.conftest import TEST_TOKEN
 
-
-TEST_WATCHLIST_ID = "1-watchlist-42"
+TEST_WATCHLIST_ID = "1c7dd799-1aa0-4f3a-bae8-1d3242fc2af6"
 TEST_ID = "b799bf9c-8838-480f-85dc-438d74e3ca0d"
 
 TEST_WATCHLIST_1 = {
@@ -38,7 +38,7 @@ TEST_WATCHLIST_1 = {
     },
     "tenantId": "code-42",
     "title": "departing employee",
-    "watchlistId": "1-watchlist-42",
+    "watchlistId": TEST_WATCHLIST_ID,
 }
 TEST_WATCHLIST_2 = {
     "description": "custom watchlist",
@@ -138,13 +138,6 @@ def mock_get_all(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request(
         "/v1/watchlists", method="GET", query_string=urlencode(query)
     ).respond_with_json(data)
-
-
-@pytest.fixture
-def mock_get(httpserver_auth: HTTPServer):
-    httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}", method="GET"
-    ).respond_with_json(TEST_WATCHLIST_1)
 
 
 @pytest.fixture
@@ -284,7 +277,11 @@ def test_iter_all_when_default_params_returns_expected_data(
     assert total == 3
 
 
-def test_get_returns_expected_data(mock_get):
+def test_get_returns_expected_data(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}", method="GET"
+    ).respond_with_json(TEST_WATCHLIST_1)
+
     c = Client()
     watchlist = c.watchlists.v1.get(TEST_WATCHLIST_ID)
     assert isinstance(watchlist, Watchlist)
@@ -584,8 +581,8 @@ def test_get_department_returns_expected_data(mock_get_department):
 @pytest.mark.parametrize(
     ("name", "expected"),
     [
-        ("DEPARTING_EMPLOYEE", "1-watchlist-42"),
-        (WatchlistType.DEPARTING_EMPLOYEE, "1-watchlist-42"),
+        ("DEPARTING_EMPLOYEE", TEST_WATCHLIST_ID),
+        (WatchlistType.DEPARTING_EMPLOYEE, TEST_WATCHLIST_ID),
         ("test", "1-watchlist-43"),
     ],
 )
@@ -627,8 +624,36 @@ def test_cli_list_makes_expected_call(
     assert result.exit_code == 0
 
 
-def test_cli_show_makes_expected_call(httpserver_auth: HTTPServer, runner, mock_get):
-    result = runner.invoke(incydr, ["watchlists", "show", TEST_WATCHLIST_ID])
+@pytest.mark.parametrize(
+    "watchlist_input,watchlist_expected",
+    [
+        (TEST_WATCHLIST_ID, TEST_WATCHLIST_ID),
+        ("DEPARTING_EMPLOYEE", TEST_WATCHLIST_ID),
+        ("test", "1-watchlist-43"),
+    ],
+)
+def test_cli_show_makes_expected_call(
+    httpserver_auth: HTTPServer,
+    runner,
+    mock_get_all,
+    watchlist_input,
+    watchlist_expected,
+):
+    # mock unordered token request to follow watchlist arg callback
+    auth_response = dict(
+        token_type="bearer",
+        expires_in=900,
+        access_token=TEST_TOKEN,
+    )
+    httpserver_auth.expect_request("/v1/oauth", method="POST").respond_with_json(
+        auth_response
+    )
+
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{watchlist_expected}", method="GET"
+    ).respond_with_json(TEST_WATCHLIST_1)
+
+    result = runner.invoke(incydr, ["watchlists", "show", watchlist_input])
     httpserver_auth.check()
     assert result.exit_code == 0
 

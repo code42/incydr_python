@@ -1,3 +1,5 @@
+from uuid import UUID
+
 import click
 from click import Context
 from rich.panel import Panel
@@ -22,21 +24,20 @@ from incydr.cli.cmds.utils import user_lookup
 from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
-from incydr.enums.watchlists import WatchlistType
 from incydr.utils import model_as_card
 from incydr.utils import read_dict_from_csv
 
 
-# TODO: check for custom title?
 def get_watchlist_id_callback(ctx, param, value):
     if not value:
         return
     try:
-        value = WatchlistType[value.upper()]  # if watchlist type
+        UUID(hex=value)
+        return value
+    except ValueError:
+        # if not an ID value
         client = ctx.obj()
         return client.watchlists.v1.get_id_by_name(value)
-    except KeyError:
-        return value
 
 
 @click.group(cls=IncydrGroup)
