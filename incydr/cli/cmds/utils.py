@@ -1,4 +1,3 @@
-import functools
 import itertools
 import json
 import sys
@@ -145,22 +144,3 @@ def output_single_format(
 
     else:
         echo(result.json())
-
-
-# TODO: these methods can be removed once the alerts outputting is refactored
-def rgetattr(obj, attr, *args):
-    """
-    Drop in replacements for getattr() and setattr() that account for nested attributes specified by dot notation
-
-    See https://stackoverflow.com/questions/31174295/getattr-and-setattr-on-nested-objects/31174427?noredirect=1#comment86638618_31174427
-    """
-
-    def _getattr(obj, attr):
-        return getattr(obj, attr, *args)
-
-    return functools.reduce(_getattr, [obj] + attr.split("."))
-
-
-def rsetattr(obj, attr, val):
-    pre, _, post = attr.rpartition(".")
-    return setattr(rgetattr(obj, pre) if pre else obj, post, val)
