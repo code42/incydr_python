@@ -12,7 +12,7 @@ from pydantic import root_validator
 from pydantic import SecretStr
 from pydantic import ValidationError
 
-from incydr._jsonutils import JSONLIterator
+from boltons.jsonutils import JSONLIterator
 
 
 class Model(BaseModel):

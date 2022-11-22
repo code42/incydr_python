@@ -23,12 +23,13 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
+  "boltons",
+  "chardet",
   "requests",
   "requests-toolbelt",
   "rich",
   "pydantic[dotenv]",
   "isodate",
-  "typer",
 ]
 dynamic = ["version"]
 
