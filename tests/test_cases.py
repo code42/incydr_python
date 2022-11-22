@@ -637,35 +637,40 @@ def test_cli_update_when_usernames_specified_performs_additional_lookup_makes_ex
 def test_cli_bulk_update_makes_expected_call(
     runner, httpserver_auth: HTTPServer, tmp_path
 ):
-    data_1 = {
+    update_1 = {
         "name": "Test Case 1",
-        "assignee": "user-1",
-        "description": "test case 1",
-        "findings": "no findings",
+        "assignee": "new-user",
+        "description": "updated-1",
+        "findings": "updated-findings",
         "subject": "user-2",
         "status": "OPEN",
     }
-    data_2 = {
+    update_2 = {
         "name": "Test Case 2",
         "assignee": "user-3",
-        "description": "test case 2",
-        "findings": "some findings",
+        "description": "updated-2",
+        "findings": "updated-findings",
         "subject": "user-4",
         "status": "CLOSED",
     }
-
+    httpserver_auth.expect_request("/v1/cases/1", method="GET").respond_with_json(
+        TEST_CASE_1
+    )
+    httpserver_auth.expect_request("/v1/cases/42", method="GET").respond_with_json(
+        TEST_CASE_2
+    )
     httpserver_auth.expect_request(
-        "/v1/cases/1", method="PUT", json=data_1
+        "/v1/cases/1", method="PUT", json=update_1
     ).respond_with_json(TEST_CASE_1)
     httpserver_auth.expect_request(
-        "/v1/cases/2", method="PUT", json=data_2
+        "/v1/cases/42", method="PUT", json=update_2
     ).respond_with_json(TEST_CASE_2)
 
-    p = tmp_path / "event_ids.csv"
+    p = tmp_path / "@event_ids.csv"
     p.write_text(
         "number,assignee,description,findings,name,status,subject\n"
-        "1,user-1,test case 1,no findings,Test Case 1,OPEN,user-2\n"
-        "2,user-3,test case 2,some findings,Test Case 2,CLOSED,user-4"
+        f"1,{update_1['assignee']},{update_1['description']},{update_1['findings']},{update_1['name']},{update_1['status']},{update_1['subject']}\n"
+        f"42,{update_2['assignee']},{update_2['description']},{update_2['findings']},{update_2['name']},{update_2['status']},{update_2['subject']}"
     )
 
     result = runner.invoke(incydr, ["cases", "bulk-update", str(p)])
@@ -684,7 +689,9 @@ def test_cli_bulk_update_when_usernames_makes_user_lookup(
         "subject": "user-2",
         "status": "OPEN",
     }
-
+    httpserver_auth.expect_request("/v1/cases/1", method="GET").respond_with_json(
+        TEST_CASE_1
+    )
     httpserver_auth.expect_request(
         "/v1/cases/1", method="PUT", json=data_1
     ).respond_with_json(TEST_CASE_1)
@@ -709,6 +716,9 @@ def test_cli_bulk_update_when_multiple_same_usernames_makes_single_user_lookup_a
         "pageSize": 100,
     }
     data_1 = {"users": [TEST_USER_1], "totalCount": 1}
+    httpserver_auth.expect_request("/v1/cases/1", method="GET").respond_with_json(
+        TEST_CASE_1
+    )
     httpserver_auth.expect_oneshot_request(
         "/v1/users", method="GET", query_string=urlencode(query_1)
     ).respond_with_json(data_1)
@@ -897,7 +907,38 @@ def test_cli_file_events_add_when_csv_makes_expected_call(
         json={"events": event_ids},
     ).respond_with_data()
     result = runner.invoke(
-        incydr, ["cases", "file-events", "add", TEST_CASE_NUMBER, str(p), "--csv"]
+        incydr,
+        ["cases", "file-events", "add", TEST_CASE_NUMBER, f"@{p}", "--format", "csv"],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_file_events_add_when_jsonlines_makes_expected_call(
+    runner, httpserver_auth: HTTPServer, tmp_path
+):
+    event_ids = ["event-1", "event-2", "event-3"]
+    p = tmp_path / "event_ids.json"
+    p.write_text(
+        """{"event_id": "event-1"}\n{"eventId": "event-2"}\n{"event": {"id": "event-3"}}"""
+    )
+
+    httpserver_auth.expect_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent",
+        method="POST",
+        json={"events": event_ids},
+    ).respond_with_data()
+    result = runner.invoke(
+        incydr,
+        [
+            "cases",
+            "file-events",
+            "add",
+            TEST_CASE_NUMBER,
+            f"@{p}",
+            "--format",
+            "json-lines",
+        ],
     )
     httpserver_auth.check()
     assert result.exit_code == 0
@@ -936,7 +977,52 @@ def test_cli_file_events_remove_when_csv_makes_expected_call(
         method="DELETE",
     ).respond_with_data()
     result = runner.invoke(
-        incydr, ["cases", "file-events", "remove", TEST_CASE_NUMBER, str(p), "--csv"]
+        incydr,
+        [
+            "cases",
+            "file-events",
+            "remove",
+            TEST_CASE_NUMBER,
+            f"@{p}",
+            "--format",
+            "csv",
+        ],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_file_events_remove_when_jsonlines_makes_expected_call(
+    runner, httpserver_auth: HTTPServer, tmp_path
+):
+    p = tmp_path / "event_ids.json"
+    p.write_text(
+        """{"event_id": "event-1"}\n{"eventId": "event-2"}\n{"event": {"id": "event-3"}}"""
+    )
+
+    httpserver_auth.expect_ordered_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/event-1",
+        method="DELETE",
+    ).respond_with_data()
+    httpserver_auth.expect_ordered_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/event-2",
+        method="DELETE",
+    ).respond_with_data()
+    httpserver_auth.expect_ordered_request(
+        f"/v1/cases/{TEST_CASE_NUMBER}/fileevent/event-3",
+        method="DELETE",
+    ).respond_with_data()
+    result = runner.invoke(
+        incydr,
+        [
+            "cases",
+            "file-events",
+            "remove",
+            TEST_CASE_NUMBER,
+            f"@{p}",
+            "--format",
+            "json-lines",
+        ],
     )
     httpserver_auth.check()
     assert result.exit_code == 0
