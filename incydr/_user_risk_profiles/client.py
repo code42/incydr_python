@@ -117,7 +117,7 @@ class UserRiskProfilesV1:
             locality=locality,
             active=active,
             deleted=deleted,
-            supportUser=support_user,
+            support_user=support_user,
         )
         response = self._parent.session.get(
             "/v1/user-risk-profiles", params=data.dict()

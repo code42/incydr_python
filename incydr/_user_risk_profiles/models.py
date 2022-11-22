@@ -138,7 +138,7 @@ class QueryUserRiskProfilesRequest(BaseModel):
     locality: Optional[str]
     active: Optional[bool]
     deleted: Optional[bool]
-    supportUser: Optional[bool]
+    support_user: Optional[bool]
 
     class Config:
         use_enum_values = True
