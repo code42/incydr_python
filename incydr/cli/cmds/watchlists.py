@@ -315,6 +315,8 @@ def add(
     """
     client = ctx.obj()
 
+    # TODO: file input refactor
+
     # Add included users
     if users:
         client.watchlists.v1.add_included_users(
@@ -411,6 +413,8 @@ def remove(
     `CUSTOM` watchlists must be specified by title or ID.
     """
     client = ctx.obj()
+
+    # TODO: file input refactor
 
     # Remove included users
     if users:
