@@ -6,7 +6,7 @@ from typing import Iterable
 from typing import Optional
 
 from pydantic import BaseModel
-from typer import echo
+from click import echo
 
 from incydr.cli import console
 from incydr.cli import render
