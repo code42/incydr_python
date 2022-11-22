@@ -176,6 +176,8 @@ class CSVModel(BaseModel, allow_population_by_field_name=True, extra="allow"):
         reader = DictReader(file, fieldnames=headers, restkey="extra")
         for row in reader:
             try:
+                # coerce empty columns from "" to None
+                row = {k: v or None for k, v in row.items()}
                 yield cls(**row)
             except ValidationError as err:
                 msg = err.errors()[0]["msg"]
