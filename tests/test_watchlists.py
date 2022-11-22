@@ -629,7 +629,6 @@ def test_cli_list_makes_expected_call(
     [
         (TEST_WATCHLIST_ID, TEST_WATCHLIST_ID),
         ("DEPARTING_EMPLOYEE", TEST_WATCHLIST_ID),
-        ("test", "1-watchlist-43"),
     ],
 )
 def test_cli_show_makes_expected_call(
@@ -638,6 +637,10 @@ def test_cli_show_makes_expected_call(
     mock_get_all,
     watchlist_input,
     watchlist_expected,
+    mock_get_all_included_users,
+    mock_get_all_excluded_users,
+    mock_get_all_departments,
+    mock_get_all_directory_groups,
 ):
     # mock unordered token request to follow watchlist arg callback
     auth_response = dict(
@@ -654,6 +657,8 @@ def test_cli_show_makes_expected_call(
     ).respond_with_json(TEST_WATCHLIST_1)
 
     result = runner.invoke(incydr, ["watchlists", "show", watchlist_input])
+    print(result)
+    print(result.output)
     httpserver_auth.check()
     assert result.exit_code == 0
 

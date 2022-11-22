@@ -2,8 +2,11 @@ from uuid import UUID
 
 import click
 from click import Context
-from rich.panel import Panel
+from pydantic import BaseModel
+from rich.console import ConsoleRenderable
+from rich.console import RichCast
 from rich.progress import track
+from rich.table import Table
 
 from incydr._watchlists.models.responses import IncludedDepartment
 from incydr._watchlists.models.responses import IncludedDirectoryGroup
@@ -15,8 +18,6 @@ from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
 from incydr.cli.cmds.options.output_options import columns_option
-from incydr.cli.cmds.options.output_options import single_format_option
-from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.options.utils import user_lookup_callback
@@ -24,9 +25,14 @@ from incydr.cli.cmds.utils import user_lookup
 from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
+from incydr.cli.render import measure_renderable
 from incydr.types import file_or_str_cls
+from incydr.utils import get_fields
+from incydr.utils import iter_model_formatted
 from incydr.utils import model_as_card
 from incydr.utils import read_dict_from_csv
+
+MAX_USER_DISPLAY_COUNT = 25
 
 
 def get_watchlist_id_callback(ctx, param, value):
@@ -96,22 +102,79 @@ def list_(
 
 @watchlists.command(cls=IncydrCommand)
 @watchlist_arg
-@single_format_option
 @click.pass_context
-def show(ctx: Context, watchlist: str = None, format_: SingleFormat = None):
+def show(ctx: Context, watchlist: str = None):
     """
     Show details for a watchlist.
 
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
 
+    If using `rich`, outputs a summary of watchlist information and membership. This includes the following:
 
+    * included_users
+    * excluded_users
+    * included_departments
+    * included_directory_groups
+
+    Lists of users will be truncated to only display the first 25 members, use the `list-included-users` and `list-excluded-users`
+    commands respectively to see more details.
+
+    If not using `rich`, outputs watchlist information in JSON without additional membership summary information.
     """
     client = ctx.obj()
-    watchlist = client.watchlists.v1.get(watchlist)
-    _output_single_result(
-        watchlist, f"{watchlist.list_type} Watchlist", format_, client.settings.use_rich
-    )
+    watchlist_response = client.watchlists.v1.get(watchlist)
+
+    if not client.settings.use_rich:
+        console.print(watchlist_response.json(), highlight=False)
+
+    def models_as_table(model, models, title=None):
+        headers = list(get_fields(model))
+        tbl = Table(*headers, title=title, show_lines=True)
+        for m in models:
+            values = []
+            for _name, value in iter_model_formatted(m, render="table"):
+                if isinstance(value, BaseModel):
+                    value = model_as_card(value)
+                elif not isinstance(value, (ConsoleRenderable, RichCast, str)):
+                    value = str(value)
+                values.append(value)
+            tbl.add_row(*values)
+        return tbl
+
+    included_users = client.watchlists.v1.list_included_users(watchlist).included_users
+    excluded_users = client.watchlists.v1.list_excluded_users(watchlist).excluded_users
+    departments = client.watchlists.v1.list_departments(watchlist).included_departments
+    dir_groups = client.watchlists.v1.list_directory_groups(
+        watchlist
+    ).included_directory_groups
+    t = Table(title=f"{watchlist_response.list_type} Watchlist")
+    t.add_column("Stats")
+
+    tables = []
+    if included_users:
+        tables.append(
+            models_as_table(WatchlistUser, included_users[:MAX_USER_DISPLAY_COUNT])
+        )
+        t.add_column("Included Users")
+    if excluded_users:
+        tables.append(
+            models_as_table(WatchlistUser, excluded_users[:MAX_USER_DISPLAY_COUNT])
+        )
+        t.add_column("Excluded Users")
+    if departments:
+        tables.append(models_as_table(IncludedDepartment, departments))
+        t.add_column("Included Departments")
+    if dir_groups:
+        tables.append(models_as_table(IncludedDirectoryGroup, dir_groups))
+        t.add_column("Included Directory Groups")
+
+    t.add_row(model_as_card(watchlist_response), *tables)
+
+    with console.pager():
+        # expand console and table so no values get truncated due to size of console, since we're using a pager
+        console.width = t.width = measure_renderable(t)
+        console.print(t, crop=False, soft_wrap=False, overflow="fold")
 
 
 @watchlists.command(cls=IncydrCommand)
@@ -420,7 +483,6 @@ def list_included_users(
 
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
-
     """
     client = ctx.obj()
     users = client.watchlists.v1.list_included_users(watchlist)
@@ -511,15 +573,6 @@ def _output_results(results, model, format_, columns=None):
     else:  # format_ == "raw-json"/TableFormat.raw_json
         for item in results:
             console.print(item.json(), highlight=False)
-
-
-def _output_single_result(model, title, format_, use_rich=True):
-    if format_ == SingleFormat.rich and use_rich:
-        console.print(Panel.fit(model_as_card(model), title=title))
-    elif format_ == SingleFormat.json:
-        console.print_json(model.json())
-    else:  # format == "raw-json"
-        console.print(model.json(), highlight=False)
 
 
 def _is_path(users: str):
