@@ -6,6 +6,7 @@ from typing import Optional
 import click
 from click import Context
 from pydantic import Field
+from pydantic import root_validator
 from requests.exceptions import HTTPError
 from rich.panel import Panel
 from rich.progress import track
@@ -19,19 +20,18 @@ from incydr.cli import console
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
-from incydr.cli.cmds.options.output_options import SingleFormat
-from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.options.output_options import columns_option
 from incydr.cli.cmds.options.output_options import single_format_option
+from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
+from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.options.utils import user_lookup_callback
 from incydr.cli.cmds.utils import user_lookup
+from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
-from incydr.cli.core import incompatible_with
 from incydr.cli.file_readers import FileOrString
 from incydr.utils import model_as_card
-from pydantic import root_validator
 
 
 class UpdateCaseCSV(CSVModel):
@@ -52,7 +52,7 @@ class FileEventJSON(FileEventV2):
     event_id: str = Field(alias="eventId")
 
     @root_validator(pre=True)
-    def _event_id_required(cls, values):
+    def _event_id_required(cls, values):  # noqa
         # check if input is V2 file event
         event = values.get("event")
         if event and event.get("id"):

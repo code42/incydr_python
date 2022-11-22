@@ -6,12 +6,13 @@ from datetime import timedelta
 from json import JSONDecodeError
 
 import requests
-from incydr._jsonutils import JSONLIterator
 from pydantic import BaseModel
 from pydantic import PrivateAttr
 from pydantic import root_validator
 from pydantic import SecretStr
 from pydantic import ValidationError
+
+from incydr._jsonutils import JSONLIterator
 
 
 class Model(BaseModel):

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2013, Mahmoud Hashemi
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,7 +27,6 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 """``jsonutils`` aims to provide various helpers for working with
 JSON. Currently it focuses on providing a reliable and intuitive means
 of working with `JSON Lines`_-formatted files.
@@ -37,12 +34,9 @@ of working with `JSON Lines`_-formatted files.
 .. _JSON Lines: http://jsonlines.org/
 
 """
-
-from __future__ import print_function
-
 import io
-import os
 import json
+import os
 
 
 DEFAULT_BLOCKSIZE = 4096
@@ -124,7 +118,7 @@ json.load(fp[, encoding[, cls[, object_hook[, parse_float[, parse_int[, parse_co
 """
 
 
-class JSONLIterator(object):
+class JSONLIterator:
     """The ``JSONLIterator`` is used to iterate over JSON-encoded objects
     stored in the `JSON Lines format`_ (one object per line).
 
@@ -158,7 +152,7 @@ class JSONLIterator(object):
                 rel_seek = 1.0
         elif not -1.0 < rel_seek < 1.0:
             raise ValueError(
-                "'rel_seek' expected a float between" " -1.0 and 1.0, not %r" % rel_seek
+                f"'rel_seek' expected a float between -1.0 and 1.0, not {rel_seek}"
             )
         elif rel_seek < 0:
             rel_seek = 1.0 - rel_seek
