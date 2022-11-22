@@ -80,6 +80,10 @@ class Model(BaseModel):
 
     @classmethod
     def parse_json_lines(cls, file):
+        """
+        Accepts an open file-like object in [JSON Lines format](https://jsonlines.org) and returns a generator of
+        models parsed from the JSON line by line.
+        """
         num = 1
         try:
             for line in JSONLIterator(file):
