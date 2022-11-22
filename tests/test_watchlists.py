@@ -723,63 +723,43 @@ def test_cli_update_makes_expected_call(httpserver_auth: HTTPServer, runner):
 
 
 @pytest.mark.parametrize(
-    "command_group,mock_server_call",
+    "command,mock_server_call",
     [
-        ("members", lazy_fixture("mock_get_all_members")),
-        ("included-users", lazy_fixture("mock_get_all_included_users")),
-        ("excluded-users", lazy_fixture("mock_get_all_excluded_users")),
-        ("directory-groups", lazy_fixture("mock_get_all_directory_groups")),
-        ("departments", lazy_fixture("mock_get_all_departments")),
+        ("list-members", lazy_fixture("mock_get_all_members")),
+        ("list-included-users", lazy_fixture("mock_get_all_included_users")),
+        ("list-excluded-users", lazy_fixture("mock_get_all_excluded_users")),
+        ("list-directory-groups", lazy_fixture("mock_get_all_directory_groups")),
+        ("list-departments", lazy_fixture("mock_get_all_departments")),
     ],
 )
 def test_cli_list_members_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, command_group, mock_server_call
+    httpserver_auth: HTTPServer, runner, command, mock_server_call
 ):
-    result = runner.invoke(
-        incydr, ["watchlists", command_group, "list", TEST_WATCHLIST_ID]
-    )
-    httpserver_auth.check()
-    assert result.exit_code == 0
-
-
-@pytest.mark.parametrize(
-    "command_group,mock_server_call",
-    [
-        ("members", lazy_fixture("mock_get_member")),
-        ("included-users", lazy_fixture("mock_get_included_user")),
-        ("excluded-users", lazy_fixture("mock_get_excluded_user")),
-        ("directory-groups", lazy_fixture("mock_get_directory_group")),
-        ("departments", lazy_fixture("mock_get_department")),
-    ],
-)
-def test_cli_show_members_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, command_group, mock_server_call
-):
-    result = runner.invoke(
-        incydr, ["watchlists", command_group, "show", TEST_WATCHLIST_ID, TEST_ID]
-    )
+    result = runner.invoke(incydr, ["watchlists", command, TEST_WATCHLIST_ID])
     httpserver_auth.check()
     assert result.exit_code == 0
 
 
 USER_IDS = ["user-1", "user-2", "user-3"]
 user_params = pytest.mark.parametrize(
-    "command_group, command, url_path, expected_request",
+    "option, command, path_group, url_path, expected_request",
     [
         (
-            "included-users",
+            "users",
             "add",
+            "included-users",
             "add",
             {"userIds": USER_IDS, "watchlistId": TEST_WATCHLIST_ID},
         ),
         (
-            "included-users",
+            "users",
             "remove",
+            "included-users",
             "delete",
             {"userIds": USER_IDS, "watchlistId": TEST_WATCHLIST_ID},
         ),
-        ("excluded-users", "add", "add", {"userIds": USER_IDS}),
-        ("excluded-users", "remove", "delete", {"userIds": USER_IDS}),
+        ("excluded-users", "add", "excluded-users", "add", {"userIds": USER_IDS}),
+        ("excluded-users", "remove", "excluded-users", "delete", {"userIds": USER_IDS}),
     ],
 )
 
@@ -788,31 +768,33 @@ user_params = pytest.mark.parametrize(
 def test_cli_update_users_when_list_makes_expected_call(
     httpserver_auth: HTTPServer,
     runner,
-    command_group,
+    option,
     command,
+    path_group,
     url_path,
     expected_request,
 ):
     httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/{command_group}/{url_path}",
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/{path_group}/{url_path}",
         method="POST",
         json=expected_request,
     ).respond_with_data()
     result = runner.invoke(
         incydr,
-        ["watchlists", command_group, command, TEST_WATCHLIST_ID, ",".join(USER_IDS)],
+        ["watchlists", command, TEST_WATCHLIST_ID, "--" + option, ",".join(USER_IDS)],
     )
     httpserver_auth.check()
     assert result.exit_code == 0
 
 
 @user_params
-def test_cli_update_users_when_CSV_makes_expected_call(
+def test_cli_update_users_when_filename_makes_expected_call(
     httpserver_auth: HTTPServer,
     runner,
-    command_group,
+    option,
     command,
     url_path,
+    path_group,
     expected_request,
     tmp_path,
 ):
@@ -820,13 +802,13 @@ def test_cli_update_users_when_CSV_makes_expected_call(
     p.write_text("user\n" + "\n".join(USER_IDS))
 
     httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/{command_group}/{url_path}",
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/{path_group}/{url_path}",
         method="POST",
         json=expected_request,
     ).respond_with_data()
     result = runner.invoke(
         incydr,
-        ["watchlists", command_group, command, TEST_WATCHLIST_ID, str(p), "--csv"],
+        ["watchlists", command, TEST_WATCHLIST_ID, "--" + option, "@" + str(p)],
     )
     httpserver_auth.check()
     assert result.exit_code == 0
@@ -836,7 +818,7 @@ GROUPS = ["scim-group-1", "scim-group-2"]
 
 
 @pytest.mark.parametrize(
-    "command_group, command, url_path, expected_request",
+    "option, command, url_path, expected_request",
     [
         ("directory-groups", "add", "add", {"groupIds": GROUPS}),
         ("directory-groups", "remove", "delete", {"groupIds": GROUPS}),
@@ -847,19 +829,19 @@ GROUPS = ["scim-group-1", "scim-group-2"]
 def test_cli_update_departments_and_directory_groups_makes_expected_call(
     httpserver_auth: HTTPServer,
     runner,
-    command_group,
+    option,
     command,
     url_path,
     expected_request,
 ):
     httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-{command_group}/{url_path}",
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-{option}/{url_path}",
         method="POST",
         json=expected_request,
     ).respond_with_data()
     result = runner.invoke(
         incydr,
-        ["watchlists", command_group, command, TEST_WATCHLIST_ID, ",".join(GROUPS)],
+        ["watchlists", command, TEST_WATCHLIST_ID, "--" + option, ",".join(GROUPS)],
     )
     httpserver_auth.check()
     assert result.exit_code == 0

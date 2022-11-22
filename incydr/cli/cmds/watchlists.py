@@ -24,6 +24,7 @@ from incydr.cli.cmds.utils import user_lookup
 from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
+from incydr.types import file_or_str_cls
 from incydr.utils import model_as_card
 from incydr.utils import read_dict_from_csv
 
@@ -48,16 +49,10 @@ def watchlists(ctx, log_level, log_file):
     """
     View and manage watchlists.
 
-    The following subcommand groups are available to manage watchlist membership:
-        * members
-        * included-users
-        * excluded-users
-        * directory-groups
-        * departments
-
-    After creation, Watchlists can be managed by ID or type.  CUSTOM watchlists must be managed by ID.
+    After creation, Watchlists can be managed by type (ex: `DEPARTING_EMPLOYEE`) or ID. `CUSTOM` watchlists must be managed by title or ID.
 
     The following values are valid watchlist types:
+
         * CONTRACT_EMPLOYEE
         * DEPARTING_EMPLOYEE
         * ELEVATED_ACCESS_PRIVILEGES
@@ -107,8 +102,10 @@ def show(ctx: Context, watchlist: str = None, format_: SingleFormat = None):
     """
     Show details for a watchlist.
 
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
+    WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
+    `CUSTOM` watchlists must be specified by title or ID.
+
+
     """
     client = ctx.obj()
     watchlist = client.watchlists.v1.get(watchlist)
@@ -128,19 +125,20 @@ def create(
     """
     Create a new watchlist.
 
-    Where WATCHLIST_TYPE is of the following:
-        * CONTRACT_EMPLOYEE
-        * DEPARTING_EMPLOYEE
-        * ELEVATED_ACCESS_PRIVILEGES
-        * FLIGHT_RISK
-        * HIGH_IMPACT_EMPLOYEE
-        * NEW_EMPLOYEE
-        * PERFORMANCE_CONCERNS
-        * POOR_SECURITY_PRACTICES
-        * SUSPICIOUS_SYSTEM_ACTIVITY
-        * CUSTOM
+    Where `WATCHLIST_TYPE` is of the following:
 
-    The --title (required) and --description (optional) options are exclusively for creating CUSTOM watchlists.
+    * `CONTRACT_EMPLOYEE`
+    * `DEPARTING_EMPLOYEE`
+    * `ELEVATED_ACCESS_PRIVILEGES`
+    * `FLIGHT_RISK`
+    * `HIGH_IMPACT_EMPLOYEE`
+    * `NEW_EMPLOYEE`
+    * `PERFORMANCE_CONCERNS`
+    * `POOR_SECURITY_PRACTICES`
+    * `SUSPICIOUS_SYSTEM_ACTIVITY`
+    * `CUSTOM`
+
+    The `--title` (required) and `--description` (optional) options are exclusively for creating CUSTOM watchlists.
     """
     client = ctx.obj()
     watchlist = client.watchlists.v1.create(watchlist_type, title, description)
@@ -156,8 +154,8 @@ def delete(ctx: Context, watchlist: str):
     """
     Delete a watchlist.
 
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
+    WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
+    `CUSTOM` watchlists must be specified by title or ID.
     """
     client = ctx.obj()
     client.watchlists.v1.delete(watchlist)
@@ -194,41 +192,201 @@ def update(
     console.print(f"Successfully updated watchlist with ID: '{watchlist_id}'.")
 
 
-@watchlists.group(cls=IncydrGroup)
-def members():
-    """
-    View watchlist members.
-
-    A member may have been added as an included user, or is a member
-    of an included department or directory group.
-    """
-
-
-@members.command("show", cls=IncydrCommand)
+@watchlists.command(cls=IncydrCommand)
 @watchlist_arg
-@click.argument("user", callback=user_lookup_callback)
-@single_format_option
+@click.option(
+    "--users",
+    default=None,
+    type=file_or_str_cls,
+    help="List of user IDs or usernames to include on the watchlist. "
+    "An additional lookup is performed if a username is passed. Argument can be "
+    "passed as a comma-delimited string or from a CSV file with a single 'user' "
+    "column if prefixed with '@', e.g. '--users @users.csv'.",
+)
+@click.option(
+    "--excluded-users",
+    default=None,
+    type=file_or_str_cls,
+    help="List of user IDs or usernames to exclude from the watchlist. "
+    "An additional lookup is performed if a username is passed. Argument can be "
+    "passed as a comma-delimited string or from a CSV file with a single 'user' "
+    "column if prefixed with '@', e.g. '--users @users.csv'.",
+)
+@click.option(
+    "--departments",
+    default=None,
+    type=file_or_str_cls,
+    help="Comma-delimited string of department names to include on the watchlist. "
+    "Individual users from the departments will be added as watchlist members, where department information comes "
+    "from SCIM or User Directory Sync.",
+)
+@click.option(
+    "--directory-groups",
+    default=None,
+    type=file_or_str_cls,
+    help="Comma-delimited string of directory group IDs to include on the watchlist. "
+    "Individual users from the directory groups will be added as watchlist members, where group information comes "
+    "from SCIM or User Directory Sync.",
+)
 @click.pass_context
-def show_member(ctx: Context, watchlist: str, user: str, format_: SingleFormat):
+def add(
+    ctx: Context,
+    watchlist: str,
+    users=None,
+    excluded_users=None,
+    departments=None,
+    directory_groups=None,
+):
     """
-    Show details for a single member of a watchlist.
+    Manage watchlist membership by including or excluding individual users and/or groups.
 
-    A member may have been added as an included user, or is a member of an included department, etc.
+    Add any of the following members to a watchlist with the corresponding options:
 
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
+    * users
+    * excluded-users
+    * departments
+    * directory-groups
+
+    WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
+    `CUSTOM` watchlists must be specified by title or ID.
     """
     client = ctx.obj()
-    member = client.watchlists.v1.get_member(watchlist, user)
-    _output_single_result(
-        member,
-        f"Watchlist Member: {member.username}",
-        format_,
-        client.settings.use_rich,
-    )
+
+    # Add included users
+    if users:
+        client.watchlists.v1.add_included_users(
+            watchlist, _get_user_ids(client, users, _is_path(users))
+        )
+        console.print(
+            f"Successfully included users on watchlist with ID: '{watchlist}'"
+        )
+
+    # Add excluded users
+    if excluded_users:
+        client.watchlists.v1.add_excluded_users(
+            watchlist, _get_user_ids(client, excluded_users, _is_path(excluded_users))
+        )
+        console.print(
+            f"Successfully excluded users from watchlist with ID: '{watchlist}'"
+        )
+
+    # Add departments
+    if departments:
+        client.watchlists.v1.add_departments(
+            watchlist, [i.strip() for i in departments.split(",")]
+        )
+        console.print(
+            f"Successfully included departments to watchlist with ID: {watchlist}"
+        )
+
+    # Add directory groups
+    if directory_groups:
+        client.watchlists.v1.add_directory_groups(
+            watchlist, [i.strip() for i in directory_groups.split(",")]
+        )
+        console.print(
+            f"Successfully included directory groups to watchlist with ID: {watchlist}"
+        )
 
 
-@members.command("list", cls=IncydrCommand)
+@watchlists.command(cls=IncydrCommand)
+@watchlist_arg
+@click.option(
+    "--users",
+    default=None,
+    type=file_or_str_cls,
+    help="List of included user IDs or usernames to remove from the watchlist. "
+    "An additional lookup is performed if a username is passed. Argument can be "
+    "passed as a comma-delimited string or from a CSV file with a single 'user' "
+    "column if prefixed with '@', e.g. '--users @users.csv'.",
+)
+@click.option(
+    "--excluded-users",
+    default=None,
+    type=file_or_str_cls,
+    help="List of excluded user IDs or usernames to remove from the watchlist. "
+    "An additional lookup is performed if a username is passed. Argument can be "
+    "passed as a comma-delimited string or from a CSV file with a single 'user' "
+    "column if prefixed with '@', e.g. '--users @users.csv'.",
+)
+@click.option(
+    "--departments",
+    default=None,
+    type=file_or_str_cls,
+    help="Comma-delimited string of department names to remove from the watchlist. "
+    "Individual users from the departments will be added as watchlist members, where department information comes "
+    "from SCIM or User Directory Sync.",
+)
+@click.option(
+    "--directory-groups",
+    default=None,
+    type=file_or_str_cls,
+    help="Comma-delimited string of directory group IDs to remove from the watchlist. "
+    "Individual users from the directory groups will be added as watchlist members, where group information comes "
+    "from SCIM or User Directory Sync.",
+)
+@click.pass_context
+def remove(
+    ctx: Context,
+    watchlist: str,
+    users=None,
+    excluded_users=None,
+    departments=None,
+    directory_groups=None,
+):
+    """
+    Manage watchlist membership by removing individual users and/or groups.
+
+    Remove any of the following members from a watchlist with the corresponding options:
+
+    * users
+    * excluded-users
+    * departments
+    * directory-groups
+
+    WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
+    `CUSTOM` watchlists must be specified by title or ID.
+    """
+    client = ctx.obj()
+
+    # Remove included users
+    if users:
+        client.watchlists.v1.remove_included_users(
+            watchlist, _get_user_ids(client, users, _is_path(users))
+        )
+        console.print(
+            f"Successfully removed included users on watchlist with ID: '{watchlist}'"
+        )
+
+    # Remove excluded users
+    if excluded_users:
+        client.watchlists.v1.remove_excluded_users(
+            watchlist, _get_user_ids(client, excluded_users, _is_path(excluded_users))
+        )
+        console.print(
+            f"Successfully removed excluded users from watchlist with ID: '{watchlist}'"
+        )
+
+    # Remove departments
+    if departments:
+        client.watchlists.v1.remove_departments(
+            watchlist, [i.strip() for i in departments.split(",")]
+        )
+        console.print(
+            f"Successfully removed departments from watchlist with ID: {watchlist}"
+        )
+
+    # Remove directory groups
+    if directory_groups:
+        client.watchlists.v1.remove_directory_groups(
+            watchlist, [i.strip() for i in directory_groups.split(",")]
+        )
+        console.print(
+            f"Successfully removed directory groups from watchlist with ID: {watchlist}"
+        )
+
+
+@watchlists.command(cls=IncydrCommand)
 @watchlist_arg
 @columns_option
 @table_format_option
@@ -241,103 +399,15 @@ def list_members(
 
     A member may have been added as an included user, or is a member of an included department, etc.
 
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
+    WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
+    `CUSTOM` watchlists must be specified by title or ID.
     """
     client = ctx.obj()
     members = client.watchlists.v1.list_members(watchlist)
     _output_results(members.watchlist_members, WatchlistUser, format_, columns)
 
 
-@watchlists.group(cls=IncydrGroup)
-def included_users():
-    """View and manage users individually included on a watchlist."""
-
-
-@included_users.command("add", cls=IncydrCommand)
-@watchlist_arg
-@click.argument("users")
-@csv_option
-@click.pass_context
-def add_included_users(ctx: Context, watchlist: str, users: str, csv: bool = False):
-    """
-    Include individual users on a watchlist.
-
-        watchlists included-users add WATCHLIST USERS --csv
-
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
-
-    USERS is a comma-delimited string of user IDs or usernames to add to the case.
-    An additional lookup is performed if a username is passed.
-
-    To read the users from a csv (single 'users' column),
-    pass the path to a csv along with the --csv flag:
-
-        watchlists included-users add WATCHLIST CSV_PATH --csv
-    """
-    client = ctx.obj()
-
-    users = _get_user_ids(client, users, csv)
-
-    client.watchlists.v1.add_included_users(watchlist, users)
-    console.print(f"Successfully included users on watchlist with ID: '{watchlist}'")
-
-
-@included_users.command("remove", cls=IncydrCommand)
-@watchlist_arg
-@click.argument("users")
-@csv_option
-@click.pass_context
-def remove_included_users(ctx: Context, watchlist, users: str, csv: bool = False):
-    """
-    Remove included users from a watchlist.
-
-        watchlists included-users remove WATCHLIST USERS --csv
-
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
-
-    USERS is a comma-delimited string of user IDs or usernames to add to the case.
-    An additional lookup is performed if a username is passed.
-
-    To read the users from a csv (single 'users' column),
-    pass the path to a csv along with the --csv flag:
-
-        watchlists included-users remove WATCHLIST CSV_PATH --csv
-
-    """
-    client = ctx.obj()
-
-    users = _get_user_ids(client, users, csv)
-
-    client.watchlists.v1.remove_included_users(watchlist, users)
-    console.print(
-        f"Successfully removed included users from watchlist with ID: '{watchlist}'"
-    )
-
-
-@included_users.command("show", cls=IncydrCommand)
-@watchlist_arg
-@click.argument("user")
-@single_format_option
-@click.pass_context
-def show_included_user(ctx: Context, watchlist: str, user: str, format_: SingleFormat):
-    """
-    Show details for a user explicitly included on a watchlist.
-
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
-
-    """
-    client = ctx.obj()
-    user = client.watchlists.v1.get_included_user(watchlist, user)
-    _output_single_result(
-        user, f"Included User: {user.username}", format_, client.settings.use_rich
-    )
-
-
-@included_users.command("list", cls=IncydrCommand)
+@watchlists.command(cls=IncydrCommand)
 @watchlist_arg
 @table_format_option
 @columns_option
@@ -348,8 +418,8 @@ def list_included_users(
     """
     List users explicitly included on a watchlist.
 
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
+    WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
+    `CUSTOM` watchlists must be specified by title or ID.
 
     """
     client = ctx.obj()
@@ -357,94 +427,7 @@ def list_included_users(
     _output_results(users.included_users, WatchlistUser, format_, columns)
 
 
-@watchlists.group(cls=IncydrGroup)
-def excluded_users():
-    """View and manage users individually excluded from a watchlist."""
-
-
-@excluded_users.command("add", cls=IncydrCommand)
-@watchlist_arg
-@click.argument("users")
-@csv_option
-@click.pass_context
-def add_excluded_users(ctx: Context, watchlist: str, users: str, csv: bool = False):
-    """
-    Exclude individual users from a watchlist.
-
-        watchlists excluded-users add WATCHLIST USERS --csv
-
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
-
-    USERS is a comma-delimited string of user IDs or usernames to add to the case.
-    An additional lookup is performed if a username is passed.
-
-    To read the users from a csv (single 'users' column),
-    pass the path to a csv along with the --csv flag:
-
-        watchlists excluded-users add WATCHLIST CSV_PATH --csv
-    """
-    client = ctx.obj()
-
-    users = _get_user_ids(client, users, csv)
-
-    client.watchlists.v1.add_excluded_users(watchlist, users)
-    console.print(f"Successfully excluded users from watchlist with ID: '{watchlist}'")
-
-
-@excluded_users.command("remove", cls=IncydrCommand)
-@watchlist_arg
-@click.argument("users")
-@csv_option
-@click.pass_context
-def remove_excluded_users(ctx: Context, watchlist: str, users: str, csv: bool = False):
-    """
-    Remove excluded users from a watchlist.
-
-        watchlists excluded-users remove WATCHLIST USERS --csv
-
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
-
-    USERS is a comma-delimited string of user IDs or usernames to add to the case.
-    An additional lookup is performed if a username is passed.
-
-    To read the users from a csv (single 'users' column),
-    pass the path to a csv along with the --csv flag:
-
-        watchlists excluded-users remove WATCHLIST CSV_PATH --csv
-
-    """
-    client = ctx.obj()
-
-    users = _get_user_ids(client, users, csv)
-
-    client.watchlists.v1.remove_excluded_users(watchlist, users)
-    console.print(
-        f"Successfully removed excluded users from watchlist with ID: '{watchlist}'"
-    )
-
-
-@excluded_users.command("show", cls=IncydrCommand)
-@watchlist_arg
-@click.argument("user")
-@single_format_option
-@click.pass_context
-def show_excluded_user(ctx: Context, watchlist: str, user: str, format_: SingleFormat):
-    """
-    Show details for a user excluded from a watchlist.
-
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
-    """
-    client = ctx.obj()
-    user = client.watchlists.v1.get_excluded_user(watchlist, user)
-    _output_single_result(
-        user, f"Excluded User: {user.username}", format_, client.settings.use_rich
-    )
-
-
-@excluded_users.command("list", cls=IncydrCommand)
+@watchlists.command(cls=IncydrCommand)
 @watchlist_arg
 @table_format_option
 @columns_option
@@ -455,91 +438,15 @@ def list_excluded_users(
     """
     List users excluded from a watchlist.
 
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
+    WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
+    `CUSTOM` watchlists must be specified by title or ID.
     """
     client = ctx.obj()
     users = client.watchlists.v1.list_excluded_users(watchlist)
     _output_results(users.excluded_users, WatchlistUser, format_, columns)
 
 
-@watchlists.group(cls=IncydrGroup)
-def directory_groups():
-    """
-    View and manage directory groups included on a watchlist.
-
-    Directory groups are pushed to Code42 from SCIM or User Directory Sync.
-    Retrieve information on the directory groups in your environment using
-    the `incydr directory-groups` command group.
-    """
-
-
-@directory_groups.command("add", cls=IncydrCommand)
-@watchlist_arg
-@click.argument("group_ids")
-@click.pass_context
-def add_directory_group(ctx: Context, watchlist: str, group_ids: str):
-    """
-    Include directory groups on a watchlist.
-
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
-
-    GROUP_IDS is a comma-delimited list of directory group IDs.
-    """
-    client = ctx.obj()
-    client.watchlists.v1.add_directory_groups(
-        watchlist, [i.strip() for i in group_ids.split(",")]
-    )
-    console.print(
-        f"Successfully included directory groups to watchlist with ID: {watchlist}"
-    )
-
-
-@directory_groups.command("remove", cls=IncydrCommand)
-@watchlist_arg
-@click.argument("group_ids")
-@click.pass_context
-def remove_directory_group(ctx: Context, watchlist: str, group_ids: str):
-    """
-    Remove included directory groups from a watchlist.
-
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
-
-    GROUP_IDS is a comma-delimited list of directory group IDs.
-    """
-    client = ctx.obj()
-    client.watchlists.v1.remove_directory_groups(
-        watchlist, [i.strip() for i in group_ids.split(",")]
-    )
-    console.print(
-        f"Successfully removed included directory groups from watchlist with ID: {watchlist}"
-    )
-
-
-@directory_groups.command("show", cls=IncydrCommand)
-@watchlist_arg
-@click.argument("group_id")
-@single_format_option
-@click.pass_context
-def show_directory_group(
-    ctx: Context, watchlist: str, group_id: str, format_: SingleFormat
-):
-    """
-    Show details for a directory group included on a watchlist.
-
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
-    """
-    client = ctx.obj()
-    group = client.watchlists.v1.get_directory_group(watchlist, group_id)
-    _output_single_result(
-        group, f"Directory Group: {group.name}", format_, client.settings.use_rich
-    )
-
-
-@directory_groups.command("list", cls=IncydrCommand)
+@watchlists.command(cls=IncydrCommand)
 @watchlist_arg
 @table_format_option
 @columns_option
@@ -550,8 +457,8 @@ def list_directory_groups(
     """
     List directory groups included on a watchlist.
 
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
+    WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
+    `CUSTOM` watchlists must be specified by title or ID.
     """
     client = ctx.obj()
     groups = client.watchlists.v1.list_directory_groups(watchlist)
@@ -560,83 +467,7 @@ def list_directory_groups(
     )
 
 
-@watchlists.group(cls=IncydrGroup)
-def departments():
-    """
-    View and manage departments included on a watchlist.
-
-    Departments are pushed to Code42 from SCIM or User Directory Sync.
-    Retrieve information on the departments in your environment using
-    the `incydr departments` command group.
-    """
-
-
-@departments.command("add", cls=IncydrCommand)
-@watchlist_arg
-@click.argument("departments")
-@click.pass_context
-def add_department(ctx: Context, watchlist: str, departments: str):
-    """
-    Include departments on a watchlist.
-
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
-
-    DEPARTMENTS is a comma-delimited list of department names.
-    """
-    client = ctx.obj()
-    client.watchlists.v1.add_departments(
-        watchlist, [i.strip() for i in departments.split(",")]
-    )
-    console.print(
-        f"Successfully included departments to watchlist with ID: {watchlist}"
-    )
-
-
-@departments.command("remove", cls=IncydrCommand)
-@watchlist_arg
-@click.argument("departments")
-@click.pass_context
-def remove_department(ctx: Context, watchlist: str, departments: str):
-    """
-    Remove included departments from a watchlist.
-
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
-
-    DEPARTMENTS is a comma-delimited list of department names.
-    """
-    client = ctx.obj()
-    client.watchlists.v1.remove_departments(
-        watchlist, [i.strip() for i in departments.split(",")]
-    )
-    console.print(
-        f"Successfully removed included departments from watchlist with ID: {watchlist}"
-    )
-
-
-@departments.command("show", cls=IncydrCommand)
-@watchlist_arg
-@click.argument("department")
-@single_format_option
-@click.pass_context
-def show_department(
-    ctx: Context, watchlist: str, department: str, format_: SingleFormat
-):
-    """
-    Show details for a department included on a watchlist.
-
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
-    """
-    client = ctx.obj()
-    dep = client.watchlists.v1.get_department(watchlist, department)
-    _output_single_result(
-        dep, f"Department: {dep.name}", format_, client.settings.use_rich
-    )
-
-
-@departments.command("list", cls=IncydrCommand)
+@watchlists.command(cls=IncydrCommand)
 @watchlist_arg
 @table_format_option
 @columns_option
@@ -647,8 +478,8 @@ def list_departments(
     """
     List departments included on a watchlist.
 
-    WATCHLIST can be specified by watchlist type (ex: DEPARTING_EMPLOYEE) or ID.
-    CUSTOM watchlists must be specified by ID.
+    WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
+    `CUSTOM` watchlists must be specified by title or ID.
     """
     client = ctx.obj()
     deps = client.watchlists.v1.list_departments(watchlist)
@@ -689,3 +520,7 @@ def _output_single_result(model, title, format_, use_rich=True):
         console.print_json(model.json())
     else:  # format == "raw-json"
         console.print(model.json(), highlight=False)
+
+
+def _is_path(users: str):
+    return users.lower().endswith(".csv")

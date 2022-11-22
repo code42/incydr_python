@@ -22,25 +22,12 @@
 
 ::: mkdocs-click
     :module: incydr.cli.cmds.watchlists
-    :command: members
-    :list_subcommands:
+    :command: add
 
 ::: mkdocs-click
     :module: incydr.cli.cmds.watchlists
-    :command: included_users
-    :list_subcommands:
+    :command: remove
 
 ::: mkdocs-click
     :module: incydr.cli.cmds.watchlists
-    :command: excluded_users
-    :list_subcommands:
-
-::: mkdocs-click
-    :module: incydr.cli.cmds.watchlists
-    :command: directory_groups
-    :list_subcommands:
-
-::: mkdocs-click
-    :module: incydr.cli.cmds.watchlists
-    :command: departments
-    :list_subcommands:
+    :command: list_members
