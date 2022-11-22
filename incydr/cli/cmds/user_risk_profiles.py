@@ -91,12 +91,18 @@ def list_(
         render.csv(UserRiskProfile, profiles, columns=columns, flat=True)
     elif format_ == TableFormat.table:
         render.table(UserRiskProfile, profiles, columns=columns, flat=False)
-    elif format_ == TableFormat.json:
-        for p in profiles:
-            console.print_json(p.json())
-    else:  # format == "raw-json"/TableFormat.raw_json
-        for p in profiles:
-            console.print(p.json(), highlight=False)
+    else:
+        printed = False
+        if format_ == TableFormat.json:
+            for p in profiles:
+                printed = True
+                console.print_json(p.json())
+        else:  # raw-json
+            for p in profiles:
+                printed = True
+                click.echo(p.json())
+        if not printed:
+            console.print("No results found.")
 
 
 @risk_profiles.command(cls=IncydrCommand)

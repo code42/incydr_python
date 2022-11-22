@@ -142,7 +142,9 @@ def search(
         def yield_all_events(q: EventQuery):
             while q.page_token is not None:
                 response = client.session.post("/v2/file-events", json=q.dict())
-                yield from response.json()["fileEvents"]
+                response_dict = response.json()
+                q.page_token = response_dict.get("nextPgToken")
+                yield from response_dict["fileEvents"]
 
     else:
 
@@ -160,12 +162,19 @@ def search(
         render.csv(FileEventV2, events, columns=columns, flat=True)
     elif format_ == TableFormat.table:
         render.table(FileEventV2, events, columns=columns, flat=False)
-    elif format_ == TableFormat.json:
-        for event in events:
-            console.print_json(data=event)
-    else:  # format_ == "raw-json"/TableFormat.raw_json
-        for event in events:
-            console.print(json.dumps(event), highlight=False)
+    else:
+        printed = False
+        if format_ == TableFormat.json:
+            for event in events:
+                printed = True
+                console.print_json(data=event)
+        else:  # raw-json
+            for event in events:
+                printed = True
+                event = json.dumps(event)
+                click.echo(event)
+        if not printed:
+            console.print("No results found.")
 
 
 @file_events.command(cls=IncydrCommand)
