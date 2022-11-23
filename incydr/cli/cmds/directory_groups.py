@@ -37,8 +37,6 @@ def list_(ctx: Context, format_: TableFormat, name: Optional[str] = None):
 
     The results can then be used with the watchlists commands to automatically assign users to watchlists by directory group.
     """
-    if not format_:
-        format_ = TableFormat.table
     client = ctx.obj()
     groups = client.directory_groups.v1.iter_all(name=name)
     if format_ == TableFormat.table:

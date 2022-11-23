@@ -69,3 +69,14 @@ class AlertTerm(_Enum):
     LAST_MODIFIED_BY = "LastModifiedBy"
     RULE_ID = "RuleId"
     SEVERITY = "AlertSeverity"
+
+
+class MessagingMethod(_Enum):
+    """
+    Instructor messaging method for an alert rule.
+
+    Only part of alert rule responses as of 11/28/2022.
+    """
+
+    EMAIL = "Email"
+    SLACK = "Slack"

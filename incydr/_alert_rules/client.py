@@ -4,12 +4,20 @@ from typing import List
 from typing import Union
 
 from pydantic import parse_obj_as
+from requests import HTTPError
 from requests import Response
 
 from incydr._alert_rules.models.request import GetRulesRequest
 from incydr._alert_rules.models.response import RuleDetails
 from incydr._alert_rules.models.response import RuleUsersList
 from incydr._user_risk_profiles.models import UserRiskProfile
+
+
+class MissingUsernameCriterionError(Exception):
+    """An error raised when the date data cannot be parsed."""
+
+    def __init__(self, rule_id):
+        super().__init__(f"Rule '{rule_id}' has no username filter.")
 
 
 class AlertRulesClient:
@@ -144,13 +152,22 @@ class AlertRulesV2:
         """
         Get all users assigned to a rule.
 
+        Raises a `MissingUsernameCriterionError` if the rule doesn't have a username filter.
+
         **Parameters**:
 
         * **rule_id**: `str` (required) - The ID of the rule.
 
         **Returns**: A [`RuleUsersList`][ruleuserslist-model] model.
         """
-        response = self._parent.session.get(url=f"/v2/alert-rules/{rule_id}/users")
+        try:
+            response = self._parent.session.get(url=f"/v2/alert-rules/{rule_id}/users")
+        except HTTPError as e:
+            # This endpoint doesn't have query params or a request body, so it should
+            # only return a 400 if there is not username filter for the rule.
+            if e.response.status_code == 400:
+                raise MissingUsernameCriterionError(rule_id)
+            raise e
         return RuleUsersList.parse_response(response)
 
     def _get_user_aliases(self, user_id):
