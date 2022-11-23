@@ -6,13 +6,12 @@ from datetime import timedelta
 from json import JSONDecodeError
 
 import requests
+from boltons.jsonutils import JSONLIterator
 from pydantic import BaseModel
 from pydantic import PrivateAttr
 from pydantic import root_validator
 from pydantic import SecretStr
 from pydantic import ValidationError
-
-from boltons.jsonutils import JSONLIterator
 
 
 class Model(BaseModel):

@@ -5,8 +5,8 @@ import sys
 from typing import Iterable
 from typing import Optional
 
-from pydantic import BaseModel
 from click import echo
+from pydantic import BaseModel
 
 from incydr.cli import console
 from incydr.cli import render
