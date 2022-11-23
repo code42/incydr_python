@@ -8,7 +8,6 @@ from incydr.cli.core import incompatible_with
 
 AdvancedQueryIncompatible = incompatible_with(["advanced_query"])
 
-# TODO
 start_option = click.option(
     "--start",
     default=None,

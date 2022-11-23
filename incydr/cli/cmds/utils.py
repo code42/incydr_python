@@ -1,4 +1,3 @@
-import functools
 import itertools
 import json
 import sys
@@ -119,6 +118,11 @@ def output_format_logger(
 
 
 def user_lookup(client, value):
+    """
+    Returns the user ID for a given username, or returns the value unchanged if not a username.
+
+    Used with the `user_lookup_callback` method on user args.
+    """
     if "@" in str(value):
         # assume username/email was passed
         users = client.users.v1.get_page(username=value).users
@@ -140,19 +144,3 @@ def output_single_format(
 
     else:
         echo(result.json())
-
-
-# Drop in replacements for getattr() and setattr() that account for nested attributes
-# specified by dot notation
-
-# See https://stackoverflow.com/questions/31174295/getattr-and-setattr-on-nested-objects/31174427?noredirect=1#comment86638618_31174427
-def rgetattr(obj, attr, *args):
-    def _getattr(obj, attr):
-        return getattr(obj, attr, *args)
-
-    return functools.reduce(_getattr, [obj] + attr.split("."))
-
-
-def rsetattr(obj, attr, val):
-    pre, _, post = attr.rpartition(".")
-    return setattr(rgetattr(obj, pre) if pre else obj, post, val)

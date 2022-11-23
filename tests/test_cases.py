@@ -666,7 +666,7 @@ def test_cli_bulk_update_makes_expected_call(
         "/v1/cases/42", method="PUT", json=update_2
     ).respond_with_json(TEST_CASE_2)
 
-    p = tmp_path / "@event_ids.csv"
+    p = tmp_path / "@cases.csv"
     p.write_text(
         "number,assignee,description,findings,name,status,subject\n"
         f"1,{update_1['assignee']},{update_1['description']},{update_1['findings']},{update_1['name']},{update_1['status']},{update_1['subject']}\n"
@@ -696,7 +696,7 @@ def test_cli_bulk_update_when_usernames_makes_user_lookup(
         "/v1/cases/1", method="PUT", json=data_1
     ).respond_with_json(TEST_CASE_1)
 
-    p = tmp_path / "event_ids.csv"
+    p = tmp_path / "cases.csv"
     p.write_text(
         "number,assignee,description,findings,name,status,subject\n"
         "1,foo@bar.com,test case 1,no findings,Test Case 1,OPEN,baz@bar.com\n"
@@ -744,7 +744,7 @@ def test_cli_bulk_update_when_multiple_same_usernames_makes_single_user_lookup_a
         "/v1/cases/1", method="PUT", json=data_1
     ).respond_with_json(TEST_CASE_1)
 
-    p = tmp_path / "event_ids.csv"
+    p = tmp_path / "cases.csv"
     p.write_text(
         "number,assignee,description,findings,name,status,subject\n"
         "1,foo@bar.com,test case 1,no findings,Test Case 1,OPEN,foo@bar.com\n"

@@ -38,7 +38,7 @@ def measure_renderable(r: ConsoleRenderable):
     return Console(width=100_000).measure(r).maximum
 
 
-def table(
+def models_as_table(
     model: Type[BaseModel],
     models: Iterable[BaseModel],
     columns: List[str] = None,
@@ -58,6 +58,17 @@ def table(
                 value = str(value)
             values.append(value)
         tbl.add_row(*values)
+    return tbl
+
+
+def table(
+    model: Type[BaseModel],
+    models: Iterable[BaseModel],
+    columns: List[str] = None,
+    title=None,
+    flat=False,
+):
+    tbl = models_as_table(model, models, columns, title, flat)
 
     if not tbl.rows:
         console.print("No results found.")

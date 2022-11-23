@@ -79,6 +79,7 @@ dependencies = [
   "pytest",
   "pytest-cov",
   "pytest-httpserver",
+  "pytest-lazy-fixture",
   "click",
   "chardet"
 ]

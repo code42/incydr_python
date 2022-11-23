@@ -4,6 +4,9 @@ from urllib.parse import urlencode
 
 import pytest
 from pytest_httpserver import HTTPServer
+from pytest_lazyfixture import (
+    lazy_fixture,
+)  # lazy_fixture allows us to pass a fixture as a value in @pytest.mark.parametrize
 
 from incydr._core.client import Client
 from incydr._watchlists.models.responses import ExcludedUsersList
@@ -16,10 +19,13 @@ from incydr._watchlists.models.responses import Watchlist
 from incydr._watchlists.models.responses import WatchlistMembersList
 from incydr._watchlists.models.responses import WatchlistsPage
 from incydr._watchlists.models.responses import WatchlistUser
+from incydr.cli.main import incydr
 from incydr.enums.watchlists import WatchlistType
 from incydr.exceptions import WatchlistNotFoundError
+from tests.conftest import TEST_TOKEN
 
-TEST_WATCHLIST_ID = "1-watchlist-42"
+TEST_WATCHLIST_ID = "1c7dd799-1aa0-4f3a-bae8-1d3242fc2af6"
+TEST_ID = "b799bf9c-8838-480f-85dc-438d74e3ca0d"
 
 TEST_WATCHLIST_1 = {
     "description": None,
@@ -32,7 +38,7 @@ TEST_WATCHLIST_1 = {
     },
     "tenantId": "code-42",
     "title": "departing employee",
-    "watchlistId": "1-watchlist-42",
+    "watchlistId": TEST_WATCHLIST_ID,
 }
 TEST_WATCHLIST_2 = {
     "description": "custom watchlist",
@@ -64,7 +70,7 @@ TEST_WATCHLIST_3 = {
 
 TEST_USER_1 = {
     "addedTime": "2022-07-18T16:39:51.356082Z",
-    "userId": "user-42",
+    "userId": TEST_ID,
     "username": "foo@bar.com",
 }
 TEST_USER_2 = {
@@ -78,7 +84,7 @@ TEST_DEPARTMENT_2 = {"addedTime": "2022-08-18T16:39:51.356082Z", "name": "Market
 
 TEST_GROUP_1 = {
     "addedTime": "2022-07-18T16:39:51.356082Z",
-    "groupId": "group-42",
+    "groupId": TEST_ID,
     "isDeleted": False,
     "name": "Sales",
 }
@@ -95,14 +101,36 @@ valid_ids_param = pytest.mark.parametrize(
     [("user-42", ["user-42"]), (["user-42", "user-43"], ["user-42", "user-43"])],
 )
 
-watchlist_type_param = pytest.mark.parametrize(
-    "watchlist_type", ["DEPARTING_EMPLOYEE", WatchlistType.DEPARTING_EMPLOYEE]
-)
+
+@pytest.fixture
+def mock_create_custom(httpserver_auth: HTTPServer):
+    data = {
+        "description": "custom watchlist",
+        "title": "test",
+        "watchlistType": "CUSTOM",
+    }
+    httpserver_auth.expect_request(
+        "/v1/watchlists", method="POST", json=data
+    ).respond_with_json(TEST_WATCHLIST_2)
 
 
-def test_get_page_when_default_params_returns_expected_data(
-    httpserver_auth: HTTPServer,
-):
+@pytest.fixture
+def mock_create_departing_employee(httpserver_auth: HTTPServer):
+    data = {"description": None, "title": None, "watchlistType": "DEPARTING_EMPLOYEE"}
+    httpserver_auth.expect_request(
+        "/v1/watchlists", method="POST", json=data
+    ).respond_with_json(TEST_WATCHLIST_1)
+
+
+@pytest.fixture
+def mock_delete(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}", method="DELETE"
+    ).respond_with_data()
+
+
+@pytest.fixture
+def mock_get_all(httpserver_auth: HTTPServer):
     data = {"watchlists": [TEST_WATCHLIST_1, TEST_WATCHLIST_2], "totalCount": 2}
 
     query = {"page": 1, "pageSize": 100}
@@ -111,6 +139,86 @@ def test_get_page_when_default_params_returns_expected_data(
         "/v1/watchlists", method="GET", query_string=urlencode(query)
     ).respond_with_json(data)
 
+
+@pytest.fixture
+def mock_get_all_members(httpserver_auth: HTTPServer):
+    data = {"watchlistMembers": [TEST_USER_1, TEST_USER_2], "totalCount": 2}
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/members"
+    ).respond_with_json(data)
+
+
+@pytest.fixture
+def mock_get_all_included_users(httpserver_auth: HTTPServer):
+    data = {"includedUsers": [TEST_USER_1, TEST_USER_2], "totalCount": 2}
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-users"
+    ).respond_with_json(data)
+
+
+@pytest.fixture
+def mock_get_all_excluded_users(httpserver_auth: HTTPServer):
+    data = {"excludedUsers": [TEST_USER_1, TEST_USER_2], "totalCount": 2}
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/excluded-users"
+    ).respond_with_json(data)
+
+
+@pytest.fixture
+def mock_get_all_departments(httpserver_auth: HTTPServer):
+    data = {
+        "includedDepartments": [TEST_DEPARTMENT_1, TEST_DEPARTMENT_2],
+        "totalCount": 2,
+    }
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-departments"
+    ).respond_with_json(data)
+
+
+@pytest.fixture
+def mock_get_all_directory_groups(httpserver_auth: HTTPServer):
+    data = {"includedDirectoryGroups": [TEST_GROUP_1, TEST_GROUP_2], "totalCount": 2}
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-directory-groups"
+    ).respond_with_json(data)
+
+
+@pytest.fixture
+def mock_get_member(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/members/{TEST_ID}", method="GET"
+    ).respond_with_json(TEST_USER_1)
+
+
+@pytest.fixture
+def mock_get_included_user(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-users/{TEST_ID}"
+    ).respond_with_json(TEST_USER_1)
+
+
+@pytest.fixture
+def mock_get_excluded_user(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/excluded-users/{TEST_ID}"
+    ).respond_with_json(TEST_USER_1)
+
+
+@pytest.fixture
+def mock_get_department(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-departments/{TEST_ID}"
+    ).respond_with_json(TEST_DEPARTMENT_1)
+
+
+@pytest.fixture
+def mock_get_directory_group(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-directory-groups/{TEST_ID}"
+    ).respond_with_json(TEST_GROUP_1)
+
+
+def test_get_page_when_default_params_returns_expected_data(mock_get_all):
     c = Client()
     page = c.watchlists.v1.get_page()
     assert isinstance(page, WatchlistsPage)
@@ -173,6 +281,7 @@ def test_get_returns_expected_data(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request(
         f"/v1/watchlists/{TEST_WATCHLIST_ID}", method="GET"
     ).respond_with_json(TEST_WATCHLIST_1)
+
     c = Client()
     watchlist = c.watchlists.v1.get(TEST_WATCHLIST_ID)
     assert isinstance(watchlist, Watchlist)
@@ -180,29 +289,16 @@ def test_get_returns_expected_data(httpserver_auth: HTTPServer):
     assert watchlist.json() == json.dumps(TEST_WATCHLIST_1)
 
 
-@watchlist_type_param
 def test_create_when_required_params_returns_expected_data(
-    httpserver_auth: HTTPServer, watchlist_type
+    mock_create_departing_employee,
 ):
-    data = {"description": None, "title": None, "watchlistType": "DEPARTING_EMPLOYEE"}
-    httpserver_auth.expect_request(
-        "/v1/watchlists", method="POST", json=data
-    ).respond_with_json(TEST_WATCHLIST_1)
     c = Client()
-    watchlist = c.watchlists.v1.create(watchlist_type)
+    watchlist = c.watchlists.v1.create(WatchlistType.DEPARTING_EMPLOYEE)
     assert isinstance(watchlist, Watchlist)
     assert watchlist.json() == json.dumps(TEST_WATCHLIST_1)
 
 
-def test_create_when_all_params_returns_expected_data(httpserver_auth: HTTPServer):
-    data = {
-        "description": "custom watchlist",
-        "title": "test",
-        "watchlistType": "CUSTOM",
-    }
-    httpserver_auth.expect_request(
-        "/v1/watchlists", method="POST", json=data
-    ).respond_with_json(TEST_WATCHLIST_2)
+def test_create_when_all_params_returns_expected_data(mock_create_custom):
     c = Client()
     watchlist = c.watchlists.v1.create(
         "CUSTOM", title="test", description="custom watchlist"
@@ -213,16 +309,12 @@ def test_create_when_all_params_returns_expected_data(httpserver_auth: HTTPServe
 
 def test_create_when_custom_and_no_title_raises_error(httpserver_auth: HTTPServer):
     c = Client()
-
     with pytest.raises(ValueError) as err:
         c.watchlists.v1.create("CUSTOM")
     assert err.value.args[0] == "`title` value is required for custom watchlists."
 
 
-def test_delete_returns_expected_data(httpserver_auth: HTTPServer):
-    httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}", method="DELETE"
-    ).respond_with_data()
+def test_delete_returns_expected_data(mock_delete):
     c = Client()
     assert c.watchlists.v1.delete(TEST_WATCHLIST_ID).status_code == 200
 
@@ -266,14 +358,11 @@ def test_update_when_one_param_returns_expected_data(httpserver_auth: HTTPServer
     assert response.json() == json.dumps(watchlist)
 
 
-def test_get_member_returns_expected_data(httpserver_auth: HTTPServer):
-    httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/members/user-42", method="GET"
-    ).respond_with_json(TEST_USER_1)
+def test_get_member_returns_expected_data(mock_get_member):
     c = Client()
-    member = c.watchlists.v1.get_member(TEST_WATCHLIST_ID, "user-42")
+    member = c.watchlists.v1.get_member(TEST_WATCHLIST_ID, TEST_ID)
     assert isinstance(member, WatchlistUser)
-    assert member.user_id == "user-42"
+    assert member.user_id == TEST_ID
     assert member.username == "foo@bar.com"
     assert member.added_time == datetime.datetime.fromisoformat(
         TEST_USER_1["addedTime"].replace("Z", "+00:00")
@@ -281,11 +370,7 @@ def test_get_member_returns_expected_data(httpserver_auth: HTTPServer):
     assert member.json() == json.dumps(TEST_USER_1)
 
 
-def test_list_members_returns_expected_data(httpserver_auth: HTTPServer):
-    data = {"watchlistMembers": [TEST_USER_1, TEST_USER_2], "totalCount": 2}
-    httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/members"
-    ).respond_with_json(data)
+def test_list_members_returns_expected_data(mock_get_all_members):
     c = Client()
     members = c.watchlists.v1.list_members(TEST_WATCHLIST_ID)
     assert isinstance(members, WatchlistMembersList)
@@ -323,14 +408,11 @@ def test_remove_included_users_returns_expected_data(
     )
 
 
-def test_get_included_user_returns_expected_data(httpserver_auth: HTTPServer):
-    httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-users/user-42"
-    ).respond_with_json(TEST_USER_1)
+def test_get_included_user_returns_expected_data(mock_get_included_user):
     c = Client()
-    user = c.watchlists.v1.get_included_user(TEST_WATCHLIST_ID, "user-42")
+    user = c.watchlists.v1.get_included_user(TEST_WATCHLIST_ID, TEST_ID)
     assert isinstance(user, WatchlistUser)
-    assert user.user_id == "user-42"
+    assert user.user_id == TEST_ID
     assert user.username == "foo@bar.com"
     assert user.added_time == datetime.datetime.fromisoformat(
         TEST_USER_1["addedTime"].replace("Z", "+00:00")
@@ -338,11 +420,7 @@ def test_get_included_user_returns_expected_data(httpserver_auth: HTTPServer):
     assert user.json() == json.dumps(TEST_USER_1)
 
 
-def test_list_included_users_returns_expected_data(httpserver_auth: HTTPServer):
-    data = {"includedUsers": [TEST_USER_1, TEST_USER_2], "totalCount": 2}
-    httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-users"
-    ).respond_with_json(data)
+def test_list_included_users_returns_expected_data(mock_get_all_included_users):
     c = Client()
     users = c.watchlists.v1.list_included_users(TEST_WATCHLIST_ID)
     assert isinstance(users, IncludedUsersList)
@@ -380,14 +458,11 @@ def test_remove_excluded_users_returns_expected_data(
     )
 
 
-def test_get_excluded_user_returns_expected_data(httpserver_auth: HTTPServer):
-    httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/excluded-users/user-42"
-    ).respond_with_json(TEST_USER_1)
+def test_get_excluded_user_returns_expected_data(mock_get_excluded_user):
     c = Client()
-    user = c.watchlists.v1.get_excluded_user(TEST_WATCHLIST_ID, "user-42")
+    user = c.watchlists.v1.get_excluded_user(TEST_WATCHLIST_ID, TEST_ID)
     assert isinstance(user, WatchlistUser)
-    assert user.user_id == "user-42"
+    assert user.user_id == TEST_ID
     assert user.username == "foo@bar.com"
     assert user.added_time == datetime.datetime.fromisoformat(
         TEST_USER_1["addedTime"].replace("Z", "+00:00")
@@ -395,11 +470,7 @@ def test_get_excluded_user_returns_expected_data(httpserver_auth: HTTPServer):
     assert user.json() == json.dumps(TEST_USER_1)
 
 
-def test_list_excluded_users_returns_expected_data(httpserver_auth: HTTPServer):
-    data = {"excludedUsers": [TEST_USER_1, TEST_USER_2], "totalCount": 2}
-    httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/excluded-users"
-    ).respond_with_json(data)
+def test_list_excluded_users_returns_expected_data(mock_get_all_excluded_users):
     c = Client()
     users = c.watchlists.v1.list_excluded_users(TEST_WATCHLIST_ID)
     assert isinstance(users, ExcludedUsersList)
@@ -439,12 +510,8 @@ def test_remove_directory_groups_returns_expected_data(
 
 
 def test_list_included_directory_groups_returns_expected_data(
-    httpserver_auth: HTTPServer,
+    mock_get_all_directory_groups,
 ):
-    data = {"includedDirectoryGroups": [TEST_GROUP_1, TEST_GROUP_2], "totalCount": 2}
-    httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-directory-groups"
-    ).respond_with_json(data)
     c = Client()
     groups = c.watchlists.v1.list_directory_groups(TEST_WATCHLIST_ID)
     assert isinstance(groups, IncludedDirectoryGroupsList)
@@ -453,16 +520,11 @@ def test_list_included_directory_groups_returns_expected_data(
     assert groups.total_count == len(groups.included_directory_groups) == 2
 
 
-def test_get_directory_group_returns_expected_data(
-    httpserver_auth: HTTPServer,
-):
-    httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-directory-groups/group-42"
-    ).respond_with_json(TEST_GROUP_1)
+def test_get_directory_group_returns_expected_data(mock_get_directory_group):
     c = Client()
-    group = c.watchlists.v1.get_directory_group(TEST_WATCHLIST_ID, "group-42")
+    group = c.watchlists.v1.get_directory_group(TEST_WATCHLIST_ID, TEST_ID)
     assert isinstance(group, IncludedDirectoryGroup)
-    assert group.group_id == "group-42"
+    assert group.group_id == TEST_ID
     assert group.name == "Sales"
     assert group.added_time == datetime.datetime.fromisoformat(
         TEST_GROUP_1["addedTime"].replace("Z", "+00:00")
@@ -496,14 +558,7 @@ def test_remove_departments_returns_expected_data(
     )
 
 
-def test_list_included_departments_returns_expected_data(httpserver_auth: HTTPServer):
-    data = {
-        "includedDepartments": [TEST_DEPARTMENT_1, TEST_DEPARTMENT_2],
-        "totalCount": 2,
-    }
-    httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-departments"
-    ).respond_with_json(data)
+def test_list_included_departments_returns_expected_data(mock_get_all_departments):
     c = Client()
     departments = c.watchlists.v1.list_departments(TEST_WATCHLIST_ID)
     assert isinstance(departments, IncludedDepartmentsList)
@@ -512,12 +567,9 @@ def test_list_included_departments_returns_expected_data(httpserver_auth: HTTPSe
     assert departments.total_count == len(departments.included_departments) == 2
 
 
-def test_get_department_returns_expected_data(httpserver_auth: HTTPServer):
-    httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-departments/Engineering"
-    ).respond_with_json(TEST_DEPARTMENT_1)
+def test_get_department_returns_expected_data(mock_get_department):
     c = Client()
-    department = c.watchlists.v1.get_department(TEST_WATCHLIST_ID, "Engineering")
+    department = c.watchlists.v1.get_department(TEST_WATCHLIST_ID, TEST_ID)
     assert isinstance(department, IncludedDepartment)
     assert department.name == "Engineering"
     assert department.added_time == datetime.datetime.fromisoformat(
@@ -529,8 +581,8 @@ def test_get_department_returns_expected_data(httpserver_auth: HTTPServer):
 @pytest.mark.parametrize(
     ("name", "expected"),
     [
-        ("DEPARTING_EMPLOYEE", "1-watchlist-42"),
-        (WatchlistType.DEPARTING_EMPLOYEE, "1-watchlist-42"),
+        ("DEPARTING_EMPLOYEE", TEST_WATCHLIST_ID),
+        (WatchlistType.DEPARTING_EMPLOYEE, TEST_WATCHLIST_ID),
         ("test", "1-watchlist-43"),
     ],
 )
@@ -559,3 +611,242 @@ def test_get_id_by_name_when_no_id_raises_error(httpserver_auth: HTTPServer):
     assert (
         err.value.args[0] == "No watchlist matching the type or title 'name' was found."
     )
+
+
+# ************************************************ CLI ************************************************
+
+
+def test_cli_list_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_get_all
+):
+    result = runner.invoke(incydr, ["watchlists", "list"])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+@pytest.mark.parametrize(
+    "watchlist_input,watchlist_expected",
+    [
+        (TEST_WATCHLIST_ID, TEST_WATCHLIST_ID),
+        ("DEPARTING_EMPLOYEE", TEST_WATCHLIST_ID),
+    ],
+)
+def test_cli_show_makes_expected_call(
+    httpserver_auth: HTTPServer,
+    runner,
+    mock_get_all,
+    watchlist_input,
+    watchlist_expected,
+    mock_get_all_included_users,
+    mock_get_all_excluded_users,
+    mock_get_all_departments,
+    mock_get_all_directory_groups,
+):
+    # mock unordered token request to follow watchlist arg callback
+    auth_response = dict(
+        token_type="bearer",
+        expires_in=900,
+        access_token=TEST_TOKEN,
+    )
+    httpserver_auth.expect_request("/v1/oauth", method="POST").respond_with_json(
+        auth_response
+    )
+
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{watchlist_expected}", method="GET"
+    ).respond_with_json(TEST_WATCHLIST_1)
+
+    result = runner.invoke(incydr, ["watchlists", "show", watchlist_input])
+    print(result)
+    print(result.output)
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_create_default_watchlist_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_create_departing_employee
+):
+    result = runner.invoke(incydr, ["watchlists", "create", "DEPARTING_EMPLOYEE"])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_create_custom_watchlist_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_create_custom
+):
+    result = runner.invoke(
+        incydr,
+        [
+            "watchlists",
+            "create",
+            "CUSTOM",
+            "--title",
+            "test",
+            "--description",
+            "custom watchlist",
+        ],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_delete_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_delete
+):
+    result = runner.invoke(incydr, ["watchlists", "delete", TEST_WATCHLIST_ID])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_update_makes_expected_call(httpserver_auth: HTTPServer, runner):
+    query = {"paths": ["title", "description"]}
+    data = {"description": "updated description", "title": "updated title"}
+    watchlist = TEST_WATCHLIST_2.copy()
+    watchlist["title"] = "updated title"
+    watchlist["description"] = "updated description"
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}",
+        method="PATCH",
+        query_string=urlencode(query, doseq=True),
+        json=data,
+    ).respond_with_json(watchlist)
+
+    result = runner.invoke(
+        incydr,
+        [
+            "watchlists",
+            "update",
+            TEST_WATCHLIST_ID,
+            "--title",
+            "updated title",
+            "--description",
+            "updated description",
+        ],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+@pytest.mark.parametrize(
+    "command,mock_server_call",
+    [
+        ("list-members", lazy_fixture("mock_get_all_members")),
+        ("list-included-users", lazy_fixture("mock_get_all_included_users")),
+        ("list-excluded-users", lazy_fixture("mock_get_all_excluded_users")),
+        ("list-directory-groups", lazy_fixture("mock_get_all_directory_groups")),
+        ("list-departments", lazy_fixture("mock_get_all_departments")),
+    ],
+)
+def test_cli_list_members_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, command, mock_server_call
+):
+    result = runner.invoke(incydr, ["watchlists", command, TEST_WATCHLIST_ID])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+USER_IDS = ["user-1", "user-2", "user-3"]
+user_params = pytest.mark.parametrize(
+    "option, command, path_group, url_path, expected_request",
+    [
+        (
+            "users",
+            "add",
+            "included-users",
+            "add",
+            {"userIds": USER_IDS, "watchlistId": TEST_WATCHLIST_ID},
+        ),
+        (
+            "users",
+            "remove",
+            "included-users",
+            "delete",
+            {"userIds": USER_IDS, "watchlistId": TEST_WATCHLIST_ID},
+        ),
+        ("excluded-users", "add", "excluded-users", "add", {"userIds": USER_IDS}),
+        ("excluded-users", "remove", "excluded-users", "delete", {"userIds": USER_IDS}),
+    ],
+)
+
+
+@user_params
+def test_cli_update_users_when_list_makes_expected_call(
+    httpserver_auth: HTTPServer,
+    runner,
+    option,
+    command,
+    path_group,
+    url_path,
+    expected_request,
+):
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/{path_group}/{url_path}",
+        method="POST",
+        json=expected_request,
+    ).respond_with_data()
+    result = runner.invoke(
+        incydr,
+        ["watchlists", command, TEST_WATCHLIST_ID, "--" + option, ",".join(USER_IDS)],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+@user_params
+def test_cli_update_users_when_filename_makes_expected_call(
+    httpserver_auth: HTTPServer,
+    runner,
+    option,
+    command,
+    url_path,
+    path_group,
+    expected_request,
+    tmp_path,
+):
+    p = tmp_path / "users.csv"
+    p.write_text("user\n" + "\n".join(USER_IDS))
+
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/{path_group}/{url_path}",
+        method="POST",
+        json=expected_request,
+    ).respond_with_data()
+    result = runner.invoke(
+        incydr,
+        ["watchlists", command, TEST_WATCHLIST_ID, "--" + option, "@" + str(p)],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+GROUPS = ["scim-group-1", "scim-group-2"]
+
+
+@pytest.mark.parametrize(
+    "option, command, url_path, expected_request",
+    [
+        ("directory-groups", "add", "add", {"groupIds": GROUPS}),
+        ("directory-groups", "remove", "delete", {"groupIds": GROUPS}),
+        ("departments", "add", "add", {"departments": GROUPS}),
+        ("departments", "remove", "delete", {"departments": GROUPS}),
+    ],
+)
+def test_cli_update_departments_and_directory_groups_makes_expected_call(
+    httpserver_auth: HTTPServer,
+    runner,
+    option,
+    command,
+    url_path,
+    expected_request,
+):
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-{option}/{url_path}",
+        method="POST",
+        json=expected_request,
+    ).respond_with_data()
+    result = runner.invoke(
+        incydr,
+        ["watchlists", command, TEST_WATCHLIST_ID, "--" + option, ",".join(GROUPS)],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
