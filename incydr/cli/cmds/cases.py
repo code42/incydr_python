@@ -1,20 +1,22 @@
 import os
+from functools import lru_cache
 from pathlib import Path
 from typing import Optional
-from typing import Union
 
 import click
+from click import Context
+from pydantic import Field
+from pydantic import root_validator
 from requests.exceptions import HTTPError
 from rich.panel import Panel
 from rich.progress import track
-from typer import Context
-from typer import Typer
 
 from incydr._cases.models import Case
 from incydr._cases.models import CaseDetail
 from incydr._cases.models import FileEvent
+from incydr._core.models import CSVModel
+from incydr._file_events.models.event import FileEventV2
 from incydr.cli import console
-from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
@@ -28,12 +30,34 @@ from incydr.cli.cmds.utils import user_lookup
 from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
-from incydr.utils import CSVValidationError
+from incydr.cli.file_readers import FileOrString
 from incydr.utils import model_as_card
-from incydr.utils import read_dict_from_csv
-from incydr.utils import read_models_from_csv
 
-app = Typer()
+
+class UpdateCaseCSV(CSVModel):
+    number: str = Field(csv_aliases=["number", "case_number"])
+    assignee: Optional[str]
+    description: Optional[str]
+    findings: Optional[str]
+    name: Optional[str]
+    status: Optional[str]
+    subject: Optional[str]
+
+
+class FileEventCSV(CSVModel):
+    event_id: str = Field(csv_aliases=["event_id", "eventId"])
+
+
+class FileEventJSON(FileEventV2):
+    event_id: str = Field(alias="eventId")
+
+    @root_validator(pre=True)
+    def _event_id_required(cls, values):  # noqa
+        # check if input is V2 file event
+        event = values.get("event")
+        if event and event.get("id"):
+            values["event_id"] = event["id"]
+        return values
 
 
 path_option = click.option(
@@ -47,9 +71,9 @@ path_option = click.option(
 @log_level_option
 @log_file_option
 @click.pass_context
-def cases(ctx, log_level, log_file):
+def cases(ctx: Context, log_level, log_file):
     """View and manage cases."""
-    init_client(ctx, log_level, log_file)
+    ...
 
 
 @cases.command(cls=IncydrCommand)
@@ -141,7 +165,7 @@ def list_(
 
     else:
         for case in cases:
-            console.print(case.json(), highlight=False)
+            click.echo(case.json())
 
 
 @cases.command(cls=IncydrCommand)
@@ -226,16 +250,20 @@ def update(
 
 
 @cases.command(cls=IncydrCommand)
-@click.argument("csv")
+@click.argument("file", type=click.File())
+@click.option(
+    "--format", "-f", "format_", type=click.Choice(["csv", "json-lines"]), default="csv"
+)
 @click.pass_context
-def bulk_update(ctx: Context, csv: Path):
+def bulk_update(ctx: Context, file: Path, format_: str):
     """
-    Bulk update cases using a `.csv` file.
+    Bulk update cases from a file.
 
-    Takes a single arg `CSV` which specifies the path to the file.
-    Requires a `number` column to identify the case by its `case_number`.
+    Takes a single arg `FILE` which specifies the path to the file (use "-" to read from stdin).
 
-    Valid CSV columns that correspond to mutable case fields include:
+    File format can either be CSV or [JSON Lines format](https://jsonlines.org) (Default is CSV).
+
+    Valid CSV columns that correspond to update-able case fields include:
 
     * `number` (REQUIRED) - Case number.
     * `assignee` - User ID or username of the administrator assigned to the case. Performs an additional lookup if a username is passed.
@@ -247,32 +275,39 @@ def bulk_update(ctx: Context, csv: Path):
 
     """
     client = ctx.obj()
-    username_cache = {}
+
+    @lru_cache()
+    def resolve_username(user):
+        if user is None:
+            return
+        elif "@" in user:
+            return user_lookup(client, user)
+        else:  # assume user_id
+            return user
+
+    if format_ == "csv":
+        models = UpdateCaseCSV.parse_csv(file)
+    else:  # format_ == "json-lines":
+        models = CaseDetail.parse_json_lines(file)
     try:
-        for case in track(
-            read_models_from_csv(CaseDetail, csv),
-            description="Updating cases...",
-            transient=True,
-        ):
-            if case.assignee and "@" in case.assignee:
-                assignee = username_cache.get(case.assignee)
-                if not assignee:
-                    assignee = username_cache[case.assignee] = user_lookup(
-                        client, case.assignee
-                    )
-                case.assignee = assignee
-
-            if case.subject and "@" in case.subject:
-                subject = username_cache.get(case.subject)
-                if not subject:
-                    subject = username_cache[case.subject] = user_lookup(
-                        client, case.subject
-                    )
-                case.subject = subject
-
+        for updated in track(models, description="Updating cases...", transient=True):
+            fields_set = updated.__fields_set__
+            case = client.cases.v1.get_case(updated.number)
+            if "assignee" in fields_set and case.assignee != updated.assignee:
+                case.assignee = resolve_username(updated.assignee)
+            if "subject" in fields_set and case.subject != updated.subject:
+                case.subject = resolve_username(updated.subject)
+            if "description" in fields_set:
+                case.description = updated.description
+            if "findings" in fields_set:
+                case.findings = updated.findings
+            if "name" in fields_set:
+                case.name = updated.name
+            if "status" in fields_set:
+                case.status = updated.status
             client.cases.v1.update(case)
-    except CSVValidationError as err:
-        console.print(f"[red]Error:[/red] {err.msg}")
+    except ValueError as err:
+        console.print(f"[red]Error:[/red] {err}")
     except HTTPError as err:
         console.print(f"[red]Error:[/red] {err.response.text}")
 
@@ -441,64 +476,98 @@ csv_option = click.option(
 
 @file_events.command(cls=IncydrCommand)
 @click.argument("case_number")
-@click.argument("event_ids")
-@csv_option
+@click.argument("event_ids", type=FileOrString())
+@click.option(
+    "--format", "-f", "format_", type=click.Choice(["csv", "json-lines"]), default="csv"
+)
 @click.pass_context
-def add(ctx: Context, case_number: int, event_ids: Union[str, Path], csv: bool):
+def add(ctx: Context, case_number: int, event_ids: FileOrString, format_: str):
     """
     Attach file events to a case specified by CASE_NUMBER.
 
-    EVENT_IDS is a comma-delimited string of event IDs to add to the case:
+    EVENT_IDS can be either a comma-delimited string of event IDs:
 
-        add CASE_NUMBER EVENT_IDS
+        add CASE_NUMBER "id-1,id-2,id-3,..."
 
-    To read the event IDs from a csv (single 'event_id' column),
-    pass the path to a csv along with the --csv flag:
+    Or a CSV or [JSON Lines](https://jsonlines.org) formatted file:
 
-        add CASE_NUMBER CSV_PATH --csv
+        add CASE_NUMBER @path_to_csv --format csv
+
+        add CASE_NUMBER @path_to_json --format json-lines
+
+    CSV format requires a header row and a column with name matching either "event_id" or "eventId".
+
+    Input can also be parsed from stdin using "-" as the command argument, so you can add events
+    directly from an `incydr file-events search` command to a case:
+
+        incydr file-events search SEARCH_OPTIONS --format json-lines | incydr cases add CASE_NUMBER --format json-lines -
+
     """
     client = ctx.obj()
-    client.cases.v1.add_file_events_to_case(
-        case_number, _parse_event_ids(event_ids, csv)
-    )
+    if isinstance(event_ids, str):
+        event_ids = [e.strip() for e in event_ids.split(",")]
+    elif format_ == "csv":
+        events = FileEventCSV.parse_csv(event_ids)
+        event_ids = [e.event_id for e in events]
+    else:
+        events = FileEventJSON.parse_json_lines(event_ids)
+        event_ids = [e.event_id for e in events]
+
+    client.cases.v1.add_file_events_to_case(case_number, event_ids)
+    console.print(f"{len(event_ids)} events added to case {case_number}")
 
 
 @file_events.command(cls=IncydrCommand)
 @click.argument("case_number")
-@click.argument("event_ids")
-@csv_option
+@click.argument("event_ids", type=FileOrString())
+@click.option(
+    "--format", "-f", "format_", type=click.Choice(["csv", "json-lines"]), default="csv"
+)
 @click.pass_context
-def remove(ctx: Context, case_number: int, event_ids: str, csv: bool):
+def remove(ctx: Context, case_number: int, event_ids: str, format_: str):
     """
     Remove file events from a case specified by CASE_NUMBER.
 
-    EVENT_IDS is a comma-delimited string of event IDs to add to the case:
+    EVENT_IDS can be either a comma-delimited string of event IDs:
 
-        add CASE_NUMBER EVENT_IDSs
+        remove CASE_NUMBER "id-1,id-2,id-3,..."
 
-    To read the event IDs from a csv (single 'event_id' column),
-    pass the path to a csv along with the --csv flag:
+    Or a CSV or [JSON Lines](https://jsonlines.org) formatted file:
 
-        add CASE_NUMBER CSV_PATH --csv
+        remove CASE_NUMBER @path_to_csv --format csv
+
+        remove CASE_NUMBER @path_to_json --format json-lines
+
+    CSV format requires a header row and a column with name matching either "event_id" or "eventId".
+
+    Input can also be parsed from stdin using "-" as the command argument, so you can remove all events from a case
+    by sending the output of `cases file-events list` command into `cases file-events remove`:
+
+        incydr cases file-events list CASE_NUMBER --format json-lines | incydr cases remove CASE_NUMBER --format json-lines -
+
     """
     client = ctx.obj()
-    ids = _parse_event_ids(event_ids, csv)
-    for id_ in ids:
-        client.cases.v1.delete_file_event_from_case(case_number, id_)
-
-
-def _parse_event_ids(event_ids, csv):
-    if csv:
-        ids = []
-        for row in track(
-            read_dict_from_csv(event_ids),
-            description="Reading event IDs...",
-            transient=True,
-        ):
-            ids.append(row["event_id"])
+    if isinstance(event_ids, str):
+        event_ids = [e.strip() for e in event_ids.split(",")]
+    elif format_ == "csv":
+        events = FileEventCSV.parse_csv(event_ids)
+        event_ids = [e.event_id for e in events]
     else:
-        ids = [e.strip() for e in event_ids.split(",")]
-    return ids
+        events = FileEventJSON.parse_json_lines(event_ids)
+        event_ids = [e.event_id for e in events]
+
+    for id_ in event_ids:
+        try:
+            client.cases.v1.delete_file_event_from_case(case_number, id_)
+            console.print(f"Event removed: {id_}", highlight=False)
+        except HTTPError as err:
+            if err.response.status_code == 404:
+                console.print(f"Event not found on case: {id_}", highlight=False)
+            else:
+                console.print(
+                    f"[red]Error removing event:[/red] {id_} ({err.response.status_code})",
+                    highlight=False,
+                )
 
 
 if __name__ == "__main__":
