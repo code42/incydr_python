@@ -129,15 +129,6 @@ def test_get_page_when_all_params_returns_expected_data(
     assert page.pagination_range_end_index == len(page.events) == 2
 
 
-def test_search_events_when_default_params_returns_expected_data(mock_export):
-    client = Client()
-    page = client.audit_log.v1.search_events()
-    assert isinstance(page, AuditEventsPage)
-    assert page.events[0] == TEST_AL_ENTRY_1
-    assert page.events[1] == TEST_AL_ENTRY_2
-    assert page.pagination_range_end_index == len(page.events) == 2
-
-
 def test_get_events_count_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
@@ -239,68 +230,7 @@ def test_cli_search_when_custom_params_makes_expected_call(
     assert result.exit_code == 0
 
 
-def test_cli_list_when_default_params_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, mock_export
-):
-    result = runner.invoke(incydr, ["audit-log", "list"])
-    httpserver_auth.check()
-    assert result.exit_code == 0
-
-
-def test_cli_list_when_custom_params_makes_expected_call(
-    runner, httpserver_auth: HTTPServer
-):
-    audit_events_data = {
-        "events": [
-            TEST_AL_ENTRY_1,
-            TEST_AL_ENTRY_2,
-        ],
-        "pagination_range_start_index": 0,
-        "pagination_range_end_index": 2,
-    }
-    data = {
-        "actorIds": ["foo", "bar"],
-        "actorIpAddresses": ["foo1", "bar1"],
-        "actorNames": ["foo2", "bar2"],
-        "dateRange": {"endTime": 1666296001.0, "startTime": 1662768000.0},
-        "eventTypes": ["foo3", "bar3"],
-        "pageNum": 0,
-        "pageSize": 0,
-        "resourceIds": ["foo4", "bar4"],
-        "userTypes": ["USER"],
-    }
-    httpserver_auth.expect_request(
-        "/v1/audit/search-results-export", method="POST", json=data
-    ).respond_with_json(audit_events_data)
-
-    result = runner.invoke(
-        incydr,
-        [
-            "audit-log",
-            "list",
-            "--start",
-            "2022-09-10",
-            "--end",
-            "2022-10-20 20:00:01",
-            "--actor-ids",
-            "foo,bar",
-            "--actor-ip-addresses",
-            "foo1,bar1",
-            "--actor-names",
-            "foo2,bar2",
-            "--event-types",
-            "foo3,bar3",
-            "--resource-ids",
-            "foo4,bar4",
-            "--user-types",
-            "USER",
-        ],
-    )
-    httpserver_auth.check()
-    assert result.exit_code == 0
-
-
-def test_cli_list_when_download_makes_expected_call(
+def test_cli_download_makes_expected_call(
     runner, httpserver_auth: HTTPServer, tmp_path
 ):
     export_event_data = {
@@ -329,8 +259,6 @@ def test_cli_list_when_download_makes_expected_call(
         "/v1/audit/redeemDownloadToken", query_string=export_event_data
     ).respond_with_json(redeem_events_data)
 
-    result = runner.invoke(
-        incydr, ["audit-log", "list", "--download", "--path", tmp_path]
-    )
+    result = runner.invoke(incydr, ["audit-log", "download", "--path", tmp_path])
     httpserver_auth.check()
     assert result.exit_code == 0

@@ -7,6 +7,7 @@ from click import Context
 from incydr._audit_log.models import DateRange
 from incydr._audit_log.models import QueryAuditLogRequest
 from incydr._queries.utils import parse_timestamp_to_posix_timestamp
+from incydr.cli import console
 from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
@@ -83,6 +84,7 @@ def search(
     events = client.session.post("/v1/audit/search-audit-log", json=request.dict())
     events = events.json()["events"]
 
+    # TODO: output refactor
     if output:
         output_format_logger(events, output, columns, certs, ignore_cert_validation)
     else:
@@ -95,27 +97,17 @@ def search(
         )
 
 
-@audit_log.command("list", cls=IncydrCommand)
-@table_format_option
-@columns_option
+@audit_log.command(cls=IncydrCommand)
 @filter_options
 @click.option(
     "--path",
     help="The file path where to save the CSV. Defaults to the current directory if not specified.",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
     default=os.getcwd(),
 )
-@click.option(
-    "--download",
-    default=False,
-    is_flag=True,
-    help="Download results in CSV format. Use the --path option to specify a target folder, defaults to the current directory.",
-)
 @click.pass_context
-def list_(
+def download(
     ctx: Context,
-    format_: TableFormat,
-    columns: Optional[str],
-    download: Optional[bool],
     path: Optional[str],
     start: Optional[str],
     end: Optional[str],
@@ -127,9 +119,9 @@ def list_(
     user_types: Optional[str],
 ):
     """
-    Search audit log events.  Returns the most recent 100,000 events that match the search criteria.
+    Download audit log events in CSV format.  Returns up to the most recent 100,000 events that match the search criteria.
 
-    Use the --download flag to download results in CSV format, otherwise results will be output to the console.
+    Use the --path option to specify where to save the CSV.  Defaults to the current directory if not specified.
     """
     client = ctx.obj()
 
@@ -143,21 +135,8 @@ def list_(
     resource_ids = resource_ids.split(",") if isinstance(resource_ids, str) else None
     user_types = user_types.split(",") if isinstance(user_types, str) else None
 
-    if download:
-        client.audit_log.v1.download_events(
-            path,
-            actor_ids,
-            actor_ip_addresses,
-            actor_names,
-            start,
-            end,
-            event_types,
-            resource_ids,
-            user_types,
-        )
-        return
-
-    events = client.audit_log.v1.search_events(
+    client.audit_log.v1.download_events(
+        path,
         actor_ids,
         actor_ip_addresses,
         actor_names,
@@ -166,12 +145,6 @@ def list_(
         event_types,
         resource_ids,
         user_types,
-    ).events
-
-    output_response_format(
-        events,
-        "Audit Log Events",
-        format_,
-        columns,
-        client.settings.use_rich,
     )
+
+    console.print(f"Audit log events downloaded to '{path}'")
