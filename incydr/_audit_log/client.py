@@ -92,56 +92,6 @@ class AuditLogV1:
 
         return AuditEventsPage.parse_response(response)
 
-    def search_events(
-        self,
-        actor_ids: Union[List[str], str] = None,
-        actor_ip_addresses: Union[List[str], str] = None,
-        actor_names: Union[List[str], str] = None,
-        start_time: Union[str, datetime] = None,
-        end_time: Union[str, datetime] = None,
-        event_types: Union[List[str], str] = None,
-        resource_ids: Union[List[str], str] = None,
-        user_types: Union[List[UserTypes], UserTypes] = None,
-    ) -> AuditEventsPage:
-        """
-        Search audit log entries, specifically for large return sets without paging.
-
-        Returns up to 100,000 events that match the search criteria provided.
-
-        Default: returns most recent 100,000 events.
-
-        **Parameters:**
-
-        * **actor_ids**: `List[str] | str` - Finds events whose actor_id is one of the given ids.
-        * **actor_ip_addresses**: `List[str] | str` - Finds events whose actor_ip_address is one of the given IP addresses.
-        * **actor_names**: `List[str] | str` - Finds events whose actor_name is one of the given names.
-        * **start_time**: `datetime | str` - Search for events within a date range.  Start time for this date range.
-        * **end_time**: `datetime | str` - Search for events within a date range.  End time for this date range.
-        * **event_types**: `List[str] | str` - Finds events whose type is one of the given types.
-        * **resource_ids**: `List[str] | str` - Filters searchable events that match resource_id.
-        * **user_types**: `List[UserTypes]` - Filters searchable events that match actor type.
-
-        **Returns**: A [`AuditEventsPage`][auditeventspage-model] object representing the search response.
-        """
-
-        request = _build_query_request(
-            page_num=0,
-            page_size=0,
-            actor_ids=actor_ids,
-            actor_ip_addresses=actor_ip_addresses,
-            actor_names=actor_names,
-            start_time=start_time,
-            end_time=end_time,
-            event_types=event_types,
-            resource_ids=resource_ids,
-            user_types=user_types,
-        )
-        response = self._parent.session.post(
-            "/v1/audit/search-results-export", json=request.dict()
-        )
-
-        return AuditEventsPage.parse_response(response)
-
     def get_event_count(
         self,
         page_num: int = 0,

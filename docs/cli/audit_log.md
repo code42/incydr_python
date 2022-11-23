@@ -6,4 +6,4 @@
 
 ::: mkdocs-click
     :module: incydr.cli.cmds.audit_log
-    :command: list_
+    :command: download
