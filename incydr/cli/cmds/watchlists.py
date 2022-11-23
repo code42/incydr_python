@@ -2,9 +2,6 @@ from uuid import UUID
 
 import click
 from click import Context
-from pydantic import BaseModel
-from rich.console import ConsoleRenderable
-from rich.console import RichCast
 from rich.progress import track
 from rich.table import Table
 
@@ -26,9 +23,8 @@ from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
 from incydr.cli.render import measure_renderable
+from incydr.cli.render import models_as_table
 from incydr.types import file_or_str_cls
-from incydr.utils import get_fields
-from incydr.utils import iter_model_formatted
 from incydr.utils import model_as_card
 from incydr.utils import read_dict_from_csv
 
@@ -127,20 +123,6 @@ def show(ctx: Context, watchlist: str = None):
 
     if not client.settings.use_rich:
         console.print(watchlist_response.json(), highlight=False)
-
-    def models_as_table(model, models, title=None):
-        headers = list(get_fields(model))
-        tbl = Table(*headers, title=title, show_lines=True)
-        for m in models:
-            values = []
-            for _name, value in iter_model_formatted(m, render="table"):
-                if isinstance(value, BaseModel):
-                    value = model_as_card(value)
-                elif not isinstance(value, (ConsoleRenderable, RichCast, str)):
-                    value = str(value)
-                values.append(value)
-            tbl.add_row(*values)
-        return tbl
 
     included_users = client.watchlists.v1.list_included_users(watchlist).included_users
     excluded_users = client.watchlists.v1.list_excluded_users(watchlist).excluded_users
