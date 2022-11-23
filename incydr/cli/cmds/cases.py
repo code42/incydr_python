@@ -116,7 +116,7 @@ def create(
             description=description,
         )
         if client.settings.use_rich:
-            console.print(Panel.fit(model_as_card(case)))
+            console.print(Panel.fit(model_as_card(case), title="Case"))
         else:
             console.print(case.json(), highlight=False)
     except HTTPError as err:
@@ -135,6 +135,7 @@ def delete(
     """
     client = ctx.obj()
     client.cases.v1.delete(case_number)
+    console.print(f"Case number '{case_number}' successfully deleted.")
 
 
 @cases.command("list", cls=IncydrCommand)
@@ -149,22 +150,18 @@ def list_(
     """
     List all cases.
     """
-    if not format_:
-        format_ = TableFormat.table
     client = ctx.obj()
-    cases = client.cases.v1.iter_all()
+    cases_ = client.cases.v1.iter_all()
+
     if format_ == TableFormat.table:
-        render.table(Case, cases, columns=columns)
-
+        render.table(Case, cases_, columns=columns)
     elif format_ == TableFormat.csv:
-        render.csv(Case, cases, columns=columns)
-
+        render.csv(Case, cases_, columns=columns)
     elif format_ == TableFormat.json:
-        for case in cases:
+        for case in cases_:
             console.print_json(case.json())
-
     else:
-        for case in cases:
+        for case in cases_:
             click.echo(case.json())
 
 
@@ -180,12 +177,10 @@ def show(ctx: Context, case_number: int, format_: SingleFormat):
     case = client.cases.v1.get_case(case_number)
     if format_ == SingleFormat.rich and client.settings.use_rich:
         console.print(Panel.fit(model_as_card(case), title="Case", width=120))
-
     elif format_ == SingleFormat.json:
         console.print_json(case.json())
-
     else:
-        console.print(case.json(), highlight=False)
+        click.echo(case.json())
 
 
 @cases.command(cls=IncydrCommand)
@@ -246,7 +241,10 @@ def update(
     if subject:
         case.subject = subject
     updated_case = client.cases.v1.update(case)
-    console.print(Panel.fit(model_as_card(updated_case), title="Case Updated"))
+    if client.settings.use_rich:
+        console.print(Panel.fit(model_as_card(updated_case), title="Updated Case"))
+    else:
+        console.print(updated_case.json(), highlight=False)
 
 
 @cases.command(cls=IncydrCommand)
@@ -388,6 +386,7 @@ def download(
         include_summary=summary,
         include_file_events=events,
     )
+    console.print(f"Case file(s) downloaded to '{path}'")
 
 
 @cases.group(cls=IncydrGroup)
@@ -412,12 +411,10 @@ def show_file_event(
 
     if format_ == SingleFormat.rich and client.settings.use_rich:
         console.print(Panel.fit(model_as_card(event)))
-
     elif format_ == SingleFormat.json:
         console.print_json(event.json())
-
     else:
-        console.print(event.json(), highlight=False)
+        click.echo(event.json())
 
 
 @file_events.command("list", cls=IncydrCommand)
@@ -434,23 +431,22 @@ def list_file_events(
     client = ctx.obj()
     response = client.cases.v1.get_file_events(case_number)
 
-    columns = columns or [
-        "event_timestamp",
-        "file_name",
-        "file_path",
-        "file_availability",
-        "risk_indicators",
-        "risk_score",
-        "event_id",
-    ]
     if format_ == TableFormat.table:
+        columns = columns or [
+            "event_timestamp",
+            "file_name",
+            "file_path",
+            "file_availability",
+            "risk_indicators",
+            "risk_score",
+            "event_id",
+        ]
         render.table(
             FileEvent,
             response.events,
             title=f"Case {case_number}: File Events",
             columns=columns,
         )
-
     elif format_ == TableFormat.csv:
         render.csv(FileEvent, response.events, columns=columns)
 

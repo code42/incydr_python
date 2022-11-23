@@ -109,27 +109,26 @@ def search(
         )
         return
     if format_ == TableFormat.table:
-        if not columns:
-            columns = [
-                "created_at",
-                "risk_severity",
-                "state",
-                "actor",
-                "actor_id",
-                "name",
-                "description",
-                "watchlists",
-                "state_last_modified_by",
-                "state_last_modified_at",
-                "id",
-            ]
+        columns = columns or [
+            "created_at",
+            "risk_severity",
+            "state",
+            "actor",
+            "actor_id",
+            "name",
+            "description",
+            "watchlists",
+            "state_last_modified_by",
+            "state_last_modified_at",
+            "id",
+        ]
         render.table(AlertSummary, alert_summaries, columns=columns, flat=False)
     elif format_ == TableFormat.csv:
         render.csv(AlertSummary, alert_summaries, columns=columns, flat=True)
     elif format_ == TableFormat.json:
         for alert in alert_summaries:
             console.print_json(alert.json())
-    else:
+    else:  # raw-json
         for alert in alert_summaries:
             click.echo(alert.json())
 
@@ -149,7 +148,7 @@ def show(ctx: Context, alert_id: str, format_: SingleFormat):
         console.print(Panel.fit(model_as_card(alert)))
     elif format_ == SingleFormat.json:
         console.print_json(alert.json())
-    else:
+    else:  # raw-json
         click.echo(alert.json())
 
 

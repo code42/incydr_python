@@ -77,19 +77,18 @@ def list_(
         support_user=support_user,
     )
 
-    columns = columns or [
-        "username",
-        "user_id",
-        "display_name",
-        "cloud_aliases",
-        "active",
-        "start_date",
-        "end_date",
-    ]
-
     if format_ == TableFormat.csv:
         render.csv(UserRiskProfile, profiles, columns=columns, flat=True)
     elif format_ == TableFormat.table:
+        columns = columns or [
+            "username",
+            "user_id",
+            "display_name",
+            "cloud_aliases",
+            "active",
+            "start_date",
+            "end_date",
+        ]
         render.table(UserRiskProfile, profiles, columns=columns, flat=False)
     else:
         printed = False
@@ -124,7 +123,7 @@ def show(ctx: Context, user: str, format_: SingleFormat):
     elif format_ == SingleFormat.json:
         console.print_json(profile.json())
     else:  # format == "raw-json"
-        console.print(profile.json(), highlight=False)
+        click.echo(profile.json())
 
 
 @risk_profiles.command(cls=IncydrCommand)
@@ -197,7 +196,17 @@ def update(
         notes = ""
 
     try:
-        client.user_risk_profiles.v1.update(user, notes, start_date, end_date)
+        updated_profile = client.user_risk_profiles.v1.update(
+            user, notes, start_date, end_date
+        )
+        if client.settings.use_rich:
+            console.print(
+                Panel.fit(
+                    model_as_card(updated_profile), title="Updated User Risk Profile"
+                )
+            )
+        else:
+            console.print(updated_profile.json(), highlight=False)
     except DateParseError as err:
         raise err
 
@@ -218,6 +227,7 @@ def add_cloud_alias(ctx: Context, user, cloud_alias):
     """
     client = ctx.obj()
     client.user_risk_profiles.v1.add_cloud_alias(user, cloud_alias)
+    console.print(f"Cloud alias successfully added to user '{user}")
 
 
 @risk_profiles.command(cls=IncydrCommand)
@@ -232,6 +242,7 @@ def remove_cloud_alias(ctx: Context, user, cloud_alias):
     """
     client = ctx.obj()
     client.user_risk_profiles.v1.delete_cloud_alias(user, cloud_alias)
+    console.print(f"Cloud alias successfully removed from user '{user}")
 
 
 @risk_profiles.command(cls=IncydrCommand)

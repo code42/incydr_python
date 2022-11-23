@@ -51,4 +51,4 @@ def list_(ctx: Context, format_: SingleFormat, name: Optional[str] = None):
     elif format_ == SingleFormat.json:
         console.print_json(data=deps)
     else:
-        console.print(json.dumps(deps), highlight=False)
+        click.echo(json.dumps(deps))
