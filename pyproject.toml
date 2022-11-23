@@ -59,6 +59,7 @@ check-no-diff = "pre-commit run --all-files"
 
 [tool.hatch.envs.docs]
 dependencies = [
+  "chardet",
   "mkdocs-autorefs",
   "mkdocs-material",
   "mkautodoc",
