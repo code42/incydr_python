@@ -323,7 +323,7 @@ def test_search_when_no_start_or_on_param_raises_bad_option_usage_exception(
     )
     assert result.exit_code == 2
     assert (
-        "--start or --on options are required if not using the --advanced-query option."
+        "--start, --end, or --on options are required if not using the --advanced-query option."
         in result.output
     )
 
@@ -405,12 +405,10 @@ def test_cli_alerts_add_note_makes_expected_call(httpserver_auth: HTTPServer, ru
     assert result.exit_code == 0
 
 
-def test_cli_update_state_when_alert_ids_list_makes_expected_call(
-    httpserver_auth: HTTPServer, runner
-):
+def test_cli_update_state_makes_expected_call(httpserver_auth: HTTPServer, runner):
     expected = {
         "tenantId": "abcd-1234",
-        "alertIds": ["1234", "abcd", "foo", "bar"],
+        "alertIds": ["1234"],
         "state": "PENDING",
         "note": None,
     }
@@ -418,32 +416,7 @@ def test_cli_update_state_when_alert_ids_list_makes_expected_call(
         "/v1/alerts/update-state", method="POST", json=expected
     ).respond_with_data()
 
-    result = runner.invoke(
-        incydr, ["alerts", "update-state", ",".join(expected["alertIds"]), "PENDING"]
-    )
-
-    assert result.exit_code == 0
-
-
-def test_cli_update_state_when_csv_input_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, tmp_path
-):
-    p = tmp_path / "event_ids.csv"
-    p.write_text("1234\nabcd\nfoo\nbar")
-
-    expected = {
-        "tenantId": "abcd-1234",
-        "alertIds": ["1234", "abcd", "foo", "bar"],
-        "state": "PENDING",
-        "note": None,
-    }
-    httpserver_auth.expect_request(
-        "/v1/alerts/update-state", method="POST", json=expected
-    ).respond_with_data()
-
-    result = runner.invoke(
-        incydr, ["alerts", "update-state", str(p), "PENDING", "--csv"]
-    )
+    result = runner.invoke(incydr, ["alerts", "update-state", "1234", "PENDING"])
 
     assert result.exit_code == 0
 
@@ -506,3 +479,94 @@ def test_cli_bulk_update_state_when_no_note_column_makes_expected_calls(
 
     result = runner.invoke(incydr, ["alerts", "bulk-update-state", str(p)])
     assert result.exit_code == 0
+
+
+def test_cli_bulk_update_state_when_state_and_note_options_makes_expected_calls(
+    httpserver_auth: HTTPServer, runner, tmp_path
+):
+    note_override = "override"
+    state_override = "PENDING"
+    data_1 = {
+        "tenantId": "abcd-1234",
+        "alertIds": ["1234", "abcd"],
+        "state": state_override,
+        "note": note_override,
+    }
+
+    httpserver_auth.expect_request(
+        "/v1/alerts/update-state", method="POST", json=data_1
+    ).respond_with_data()
+
+    p = tmp_path / "alerts.csv"
+    p.write_text("alert_id,state,note\n1234,RESOLVED,\nabcd,OPEN,test note")
+
+    result = runner.invoke(
+        incydr,
+        [
+            "alerts",
+            "bulk-update-state",
+            str(p),
+            "--state",
+            state_override,
+            "--note",
+            note_override,
+        ],
+    )
+    assert result.exit_code == 0
+
+
+def test_cli_bulk_update_state_when_404_retries_individual_alert_ids(
+    httpserver_auth: HTTPServer, runner, tmp_path
+):
+    data_1 = {
+        "tenantId": "abcd-1234",
+        "alertIds": ["1234", "abcd", "invalid"],
+        "state": "RESOLVED",
+        "note": None,
+    }
+    data_2 = {
+        "tenantId": "abcd-1234",
+        "alertIds": ["1234"],
+        "state": "RESOLVED",
+        "note": None,
+    }
+    data_3 = {
+        "tenantId": "abcd-1234",
+        "alertIds": ["abcd"],
+        "state": "RESOLVED",
+        "note": None,
+    }
+    data_4 = {
+        "tenantId": "abcd-1234",
+        "alertIds": ["invalid"],
+        "state": "RESOLVED",
+        "note": None,
+    }
+    httpserver_auth.expect_ordered_request(
+        "/v1/alerts/update-state", method="POST", json=data_1
+    ).respond_with_data(status=404)
+    httpserver_auth.expect_ordered_request(
+        "/v1/alerts/update-state", method="POST", json=data_2
+    ).respond_with_data()
+    httpserver_auth.expect_ordered_request(
+        "/v1/alerts/update-state", method="POST", json=data_3
+    ).respond_with_data()
+    httpserver_auth.expect_ordered_request(
+        "/v1/alerts/update-state", method="POST", json=data_4
+    ).respond_with_data()
+
+    p = tmp_path / "alerts.csv"
+    p.write_text("alert_id,state\n1234,RESOLVED\nabcd,RESOLVED\ninvalid,RESOLVED\n")
+
+    result = runner.invoke(
+        incydr,
+        [
+            "alerts",
+            "bulk-update-state",
+            str(p),
+            "--format",
+            "csv",
+        ],
+    )
+    assert result.exit_code == 0
+    httpserver_auth.check()

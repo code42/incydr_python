@@ -6,12 +6,12 @@ from boltons.iterutils import bucketize
 from boltons.iterutils import chunked
 from click import BadOptionUsage
 from click import Context
-from pydantic import Field, validator
+from pydantic import Field
 from rich.panel import Panel
-from rich.progress import track
 
 from incydr._alerts.models.alert import AlertSummary
-from incydr._core.models import CSVModel, Model
+from incydr._core.models import CSVModel
+from incydr._core.models import Model
 from incydr._queries.alerts import AlertQuery
 from incydr.cli import console
 from incydr.cli import init_client
@@ -31,7 +31,6 @@ from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
 from incydr.cli.file_readers import AutoDecodedFile
 from incydr.utils import model_as_card
-from incydr.utils import read_dict_from_csv
 
 
 @click.group(cls=IncydrGroup)
@@ -222,7 +221,7 @@ def bulk_update_state(ctx: Context, file, format_, state, note):
 
     class AlertBulkCSV(CSVModel):
         alert_id: str = Field(csv_aliases=["id", "alert_id"])
-        state: state_type
+        state: state_type = Field(csv_aliases=["state"])
         note: Optional[str]
 
     class AlertBulkJSON(Model):
@@ -261,7 +260,7 @@ def bulk_update_state(ctx: Context, file, format_, state, note):
                     )
                     for id_ in chunk:
                         try:
-                            client.alerts.v1.change_state(chunk, state, note)
+                            client.alerts.v1.change_state(id_, state, note)
                             console.print(
                                 f"Successfully set alert_id '{id_}' to '{state}' with note: '{note}'"
                             )
