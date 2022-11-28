@@ -1,12 +1,17 @@
 from typing import Optional
 
 import click
+import requests
+from boltons.iterutils import bucketize
+from boltons.iterutils import chunked
 from click import BadOptionUsage
 from click import Context
+from pydantic import Field
 from rich.panel import Panel
-from rich.progress import track
 
 from incydr._alerts.models.alert import AlertSummary
+from incydr._core.models import CSVModel
+from incydr._core.models import Model
 from incydr._queries.alerts import AlertQuery
 from incydr.cli import console
 from incydr.cli import init_client
@@ -24,8 +29,8 @@ from incydr.cli.cmds.options.output_options import TableFormat
 from incydr.cli.cmds.utils import output_format_logger
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
+from incydr.cli.file_readers import AutoDecodedFile
 from incydr.utils import model_as_card
-from incydr.utils import read_dict_from_csv
 
 
 @click.group(cls=IncydrGroup)
@@ -71,10 +76,10 @@ def search(
     if advanced_query:
         query = AlertQuery.parse_raw(advanced_query)
     else:
-        if not any([start, on]):
+        if not any([start, on, end]):
             raise BadOptionUsage(
                 "start",
-                "--start or --on options are required if not using the --advanced-query option.",
+                "--start, --end, or --on options are required if not using the --advanced-query option.",
             )
         query = _create_query(
             start=start,
@@ -126,7 +131,7 @@ def search(
             console.print_json(alert.json())
     else:
         for alert in alert_summaries:
-            console.print(alert.json(), highlight=False)
+            click.echo(alert.json())
 
 
 # Future enhancement: add functionality to show human-readable summaries for multiple alerts
@@ -145,7 +150,7 @@ def show(ctx: Context, alert_id: str, format_: SingleFormat):
     elif format_ == SingleFormat.json:
         console.print_json(alert.json())
     else:
-        console.print(alert.json(), highlight=False)
+        click.echo(alert.json())
 
 
 @alerts.command(cls=IncydrCommand)
@@ -163,77 +168,106 @@ def add_note(ctx: Context, alert_id: str, note: str):
 
 @alerts.command(cls=IncydrCommand)
 @click.pass_context
-@click.argument("alert-ids")
+@click.argument("alert-id")
 @click.argument("state")
 @click.option(
     "--note",
     default=None,
     help="Optional note to indicate the reason for the state change.",
 )
-@click.option(
-    "--csv", is_flag=True, default=False, help="alert IDs are specified in a CSV file."
-)
-def update_state(
-    ctx: Context, alert_ids: str, state: str, note: str = None, csv: bool = False
-):
+def update_state(ctx: Context, alert_id: str, state: str, note: str = None):
     """
-    Update multiple alerts to the same state.
-
-    Changes the state of all alerts specified in `ALERT-IDS` to the indicated `STATE`,
-    where `STATE` is one of `OPEN`, `RESOLVED`, `IN_PROGRESS` or `PENDING`
-
-    `ALERT-IDS` is a comma-delimited list of alert IDs.
-
-        alerts update-state ALERT_IDS STATE
-
-    To read alert event IDs from a csv (single column, no header),
-    pass the path to a csv along with the --csv flag:
-
-        alerts update-state CSV_PATH STATE --csv
-
+    Change the state of an alert, and optionally add a note.
     """
-    alert_ids = _parse_alert_ids(alert_ids, csv)
     client = ctx.obj()
-    client.alerts.v1.change_state(alert_ids, state, note)
-    console.print("State changed.")
+    client.alerts.v1.change_state(alert_id, state, note)
+    console.print("State changed successfully.")
 
 
 @alerts.command(cls=IncydrCommand)
-@click.argument("csv")
+@click.argument("file", type=AutoDecodedFile())
+@click.option(
+    "--format",
+    "-f",
+    "format_",
+    type=click.Choice(["csv", "json-lines"]),
+    default="csv",
+    help="Specify format of input file.",
+)
+@click.option(
+    "--state",
+    type=click.Choice(["OPEN", "RESOLVED", "IN_PROGRESS", "PENDING"]),
+    help="Override CSV/JSON input's `state` value with this value.",
+)
+@click.option("--note", help="Override CSV/JSON input's `note` value with this value.")
 @click.pass_context
-def bulk_update_state(ctx: Context, csv: str):
+def bulk_update_state(ctx: Context, file, format_, state, note):
     """
-    Bulk update multiple alerts to different states using a CSV file.
+    Bulk update multiple alerts from CSV or JSON Lines input.
 
-    Takes a single arg `CSV` which specifies the path to the file.
-    Requires an `alert_id` column to identify the alerts by its ID.
+    FILE argument specifies the path to the file (use "-" to read from stdin).
 
-    Valid CSV columns include:
+    The --state and --note options to this command will override respective columns/keys in the CSV/JSON input.
 
-    * `alert_id` (REQUIRED) - Alert ID.
-    * `state` (REQUIRED) - Updated alert state. One of OPEN, RESOLVED, IN_PROGRESS or PENDING.
-    * `note` - Brief optional note to indicate the reason for the state change.
+    This allows you to bulk change a set of alerts without having manually modify the state/note value for each CSV or
+    JSON Lines row in the file. For example, to close all currently "PENDING" alerts older than <DATE>:
+
+        incydr alerts search --end <DATE> --state PENDING --format json-lines | incydr alerts bulk-update-state - --state RESOLVED --note "bulk resolved alerts older than <DATE>"
+
+    If --state is not provided, the CSV/JSON input _must_ have a `state` column/key for each row/object.
     """
+    # if --state is provided, we want that column/key to be optional on input data, otherwise required
+    state_type = Optional[str] if state else str
+
+    class AlertBulkCSV(CSVModel):
+        alert_id: str = Field(csv_aliases=["id", "alert_id"])
+        state: state_type = Field(csv_aliases=["state"])
+        note: Optional[str]
+
+    class AlertBulkJSON(Model):
+        alert_id: str = Field(alias="id")
+        state: state_type
+        note: Optional[str]
+
     client = ctx.obj()
-    for row in track(
-        read_dict_from_csv(csv), description="Updating cases...", transient=True
-    ):
-        note = row.get("note")
-        client.alerts.v1.change_state(row["alert_id"], row["state"], note)
+    if format_ == "csv":
+        alerts = AlertBulkCSV.parse_csv(file)
 
-
-def _parse_alert_ids(alert_ids, csv):
-    if csv:
-        ids = []
-        for row in track(
-            read_dict_from_csv(alert_ids, field_names=["alert_id"]),
-            description="Reading alert IDs...",
-            transient=True,
-        ):
-            ids.append(row["alert_id"])
     else:
-        ids = [e.strip() for e in alert_ids.split(",")]
-    return ids
+        alerts = AlertBulkJSON.parse_json_lines(file)
+
+    # group alerts where state and note are the same, so we can batch API calls
+    buckets = bucketize(
+        alerts,
+        key=lambda alert: (state or alert.state, note or alert.note),
+        value_transform=lambda alert: alert.alert_id,
+    )
+    for bucket in buckets:
+        state_, note_ = bucket
+        alert_ids = buckets[bucket]
+        # backend allows max of 100 alerts per request
+        for chunk in chunked(alert_ids, size=100):
+            try:
+                client.alerts.v1.change_state(chunk, state_, note_)
+                console.print(
+                    f"{len(chunk)} alerts successfully set to '{state_}' with note: '{note_}'"
+                )
+            except requests.HTTPError as err:
+                # backend doesn't specify _which_ alert_id doesn't exist, so we need to try them 1 by 1
+                if err.response.status_code == 404:
+                    console.print(
+                        f"[red]Error processing batch of {len(chunk)} alerts, trying individually..."
+                    )
+                    for id_ in chunk:
+                        try:
+                            client.alerts.v1.change_state(id_, state_, note_)
+                            console.print(
+                                f"Successfully set alert_id '{id_}' to '{state_}' with note: '{note_}'"
+                            )
+                        except requests.HTTPError as err:
+                            console.print(
+                                f"[red]Error updating alert_id[/red] '{id_}': {err.response.status_code}"
+                            )
 
 
 field_option_map = {
