@@ -243,14 +243,14 @@ def bulk_update_state(ctx: Context, file, format_, state, note):
         value_transform=lambda alert: alert.alert_id,
     )
     for bucket in buckets:
-        state, note = bucket
+        state_, note_ = bucket
         alert_ids = buckets[bucket]
         # backend allows max of 100 alerts per request
         for chunk in chunked(alert_ids, size=100):
             try:
-                client.alerts.v1.change_state(chunk, state, note)
+                client.alerts.v1.change_state(chunk, state_, note_)
                 console.print(
-                    f"{len(chunk)} alerts successfully set to '{state}' with note: '{note}'"
+                    f"{len(chunk)} alerts successfully set to '{state_}' with note: '{note_}'"
                 )
             except requests.HTTPError as err:
                 # backend doesn't specify _which_ alert_id doesn't exist, so we need to try them 1 by 1
@@ -260,9 +260,9 @@ def bulk_update_state(ctx: Context, file, format_, state, note):
                     )
                     for id_ in chunk:
                         try:
-                            client.alerts.v1.change_state(id_, state, note)
+                            client.alerts.v1.change_state(id_, state_, note_)
                             console.print(
-                                f"Successfully set alert_id '{id_}' to '{state}' with note: '{note}'"
+                                f"Successfully set alert_id '{id_}' to '{state_}' with note: '{note_}'"
                             )
                         except requests.HTTPError as err:
                             console.print(
