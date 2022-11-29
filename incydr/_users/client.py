@@ -168,7 +168,7 @@ class UsersV1:
             if len(page.users) < page_size:
                 break
 
-    def get_roles(
+    def list_user_roles(
         self,
         user_id: str,
     ) -> List[UserRole]:
@@ -278,7 +278,7 @@ class UsersV1:
         """
         return self._parent.session.post(f"/v1/users/{user_id}/deactivate")
 
-    def get_available_roles(self) -> List[Role]:
+    def list_roles(self) -> List[Role]:
         """
         Get a list of all available roles that can be assigned by the current user.
 
@@ -322,7 +322,7 @@ class UsersV1:
 
         Returns the updated list of role IDs for a user.
         """
-        role_ids = [i.role_id for i in self.get_roles(user_id)]
+        role_ids = [i.role_id for i in self.list_user_roles(user_id)]
 
         if not self._available_roles:
             self._lookup_roles()
@@ -346,7 +346,7 @@ class UsersV1:
     def _lookup_roles(self):
         """Map role names to role ID."""
         self._available_roles = {}
-        available_roles = self.get_available_roles()
+        available_roles = self.list_roles()
         for r in available_roles:
             self._available_roles[r.role_name] = r.role_id
 

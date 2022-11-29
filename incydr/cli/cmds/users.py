@@ -164,7 +164,7 @@ def list_roles(ctx: Context, user: str, format_: TableFormat, columns: str = Non
     List roles associated with a particular user.
     """
     client = ctx.obj()
-    roles = client.users.v1.get_roles(user)
+    roles = client.users.v1.list_user_roles(user)
 
     if format_ == TableFormat.csv:
         render.csv(UserRole, roles, columns=columns, flat=True)

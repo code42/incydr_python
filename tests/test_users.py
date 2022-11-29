@@ -410,7 +410,7 @@ def test_get_devices_when_custom_query_params_returns_expected_data(
 
 def test_get_roles_returns_expected_data(mock_get_roles):
     client = Client()
-    roles = client.users.v1.get_roles(user_id="user-1")
+    roles = client.users.v1.list_user_roles(user_id="user-1")
     assert isinstance(roles, list)
     assert isinstance(roles[0], UserRole)
     assert isinstance(roles[1], UserRole)
@@ -443,7 +443,7 @@ def test_update_roles_returns_expected_data(
 
 def test_get_available_roles_returns_expected_data(mock_get_available_roles):
     client = Client()
-    roles = client.users.v1.get_available_roles()
+    roles = client.users.v1.list_roles()
     assert isinstance(roles, list)
     assert isinstance(roles[0], Role)
     assert isinstance(roles[1], Role)
