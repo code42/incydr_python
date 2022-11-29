@@ -7,9 +7,11 @@ from pytest_httpserver import HTTPServer
 
 from incydr import Client
 from incydr._devices.models import DevicesPage
+from incydr._users.client import UserNotAssignedRoleError
 from incydr._users.models import Role
 from incydr._users.models import UpdateRolesResponse
 from incydr._users.models import User
+from incydr._users.models import UserRole
 from incydr._users.models import UsersPage
 from incydr.cli.main import incydr
 from incydr.enums import SortDirection
@@ -34,7 +36,6 @@ TEST_USER_1 = {
     "creationDate": "2022-07-14T16:49:11.166000Z",
     "modificationDate": "2022-07-14T17:05:44.524000Z",
 }
-
 TEST_USER_2 = {
     "legacyUserId": "legacyUserId-2",
     "userId": "user-2",
@@ -51,7 +52,6 @@ TEST_USER_2 = {
     "creationDate": "2022-07-14T16:49:11.166000Z",
     "modificationDate": "2022-07-14T17:05:44.524000Z",
 }
-
 TEST_USER_3 = {
     "legacyUserId": "legacyUserId-3",
     "userId": "user-3",
@@ -154,6 +154,34 @@ TEST_USER_ROLE_UPDATE = {
     "unassignedRolesIds": ["unassignedRolesIds-1", "unassignedRolesIds-2"],
     "ignoredRolesIds": ["ignoredRolesIds-1", "ignoredRolesIds-2"],
 }
+TEST_ROLE_ID = "test-role"
+TEST_ROLE_1 = {
+    "roleId": TEST_ROLE_ID,
+    "roleName": "Test Role",
+    "creationDate": "2021-04-09T23:13:06.641000Z",
+    "modificationDate": "2022-09-08T14:05:05.418000Z",
+    "permissions": [
+        {"permission": "test.write", "description": "Test write."},
+        {"permission": "test.read", "description": "Test read."},
+    ],
+}
+TEST_ROLE_2 = {
+    "roleId": "watchlist-manager",
+    "roleName": "Watchlist Manager",
+    "creationDate": "2020-08-06T18:04:09.696000Z",
+    "modificationDate": "2022-01-14T17:30:28.870000Z",
+    "permissions": [
+        {"permission": "watchlists.write", "description": "Manage watchlists."},
+    ],
+}
+
+
+@pytest.fixture
+def mock_get_available_roles(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request("/v1/users/roles", method="GET").respond_with_json(
+        [TEST_ROLE_1, TEST_ROLE_2]
+    )
+
 
 user_input = pytest.mark.parametrize("user", [TEST_USER_ID, "foo@bar.com"])
 
@@ -382,28 +410,143 @@ def test_get_devices_when_custom_query_params_returns_expected_data(
 
 def test_get_roles_returns_expected_data(mock_get_roles):
     client = Client()
-    roles = client.users.v1.get_roles(user_id="user-1")
+    roles = client.users.v1.list_user_roles(user_id="user-1")
     assert isinstance(roles, list)
-    assert isinstance(roles[0], Role)
-    assert isinstance(roles[1], Role)
+    assert isinstance(roles[0], UserRole)
+    assert isinstance(roles[1], UserRole)
     assert roles[0].json() == json.dumps(TEST_USER_1_ROLE_1)
     assert roles[1].json() == json.dumps(TEST_USER_1_ROLE_2)
 
 
+@pytest.mark.parametrize(
+    "input_roles,expected_roles",
+    [
+        ("test-role", ["test-role"]),
+        (["Test Role", "watchlist-manager"], ["test-role", "watchlist-manager"]),
+    ],
+)
 def test_update_roles_returns_expected_data(
-    httpserver_auth: HTTPServer,
+    httpserver_auth: HTTPServer, mock_get_available_roles, input_roles, expected_roles
 ):
     httpserver_auth.expect_request(
-        "/v1/users/user-1/roles", method="PUT"
+        "/v1/users/user-1/roles", method="PUT", json={"roleIds": expected_roles}
     ).respond_with_json(TEST_USER_ROLE_UPDATE)
 
     client = Client()
     response = client.users.v1.update_roles(
         user_id="user-1",
-        role_ids=["newlyAssignedRolesIds-1", "newlyAssignedRolesIds-2"],
+        roles=input_roles,
     )
     assert isinstance(response, UpdateRolesResponse)
     assert response.json() == json.dumps(TEST_USER_ROLE_UPDATE)
+
+
+def test_get_available_roles_returns_expected_data(mock_get_available_roles):
+    client = Client()
+    roles = client.users.v1.list_roles()
+    assert isinstance(roles, list)
+    assert isinstance(roles[0], Role)
+    assert isinstance(roles[1], Role)
+    assert roles[0].json() == json.dumps(TEST_ROLE_1)
+    assert roles[1].json() == json.dumps(TEST_ROLE_2)
+
+
+@pytest.mark.parametrize("role", ["test-role", "Test Role"])
+def test_get_role_returns_expected_data(
+    httpserver_auth: HTTPServer, mock_get_available_roles, role
+):
+    httpserver_auth.expect_request(
+        f"/v1/users/roles/{TEST_ROLE_ID}", method="GET"
+    ).respond_with_json(TEST_ROLE_1)
+    client = Client()
+    role = client.users.v1.get_role(role)
+    assert isinstance(role, Role)
+    assert role.json() == json.dumps(TEST_ROLE_1)
+
+
+@pytest.mark.parametrize(
+    "input_roles,expected_roles",
+    [
+        ("test-role", ["role-1", "role-2", "test-role"]),
+        ("Test Role", ["role-1", "role-2", "test-role"]),
+        (
+            ["test-role", "watchlist-manager"],
+            ["role-1", "role-2", "test-role", "watchlist-manager"],
+        ),
+        (
+            ["test-role", "Watchlist Manager"],
+            ["role-1", "role-2", "test-role", "watchlist-manager"],
+        ),
+        (
+            ["Test Role", "Watchlist Manager"],
+            ["role-1", "role-2", "test-role", "watchlist-manager"],
+        ),
+    ],
+)
+def test_add_roles_returns_expected_data(
+    httpserver_auth: HTTPServer, mock_get_available_roles, input_roles, expected_roles
+):
+    # mock roles update
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/roles",
+        method="PUT",
+        json={"roleIds": expected_roles},
+    ).respond_with_json(TEST_USER_ROLE_UPDATE)
+
+    # mock get user roles
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/roles", method="GET"
+    ).respond_with_json({"roles": [TEST_USER_1_ROLE_1, TEST_USER_1_ROLE_2]})
+
+    client = Client()
+    response = client.users.v1.add_roles(TEST_USER_ID, input_roles)
+    assert isinstance(response, UpdateRolesResponse)
+
+
+@pytest.mark.parametrize(
+    "input_roles,expected_roles",
+    [
+        ("test-role", ["watchlist-manager"]),
+        ("Test Role", ["watchlist-manager"]),
+        (["test-role", "watchlist-manager"], []),
+        (["test-role", "Watchlist Manager"], []),
+        (["Test Role", "Watchlist Manager"], []),
+    ],
+)
+def test_remove_roles_returns_expected_data(
+    httpserver_auth: HTTPServer, mock_get_available_roles, input_roles, expected_roles
+):
+    # mock roles update
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/roles",
+        method="PUT",
+        json={"roleIds": expected_roles},
+    ).respond_with_json(TEST_USER_ROLE_UPDATE)
+
+    # mock get user roles
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/roles", method="GET"
+    ).respond_with_json({"roles": [TEST_ROLE_1, TEST_ROLE_2]})
+
+    client = Client()
+    response = client.users.v1.remove_roles(TEST_USER_ID, input_roles)
+    assert isinstance(response, UpdateRolesResponse)
+
+
+def test_remove_role_when_user_not_assigned_role_raises_error(
+    httpserver_auth: HTTPServer, mock_get_available_roles
+):
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/roles", method="GET"
+    ).respond_with_json({"roles": [TEST_ROLE_2]})
+
+    client = Client()
+    with pytest.raises(UserNotAssignedRoleError) as e:
+        client.users.v1.remove_roles(TEST_USER_ID, "test-role")
+    assert (
+        "User is not currently assigned the following role: 'test-role'. Role cannot be removed."
+        in str(e.value)
+    )
 
 
 def test_activate_returns_expected_data(mock_activate):
@@ -494,7 +637,11 @@ def test_cli_list_roles_makes_expected_call(
 
 @user_input
 def test_cli_update_roles_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, mock_user_lookup, user
+    httpserver_auth: HTTPServer,
+    runner,
+    mock_user_lookup,
+    user,
+    mock_get_available_roles,
 ):
     httpserver_auth.expect_request(
         "/v1/users/user-1/roles",
@@ -536,7 +683,11 @@ def test_cli_move_makes_expected_call(
 
 
 def test_cli_bulk_update_roles_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, tmp_path, mock_user_lookup
+    httpserver_auth: HTTPServer,
+    runner,
+    tmp_path,
+    mock_user_lookup,
+    mock_get_available_roles,
 ):
     httpserver_auth.expect_request(
         "/v1/users/test-user-id/roles",

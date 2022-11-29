@@ -91,8 +91,8 @@ class TrustedActivity(ResponseModel):
     principal_type: Optional[PrincipalType] = Field(
         None, alias="principalType", allow_mutation=False
     )
-    activity_type: Optional[ActivityType] = Field(
-        None, description="The type of the trusted activity.", alias="activityType"
+    type: Optional[ActivityType] = Field(
+        None, description="The type of the trusted activity.", alias="type"
     )
     update_time: Optional[datetime] = Field(
         None,
@@ -130,13 +130,13 @@ class UpdateTrustedActivity(BaseModel):
     description: Optional[str] = Field(
         None, description="The description of the trusted activity."
     )
-    activity_type: Optional[ActivityType] = Field(
+    type: Optional[ActivityType] = Field(
         None,
         description="The type of the trusted activity.\n\nNote: The `ACCOUNT_NAME` trusted activity type requires "
         "agent version 1.5.0 or later for Incydr \nProfessional, Enterprise, Gov F2, and Horizon product "
         "plans, and Code42 app version 9.0.0 or later for \nIncydr Basic, Advanced, and Gov F1 product "
         "plans.\n",
-        alias="activityType",
+        alias="type",
     )
     value: Optional[str] = Field(None, description="The value of the trusted activity.")
 

@@ -499,6 +499,73 @@
 * **LOW** = `"LOW"`
 * **NO_RISK_INDICATED** = `"NO_RISK_INDICATED"`
 
+## Trusted Activities
+
+### Activity Types
+
+::: incydr.enums.trusted_activities.ActivityType
+    :docstring:
+
+* **DOMAIN** = `"DOMAIN"`
+* **ACCOUNT_NAME** = `"ACCOUNT_NAME"`
+* **URL_PATH** = `"URL_PATH"`
+* **SLACK** = `"SLACK"`
+* **CLOUD_SHARE** = `"CLOUD_SHARE"`
+* **CLOUD_SYNC** = `"CLOUD_SYNC"`
+* **EMAIL** = `"EMAIL"`
+* **FILE_UPLOAD** = `"FILE_UPLOAD"`
+* **GIT_PUSH** = `"GIT_PUSH"`
+* **GIT_REPOSITORY_URI** = `"GIT_REPOSITORY_URI"`
+
+### Cloud Sync Apps
+
+::: incydr.enums.trusted_activities.CloudSyncApps
+    :docstring:
+
+* **BOX** = `"BOX"`
+* **GOOGLE_DRIVE** = `"GOOGLE_DRIVE"`
+* **ICLOUD** = `"ICLOUD"`
+* **ONE_DRIVE** = `"ONE_DRIVE"`
+
+### Cloud Share Apps
+
+::: incydr.enums.trusted_activities.CloudShareApps
+    :docstring:
+
+* **BOX** = `"BOX"`
+* **GOOGLE_DRIVE** = `"GOOGLE_DRIVE"`
+* **ONE_DRIVE** = `"ONE_DRIVE"`
+
+### Email Services
+
+::: incydr.enums.trusted_activities.EmailServices
+    :docstring:
+
+* **GMAIL** = `"GMAIL"`
+* **OFFICE_365** = `"OFFICE_365"`
+
+### Principal Types
+
+::: incydr.enums.trusted_activities.PrincipalType
+    :docstring:
+
+* **USER** = `"USER"`
+* **API_KEY** = `"API_KEY"`
+* **DEVICE** = `"DEVICE"`
+* **SERVICE** = `"SERVICE"`
+
+### Trusted Activities Sort Keys
+
+::: incydr.enums.trusted_activities.SortKeys
+    :docstring:
+
+* **ACTIVITY_ID** = `"ACTIVITY_ID"`
+* **DESCRIPTION** = `"DESCRIPTION"`
+* **TYPE** = `"TYPE"`
+* **UPDATED_BY_PRINCIPAL_NAME** = `"UPDATED_BY_PRINCIPAL_NAME"`
+* **UPDATE_TIME** = `"UPDATE_TIME"`
+* **VALUE** = `"VALUE"`
+
 ## Watchlists
 
 ### Watchlist Types

@@ -29,6 +29,7 @@ from incydr._user_risk_profiles.models import UserRiskProfilesPage
 from incydr._users.models import Role
 from incydr._users.models import UpdateRolesResponse
 from incydr._users.models import User
+from incydr._users.models import UserRole
 from incydr._users.models import UsersPage
 from incydr._watchlists.models.responses import ExcludedUsersList
 from incydr._watchlists.models.responses import IncludedDepartment
@@ -56,6 +57,7 @@ __all__ = [
     "FileEventV2",
     "User",
     "UsersPage",
+    "UserRole",
     "Role",
     "UpdateRolesResponse",
     "RuleUsersList",
