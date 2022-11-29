@@ -2,16 +2,20 @@ import json
 from datetime import datetime
 from urllib.parse import urlencode
 
+import pytest
 from pytest_httpserver import HTTPServer
 
 from incydr import Client
 from incydr._devices.models import Device
 from incydr._devices.models import DevicesPage
+from incydr.cli.main import incydr
 from incydr.enums import SortDirection
 from incydr.enums.devices import SortKeys
 
+TEST_DEVICE_ID = "device-1"
+
 TEST_DEVICE_1 = {
-    "deviceId": "device-1",
+    "deviceId": TEST_DEVICE_ID,
     "legacyDeviceId": "41",
     "name": "DESKTOP-H6V9R95",
     "osHostname": "DESKTOP-H6V9R95",
@@ -102,10 +106,29 @@ TEST_DEVICE_3 = {
 }
 
 
-def test_get_device_returns_expected_data(httpserver_auth: HTTPServer):
+@pytest.fixture
+def mock_get_all_default(httpserver_auth: HTTPServer):
+    query = {
+        "page": 1,
+        "pageSize": 100,
+        "sortDirection": "asc",
+        "sortKey": "name",
+    }
+
+    devices_data = {"devices": [TEST_DEVICE_1, TEST_DEVICE_2], "totalCount": 2}
     httpserver_auth.expect_request(
-        uri="/v1/devices/device-1", method="GET"
+        "/v1/devices", method="GET", query_string=urlencode(query)
+    ).respond_with_json(devices_data)
+
+
+@pytest.fixture
+def mock_get(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request(
+        uri=f"/v1/devices/{TEST_DEVICE_ID}", method="GET"
     ).respond_with_json(TEST_DEVICE_1)
+
+
+def test_get_device_returns_expected_data(mock_get):
     client = Client()
     device = client.devices.v1.get_device("device-1")
     assert isinstance(device, Device)
@@ -127,21 +150,7 @@ def test_get_device_returns_expected_data(httpserver_auth: HTTPServer):
     )
 
 
-def test_get_page_when_default_query_params_returns_expected_data(
-    httpserver_auth: HTTPServer,
-):
-    query = {
-        "page": 1,
-        "pageSize": 100,
-        "sortDirection": "asc",
-        "sortKey": "name",
-    }
-
-    devices_data = {"devices": [TEST_DEVICE_1, TEST_DEVICE_2], "totalCount": 2}
-    httpserver_auth.expect_request(
-        "/v1/devices", method="GET", query_string=urlencode(query)
-    ).respond_with_json(devices_data)
-
+def test_get_page_when_default_query_params_returns_expected_data(mock_get_all_default):
     client = Client()
     page = client.devices.v1.get_page()
     assert isinstance(page, DevicesPage)
@@ -198,8 +207,8 @@ def test_iter_all_when_default_params_returns_expected_data(
         "sortKey": "name",
     }
 
-    devices_data_1 = {"devices": [TEST_DEVICE_1, TEST_DEVICE_2], "totalCount": 2}
-    devices_data_2 = {"devices": [TEST_DEVICE_3], "totalCount": 1}
+    devices_data_1 = {"devices": [TEST_DEVICE_1, TEST_DEVICE_2], "totalCount": 3}
+    devices_data_2 = {"devices": [TEST_DEVICE_3], "totalCount": 3}
 
     httpserver_auth.expect_ordered_request(
         "/v1/devices", method="GET", query_string=urlencode(query_1)
@@ -217,3 +226,44 @@ def test_iter_all_when_default_params_returns_expected_data(
         assert isinstance(item, Device)
         assert item.json() == json.dumps(expected_devices.pop(0))
     assert total_devices == 3
+
+
+# ************************************************ CLI ************************************************
+
+
+def test_cli_list_when_default_params_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_get_all_default
+):
+    result = runner.invoke(incydr, ["devices", "list"])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_list_when_custom_params_makes_expected_call(
+    httpserver_auth: HTTPServer, runner
+):
+    query = {
+        "active": True,
+        "blocked": False,
+        "page": 1,
+        "pageSize": 100,
+        "sortDirection": "asc",
+        "sortKey": "name",
+    }
+
+    devices_data = {"devices": [TEST_DEVICE_1, TEST_DEVICE_2], "totalCount": 2}
+    httpserver_auth.expect_request(
+        uri="/v1/devices", method="GET", query_string=urlencode(query)
+    ).respond_with_json(devices_data)
+
+    result = runner.invoke(incydr, ["devices", "list", "--active", "--unblocked"])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_show_when_custom_params_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_get
+):
+    result = runner.invoke(incydr, ["devices", "show", TEST_DEVICE_ID])
+    httpserver_auth.check()
+    assert result.exit_code == 0

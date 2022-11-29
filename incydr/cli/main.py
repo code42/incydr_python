@@ -12,6 +12,7 @@ from incydr.cli.cmds.alerts import alerts
 from incydr.cli.cmds.audit_log import audit_log
 from incydr.cli.cmds.cases import cases
 from incydr.cli.cmds.departments import departments
+from incydr.cli.cmds.devices import devices
 from incydr.cli.cmds.directory_groups import directory_groups
 from incydr.cli.cmds.file_events import file_events
 from incydr.cli.cmds.user_risk_profiles import risk_profiles
@@ -37,6 +38,7 @@ def incydr(ctx, log_level, log_file):
 incydr.add_command(alerts)
 incydr.add_command(audit_log)
 incydr.add_command(departments)
+incydr.add_command(devices)
 incydr.add_command(directory_groups)
 incydr.add_command(file_events)
 incydr.add_command(cases, name="cases")

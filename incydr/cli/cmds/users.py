@@ -67,21 +67,20 @@ def list_(
     client = ctx.obj()
     users_ = client.users.v1.iter_all(active=active, blocked=blocked, username=username)
 
-    columns = columns or [
-        "user_id",
-        "username",
-        "first_name",
-        "last_name",
-        "org_guid",
-        "org_name",
-        "notes",
-        "active",
-        "blocked",
-    ]
-
     if format_ == TableFormat.csv:
         render.csv(User, users_, columns=columns, flat=True)
     elif format_ == TableFormat.table:
+        columns = columns or [
+            "user_id",
+            "username",
+            "first_name",
+            "last_name",
+            "org_guid",
+            "org_name",
+            "notes",
+            "active",
+            "blocked",
+        ]
         render.table(User, users_, columns=columns, flat=False)
     else:
         printed = False
@@ -115,7 +114,7 @@ def show(ctx: Context, user, format_: SingleFormat):
     elif format_ == SingleFormat.json:
         console.print_json(user.json())
     else:  # format == "raw-json"
-        console.print(user.json(), highlight=False)
+        click.echo(user.json())
 
 
 @users.command(cls=IncydrCommand)
@@ -130,28 +129,27 @@ def list_devices(ctx: Context, user, format_: TableFormat, columns: str = None):
     client = ctx.obj()
     devices = client.users.v1.get_devices(user).devices
 
-    columns = columns or [
-        "device_id",
-        "name",
-        "os_hostname",
-        "status",
-        "active",
-        "blocked",
-        "alert_state",
-        "org_guid",
-        "login_date",
-    ]
-
     if format_ == TableFormat.csv:
         render.csv(Device, devices, columns=columns, flat=True)
     elif format_ == TableFormat.table:
+        columns = columns or [
+            "device_id",
+            "name",
+            "os_hostname",
+            "status",
+            "active",
+            "blocked",
+            "alert_state",
+            "org_guid",
+            "login_date",
+        ]
         render.table(Device, devices, columns=columns, flat=False)
     elif format_ == TableFormat.json:
         for item in devices:
             console.print_json(item.json())
-    else:  # format == "raw-json"/TableFormat.raw_json
+    else:  # raw-json
         for item in devices:
-            console.print(item.json(), highlight=False)
+            click.echo(item.json())
 
 
 @users.command(cls=IncydrCommand)
@@ -173,9 +171,9 @@ def list_roles(ctx: Context, user: str, format_: TableFormat, columns: str = Non
     elif format_ == TableFormat.json:
         for item in roles:
             console.print_json(item.json())
-    else:  # format == "raw-json"/TableFormat.raw_json
+    else:  # raw-json
         for item in roles:
-            console.print(item.json(), highlight=False)
+            click.echo(item.json())
 
 
 @users.command(cls=IncydrCommand)
@@ -196,6 +194,7 @@ def update_roles(ctx: Context, user, roles):
     """
     client = ctx.obj()
     client.users.v1.update_roles(user, roles.split(","))
+    console.print(f"Roles successfully updated for user '{user}'")
 
 
 # TODO: add-role. blocked by INTEG-2298
@@ -212,6 +211,7 @@ def activate(ctx: Context, user):
     """
     client = ctx.obj()
     client.users.v1.activate(user)
+    console.print(f"User '{user}' successfully activated.")
 
 
 @users.command(cls=IncydrCommand)
@@ -223,6 +223,7 @@ def deactivate(ctx: Context, user):
     """
     client = ctx.obj()
     client.users.v1.deactivate(user)
+    console.print(f"User '{user}' successfully deactivated.")
 
 
 @users.command(cls=IncydrCommand)
@@ -235,6 +236,7 @@ def move(ctx: Context, user, org_guid):
     """
     client = ctx.obj()
     client.users.v1.move(user, org_guid)
+    console.print(f"User '{user}' successfully moved to org '{org_guid}'.")
 
 
 @users.command(cls=IncydrCommand)

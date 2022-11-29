@@ -37,10 +37,9 @@ def list_(ctx: Context, format_: TableFormat, name: Optional[str] = None):
 
     The results can then be used with the watchlists commands to automatically assign users to watchlists by directory group.
     """
-    if not format_:
-        format_ = TableFormat.table
     client = ctx.obj()
     groups = client.directory_groups.v1.iter_all(name=name)
+
     if format_ == TableFormat.table:
         render.table(DirectoryGroup, groups)
     elif format_ == TableFormat.csv:
@@ -50,4 +49,4 @@ def list_(ctx: Context, format_: TableFormat, name: Optional[str] = None):
             console.print_json(group.json())
     else:
         for group in groups:
-            console.print(group.json(), highlight=False)
+            click.echo(group.json())

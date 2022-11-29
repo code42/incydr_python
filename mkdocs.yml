@@ -62,6 +62,7 @@ nav:
       - Audit Log: 'cli/audit_log.md'
       - Cases: 'cli/cases.md'
       - Departments: 'cli/departments.md'
+      - Devices: 'cli/devices.md'
       - Directory Groups: 'cli/directory_groups.md'
       - File Events: 'cli/file_events.md'
       - User Risk Profiles: 'cli/user_risk_profiles.md'
