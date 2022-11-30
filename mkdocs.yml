@@ -49,7 +49,6 @@ nav:
     - Directory Groups: 'sdk/clients/directory_groups.md'
     - File Events: 'sdk/clients/file_events.md'
     - File Event Queries: 'sdk/clients/file_event_queries.md'
-    - Legal Hold: 'sdk/clients/legal_hold.md'
     - Trusted Activites: 'sdk/clients/trusted_activities.md'
     - Users: 'sdk/clients/users.md'
     - User Risk Profiles: 'sdk/clients/user_risk_profiles.md'
