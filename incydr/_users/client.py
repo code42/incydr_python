@@ -211,12 +211,12 @@ class UsersV1:
         self, user_id: str, roles: Union[str, List[str]]
     ) -> UpdateRolesResponse:
         """
-        Add a role, or multiple roles, to a user's current roles.
+        Add a role, or multiple roles, to a user's existing roles.
 
         **Parameters**:
 
         * **user_id**: `str` (required) - The unique ID for the user.
-        * **roles**: `str | List[str]` The roles to add to the user. Accepts either role IDs or role names."
+        * **roles**: `str | List[str]` The roles to add to the user. Accepts either role IDs or role names (case-sensitive)."
 
         **Returns**: A [`UpdateRolesResponse`][updaterolesresponse-model] object.
         """
@@ -295,7 +295,7 @@ class UsersV1:
 
         **Parameters**:
 
-        * **role**: `str` (required) - Role ID or role name.
+        * **role**: `str` (required) - Role ID or role name (case-sensitive).
         """
         response = self._parent.session.get(
             f"/v1/users/roles/{self._get_id_by_name(role)}"
@@ -331,8 +331,10 @@ class UsersV1:
             roles = [roles]
 
         for role in roles:
+            found = False
             for name, id_ in self._available_roles.items():
                 if (role == name) or (role == id_):
+                    found = True
                     if add:
                         role_ids.append(id_)
                     else:
@@ -341,6 +343,8 @@ class UsersV1:
                         except ValueError:
                             raise UserNotAssignedRoleError(id_)
                     break
+            if not found:
+                raise RoleNotFoundError(role)
         return role_ids
 
     def _lookup_roles(self):
@@ -360,4 +364,16 @@ class UserNotAssignedRoleError(Exception):
     @property
     def role(self):
         """The role which cannot be assigned."""
+        return self._role
+
+
+class RoleNotFoundError(Exception):
+    def __init__(self, role):
+        message = f"No role matching the following was found: '{role}', or you do not have permission to assign this role. Roles can be specified by name (case-sensitive) or ID."
+        super().__init__(message)
+        self._role = role
+
+    @property
+    def role(self):
+        """The role which could not be found"""
         return self._role

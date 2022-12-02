@@ -21,6 +21,7 @@ from incydr.cli import render
 from incydr.cli.cmds.options.alert_filter_options import advanced_query_option
 from incydr.cli.cmds.options.alert_filter_options import filter_options
 from incydr.cli.cmds.options.output_options import columns_option
+from incydr.cli.cmds.options.output_options import input_format_option
 from incydr.cli.cmds.options.output_options import output_options
 from incydr.cli.cmds.options.output_options import single_format_option
 from incydr.cli.cmds.options.output_options import SingleFormat
@@ -185,14 +186,7 @@ def update_state(ctx: Context, alert_id: str, state: str, note: str = None):
 
 @alerts.command(cls=IncydrCommand)
 @click.argument("file", type=AutoDecodedFile())
-@click.option(
-    "--format",
-    "-f",
-    "format_",
-    type=click.Choice(["csv", "json-lines"]),
-    default="csv",
-    help="Specify format of input file.",
-)
+@input_format_option
 @click.option(
     "--state",
     type=click.Choice(["OPEN", "RESOLVED", "IN_PROGRESS", "PENDING"]),

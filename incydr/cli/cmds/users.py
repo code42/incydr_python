@@ -1,12 +1,20 @@
+from functools import lru_cache
 from typing import Optional
 
 import click
+from boltons.iterutils import bucketize
 from click import Context
+from pydantic import Field
 from requests import HTTPError
 from rich.panel import Panel
 from rich.progress import track
 
+from incydr._core.models import CSVModel
+from incydr._core.models import Model
 from incydr._devices.models import Device
+from incydr._users.client import RoleNotFoundError
+from incydr._users.client import UserNotAssignedRoleError
+from incydr._users.models import Role
 from incydr._users.models import User
 from incydr._users.models import UserRole
 from incydr.cli import console
@@ -15,6 +23,7 @@ from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
 from incydr.cli.cmds.options.output_options import columns_option
+from incydr.cli.cmds.options.output_options import input_format_option
 from incydr.cli.cmds.options.output_options import single_format_option
 from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
@@ -23,6 +32,7 @@ from incydr.cli.cmds.options.utils import user_lookup_callback
 from incydr.cli.cmds.utils import user_lookup
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
+from incydr.cli.file_readers import AutoDecodedFile
 from incydr.utils import model_as_card
 from incydr.utils import read_dict_from_csv
 
@@ -34,7 +44,7 @@ user_arg = click.argument("user", callback=user_lookup_callback)
 @log_file_option
 @click.pass_context
 def users(ctx, log_level, log_file):
-    """View and manage file events."""
+    """View and manage users and user roles."""
     init_client(ctx, log_level, log_file)
 
 
@@ -152,12 +162,12 @@ def list_devices(ctx: Context, user, format_: TableFormat, columns: str = None):
             click.echo(item.json())
 
 
-@users.command(cls=IncydrCommand)
+@users.command("list-roles", cls=IncydrCommand)
 @user_arg
 @table_format_option
 @columns_option
 @click.pass_context
-def list_roles(ctx: Context, user: str, format_: TableFormat, columns: str = None):
+def list_user_roles(ctx: Context, user: str, format_: TableFormat, columns: str = None):
     """
     List roles associated with a particular user.
     """
@@ -179,27 +189,48 @@ def list_roles(ctx: Context, user: str, format_: TableFormat, columns: str = Non
 @users.command(cls=IncydrCommand)
 @user_arg
 @click.argument("roles")
+@click.option("--add", "update_method", flag_value="add", default=None)
+@click.option("--remove", "update_method", flag_value="remove", default=None)
 @click.pass_context
-# TODO: role IDs
-def update_roles(ctx: Context, user, roles):
+def update_roles(ctx: Context, user, roles, update_method):
     """
     Update roles associated with a particular user.
 
     Usage:
         users update-roles USER ROLES
 
-    Where USER is the user ID or username of the user whose roles will be updated. Performs an additional lookup if username is passed.
-    ROLES is a comma-delimited list of roles to replace that user's roles.
+    USER is the user ID or username of the user whose roles will be updated.
+    Performs an additional lookup if username is passed.
 
+    ROLES is a comma-delimited list of role IDs and/or role names to replace that user's roles.
+
+    Use the "--remove" flag to remove the specified role(s) from a user's existing roles.
+
+    Alternatively, use the "--add" flag to assign additional roles to a user's existing roles.
     """
+    if update_method == "add":
+
+        def update_user_roles(user_, roles):
+            client.users.v1.add_roles(user_, roles)
+
+    elif update_method == "remove":
+
+        def update_user_roles(user_, roles):
+            client.users.v1.remove_roles(user_, roles)
+
+    else:
+
+        def update_user_roles(user_, roles):
+            client.users.v1.update_roles(user_, roles)
+
     client = ctx.obj()
-    client.users.v1.update_roles(user, roles.split(","))
+    try:
+        update_user_roles(user, [r.strip() for r in roles.split(",")])
+    except RoleNotFoundError as e:
+        raise e
+    except UserNotAssignedRoleError as e:
+        raise e
     console.print(f"Roles successfully updated for user '{user}'")
-
-
-# TODO: add-role. blocked by INTEG-2298
-
-# TODO: remove-role. blocked by INTEG-2298
 
 
 @users.command(cls=IncydrCommand)
@@ -239,33 +270,135 @@ def move(ctx: Context, user, org_guid):
     console.print(f"User '{user}' successfully moved to org '{org_guid}'.")
 
 
-@users.command(cls=IncydrCommand)
-@click.argument("csv")
+@users.group("roles", cls=IncydrGroup)
+def roles_():
+    """View available roles."""
+
+
+@roles_.command("show", cls=IncydrCommand)
+@single_format_option
+@click.argument("role")
 @click.pass_context
-# TODO: role IDs
-def bulk_update_roles(ctx: Context, csv):
+def show_role(ctx: Context, role, format_: SingleFormat = None):
+    """
+    Show details for a single role, specified by role name or role ID.
+    """
+    client = ctx.obj()
+    role = client.users.v1.get_role(role)
+    if format_ == SingleFormat.rich and client.settings.use_rich:
+        console.print(Panel.fit(model_as_card(role), title=role.role_name))
+    elif format_ == SingleFormat.json:
+        console.print_json(role.json())
+    else:  # format == "raw-json"
+        click.echo(role.json())
+
+
+@roles_.command("list", cls=IncydrCommand)
+@single_format_option
+@click.pass_context
+def list_roles(ctx: Context, format_: SingleFormat = None):
+    """
+    List all available roles that can be assigned by the current user.
+    """
+    client = ctx.obj()
+    roles = client.users.v1.list_roles()
+    if format_ == TableFormat.csv:
+        render.csv(Role, roles, flat=True)
+    elif format_ == TableFormat.table:
+        render.table(Role, roles, flat=False)
+    elif format_ == TableFormat.json:
+        for item in roles:
+            console.print_json(item.json())
+    else:  # raw-json
+        for item in roles:
+            click.echo(item.json())
+
+
+@users.command(cls=IncydrCommand)
+@click.argument("file", type=AutoDecodedFile())
+@input_format_option
+@click.option("--add", "update_method", flag_value="add", default=None)
+@click.option("--remove", "update_method", flag_value="remove", default=None)
+@click.pass_context
+def bulk_update_roles(ctx: Context, file, update_method=None, format_=None):
     """
     Bulk update roles associated with multiple users with a CSV file.
+
+     By default, the provided roles will replace the specified user's existing roles.
+     Use the --add flag or the --remove flag to add or remove roles, respectively, from a user's existing roles.
 
     Takes a single arg `CSV` which specifies the path to the file.
     Requires the following columns:
 
     * `user` - User ID or username of the user whose roles will be updated. Performs an additional lookup if username is passed.
-    * `roles` - Space-delimited list of role IDs to assign to the new user.  These will replace the specified user's existing roles.
+    * `role` - Role ID and/or role name (case-sensitive) to assign to the new user.
     """
+
+    @lru_cache()
+    def resolve_username(user):
+        if user is None:
+            return
+        elif "@" in user:
+            return user_lookup(client, user)
+        else:  # assume user_id
+            return user
+
+    class RoleUpdateCSV(CSVModel):
+        user: str = Field(csv_aliases=["user"])
+        role: str = Field(csv_aliases=["role"])
+
+    class RoleUpdateJSON(Model):
+        user: str
+        role: str
+
+    if format_ == "csv":
+        roles_file = RoleUpdateCSV.parse_csv(file)
+    else:
+        roles_file = RoleUpdateJSON.parse_json_lines(file)
+
     client = ctx.obj()
-    try:
-        for row in track(
-            read_dict_from_csv(csv),
-            description="Updated user roles...",
-            transient=True,
-        ):
-            user = row.get("user")
-            if user and "@" in user:
-                user = user_lookup(client, row["user"])
-            client.users.v1.update_roles(user, row["roles"].split(" "))
-    except HTTPError as err:
-        console.print(f"[red]Error:[/red] {err.response.text}")
+    if update_method == "add":
+
+        def update_user_roles(user_, roles):
+            client.users.v1.add_roles(user_, roles)
+
+    elif update_method == "remove":
+
+        def update_user_roles(user_, roles):
+            client.users.v1.remove_roles(user_, roles)
+
+    else:
+
+        def update_user_roles(user_, roles):
+            client.users.v1.update_roles(user_, roles)
+
+    # group updates by user
+    buckets = bucketize(
+        roles_file,
+        key=lambda role_update: role_update.user,
+        value_transform=lambda role_update: role_update.role,
+    )
+    for bucket in buckets:
+        user = bucket
+        roles = buckets[bucket]
+        try:
+            user = resolve_username(user)
+            update_user_roles(user, roles)
+        except RoleNotFoundError:
+            console.print(
+                f"[red]Error! Could not find a role matching one of the following roles:[/red] {roles}",
+                highlight=False,
+            )
+        except UserNotAssignedRoleError:
+            console.print(
+                f"[red]User is not currently one of the following roles:[/red] '{roles}'. "
+                f"[red]Role cannot be removed.[/red])",
+                highlight=False,
+            )
+        except HTTPError as err:
+            console.print(
+                f"[red]Error:[/red] {err.response.text} ({err.response.status_code})"
+            )
 
 
 @users.command(cls=IncydrCommand)

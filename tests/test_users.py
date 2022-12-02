@@ -7,6 +7,7 @@ from pytest_httpserver import HTTPServer
 
 from incydr import Client
 from incydr._devices.models import DevicesPage
+from incydr._users.client import RoleNotFoundError
 from incydr._users.client import UserNotAssignedRoleError
 from incydr._users.models import Role
 from incydr._users.models import UpdateRolesResponse
@@ -129,7 +130,7 @@ TEST_USER_1_DEVICE_2 = {
     "osName": "win64",
 }
 
-TEST_USER_1_ROLE_1 = {
+TEST_USER_ROLE_1 = {
     "roleId": "role-1",
     "roleName": "rolename-1",
     "creationDate": "2022-07-14T16:49:11.166000Z",
@@ -137,7 +138,7 @@ TEST_USER_1_ROLE_1 = {
     "permissionIds": ["permission-1", "permission-2", "permission-3"],
 }
 
-TEST_USER_1_ROLE_2 = {
+TEST_USER_ROLE_2 = {
     "roleId": "role-2",
     "roleName": "rolename-2",
     "creationDate": "2022-07-14T16:49:11.166000Z",
@@ -177,7 +178,7 @@ TEST_ROLE_2 = {
 
 
 @pytest.fixture
-def mock_get_available_roles(httpserver_auth: HTTPServer):
+def mock_list_roles(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request("/v1/users/roles", method="GET").respond_with_json(
         [TEST_ROLE_1, TEST_ROLE_2]
     )
@@ -189,7 +190,7 @@ user_input = pytest.mark.parametrize("user", [TEST_USER_ID, "foo@bar.com"])
 @pytest.fixture
 def mock_get(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request(
-        uri="/v1/users/user-1", method="GET"
+        uri=f"/v1/users/{TEST_USER_ID}", method="GET"
     ).respond_with_json(TEST_USER_1)
 
 
@@ -212,9 +213,9 @@ def mock_get_devices(httpserver_auth: HTTPServer):
 
 
 @pytest.fixture
-def mock_get_roles(httpserver_auth: HTTPServer):
+def mock_get_user_roles(httpserver_auth: HTTPServer):
     roles_data = {
-        "roles": [TEST_USER_1_ROLE_1, TEST_USER_1_ROLE_2],
+        "roles": [TEST_USER_ROLE_1, TEST_USER_ROLE_2],
     }
     httpserver_auth.expect_request(
         f"/v1/users/{TEST_USER_ID}/roles", method="GET"
@@ -240,6 +241,13 @@ def mock_move(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request(
         f"/v1/users/{TEST_USER_ID}/move", method="POST", json={"orgGuid": TEST_ORG_GUID}
     ).respond_with_data()
+
+
+@pytest.fixture
+def mock_get_role(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request(
+        f"/v1/users/roles/{TEST_ROLE_ID}", method="GET"
+    ).respond_with_json(TEST_ROLE_1)
 
 
 def test_get_user_when_user_id_returns_expected_data(mock_get):
@@ -408,14 +416,14 @@ def test_get_devices_when_custom_query_params_returns_expected_data(
     assert page.total_count == len(page.devices) == 2
 
 
-def test_get_roles_returns_expected_data(mock_get_roles):
+def test_get_roles_returns_expected_data(mock_get_user_roles):
     client = Client()
     roles = client.users.v1.list_user_roles(user_id="user-1")
     assert isinstance(roles, list)
     assert isinstance(roles[0], UserRole)
     assert isinstance(roles[1], UserRole)
-    assert roles[0].json() == json.dumps(TEST_USER_1_ROLE_1)
-    assert roles[1].json() == json.dumps(TEST_USER_1_ROLE_2)
+    assert roles[0].json() == json.dumps(TEST_USER_ROLE_1)
+    assert roles[1].json() == json.dumps(TEST_USER_ROLE_2)
 
 
 @pytest.mark.parametrize(
@@ -426,7 +434,7 @@ def test_get_roles_returns_expected_data(mock_get_roles):
     ],
 )
 def test_update_roles_returns_expected_data(
-    httpserver_auth: HTTPServer, mock_get_available_roles, input_roles, expected_roles
+    httpserver_auth: HTTPServer, mock_list_roles, input_roles, expected_roles
 ):
     httpserver_auth.expect_request(
         "/v1/users/user-1/roles", method="PUT", json={"roleIds": expected_roles}
@@ -441,7 +449,7 @@ def test_update_roles_returns_expected_data(
     assert response.json() == json.dumps(TEST_USER_ROLE_UPDATE)
 
 
-def test_get_available_roles_returns_expected_data(mock_get_available_roles):
+def test_get_available_roles_returns_expected_data(mock_list_roles):
     client = Client()
     roles = client.users.v1.list_roles()
     assert isinstance(roles, list)
@@ -453,18 +461,15 @@ def test_get_available_roles_returns_expected_data(mock_get_available_roles):
 
 @pytest.mark.parametrize("role", ["test-role", "Test Role"])
 def test_get_role_returns_expected_data(
-    httpserver_auth: HTTPServer, mock_get_available_roles, role
+    httpserver_auth: HTTPServer, mock_list_roles, role, mock_get_role
 ):
-    httpserver_auth.expect_request(
-        f"/v1/users/roles/{TEST_ROLE_ID}", method="GET"
-    ).respond_with_json(TEST_ROLE_1)
     client = Client()
     role = client.users.v1.get_role(role)
     assert isinstance(role, Role)
     assert role.json() == json.dumps(TEST_ROLE_1)
 
 
-@pytest.mark.parametrize(
+add_roles_input = pytest.mark.parametrize(
     "input_roles,expected_roles",
     [
         ("test-role", ["role-1", "role-2", "test-role"]),
@@ -483,8 +488,11 @@ def test_get_role_returns_expected_data(
         ),
     ],
 )
+
+
+@add_roles_input
 def test_add_roles_returns_expected_data(
-    httpserver_auth: HTTPServer, mock_get_available_roles, input_roles, expected_roles
+    httpserver_auth: HTTPServer, mock_list_roles, input_roles, expected_roles
 ):
     # mock roles update
     httpserver_auth.expect_request(
@@ -496,14 +504,28 @@ def test_add_roles_returns_expected_data(
     # mock get user roles
     httpserver_auth.expect_request(
         f"/v1/users/{TEST_USER_ID}/roles", method="GET"
-    ).respond_with_json({"roles": [TEST_USER_1_ROLE_1, TEST_USER_1_ROLE_2]})
+    ).respond_with_json({"roles": [TEST_USER_ROLE_1, TEST_USER_ROLE_2]})
 
     client = Client()
     response = client.users.v1.add_roles(TEST_USER_ID, input_roles)
     assert isinstance(response, UpdateRolesResponse)
 
 
-@pytest.mark.parametrize(
+def test_add_roles_when_role_not_found_raises_role_not_found_error(
+    httpserver_auth, mock_list_roles
+):
+    # mock get user roles
+    test_role = "a nonexistant role"
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/roles", method="GET"
+    ).respond_with_json({"roles": [TEST_USER_ROLE_1, TEST_USER_ROLE_2]})
+    client = Client()
+    with pytest.raises(RoleNotFoundError) as e:
+        client.users.v1.add_roles(TEST_USER_ID, test_role)
+    assert f"No role matching the following was found: '{test_role}'" in str(e.value)
+
+
+remove_roles_input = pytest.mark.parametrize(
     "input_roles,expected_roles",
     [
         ("test-role", ["watchlist-manager"]),
@@ -513,8 +535,11 @@ def test_add_roles_returns_expected_data(
         (["Test Role", "Watchlist Manager"], []),
     ],
 )
+
+
+@remove_roles_input
 def test_remove_roles_returns_expected_data(
-    httpserver_auth: HTTPServer, mock_get_available_roles, input_roles, expected_roles
+    httpserver_auth: HTTPServer, mock_list_roles, input_roles, expected_roles
 ):
     # mock roles update
     httpserver_auth.expect_request(
@@ -534,7 +559,7 @@ def test_remove_roles_returns_expected_data(
 
 
 def test_remove_role_when_user_not_assigned_role_raises_error(
-    httpserver_auth: HTTPServer, mock_get_available_roles
+    httpserver_auth: HTTPServer, mock_list_roles
 ):
     httpserver_auth.expect_request(
         f"/v1/users/{TEST_USER_ID}/roles", method="GET"
@@ -565,6 +590,20 @@ def test_move_returns_expected_data(mock_move):
 
 
 # ************************************************ CLI ************************************************
+
+
+@pytest.mark.parametrize("format_", ["table", "csv", "json", "raw-json"])
+def test_cli_list_when_no_results_returns_expected_message(
+    httpserver_auth, runner, format_
+):
+    httpserver_auth.expect_ordered_request("/v1/users", method="GET").respond_with_json(
+        {"users": [], "totalCount": 0}
+    )
+
+    result = runner.invoke(incydr, ["users", "list", "-f", format_])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+    assert "No results found" in result.output
 
 
 def test_cli_list_when_default_params_makes_expected_call(
@@ -628,7 +667,7 @@ def test_cli_list_devices_makes_expected_call(
 
 @user_input
 def test_cli_list_roles_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, mock_get_roles, mock_user_lookup, user
+    httpserver_auth: HTTPServer, runner, mock_get_user_roles, mock_user_lookup, user
 ):
     result = runner.invoke(incydr, ["users", "list-roles", user])
     httpserver_auth.check()
@@ -641,7 +680,7 @@ def test_cli_update_roles_makes_expected_call(
     runner,
     mock_user_lookup,
     user,
-    mock_get_available_roles,
+    mock_list_roles,
 ):
     httpserver_auth.expect_request(
         "/v1/users/user-1/roles",
@@ -650,6 +689,92 @@ def test_cli_update_roles_makes_expected_call(
     ).respond_with_json(TEST_USER_ROLE_UPDATE)
     result = runner.invoke(
         incydr, ["users", "update-roles", user, "desktop-user,cloud-admin"]
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+@user_input
+@add_roles_input
+def test_cli_add_roles_makes_expected_call(
+    httpserver_auth,
+    runner,
+    user,
+    mock_user_lookup,
+    mock_list_roles,
+    input_roles,
+    expected_roles,
+):
+    # mock roles update
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/roles",
+        method="PUT",
+        json={"roleIds": expected_roles},
+    ).respond_with_json(TEST_USER_ROLE_UPDATE)
+
+    # mock get user roles
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/roles", method="GET"
+    ).respond_with_json({"roles": [TEST_USER_ROLE_1, TEST_USER_ROLE_2]})
+
+    if not isinstance(input_roles, str):
+        input_roles = ",".join(input_roles)
+
+    result = runner.invoke(
+        incydr, ["users", "update-roles", user, input_roles, "--add"]
+    )
+
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_update_roles_when_role_not_found_raises_role_not_found_error(
+    httpserver_auth,
+    runner,
+    mock_list_roles,
+):
+    test_role = "a nonexistant role"
+
+    # mock get user roles
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/roles", method="GET"
+    ).respond_with_json({"roles": [TEST_USER_ROLE_1, TEST_USER_ROLE_2]})
+
+    result = runner.invoke(
+        incydr, ["users", "update-roles", TEST_USER_ID, test_role, "--add"]
+    )
+    assert result.exit_code == 1
+    assert isinstance(result.exception, RoleNotFoundError)
+
+
+@user_input
+@remove_roles_input
+def test_cli_remove_roles_makes_expected_call(
+    httpserver_auth,
+    runner,
+    user,
+    mock_user_lookup,
+    input_roles,
+    expected_roles,
+    mock_list_roles,
+):
+    # mock roles update
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/roles",
+        method="PUT",
+        json={"roleIds": expected_roles},
+    ).respond_with_json(TEST_USER_ROLE_UPDATE)
+
+    # mock get user roles
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/roles", method="GET"
+    ).respond_with_json({"roles": [TEST_ROLE_1, TEST_ROLE_2]})
+
+    if not isinstance(input_roles, str):
+        input_roles = ",".join(input_roles)
+
+    result = runner.invoke(
+        incydr, ["users", "update-roles", user, input_roles, "--remove"]
     )
     httpserver_auth.check()
     assert result.exit_code == 0
@@ -687,29 +812,144 @@ def test_cli_bulk_update_roles_makes_expected_call(
     runner,
     tmp_path,
     mock_user_lookup,
-    mock_get_available_roles,
+    mock_list_roles,
 ):
     httpserver_auth.expect_request(
-        "/v1/users/test-user-id/roles",
+        "/v1/users/test-1/roles",
         method="PUT",
-        json={"roleIds": ["desktop-user", "proe-user"]},
+        json={"roleIds": ["test-role", "watchlist-manager"]},
     ).respond_with_json(TEST_USER_ROLE_UPDATE)
     httpserver_auth.expect_request(
         f"/v1/users/{TEST_USER_ID}/roles",
         method="PUT",
-        json={"roleIds": ["cloud-admin"]},
+        json={"roleIds": ["test-role"]},
     ).respond_with_json(TEST_USER_ROLE_UPDATE)
     httpserver_auth.expect_request(
-        "/v1/users/test-user-id-1/roles",
+        "/v1/users/test-2/roles",
         method="PUT",
-        json={"roleIds": ["desktop-user", "support-user", "admin"]},
+        json={"roleIds": ["watchlist-manager", "test-role"]},
     ).respond_with_json(TEST_USER_ROLE_UPDATE)
 
     p = tmp_path / "users.csv"
     p.write_text(
-        "user,roles\ntest-user-id,desktop-user proe-user\nfoo@bar.com,cloud-admin\ntest-user-id-1,desktop-user support-user admin"
+        "user,role\ntest-1,test-role\ntest-1,watchlist-manager\nfoo@bar.com,Test Role\ntest-2,Watchlist Manager\ntest-2,test-role"
     )
     result = runner.invoke(incydr, ["users", "bulk-update-roles", str(p)])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_bulk_add_roles_makes_expected_call(
+    httpserver_auth,
+    runner,
+    tmp_path,
+    mock_user_lookup,
+    mock_list_roles,
+):
+    # mock get user roles
+    httpserver_auth.expect_request(
+        "/v1/users/test-1/roles", method="GET"
+    ).respond_with_json({"roles": []})
+    httpserver_auth.expect_request(
+        "/v1/users/user-1/roles", method="GET"
+    ).respond_with_json({"roles": [TEST_USER_ROLE_1]})
+    httpserver_auth.expect_request(
+        "/v1/users/test-2/roles", method="GET"
+    ).respond_with_json({"roles": [TEST_USER_ROLE_1, TEST_USER_ROLE_2]})
+
+    httpserver_auth.expect_request(
+        "/v1/users/test-1/roles",
+        method="PUT",
+        json={"roleIds": ["test-role", "watchlist-manager"]},
+    ).respond_with_json(TEST_USER_ROLE_UPDATE)
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/roles",
+        method="PUT",
+        json={"roleIds": [TEST_USER_ROLE_1["roleId"], "test-role"]},
+    ).respond_with_json(TEST_USER_ROLE_UPDATE)
+    httpserver_auth.expect_request(
+        "/v1/users/test-2/roles",
+        method="PUT",
+        json={
+            "roleIds": [
+                TEST_USER_ROLE_1["roleId"],
+                TEST_USER_ROLE_2["roleId"],
+                "watchlist-manager",
+                "test-role",
+            ]
+        },
+    ).respond_with_json(TEST_USER_ROLE_UPDATE)
+
+    p = tmp_path / "users.csv"
+    p.write_text(
+        "user,role\ntest-1,test-role\ntest-1,watchlist-manager\nfoo@bar.com,Test Role\ntest-2,Watchlist Manager\ntest-2,test-role"
+    )
+    result = runner.invoke(incydr, ["users", "bulk-update-roles", str(p), "--add"])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_bulk_remove_roles_makes_expected_call(
+    httpserver_auth,
+    runner,
+    tmp_path,
+    mock_user_lookup,
+):
+    # mock list roles
+    httpserver_auth.expect_request("/v1/users/roles", method="GET").respond_with_json(
+        [
+            {
+                "roleId": "role-1",
+                "roleName": "rolename-1",
+                "creationDate": "2022-07-14T16:49:11.166000Z",
+                "modificationDate": "2022-07-14T17:05:44.524000Z",
+                "permissions": [
+                    {"permission": "test.read", "description": "Test read."},
+                ],
+            },
+            {
+                "roleId": "role-2",
+                "roleName": "rolename-2",
+                "creationDate": "2022-07-14T16:49:11.166000Z",
+                "modificationDate": "2022-07-14T17:05:44.524000Z",
+                "permissions": [
+                    {"permission": "test.write", "description": "Test write."},
+                ],
+            },
+        ]
+    )
+    # mock get user roles
+    httpserver_auth.expect_request(
+        "/v1/users/test-1/roles", method="GET"
+    ).respond_with_json({"roles": [TEST_USER_ROLE_1, TEST_USER_ROLE_2]})
+    httpserver_auth.expect_request(
+        "/v1/users/user-1/roles", method="GET"
+    ).respond_with_json({"roles": [TEST_USER_ROLE_1]})
+    httpserver_auth.expect_request(
+        "/v1/users/test-2/roles", method="GET"
+    ).respond_with_json({"roles": [TEST_USER_ROLE_1, TEST_USER_ROLE_2]})
+
+    httpserver_auth.expect_request(
+        "/v1/users/test-1/roles",
+        method="PUT",
+        json={"roleIds": []},
+    ).respond_with_json(TEST_USER_ROLE_UPDATE)
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/roles",
+        method="PUT",
+        json={"roleIds": []},
+    ).respond_with_json(TEST_USER_ROLE_UPDATE)
+    httpserver_auth.expect_request(
+        "/v1/users/test-2/roles",
+        method="PUT",
+        json={"roleIds": [TEST_USER_ROLE_2["roleId"]]},
+    ).respond_with_json(TEST_USER_ROLE_UPDATE)
+
+    p = tmp_path / "users.csv"
+    p.write_text(
+        "user,role\ntest-1,rolename-1\ntest-1,role-2\nfoo@bar.com,role-1\ntest-2,rolename-1"
+    )
+    result = runner.invoke(incydr, ["users", "bulk-update-roles", str(p), "--remove"])
     httpserver_auth.check()
     assert result.exit_code == 0
 
@@ -755,5 +995,20 @@ def test_cli_bulk_move_makes_expected_call(
         f"user,org_guid\ntest-user-id,42\nfoo@bar.com,{TEST_ORG_GUID}\ntest-user-id-1,44"
     )
     result = runner.invoke(incydr, ["users", "bulk-move", str(p)])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+@pytest.mark.parametrize("role", ["test-role", "Test Role"])
+def test_cli_roles_show_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_get_role, role, mock_list_roles
+):
+    result = runner.invoke(incydr, ["users", "roles", "show", role])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_roles_list_makes_expected_call(httpserver_auth, runner, mock_list_roles):
+    result = runner.invoke(incydr, ["users", "roles", "list"])
     httpserver_auth.check()
     assert result.exit_code == 0
