@@ -133,7 +133,7 @@ class TrustedActivitiesV2:
         * **description**: `str` - Optional description of the trusted activity.
         * **file_upload**: `bool` - Whether to trust activity if the tab URL or tab title includes this domain.
         * **cloud_sync_services**: `List[CloudSyncApps]` - Activity is trusted if the username signed in to the
-        sync app is one of the listed domains.  Supported cloud storage apps for file syncing are
+            sync app is on this domain.  Supported cloud storage apps for file syncing are
             `BOX`, `GOOGLE_DRIVE`, `ICLOUD` and/or `ONE_DRIVE`.
         * **cloud_share_services**: `List[CloudShareApps]` - Activity is trusted if the user it's shared with is on this domain.
             Supported cloud storage services for file sharing are `BOX`, `GOOGLE_DRIVE` and/or `ONE_DRIVE`. You must
@@ -141,7 +141,6 @@ class TrustedActivitiesV2:
         * **email_share_services**: `List[EmailServices]` - Activity is trusted if the email recipient is on this domain.
             Supported email services are `GMAIL` and/or `MICROSOFT_365`.  You must have an email connector configured
             for your tenant to support this trusted action.
-        If list is empty, all supported cloud sync domains are trusted.
         * **git_push**: `bool` - Whether to trust Git push events to this domain.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
@@ -178,7 +177,7 @@ class TrustedActivitiesV2:
         ]
         for element in services:
             service, enum, activity_type = element
-            if service is None:
+            if not service:
                 continue
             providers = []
             for provider in service:
@@ -188,7 +187,7 @@ class TrustedActivitiesV2:
             )
 
         if len(activity_actions) < 1:
-            raise ValueError("At least 1 action for the domain must be trusted.")
+            raise MissingActivityActionGroupsError()
 
         data = CreateTrustedActivityRequest(
             type=ActivityType.DOMAIN,
@@ -214,7 +213,7 @@ class TrustedActivitiesV2:
 
         **Parameters:**
 
-        * **url**: `str` (required) - URL path to trust.
+        * **url**: `str` (required) - URL path to trust (ex: `example.com/path`).
         * **description**: `str` - Optional description of the trusted activity.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
@@ -328,7 +327,7 @@ class TrustedActivitiesV2:
 
         **Parameters:**
 
-        * **git_uri**: `str` (required) - Git URI to trust.
+        * **git_uri**: `str` (required) - Git URI to trust (ex: `bitbucket.org:exampleent/myrepo`).
         * **description**: `str` - Optional description of the trusted activity.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
@@ -395,7 +394,7 @@ class TrustedActivitiesV2:
         data = UpdateTrustedActivity(**trusted_activity.dict())
         response = self._parent.session.patch(
             f"/v2/trusted-activities/{trusted_activity.activity_id}",
-            json=data.dict(by_alias=True),
+            json=data.dict(),
         )
         return TrustedActivity.parse_response(response)
 
@@ -410,3 +409,10 @@ class TrustedActivitiesClient:
         if self._v2 is None:
             self._v2 = TrustedActivitiesV2(self._parent)
         return self._v2
+
+
+class MissingActivityActionGroupsError(Exception):
+    """An error raised when a trusted activity is missing trusted action groups."""
+
+    def __init__(self):
+        super().__init__("At least 1 action for the domain must be trusted.")
