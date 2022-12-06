@@ -69,9 +69,10 @@ def list_(ctx: Context, format_: TableFormat = None, columns: str = None):
 
 
 @alert_rules.command(cls=IncydrCommand)
+@single_format_option
 @click.argument("rule-id")
 @click.pass_context
-def show(ctx: Context, rule_id: str):
+def show(ctx: Context, rule_id: str, format_: SingleFormat = None):
     """
     Show details for a single rule.
 
@@ -80,7 +81,10 @@ def show(ctx: Context, rule_id: str):
     client = ctx.obj()
     rule = client.alert_rules.v2.get_rule(rule_id)
 
-    if not client.settings.use_rich:
+    if format_ == SingleFormat.json:
+        console.print_json(rule.json())
+        return
+    if format_ == SingleFormat.raw_json:
         click.echo(rule.json())
         return
 
@@ -94,12 +98,13 @@ def show(ctx: Context, rule_id: str):
         usernames = []
         for user in username_filter.users:
             usernames.extend(user.aliases)
-        tables.append(list_as_panel(usernames[:MAX_USER_DISPLAY_COUNT]))
-        t.add_column(
-            f"{'Include' if username_filter.mode == '0' else 'Exclude'}d Usernames"
-        )
-    except MissingUsernameCriterionError as e:
-        raise e
+        if usernames:
+            tables.append(list_as_panel(usernames[:MAX_USER_DISPLAY_COUNT]))
+            t.add_column(
+                f"{'Include' if username_filter.mode == '0' else 'Exclude'}d Usernames"
+            )
+    except MissingUsernameCriterionError:
+        pass
 
     if rule.notifications:
         tables.append(model_as_card(rule.notifications))
@@ -192,15 +197,16 @@ def list_users(ctx: Context, rule_id: str, format_: SingleFormat = None):
     client = ctx.obj()
     try:
         username_filter = client.alert_rules.v2.get_users(rule_id)
-    except MissingUsernameCriterionError as e:
-        raise e
+    except MissingUsernameCriterionError:
+        console.print(f"No results found for rule {rule_id}")
+        return
 
     usernames = []
     for user in username_filter.users:
         usernames.extend(user.aliases)
 
     if not usernames:
-        click.echo("No results found.")
+        console.print(f"No results found for rule {rule_id}")
         return
 
     if format_ == SingleFormat.rich:
