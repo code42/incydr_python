@@ -8,6 +8,7 @@ from pytest_httpserver import HTTPServer
 from incydr import Client
 from incydr._devices.models import DevicesPage
 from incydr._users.client import RoleNotFoundError
+from incydr._users.client import RoleProcessingError
 from incydr._users.client import UserNotAssignedRoleError
 from incydr._users.models import Role
 from incydr._users.models import UpdateRolesResponse
@@ -520,7 +521,7 @@ def test_add_roles_when_role_not_found_raises_role_not_found_error(
         f"/v1/users/{TEST_USER_ID}/roles", method="GET"
     ).respond_with_json({"roles": [TEST_USER_ROLE_1, TEST_USER_ROLE_2]})
     client = Client()
-    with pytest.raises(RoleNotFoundError) as e:
+    with pytest.raises(RoleProcessingError) as e:
         client.users.v1.add_roles(TEST_USER_ID, test_role)
     assert f"No role matching the following was found: '{test_role}'" in str(e.value)
 
@@ -558,7 +559,7 @@ def test_remove_roles_returns_expected_data(
     assert isinstance(response, UpdateRolesResponse)
 
 
-def test_remove_role_when_user_not_assigned_role_raises_error(
+def test_remove_roles_when_user_not_assigned_role_raises_error(
     httpserver_auth: HTTPServer, mock_list_roles
 ):
     httpserver_auth.expect_request(
@@ -566,7 +567,7 @@ def test_remove_role_when_user_not_assigned_role_raises_error(
     ).respond_with_json({"roles": [TEST_ROLE_2]})
 
     client = Client()
-    with pytest.raises(UserNotAssignedRoleError) as e:
+    with pytest.raises(RoleProcessingError) as e:
         client.users.v1.remove_roles(TEST_USER_ID, "test-role")
     assert (
         "User is not currently assigned the following role: 'test-role'. Role cannot be removed."
@@ -685,10 +686,10 @@ def test_cli_update_roles_makes_expected_call(
     httpserver_auth.expect_request(
         "/v1/users/user-1/roles",
         method="PUT",
-        json={"roleIds": ["desktop-user", "cloud-admin"]},
+        json={"roleIds": ["test-role", "watchlist-manager"]},
     ).respond_with_json(TEST_USER_ROLE_UPDATE)
     result = runner.invoke(
-        incydr, ["users", "update-roles", user, "desktop-user,cloud-admin"]
+        incydr, ["users", "update-roles", user, "test-role,Watchlist Manager"]
     )
     httpserver_auth.check()
     assert result.exit_code == 0
@@ -744,7 +745,26 @@ def test_cli_update_roles_when_role_not_found_raises_role_not_found_error(
         incydr, ["users", "update-roles", TEST_USER_ID, test_role, "--add"]
     )
     assert result.exit_code == 1
-    assert isinstance(result.exception, RoleNotFoundError)
+    assert isinstance(result.exception, RoleProcessingError)
+    assert len(result.exception.errors) == 1
+    assert isinstance(result.exception.errors[0], RoleNotFoundError)
+
+
+def test_cli_remove_roles_when_user_not_assigned_role_raises_user_not_assigned_role_error(
+    httpserver_auth, runner, mock_list_roles
+):
+    # mock get user roles
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/roles", method="GET"
+    ).respond_with_json({"roles": [TEST_ROLE_2]})
+
+    result = runner.invoke(
+        incydr, ["users", "update-roles", TEST_USER_ID, TEST_ROLE_ID, "--remove"]
+    )
+    assert result.exit_code == 1
+    assert isinstance(result.exception, RoleProcessingError)
+    assert len(result.exception.errors) == 1
+    assert isinstance(result.exception.errors[0], UserNotAssignedRoleError)
 
 
 @user_input

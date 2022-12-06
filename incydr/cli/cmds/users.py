@@ -13,6 +13,7 @@ from incydr._core.models import CSVModel
 from incydr._core.models import Model
 from incydr._devices.models import Device
 from incydr._users.client import RoleNotFoundError
+from incydr._users.client import RoleProcessingError
 from incydr._users.client import UserNotAssignedRoleError
 from incydr._users.models import Role
 from incydr._users.models import User
@@ -287,9 +288,9 @@ def show_role(ctx: Context, role, format_: SingleFormat = None):
 
 
 @roles_.command("list", cls=IncydrCommand)
-@single_format_option
+@table_format_option
 @click.pass_context
-def list_roles(ctx: Context, format_: SingleFormat = None):
+def list_roles(ctx: Context, format_: TableFormat = None):
     """
     List all available roles that can be assigned by the current user.
     """
@@ -344,8 +345,10 @@ def bulk_update_roles(ctx: Context, file, update_method=None, format_=None):
             return user
 
     class RoleUpdateCSV(CSVModel):
-        user: str = Field(csv_aliases=["user"])
-        role: str = Field(csv_aliases=["role"])
+        user: str = Field(csv_aliases=["user", "user_id", "username", "id", "userId"])
+        role: str = Field(
+            csv_aliases=["role", "role_id", "role_name", "roleId", "roleName"]
+        )
 
     class RoleUpdateJSON(Model):
         user: str
@@ -376,20 +379,11 @@ def bulk_update_roles(ctx: Context, file, update_method=None, format_=None):
         try:
             user = resolve_username(user)
             update_func(user, roles)
-        except RoleNotFoundError:
+            console.print(f"Successfully updated roles for user {user}.'")
+        except RoleProcessingError as err:
             console.print(
-                f"[red]Error! Could not find a role matching one of the following roles:[/red] {roles}",
+                f"[red]Error! {str(err)} [/red]",
                 highlight=False,
-            )
-        except UserNotAssignedRoleError:
-            console.print(
-                f"[red]User is not currently one of the following roles:[/red] '{roles}'. "
-                f"[red]Role cannot be removed.[/red])",
-                highlight=False,
-            )
-        except HTTPError as err:
-            console.print(
-                f"[red]Error:[/red] {err.response.text} ({err.response.status_code})"
             )
 
 
