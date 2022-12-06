@@ -135,12 +135,14 @@ def list_as_panel(
 
 
 @group()
-def model_as_card(model):
+def model_as_card(model, include=None):
     """
     Renders a pydantic model in 'card' format, where field name/value pairs are presented vertically, and when a field
     is a list of items, it renders it as a separate panel.
     """
-    for name, value in iter_model_formatted(model, flat=True, render="table"):
+    for name, value in iter_model_formatted(
+        model, include=include, flat=True, render="table"
+    ):
         # rendering list fields takes some special handling
         if isinstance(value, list):
             if not len(value):

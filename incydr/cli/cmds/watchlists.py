@@ -122,7 +122,8 @@ def show(ctx: Context, watchlist: str = None):
     watchlist_response = client.watchlists.v1.get(watchlist)
 
     if not client.settings.use_rich:
-        console.print(watchlist_response.json(), highlight=False)
+        click.echo(watchlist_response.json())
+        return
 
     included_users = client.watchlists.v1.list_included_users(watchlist).included_users
     excluded_users = client.watchlists.v1.list_excluded_users(watchlist).excluded_users

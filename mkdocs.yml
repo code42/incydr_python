@@ -59,6 +59,7 @@ nav:
   - CLI:
       - Introduction: 'cli/index.md'
       - Alerts: 'cli/alerts.md'
+      - Alert Rules: 'cli/alert_rules.md'
       - Audit Log: 'cli/audit_log.md'
       - Cases: 'cli/cases.md'
       - Departments: 'cli/departments.md'

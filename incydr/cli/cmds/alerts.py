@@ -138,7 +138,7 @@ def search(
 @click.pass_context
 @single_format_option
 @click.argument("alert-id")
-def show(ctx: Context, alert_id: str, format_: SingleFormat):
+def show(ctx: Context, alert_id: str, format_: SingleFormat = None):
     """
     Show the details of a single alert.
     """
