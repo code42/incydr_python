@@ -149,7 +149,7 @@ def enable(ctx: Context, rule_ids: str):
     """
     client = ctx.obj()
     client.alert_rules.v2.enable_rules([r.strip() for r in rule_ids.split(",")])
-    console.print("Successfully disabled rules.")
+    console.print("Successfully enabled rule(s).")
 
 
 @alert_rules.command(cls=IncydrCommand)
@@ -161,7 +161,7 @@ def disable(ctx: Context, rule_ids: str):
     """
     client = ctx.obj()
     client.alert_rules.v2.disable_rules([r.strip() for r in rule_ids.split(",")])
-    console.print("Successfully disabled rules.")
+    console.print("Successfully disabled rule(s).")
 
 
 @alert_rules.command(cls=IncydrCommand)
