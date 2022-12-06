@@ -25,7 +25,7 @@ input_format_option = click.option(
     "format_",
     type=click.Choice(["csv", "json-lines"]),
     default="csv",
-    help="Specify format of input file.",
+    help="Specify format of input file: 'csv' or 'json-lines'.  Defaults to 'csv'.",
 )
 
 table_format_option = click.option(

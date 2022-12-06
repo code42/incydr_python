@@ -208,24 +208,17 @@ def update_roles(ctx: Context, user, roles, update_method):
 
     Alternatively, use the "--add" flag to assign additional roles to a user's existing roles.
     """
-    if update_method == "add":
-
-        def update_user_roles(user_, roles):
-            client.users.v1.add_roles(user_, roles)
-
-    elif update_method == "remove":
-
-        def update_user_roles(user_, roles):
-            client.users.v1.remove_roles(user_, roles)
-
-    else:
-
-        def update_user_roles(user_, roles):
-            client.users.v1.update_roles(user_, roles)
-
     client = ctx.obj()
+
+    if update_method == "add":
+        update_func = client.users.v1.add_roles
+    elif update_method == "remove":
+        update_func = client.users.v1.remove_roles
+    else:
+        update_func = client.users.v1.update_roles
+
     try:
-        update_user_roles(user, [r.strip() for r in roles.split(",")])
+        update_func(user, [r.strip() for r in roles.split(",")])
     except RoleNotFoundError as e:
         raise e
     except UserNotAssignedRoleError as e:
@@ -322,16 +315,23 @@ def list_roles(ctx: Context, format_: SingleFormat = None):
 @click.pass_context
 def bulk_update_roles(ctx: Context, file, update_method=None, format_=None):
     """
-    Bulk update roles associated with multiple users with a CSV file.
+    Bulk update roles associated with multiple users with a CSV or JSON file.
 
      By default, the provided roles will replace the specified user's existing roles.
      Use the --add flag or the --remove flag to add or remove roles, respectively, from a user's existing roles.
 
-    Takes a single arg `CSV` which specifies the path to the file.
-    Requires the following columns:
+    Takes a single arg FILE which specifies the path to the file.  Use the --format option to specify the format of your input file.  Defaults to csv.
+
+    Requires the following CSV columns or JSON keys:
 
     * `user` - User ID or username of the user whose roles will be updated. Performs an additional lookup if username is passed.
     * `role` - Role ID and/or role name (case-sensitive) to assign to the new user.
+
+    Example:
+
+        The following command will add roles to users as specified in a JSON-lines formatted file:
+
+            incydr users bulk-update-roles path/to/file.json --add --format json-lines
     """
 
     @lru_cache()
@@ -358,19 +358,11 @@ def bulk_update_roles(ctx: Context, file, update_method=None, format_=None):
 
     client = ctx.obj()
     if update_method == "add":
-
-        def update_user_roles(user_, roles):
-            client.users.v1.add_roles(user_, roles)
-
+        update_func = client.users.v1.add_roles
     elif update_method == "remove":
-
-        def update_user_roles(user_, roles):
-            client.users.v1.remove_roles(user_, roles)
-
+        update_func = client.users.v1.remove_roles
     else:
-
-        def update_user_roles(user_, roles):
-            client.users.v1.update_roles(user_, roles)
+        update_func = client.users.v1.update_roles
 
     # group updates by user
     buckets = bucketize(
@@ -383,7 +375,7 @@ def bulk_update_roles(ctx: Context, file, update_method=None, format_=None):
         roles = buckets[bucket]
         try:
             user = resolve_username(user)
-            update_user_roles(user, roles)
+            update_func(user, roles)
         except RoleNotFoundError:
             console.print(
                 f"[red]Error! Could not find a role matching one of the following roles:[/red] {roles}",
