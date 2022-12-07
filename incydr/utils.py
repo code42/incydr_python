@@ -130,6 +130,8 @@ def list_as_panel(
         ╰───────────╯
     """
     if sep:
+        # zip has an added `strict=False` kwarg as of python 3.10
+        # flake8's B905 error will call this out, suppressed for now for backwards compatibility with <3.10
         items = list(chain(*zip(items, repeat(sep))))[:-1]
     return Panel(Group(*items), title=title, expand=expand, box=box)
 
