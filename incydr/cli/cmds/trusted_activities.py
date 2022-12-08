@@ -91,6 +91,7 @@ def list_(
 @click.option("--type", "type_", default=None)
 @click.option("--value", default=None)
 @click.option("--description", default=None)
+@click.option("--high-value-source", type=bool, default=None)
 @single_format_option
 @click.pass_context
 def update(
@@ -99,22 +100,29 @@ def update(
     type_: str = None,
     value: str = None,
     description: str = None,
+    high_value_source: bool = None,
     format_: SingleFormat = None,
 ):
     """
     Update a trusted activity.
     """
-    if not any([type_, value, description]):
+    if not any([type_, value, description, (high_value_source is not None)]):
         raise click.UsageError(
             "At least one command option must be provided to update a trusted activity.  Use `trusted-activities update --help` to see available options."
         )
     # left off updating activity-action-groups for now, they're very complex
-    request = TrustedActivity(
-        activity_id=activity_id, type=type_, value=value, description=description
-    )
     client = ctx.obj()
-    activity = client.trusted_activities.v2.update(request)
-    _output_trusted_activity(activity, format_, client.settings.use_rich)
+    trusted_activity = client.trusted_activities.v2.get_trusted_activity(activity_id)
+    if type_:
+        trusted_activity.type = type_
+    if value:
+        trusted_activity.value = value
+    if description:
+        trusted_activity.description = description
+    if high_value_source is not None:
+        trusted_activity.is_high_value_source = high_value_source
+    updated_activity = client.trusted_activities.v2.update(trusted_activity)
+    _output_trusted_activity(updated_activity, format_, client.settings.use_rich)
 
 
 @trusted_activities.command(cls=IncydrCommand)

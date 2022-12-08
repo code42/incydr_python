@@ -77,6 +77,11 @@ class TrustedActivity(ResponseModel, validate_assignment=True):
         alias="activityId",
         allow_mutation=False,
     )
+    is_high_value_source: Optional[bool] = Field(
+        None,
+        description="If the trusted activity represents a high value source",
+        alias="isHighValueSource",
+    )
     description: Optional[str] = Field(
         None, description="A description of the trusted activity."
     )
@@ -118,6 +123,11 @@ class UpdateTrustedActivity(Model, extra=Extra.ignore):
     )
     description: Optional[str] = Field(
         None, description="The description of the trusted activity."
+    )
+    is_high_value_source: Optional[bool] = Field(
+        None,
+        description="Whether the trusted activity represents a high value source",
+        alias="isHighValueSource",
     )
     type: Optional[ActivityType] = Field(
         None,
