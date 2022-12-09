@@ -392,7 +392,6 @@ def download(
 @cases.group(cls=IncydrGroup)
 def file_events():
     """View and update file events associated with a case."""
-    pass
 
 
 @file_events.command("show", cls=IncydrCommand)

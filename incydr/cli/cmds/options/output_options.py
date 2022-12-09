@@ -19,6 +19,15 @@ class SingleFormat(str, Enum):
     raw_json = "raw-json"
 
 
+input_format_option = click.option(
+    "--format",
+    "-f",
+    "format_",
+    type=click.Choice(["csv", "json-lines"]),
+    default="csv",
+    help="Specify format of input file: 'csv' or 'json-lines'.  Defaults to 'csv'.",
+)
+
 table_format_option = click.option(
     "--format",
     "-f",

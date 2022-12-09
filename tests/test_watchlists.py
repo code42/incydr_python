@@ -657,8 +657,6 @@ def test_cli_show_makes_expected_call(
     ).respond_with_json(TEST_WATCHLIST_1)
 
     result = runner.invoke(incydr, ["watchlists", "show", watchlist_input])
-    print(result)
-    print(result.output)
     httpserver_auth.check()
     assert result.exit_code == 0
 
