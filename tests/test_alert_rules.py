@@ -506,7 +506,7 @@ def test_cli_list_users_makes_expected_call(
     assert result.exit_code == 0
 
 
-def test_cli_list_users_when_400_raises_missing_username_criterion_error(
+def test_cli_list_users_when_400_raises_returns_no_results_found_message(
     httpserver_auth: HTTPServer, runner
 ):
     httpserver_auth.expect_request(
@@ -515,5 +515,5 @@ def test_cli_list_users_when_400_raises_missing_username_criterion_error(
     ).respond_with_data(status=400)
 
     result = runner.invoke(incydr, ["alert-rules", "list-users", TEST_RULE_ID])
-    assert result.exit_code == 1
-    assert isinstance(result.exception, MissingUsernameCriterionError)
+    assert result.exit_code == 0
+    assert f"No results found for rule {TEST_RULE_ID}" in result.output

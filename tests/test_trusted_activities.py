@@ -24,6 +24,7 @@ TEST_TRUSTED_ACTIVITY_1 = {
         }
     ],
     "activityId": TEST_ACTIVITY_ID,
+    "isHighValueSource": False,
     "description": None,
     "principalType": None,
     "type": "DOMAIN",
@@ -43,6 +44,7 @@ TEST_TRUSTED_ACTIVITY_2 = {
         }
     ],
     "activityId": "1324",
+    "isHighValueSource": True,
     "description": "This is a description",
     "principalType": "API_KEY",
     "type": "SLACK",
@@ -407,11 +409,13 @@ def test_update_returns_expected_data(httpserver_auth):
     test_activity = TEST_TRUSTED_ACTIVITY_1.copy()
     test_activity["value"] = "MyMail.com"
     test_activity["description"] = "my new trusted activity."
+    test_activity["isHighValueSource"] = True
     activity = TrustedActivity.parse_obj(test_activity)
 
     data = {
         "activityActionGroups": test_activity["activityActionGroups"],
         "description": "my new trusted activity.",
+        "isHighValueSource": True,
         "type": "DOMAIN",
         "value": "MyMail.com",
     }
@@ -441,15 +445,19 @@ def test_cli_list_makes_expected_call(httpserver_auth, runner, mock_get_all):
     assert result.exit_code == 0
 
 
-def test_cli_update_when_all_options_makes_expected_call(httpserver_auth, runner):
+def test_cli_update_when_all_options_makes_expected_call(
+    httpserver_auth, runner, mock_get
+):
     test_activity = TEST_TRUSTED_ACTIVITY_1.copy()
     test_activity["value"] = "MyMail.com"
     test_activity["description"] = "my new trusted activity."
+    test_activity["isHighValueSource"] = True
 
     data = {
-        "activityActionGroups": None,
+        "activityActionGroups": TEST_TRUSTED_ACTIVITY_1["activityActionGroups"],
         "description": "my new trusted activity",
-        "type": None,
+        "isHighValueSource": True,
+        "type": TEST_TRUSTED_ACTIVITY_1["type"],
         "value": "MyMail.com",
     }
     httpserver_auth.expect_request(
@@ -466,6 +474,8 @@ def test_cli_update_when_all_options_makes_expected_call(httpserver_auth, runner
             "MyMail.com",
             "--description",
             "my new trusted activity",
+            "--high-value-source",
+            "true",
         ],
     )
     httpserver_auth.check()
