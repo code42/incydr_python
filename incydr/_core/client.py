@@ -21,7 +21,6 @@ from incydr._departments.client import DepartmentsClient
 from incydr._devices.client import DevicesClient
 from incydr._directory_groups.client import DirectoryGroupsClient
 from incydr._file_events.client import FileEventsClient
-from incydr._legal_hold.client import LegalHoldClient
 from incydr._trusted_activities.client import TrustedActivitiesClient
 from incydr._user_risk_profiles.client import UserRiskProfiles
 from incydr._users.client import UsersClient
@@ -95,7 +94,6 @@ class Client:
         self._devices = DevicesClient(self)
         self._directory_groups = DirectoryGroupsClient(self)
         self._file_events = FileEventsClient(self)
-        self._legal_hold = LegalHoldClient(self)
         self._trusted_activities = TrustedActivitiesClient(self)
         self._users = UsersClient(self)
         self._user_risk_profiles = UserRiskProfiles(self)
@@ -250,17 +248,6 @@ class Client:
 
         """
         return self._file_events
-
-    @property
-    def legal_hold(self):
-        """
-        Property returning a [`LegalHoldClient`](../legal_hold) for interacting with `/v*/legal-hold` API endpoints.
-        Usage:
-
-            >>> client.legal_hold.v1.list_policies()
-
-        """
-        return self._legal_hold
 
     @property
     def trusted_activities(self):
