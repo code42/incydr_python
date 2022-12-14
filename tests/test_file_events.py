@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from datetime import timezone
 from typing import List
+from unittest import mock
 
 import pytest
 from pytest_httpserver import HTTPServer
@@ -13,6 +14,8 @@ from incydr._file_events.models.response import SavedSearch
 from incydr._file_events.models.response import SearchFilter
 from incydr._file_events.models.response import SearchFilterGroup
 from incydr._queries.file_events import EventQuery
+from incydr.cli.cmds.options.output_options import TableFormat
+from incydr.cli.cursor import BaseCursorStore
 from incydr.cli.main import incydr
 
 MICROSECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -534,6 +537,108 @@ def test_get_saved_search_returns_expected_data(mock_get_saved_search):
 
 
 # ************************************************ CLI ************************************************
+
+format_arg = pytest.mark.parametrize(
+    "format_",
+    [TableFormat.json, TableFormat.raw_json, TableFormat.csv, TableFormat.table],
+)
+
+
+@format_arg
+def test_cli_search_with_checkpointing_stores_new_checkpoint(
+    httpserver_auth, runner, mocker, format_
+):
+    query = (
+        EventQuery(start_date="2022-06-01")
+        .equals("file.category", "DOCUMENT")
+        .greater_than("risk.score", 1)
+    )
+    query.page_size = 10000
+
+    httpserver_auth.expect_ordered_request(
+        "/v2/file-events", method="POST", json=query.dict()
+    ).respond_with_json(
+        {
+            "fileEvents": [TEST_EVENT_1],
+            "nextPgToken": None,
+            "problems": None,
+            "totalCount": 1,
+        }
+    )
+
+    mock_cursor = mocker.MagicMock(spec=BaseCursorStore)
+    mock_cursor.get.return_value = None
+    with mock.patch(
+        "incydr.cli.cmds.file_events._get_cursor_store", return_value=mock_cursor
+    ) as mock_get_store, mock.patch.object(mock_cursor, "replace") as mock_replace:
+        result = runner.invoke(
+            incydr,
+            [
+                "file-events",
+                "search",
+                "--start",
+                "2022-06-01",
+                "--file-category",
+                "DOCUMENT",
+                "--checkpoint",
+                "test-chkpt",
+                "-f",
+                format_,
+            ],
+        )
+    httpserver_auth.check()
+    mock_get_store.assert_called()
+    query.pgToken = TEST_EVENT_1["event"]["id"]
+    mock_replace.assert_called_once_with("test-chkpt", json.dumps(query.dict()))
+    assert result.exit_code == 0
+
+
+@format_arg
+def test_cli_search_with_checkpointing_ignores_params_and_uses_existing_checkpoint(
+    httpserver_auth, runner, mocker, format_
+):
+    query = (
+        EventQuery(start_date="2022-06-01")
+        .equals("file.category", "DOCUMENT")
+        .greater_than("risk.score", 1)
+    )
+    query.pgToken = TEST_EVENT_1["event"]["id"]
+
+    httpserver_auth.expect_ordered_request(
+        "/v2/file-events", method="POST", json=query.dict()
+    ).respond_with_json(
+        {
+            "fileEvents": [TEST_EVENT_1],
+            "nextPgToken": None,
+            "problems": None,
+            "totalCount": 1,
+        }
+    )
+
+    mock_cursor = mocker.MagicMock(spec=BaseCursorStore)
+    mock_cursor.get.return_value = json.dumps(query.dict())
+    with mock.patch(
+        "incydr.cli.cmds.file_events._get_cursor_store", return_value=mock_cursor
+    ) as mock_get_store:
+        result = runner.invoke(
+            incydr,
+            [
+                "file-events",
+                "search",
+                "--start",
+                "2020-08-10",
+                "--risk-score",
+                "10",
+                "--checkpoint",
+                "test-chkpt",
+                "-f",
+                format_,
+            ],
+        )
+
+    httpserver_auth.check()
+    mock_get_store.assert_called()
+    assert result.exit_code == 0
 
 
 def test_cli_search_when_no_start_param_raises_bad_option_usage_exception(

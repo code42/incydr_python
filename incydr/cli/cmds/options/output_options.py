@@ -48,7 +48,8 @@ single_format_option = click.option(
 columns_option = click.option(
     "--columns",
     default=None,
-    help="Comma-delimited string of column names. Limits output to only specified fields",
+    help="Comma-delimited string of column names. Nested values should be specified in dot-notation. "
+    "Limits output to contain only the specified columns in CSV or Table format.  Ignored for JSON output formats.",
     callback=lambda ctx, param, value: value.split(",") if value is not None else None,
 )
 

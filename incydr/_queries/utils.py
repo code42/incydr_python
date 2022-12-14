@@ -8,9 +8,7 @@ DATETIME_STR_FORMAT = "%Y-%m-%d %H:%M:%S"
 DATE_STR_FORMAT = "%Y-%m-%d"
 
 
-def parse_timestamp_to_millisecond_str(
-    timestamp: Union[str, int, float, datetime, date]
-):
+def parse_ts_to_ms_str(timestamp: Union[str, int, float, datetime, date]):
     """
     Parse int/float/str/datetime timestamp to string milliseconds precision.
 
@@ -25,36 +23,28 @@ def parse_timestamp_to_millisecond_str(
     if isinstance(timestamp, (int, float)):
         timestamp = datetime.utcfromtimestamp(timestamp)
     elif isinstance(timestamp, str):
-        timestamp = parse_str_to_datetime(timestamp)
+        timestamp = parse_str_to_dt(timestamp)
     timestamp.replace(tzinfo=timezone.utc)
     # parse datetime to string
     return f"{timestamp.strftime(MICROSECOND_FORMAT)[:-4]}Z"
 
 
-def parse_timestamp_to_posix_timestamp(timestamp: Union[str, datetime]):
+def parse_ts_to_posix_ts(timestamp: Union[str, datetime]):
     """
-    Parse POSIX timestamp from str in DATE or DATETIME format or datetime obj.
+    Parse POSIX timestamp from DATE/DATETIME str or datetime obj.
     """
     date_time = (
-        timestamp
-        if isinstance(timestamp, datetime)
-        else parse_str_to_datetime(timestamp)
+        timestamp if isinstance(timestamp, datetime) else parse_str_to_dt(timestamp)
     )
-    date_time.replace(tzinfo=timezone.utc)
     return date_time.timestamp()
 
 
-def parse_str_to_datetime(timestamp: str):
-    try:
-        return datetime.strptime(timestamp, DATETIME_STR_FORMAT).replace(
-            tzinfo=timezone.utc
-        )
-    except ValueError:
+def parse_str_to_dt(timestamp: str):
+    for fmt in (MICROSECOND_FORMAT, DATETIME_STR_FORMAT, DATE_STR_FORMAT):
         try:
-            return datetime.strptime(timestamp, DATE_STR_FORMAT).replace(
-                tzinfo=timezone.utc
-            )
+            return datetime.strptime(timestamp, fmt).replace(tzinfo=timezone.utc)
         except ValueError:
-            raise ValueError(
-                f"time data '{timestamp}' does not match format {DATETIME_STR_FORMAT} or {DATE_STR_FORMAT}"
-            )
+            pass
+    raise ValueError(
+        f"Time data '{timestamp}' does not match any of the following formats: {DATETIME_STR_FORMAT} | {DATE_STR_FORMAT} | {MICROSECOND_FORMAT}"
+    )

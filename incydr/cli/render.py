@@ -5,10 +5,8 @@ from io import TextIOWrapper
 from itertools import chain
 from typing import Iterable
 from typing import List
-from typing import Set
 from typing import Type
 
-from click import BadOptionUsage
 from pydantic import BaseModel
 from rich.console import Console
 from rich.console import ConsoleRenderable
@@ -77,31 +75,6 @@ def table(
         # expand console and table so no values get truncated due to size of console, since we're using a pager
         console.width = tbl.width = measure_renderable(tbl)
         console.print(tbl, crop=False, soft_wrap=False, overflow="fold")
-
-
-def table_json(results: Iterable, columns: Set[str] = None, title=None):
-    models = iter(results)
-    first = next(models)
-    if columns:
-        try:
-            first = {c: first[c] for c in columns}
-        except KeyError as e:
-            raise BadOptionUsage(
-                e.args[0],
-                f"'{e.args[0]}' is not a valid column name.  Valid column names include: "
-                f"{list(first.keys())}",
-            )
-    header = first.keys()
-    tbl = Table(*header, title=title)
-    for model in chain([first], models):
-        row = []
-        for k, v in model.items():
-            if columns and k not in columns:
-                continue
-            else:
-                row.append(str(v))
-        tbl.add_row(*row)
-    console.print(tbl)
 
 
 def csv(

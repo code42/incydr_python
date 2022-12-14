@@ -78,10 +78,11 @@ python = ["37", "38", "39", "310","311"]
 dependencies = [
   "pytest",
   "pytest-cov",
+  "pytest-mock",
   "pytest-httpserver",
   "pytest-lazy-fixture",
   "click",
-  "chardet"
+  "chardet",
 ]
 [tool.hatch.envs.test.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=incydr"

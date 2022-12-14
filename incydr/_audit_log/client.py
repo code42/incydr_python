@@ -1,4 +1,5 @@
 from datetime import datetime
+from itertools import count
 from pathlib import Path
 from typing import List
 from typing import Union
@@ -9,7 +10,7 @@ from incydr._audit_log.models import QueryAuditLogRequest
 from incydr._audit_log.models import QueryExportRequest
 from incydr._audit_log.models import UserTypes
 from incydr._core.utils import get_filename_from_content_disposition
-from incydr._queries.utils import parse_timestamp_to_posix_timestamp
+from incydr._queries.utils import parse_ts_to_posix_ts
 
 
 class AuditLogClient:
@@ -91,6 +92,43 @@ class AuditLogV1:
         )
 
         return AuditEventsPage.parse_response(response)
+
+    def iter_all(
+        self,
+        page_size: int = None,
+        actor_ids: Union[List[str], str] = None,
+        actor_ip_addresses: Union[List[str], str] = None,
+        actor_names: Union[List[str], str] = None,
+        start_time: Union[str, datetime] = None,
+        end_time: Union[str, datetime] = None,
+        event_types: Union[List[str], str] = None,
+        resource_ids: Union[List[str], str] = None,
+        user_types: Union[List[UserTypes], UserTypes] = None,
+    ):
+        """
+        Iterate over all audit log events.
+
+        Accepts the same parameters as `.get_page()` except `page_num`.
+
+        **Returns**: A generator yielding individual `dict` objects representing audit log events.
+        """
+        page_size = page_size or self._parent.settings.page_size
+        for page_num in count(1):
+            page = self.get_page(
+                page_num=page_num,
+                page_size=page_size,
+                actor_ids=actor_ids,
+                actor_ip_addresses=actor_ip_addresses,
+                actor_names=actor_names,
+                start_time=start_time,
+                end_time=end_time,
+                event_types=event_types,
+                resource_ids=resource_ids,
+                user_types=user_types,
+            )
+            yield from page.events
+            if len(page.events) < page_size:
+                break
 
     def get_event_count(
         self,
@@ -178,9 +216,9 @@ class AuditLogV1:
 
         date_range = DateRange()
         if start_time:
-            date_range.startTime = parse_timestamp_to_posix_timestamp(start_time)
+            date_range.startTime = parse_ts_to_posix_ts(start_time)
         if end_time:
-            date_range.endTime = parse_timestamp_to_posix_timestamp(end_time)
+            date_range.endTime = parse_ts_to_posix_ts(end_time)
 
         data = QueryExportRequest(
             actorIds=[actor_ids] if isinstance(actor_ids, str) else actor_ids,
@@ -232,9 +270,9 @@ def _build_query_request(
 ):
     date_range = DateRange()
     if start_time:
-        date_range.startTime = parse_timestamp_to_posix_timestamp(start_time)
+        date_range.startTime = parse_ts_to_posix_ts(start_time)
     if end_time:
-        date_range.endTime = parse_timestamp_to_posix_timestamp(end_time)
+        date_range.endTime = parse_ts_to_posix_ts(end_time)
 
     request = QueryAuditLogRequest(
         actorIds=[actor_ids] if isinstance(actor_ids, str) else actor_ids,

@@ -12,7 +12,7 @@ from pydantic import root_validator
 from pydantic import StrictBool
 
 from incydr._core.models import Model
-from incydr._queries.utils import parse_timestamp_to_millisecond_str
+from incydr._queries.utils import parse_ts_to_ms_str
 from incydr.enums.alerts import AlertSeverity
 from incydr.enums.alerts import AlertState
 from incydr.enums.alerts import AlertTerm
@@ -249,7 +249,7 @@ def _create_date_range_filter_group(start_date, end_date, on):
             Filter(
                 term=AlertTerm.CREATED_AT,
                 operator=Operator.ON,
-                value=parse_timestamp_to_millisecond_str(on),
+                value=parse_ts_to_ms_str(on),
             )
         )
         return FilterGroup(filters=filters)
@@ -258,7 +258,7 @@ def _create_date_range_filter_group(start_date, end_date, on):
             Filter(
                 term=AlertTerm.CREATED_AT,
                 operator=Operator.ON_OR_AFTER,
-                value=parse_timestamp_to_millisecond_str(start_date),
+                value=parse_ts_to_ms_str(start_date),
             )
         )
 
@@ -267,7 +267,7 @@ def _create_date_range_filter_group(start_date, end_date, on):
             Filter(
                 term=AlertTerm.CREATED_AT,
                 operator=Operator.ON_OR_BEFORE,
-                value=parse_timestamp_to_millisecond_str(end_date),
+                value=parse_ts_to_ms_str(end_date),
             )
         )
     return FilterGroup(filters=filters)

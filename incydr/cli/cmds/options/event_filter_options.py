@@ -99,7 +99,7 @@ saved_search_option = click.option(
     help="Get events from a saved search with the given ID.  WARNING: Using a saved search is incompatible with other query-building arguments.  Any additional filter options will be ignored.",
     cls=incompatible_with(["advanced_query"]),
 )
-advanced_query_option = click.option(
+advanced_query_option = click.option(  # TODO: update file input
     "--advanced-query",
     default=None,
     help=(

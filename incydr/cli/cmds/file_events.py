@@ -1,4 +1,5 @@
 import json
+from contextlib import nullcontext
 from typing import Optional
 
 import click
@@ -24,14 +25,17 @@ from incydr.cli.cmds.options.output_options import single_format_option
 from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
-from incydr.cli.cmds.utils import output_format_logger
-from incydr.cli.cmds.utils import output_response_format
-from incydr.cli.cmds.utils import output_single_format
+from incydr.cli.cmds.options.utils import checkpoint_option
+from incydr.cli.cmds.utils import warn_interrupt
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
+from incydr.cli.cursor import BaseCursorStore
+from incydr.cli.cursor import get_user_project_path
+from incydr.cli.logger import get_server_logger
 from incydr.enums.file_events import RiskIndicators
 from incydr.enums.file_events import RiskSeverity
 from incydr.models import FileEventV2
+from incydr.utils import model_as_card
 
 
 def render_search(search_: SavedSearch):
@@ -63,6 +67,7 @@ def file_events(ctx, log_level, log_file):
 
 
 @file_events.command(cls=IncydrCommand)
+@checkpoint_option
 @table_format_option
 @columns_option
 @output_options
@@ -93,17 +98,25 @@ def search(
     risk_indicator: Optional[RiskIndicators],
     risk_severity: Optional[RiskSeverity],
     risk_score: Optional[int],
+    checkpoint_name: Optional[str],
 ):
     """
-    Search file events.
+    Search file events. Various options are provided to filter query results.
 
-    Various options are provided to filter query results.  Use the `--saved-search` and `--advanced-query` options if the available filters don't satisfy your requirements.
+    Use the `--saved-search` and `--advanced-query` options if the available filters don't satisfy your requirements.
 
-    Defaults to returning events with a risk score >= 1.  Add the `--risk-score 0` filter to return all events, including those with no risk associated with them.
+    Defaults to returning events with a risk score >= 1.  Add the `--risk-score 0` filter to return all events,
+    including those with no risk associated with them.
 
     Results will be output to the console by default, use the `--output` option to send data to a server.
+
+    Checkpointing is available through the --checkpoint <checkpoint-name> option and will only return new results
+    on subsequent queries with that same checkpoint.  Checkpointing stores the original query it was run with, so
+    additional filters on subsequent runs will be ignored.
     """
-    # TODO: checkpointing
+    if output:
+        format_ = TableFormat.raw_json
+
     client = ctx.obj()
 
     if saved_search:
@@ -136,45 +149,76 @@ def search(
 
     query.page_size = 10000
 
+    if checkpoint_name:
+        cursor = _get_cursor_store(client.settings.api_client_id)
+        checkpoint = cursor.get(checkpoint_name)
+        if checkpoint:  # if stored checkpoint, overwrite query
+            query = EventQuery.parse_raw(checkpoint)
+
+        def checkpoint_func(event_):
+            # Stored checkpoints are json strings of the original query with the `pageToken` key
+            # updated to contain the ID of the last returned event
+            q = query.copy()
+            q.page_token = event_["event"]["id"]
+            cursor.replace(checkpoint_name, json.dumps(q.dict()))
+
+    else:
+        checkpoint_func = None
+
     # skip pydantic modeling when output will just be json
-    if output or format_ in ("json", "raw-json"):
+    if format_ in ("json", "raw-json"):
 
         def yield_all_events(q: EventQuery):
             while q.page_token is not None:
                 response = client.session.post("/v2/file-events", json=q.dict())
                 response_dict = response.json()
                 q.page_token = response_dict.get("nextPgToken")
-                yield from response_dict["fileEvents"]
+                page = response_dict.get("fileEvents")
+                for event_ in page:
+                    yield event_
+                    if checkpoint_func:
+                        checkpoint_func(event_)
 
     else:
 
         def yield_all_events(q: EventQuery):
             while q.page_token is not None:
-                yield from client.file_events.v2.search(q).file_events
+                page = client.file_events.v2.search(q).file_events
+                for event_ in page:
+                    yield event_
+                    if checkpoint_func:
+                        checkpoint_func(event_.dict())
 
     events = yield_all_events(query)
 
-    if output:
-        output_format_logger(events, output, columns, certs, ignore_cert_validation)
-        return
+    with warn_interrupt() if checkpoint_name else nullcontext():
+        if format_ == TableFormat.csv:
+            render.csv(FileEventV2, events, columns=columns, flat=True)
+        elif format_ == TableFormat.table:
+            render.table(FileEventV2, events, columns=columns, flat=False)
+        else:
+            printed = False
+            for event in events:
+                printed = True
+                if format_ == TableFormat.json:
+                    console.print_json(data=event)
+                elif output:
+                    logger = get_server_logger(output, certs, ignore_cert_validation)
+                    logger.info(json.dumps(event))
+                else:
+                    click.echo(json.dumps(event))
+            if not printed:
+                console.print("No results found.")
 
-    if format_ == TableFormat.csv:
-        render.csv(FileEventV2, events, columns=columns, flat=True)
-    elif format_ == TableFormat.table:
-        render.table(FileEventV2, events, columns=columns, flat=False)
-    else:
-        printed = False
-        if format_ == TableFormat.json:
-            for event in events:
-                printed = True
-                console.print_json(data=event)
-        else:  # raw-json
-            for event in events:
-                printed = True
-                event = json.dumps(event)
-                click.echo(event)
-        if not printed:
-            console.print("No results found.")
+
+@file_events.command()
+@click.argument("checkpoint-name")
+@click.pass_context
+def clear_checkpoint(ctx: Context, checkpoint_name: str):
+    """Remove the saved file events checkpoint from searches made with `--checkpoint` mode."""
+    client = ctx.obj()
+    cursor = _get_cursor_store(client.settings.api_client_id)
+    cursor.delete(checkpoint_name)
 
 
 @file_events.command(cls=IncydrCommand)
@@ -187,7 +231,12 @@ def show_saved_search(ctx: Context, search_id: str, format_: SingleFormat):
     """
     client = ctx.obj()
     saved_search = client.file_events.v2.get_saved_search(search_id)
-    output_single_format(saved_search, render_search, format_, client.settings.use_rich)
+    if format_ == SingleFormat.rich:
+        console.print(Panel.fit(model_as_card(saved_search)))
+    elif format_ == SingleFormat.json:
+        console.print_json(saved_search.json())
+    else:  # raw-json
+        click.echo(saved_search.json())
 
 
 @file_events.command(cls=IncydrCommand)
@@ -203,11 +252,17 @@ def list_saved_searches(
     List saved searches.
     """
     client = ctx.obj()
-    response = client.session.get("/v2/file-events/saved-searches")
-    searches = response.json()["searches"]
-    output_response_format(
-        searches, "Saved Searches", format_, columns, client.settings.use_rich
-    )
+    searches = client.file_events.v2.list_saved_searches()
+    if format_ == TableFormat.table:
+        render.table(SavedSearch, searches, columns=columns, flat=False)
+    elif format_ == TableFormat.csv:
+        render.csv(SavedSearch, searches, columns=columns, flat=True)
+    elif format_ == TableFormat.json:
+        for s in searches:
+            console.print_json(s.json())
+    else:
+        for s in searches:
+            click.echo(s.json())
 
 
 field_option_map = {
@@ -237,6 +292,17 @@ def _create_query(**kwargs):
             else:
                 query = query.equals(field_option_map[k], v)
     return query
+
+
+def _get_cursor_store(api_key):
+    """
+    Get cursor store for file event search checkpoints.
+    """
+    dir_path = get_user_project_path(
+        api_key,
+        "file_event_checkpoints",
+    )
+    return BaseCursorStore(dir_path, "file_events")
 
 
 # Allows us to import individual command groups
