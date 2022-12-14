@@ -4,16 +4,17 @@ from datetime import datetime
 from typing import List
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import Extra
 from pydantic import Field
 
+from incydr._core.models import Model
 from incydr._core.models import ResponseModel
 from incydr.enums.trusted_activities import ActivityType
 from incydr.enums.trusted_activities import Name
 from incydr.enums.trusted_activities import PrincipalType
 
 
-class ProviderObject(BaseModel):
+class ProviderObject(Model):
     name: Optional[Name] = Field(
         None,
         description="The name of a provider for a specified activity action.\n  ### Supported providers for trusted "
@@ -23,11 +24,8 @@ class ProviderObject(BaseModel):
         "`OFFICE_365`\n  - `ACCOUNT_NAME`\n    - `CLOUD_SYNC`\n      - `DROPBOX`\n      - `ONE_DRIVE`\n",
     )
 
-    class Config:
-        use_enum_values = True
 
-
-class ActivityAction(BaseModel):
+class ActivityAction(Model):
     type: Optional[ActivityType] = Field(
         None,
         description="The type of an activity action.\n### Supported trusted activity types for each activity action "
@@ -40,11 +38,8 @@ class ActivityAction(BaseModel):
         description="A list of enabled providers for the specified activity action.",
     )
 
-    class Config:
-        use_enum_values = True
 
-
-class ActivityActionGroup(BaseModel):
+class ActivityActionGroup(Model):
     name: Optional[Name] = Field(
         Name.DEFAULT,
         description="The name of the activity action group. Currently, only `DEFAULT` activity action group is "
@@ -54,11 +49,8 @@ class ActivityActionGroup(BaseModel):
         None, description="The list of activity actions for an activity action group."
     )
 
-    class Config:
-        use_enum_values = True
 
-
-class TrustedActivity(ResponseModel):
+class TrustedActivity(ResponseModel, validate_assignment=True):
     """A model representing an TrustedActivity.
 
     **Fields**:
@@ -84,6 +76,11 @@ class TrustedActivity(ResponseModel):
         description="The unique identifier of the trusted activity.",
         alias="activityId",
         allow_mutation=False,
+    )
+    is_high_value_source: Optional[bool] = Field(
+        None,
+        description="If the trusted activity represents a high value source",
+        alias="isHighValueSource",
     )
     description: Optional[str] = Field(
         None, description="A description of the trusted activity."
@@ -114,11 +111,8 @@ class TrustedActivity(ResponseModel):
     )
     value: Optional[str] = Field(None, description="The value of the trusted activity.")
 
-    class Config:
-        validate_assignment = True
 
-
-class UpdateTrustedActivity(BaseModel):
+class UpdateTrustedActivity(Model, extra=Extra.ignore):
     activity_action_groups: Optional[List[ActivityActionGroup]] = Field(
         None,
         description="The list of activity action groups for the trusted activity. \n- `DOMAIN` - If array is empty, "
@@ -130,6 +124,11 @@ class UpdateTrustedActivity(BaseModel):
     description: Optional[str] = Field(
         None, description="The description of the trusted activity."
     )
+    is_high_value_source: Optional[bool] = Field(
+        None,
+        description="Whether the trusted activity represents a high value source",
+        alias="isHighValueSource",
+    )
     type: Optional[ActivityType] = Field(
         None,
         description="The type of the trusted activity.\n\nNote: The `ACCOUNT_NAME` trusted activity type requires "
@@ -139,9 +138,6 @@ class UpdateTrustedActivity(BaseModel):
         alias="type",
     )
     value: Optional[str] = Field(None, description="The value of the trusted activity.")
-
-    class Config:
-        extra = "ignore"
 
 
 class TrustedActivitiesPage(ResponseModel):
@@ -162,7 +158,7 @@ class TrustedActivitiesPage(ResponseModel):
     )
 
 
-class QueryTrustedActivitiesRequest(BaseModel):
+class QueryTrustedActivitiesRequest(Model):
     page_num: Optional[int]
     page_size: Optional[int]
     activity_type: Optional[str]
@@ -170,11 +166,8 @@ class QueryTrustedActivitiesRequest(BaseModel):
     sort_direction: Optional[str]
 
 
-class CreateTrustedActivityRequest(BaseModel):
+class CreateTrustedActivityRequest(Model):
     type: Optional[str]
     value: Optional[str]
     description: Optional[str]
     activityActionGroups: Optional[List[ActivityActionGroup]]
-
-    class Config:
-        use_enum_values = True

@@ -6,10 +6,12 @@ from urllib.parse import urlencode
 import pytest
 from pytest_httpserver import HTTPServer
 
+from incydr._alert_rules.client import MissingUsernameCriterionError
 from incydr._alert_rules.models.response import RuleDetails
 from incydr._alert_rules.models.response import RuleUser
 from incydr._alert_rules.models.response import RuleUsersList
 from incydr._core.client import Client
+from incydr.cli.main import incydr
 
 TEST_RULE_ID = "test-rule-id"
 
@@ -39,6 +41,7 @@ TEST_RULE_1 = {
             {"isEnabled": True, "type": "EMAIL", "address": "myUsername@company.com"}
         ],
     },
+    "education": None,
     "vectors": {
         "cloudSharing": {
             "observeAll": False,
@@ -137,6 +140,7 @@ TEST_RULE_2 = {
             {"isEnabled": True, "type": "EMAIL", "address": "myUsername@company.com"}
         ],
     },
+    "education": None,
     "vectors": {
         "cloudSharing": {
             "observeAll": False,
@@ -251,9 +255,8 @@ TEST_USER_RISK_PROFILE = {
 }
 
 
-def test_get_page_when_default_params_returns_expected_data(
-    httpserver_auth: HTTPServer,
-):
+@pytest.fixture
+def mock_get_page(httpserver_auth):
     data = [TEST_RULE_1, TEST_RULE_2]
     query = {
         "PageNumber": 0,
@@ -263,6 +266,37 @@ def test_get_page_when_default_params_returns_expected_data(
         uri="/v2/alert-rules", method="GET", query_string=urlencode(query)
     ).respond_with_json(data)
 
+
+@pytest.fixture
+def mock_get(httpserver_auth):
+    httpserver_auth.expect_request(
+        uri=f"/v2/alert-rules/{TEST_RULE_ID}", method="GET"
+    ).respond_with_json(TEST_RULE_1)
+
+
+@pytest.fixture
+def mock_remove_users(httpserver_auth):
+    httpserver_auth.expect_request(
+        uri=f"/v2/alert-rules/{TEST_RULE_ID}/users", method="DELETE"
+    ).respond_with_data()
+
+
+@pytest.fixture
+def mock_get_users(httpserver_auth):
+    data = {
+        "id": TEST_RULE_ID,
+        "users": [TEST_RULE_USER_1, TEST_RULE_USER_2],
+        "mode": "INCLUDE",
+    }
+    httpserver_auth.expect_request(
+        uri=f"/v2/alert-rules/{TEST_RULE_ID}/users",
+        method="GET",
+    ).respond_with_json(data)
+
+
+def test_get_page_when_default_params_returns_expected_data(
+    mock_get_page,
+):
     c = Client()
     response = c.alert_rules.v2.get_page()
     assert isinstance(response, List)
@@ -328,10 +362,7 @@ def test_iter_all_returns_expected_data(
     assert total == 3
 
 
-def test_get_rule_returns_expected_data(httpserver_auth: HTTPServer):
-    httpserver_auth.expect_request(
-        uri=f"/v2/alert-rules/{TEST_RULE_ID}", method="GET"
-    ).respond_with_json(TEST_RULE_1)
+def test_get_rule_returns_expected_data(mock_get):
     c = Client()
     response = c.alert_rules.v2.get_rule(TEST_RULE_ID)
     assert isinstance(response, RuleDetails)
@@ -395,28 +426,12 @@ def test_disable_rules_when_multiple_rule_ids_returns_expected_data(
     )
 
 
-def test_remove_all_users_returns_expected_data(httpserver_auth: HTTPServer):
-    httpserver_auth.expect_request(
-        uri=f"/v2/alert-rules/{TEST_RULE_ID}/users", method="DELETE"
-    ).respond_with_data()
-
+def test_remove_all_users_returns_expected_data(mock_remove_users):
     c = Client()
     assert c.alert_rules.v2.remove_all_users(TEST_RULE_ID).status_code == 200
 
 
-def test_get_users_when_default_params_returns_expected_data(
-    httpserver_auth: HTTPServer,
-):
-    data = {
-        "id": TEST_RULE_ID,
-        "users": [TEST_RULE_USER_1, TEST_RULE_USER_2],
-        "mode": "INCLUDE",
-    }
-    httpserver_auth.expect_request(
-        uri=f"/v2/alert-rules/{TEST_RULE_ID}/users",
-        method="GET",
-    ).respond_with_json(data)
-
+def test_get_users_when_default_params_returns_expected_data(mock_get_users):
     c = Client()
     response = c.alert_rules.v2.get_users(TEST_RULE_ID)
     assert isinstance(response, RuleUsersList)
@@ -426,3 +441,79 @@ def test_get_users_when_default_params_returns_expected_data(
         assert isinstance(user, RuleUser)
     assert response.users[0].json() == json.dumps(TEST_RULE_USER_1)
     assert response.users[1].json() == json.dumps(TEST_RULE_USER_2)
+
+
+def test_get_users_when_400_raises_missing_username_criterion_error(
+    httpserver_auth: HTTPServer,
+):
+    httpserver_auth.expect_request(
+        uri=f"/v2/alert-rules/{TEST_RULE_ID}/users",
+        method="GET",
+    ).respond_with_data(status=400)
+
+    c = Client()
+    with pytest.raises(MissingUsernameCriterionError) as e:
+        c.alert_rules.v2.get_users(TEST_RULE_ID)
+    assert f"Rule '{TEST_RULE_ID}' has no username filter." in str(e.value)
+
+
+# ************************************************ CLI ************************************************
+
+
+def test_cli_list_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_get_page
+):
+    result = runner.invoke(incydr, ["alert-rules", "list"])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_show_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_get, mock_get_users
+):
+    result = runner.invoke(incydr, ["alert-rules", "show", TEST_RULE_ID])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+@pytest.mark.parametrize("command", ["enable", "disable"])
+def test_cli_enable_and_disable_make_expected_call(
+    httpserver_auth: HTTPServer, runner, command
+):
+    httpserver_auth.expect_request(
+        uri=f"/v2/alert-rules/{command}",
+        method="POST",
+        json=["test-1", "test-2"],
+    ).respond_with_data()
+    result = runner.invoke(incydr, ["alert-rules", command, "test-1,test-2"])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_remove_all_users_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_remove_users
+):
+    result = runner.invoke(incydr, ["alert-rules", "remove-all-users", TEST_RULE_ID])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_list_users_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_get_users
+):
+    result = runner.invoke(incydr, ["alert-rules", "list-users", TEST_RULE_ID])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_list_users_when_400_raises_returns_no_results_found_message(
+    httpserver_auth: HTTPServer, runner
+):
+    httpserver_auth.expect_request(
+        uri=f"/v2/alert-rules/{TEST_RULE_ID}/users",
+        method="GET",
+    ).respond_with_data(status=400)
+
+    result = runner.invoke(incydr, ["alert-rules", "list-users", TEST_RULE_ID])
+    assert result.exit_code == 0
+    assert f"No results found for rule {TEST_RULE_ID}" in result.output

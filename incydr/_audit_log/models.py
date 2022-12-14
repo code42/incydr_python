@@ -8,6 +8,7 @@ from typing import Optional
 from pydantic import BaseModel
 from pydantic import Field
 
+from incydr._core.models import Model
 from incydr._core.models import ResponseModel
 
 
@@ -54,7 +55,7 @@ class AuditEventsPage(ResponseModel):
     )
 
 
-class QueryExportRequest(BaseModel):
+class QueryExportRequest(Model):
     actorIds: Optional[List[str]]
     actorIpAddresses: Optional[List[str]]
     actorNames: Optional[List[str]]
@@ -64,7 +65,7 @@ class QueryExportRequest(BaseModel):
     userTypes: Optional[List[UserTypes]]
 
 
-class QueryAuditLogRequest(BaseModel):
+class QueryAuditLogRequest(Model):
     actorIds: Optional[List[str]]
     actorIpAddresses: Optional[List[str]]
     actorNames: Optional[List[str]]

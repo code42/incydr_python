@@ -135,11 +135,6 @@ available model methods.
 ::: incydr.models.SavedSearch
     :docstring:
 
-### `SavedSearchesPage` model
-
-::: incydr.models.SavedSearchesPage
-    :docstring:
-
 ## Roles
 ---
 
@@ -177,6 +172,11 @@ available model methods.
 ### `UsersPage` model
 
 ::: incydr.models.UsersPage
+    :docstring:
+
+### `Role` model
+
+:::incydr.models.Role
     :docstring:
 
 ## User Risk Profiles

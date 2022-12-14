@@ -6,7 +6,9 @@ from typing import Optional
 
 from pydantic import Field
 
+from incydr._core.models import Model
 from incydr._core.models import ResponseModel
+from incydr.enums.alerts import MessagingMethod
 
 
 class RuleUser(ResponseModel):
@@ -54,10 +56,11 @@ class RuleUsersList(ResponseModel):
     mode: Optional[str] = Field(
         None,
         description="Indicates how to filter on the user list. INCLUDE or EXCLUDE.",
+        table=lambda x: "INCLUDE" if x == "0" else "EXCLUDE",
     )
 
 
-class CloudSharingDetails(ResponseModel):
+class CloudSharingDetails(Model):
     observe_all: bool = Field(
         None,
         description="Indicates whether we are watching the cloud sharing connector or not.",
@@ -68,7 +71,7 @@ class CloudSharingDetails(ResponseModel):
     direct_share: bool = Field(None, alias="directShare")
 
 
-class DownloadVector(ResponseModel):
+class DownloadVector(Model):
     observe_all: Optional[bool] = Field(None, alias="observeAll")
     salesforce: Optional[bool] = None
     box: Optional[bool] = None
@@ -77,14 +80,14 @@ class DownloadVector(ResponseModel):
     criteria_order: int = Field(None, alias="criteriaOrder")
 
 
-class EmailVector(ResponseModel):
+class EmailVector(Model):
     observe_all: Optional[bool] = Field(None, alias="observeAll")
     gmail: Optional[bool] = None
     microsoft365: Optional[bool] = None
     criteria_order: int = Field(None, alias="criteriaOrder")
 
 
-class FileUploadCategory(ResponseModel):
+class FileUploadCategory(Model):
     observe_all: bool = Field(
         None,
         description="Indicates whether we are watching all of the destinations in the category.",
@@ -98,11 +101,11 @@ class FileUploadCategory(ResponseModel):
     )
 
 
-class AdvancedSettings(ResponseModel):
+class AdvancedSettings(Model):
     observe_uncategorized: bool = Field(None, alias="observeUncategorized")
 
 
-class RemovableMediaVector(ResponseModel):
+class RemovableMediaVector(Model):
     is_enabled: bool = Field(
         None,
         description="Indicates whether to watch removable media destinations or not.",
@@ -117,7 +120,7 @@ class RemovableMediaVector(ResponseModel):
     )
 
 
-class FileCategoryFilter(ResponseModel):
+class FileCategoryFilter(Model):
     categories: Optional[List[str]] = Field(
         None,
         description="List of file categories to alert on.",
@@ -131,7 +134,7 @@ class FileCategoryFilter(ResponseModel):
     )
 
 
-class FileNameFilter(ResponseModel):
+class FileNameFilter(Model):
     patterns: Optional[List[str]] = Field(
         None,
         description="List of file name patterns to alert on.",
@@ -145,7 +148,7 @@ class FileNameFilter(ResponseModel):
     )
 
 
-class FileTypeMismatchFilter(ResponseModel):
+class FileTypeMismatchFilter(Model):
     is_enabled: bool = Field(
         None,
         description="Indicates whether or not to alert on file type mismatches only.",
@@ -160,13 +163,13 @@ class FileTypeMismatchFilter(ResponseModel):
     )
 
 
-class RiskIndicatorFilter(ResponseModel):
+class RiskIndicatorFilter(Model):
     categories: Optional[List[str]] = None
     indicators: Optional[List[str]] = None
     criteria_order: int = Field(None, alias="criteriaOrder")
 
 
-class RiskSeverityFilter(ResponseModel):
+class RiskSeverityFilter(Model):
     low: bool
     moderate: bool
     high: bool
@@ -174,11 +177,11 @@ class RiskSeverityFilter(ResponseModel):
     criteria_order: int = Field(None, alias="criteriaOrder")
 
 
-class Watchlist(ResponseModel):
+class Watchlist(Model):
     id: Optional[str] = None
 
 
-class NotificationContact(ResponseModel):
+class NotificationContact(Model):
     is_enabled: bool = Field(
         None,
         description="Indicates whether the notifications for this contact are enabled.",
@@ -195,7 +198,7 @@ class NotificationContact(ResponseModel):
     )
 
 
-class CloudSharingVector(ResponseModel):
+class CloudSharingVector(Model):
     observe_all: Optional[bool] = Field(
         None,
         description="Indicates whether to watch all cloud sharing connectors.",
@@ -224,7 +227,7 @@ class CloudSharingVector(ResponseModel):
     )
 
 
-class FileUploadVector(ResponseModel):
+class FileUploadVector(Model):
     cloud_storage: Optional[FileUploadCategory] = Field(
         None,
         description="Configuration for which cloud storage destinations to monitor.",
@@ -279,7 +282,7 @@ class FileUploadVector(ResponseModel):
     )
 
 
-class FileVolumeFilter(ResponseModel):
+class FileVolumeFilter(Model):
     count_greater_than: int = Field(
         None,
         description="File count threshold that must be exceeded to trigger an alert.",
@@ -304,7 +307,7 @@ class FileVolumeFilter(ResponseModel):
     )
 
 
-class UsernameFilter(ResponseModel):
+class UsernameFilter(Model):
     mode: Optional[str] = Field(
         None, description="Indicates how to filter on the user list. INCLUDE or EXCLUDE"
     )
@@ -321,12 +324,12 @@ class UsernameFilter(ResponseModel):
     )
 
 
-class WatchlistFilter(ResponseModel):
+class WatchlistFilter(Model):
     watchlists: Optional[List[Watchlist]] = None
     criteria_order: int = Field(None, alias="criteriaOrder")
 
 
-class NotificationSettings(ResponseModel):
+class NotificationSettings(Model):
     is_enabled: bool = Field(
         None,
         description="Indicates whether notifications are enabled.",
@@ -338,7 +341,7 @@ class NotificationSettings(ResponseModel):
     )
 
 
-class RuleVectors(ResponseModel):
+class RuleVectors(Model):
     cloud_sharing: Optional[CloudSharingVector] = Field(
         None,
         description="Configuration for cloud sharing vectors to monitor.",
@@ -358,7 +361,7 @@ class RuleVectors(ResponseModel):
     )
 
 
-class RuleFilters(ResponseModel):
+class RuleFilters(Model):
     file_category: Optional[FileCategoryFilter] = Field(
         None,
         description="Configuration for what file categories to monitor.",
@@ -387,6 +390,15 @@ class RuleFilters(ResponseModel):
     watchlist: Optional[WatchlistFilter] = None
 
 
+class EducationSettings(Model):
+    lesson_id: Optional[str] = Field(
+        None, description="Instructor lesson ID.", alias="lessonId"
+    )
+    messaging_method: Optional[MessagingMethod] = Field(
+        None, description="Messaging method.", alias="messagingMethod"
+    )
+
+
 class RuleDetails(ResponseModel):
     """
     A model representing the details of an alert rule.
@@ -399,6 +411,7 @@ class RuleDetails(ResponseModel):
     * **is_enabled**: `bool` - Indicates if the rule is currently enabled.
     * **source**: `str` - [Deprecated field] Indicates source of rule creation.
     * **notifications**: `NotificationSettings` - Notification configuration settings for this rule.
+    * **education**: `EducationSettings` - Instructor settings for a rule.
     * **vectors**: `RuleVectors` - The exfiltration vectors to be watched.
     * **filters**: `RuleFilters` - The filters to limit the scope of activity to alert on.
     * **id**: `id` - Unique ID of the rule.
@@ -435,6 +448,9 @@ class RuleDetails(ResponseModel):
     )
     notifications: Optional[NotificationSettings] = Field(
         None, description="Notifications configuration settings for this rule."
+    )
+    education: Optional[EducationSettings] = Field(
+        None, description="Education settings for a rule."
     )
     vectors: Optional[RuleVectors] = Field(
         None, description="The exfiltration vectors to be watched."

@@ -177,21 +177,27 @@ class WatchlistStats(ResponseModel):
         None,
         description="The number of users explicitly excluded from the watchlist.",
         alias="excludedUsersCount",
+        # displays a value of None as 0
+        table=lambda excluded_users_count: excluded_users_count or 0,
     )
     included_departments_count: Optional[int] = Field(
         None,
         description="The number of departments explicitly included on the watchlist.",
         alias="includedDepartmentsCount",
+        table=lambda included_departments_count: included_departments_count or 0,
     )
     included_directory_groups_count: Optional[int] = Field(
         None,
         description="The number of directory groups explicitly included on the watchlist.",
         alias="includedDirectoryGroupsCount",
+        table=lambda included_directory_groups_count: included_directory_groups_count
+        or 0,
     )
     included_users_count: Optional[int] = Field(
         None,
         description="The number of users explicitly included on the watchlist.",
         alias="includedUsersCount",
+        table=lambda included_users_count: included_users_count or 0,
     )
 
 

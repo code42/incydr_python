@@ -1,21 +1,33 @@
 from itertools import count
 from typing import Iterator
 from typing import List
+from typing import Union
 
 from pydantic import parse_obj_as
 from requests import Response
 
 from incydr._devices.models import DevicesPage
 from incydr._devices.models import QueryDevicesRequest
-from incydr._users.models import MoveUserRequest
 from incydr._users.models import QueryUsersRequest
 from incydr._users.models import Role
-from incydr._users.models import UpdateRolesRequest
 from incydr._users.models import UpdateRolesResponse
 from incydr._users.models import User
+from incydr._users.models import UserRole
 from incydr._users.models import UsersPage
 from incydr.enums import SortDirection
 from incydr.enums.devices import SortKeys
+
+
+class UsersClient:
+    def __init__(self, parent):
+        self._parent = parent
+        self._v1 = None
+
+    @property
+    def v1(self):
+        if self._v1 is None:
+            self._v1 = UsersV1(self._parent)
+        return self._v1
 
 
 class UsersV1:
@@ -30,19 +42,28 @@ class UsersV1:
 
     def __init__(self, parent):
         self._parent = parent
+        self._available_roles = {}
 
-    def get_user(self, user_id: str) -> User:
+    def get_user(self, user: str) -> User:
         """
         Get a single user.
 
         **Parameters:**
 
-        * **user_id**: `str` (required) - The unique ID for the user.
+        * **user**: `str` - The unique ID for the user or the username for the user.
 
         **Returns**: A [`User`][user-model] object representing the user.
-
         """
-        response = self._parent.session.get(f"/v1/users/{user_id}")
+
+        # if username, lookup with get page api
+        if "@" in user:
+            users = self.get_page(username=user).users
+            if len(users) < 1:
+                raise ValueError(f"User with username '{user}' not found.")
+            return users[0]
+
+        # if user ID, use GET api
+        response = self._parent.session.get(f"/v1/users/{user}")
         return User.parse_response(response)
 
     def get_page(
@@ -147,10 +168,10 @@ class UsersV1:
             if len(page.users) < page_size:
                 break
 
-    def get_roles(
+    def list_user_roles(
         self,
         user_id: str,
-    ) -> List[Role]:
+    ) -> List[UserRole]:
         """
         Get a list of roles associated with a specific user.
 
@@ -158,25 +179,67 @@ class UsersV1:
 
         * **user_id**: `str` (required) - The unique ID for the user.
 
-        **Returns**: A list of [`Role`][role-model] objects.
+        **Returns**: A list of [`UserRole`][role-model] objects.
         """
         response = self._parent.session.get(f"/v1/users/{user_id}/roles")
-        return parse_obj_as(List[Role], response.json()["roles"])
+        return parse_obj_as(List[UserRole], response.json()["roles"])
 
-    def update_roles(self, user_id: str, role_ids: List[str]) -> UpdateRolesResponse:
+    def update_roles(
+        self, user_id: str, roles: Union[str, List[str]]
+    ) -> UpdateRolesResponse:
         """
-        Update the roles associated with a user.
+        Replace the roles associated with a user.
 
         **Parameters**:
 
         * **user_id**: `str` (required) - The unique ID for the user.
-        * **roles_ids**: `List[str]` The new role IDs to assign the user (ex: desktop-user). These will replace the existing roles assigned to the user."
+        * **roles**: `str | List[str]` The new roles to assign the user (ex: desktop-user). These will replace the existing roles assigned to the user. Accepts either role IDs or role names."
 
         **Returns**: A [`UpdateRolesResponse`][updaterolesresponse-model] object.
         """
-        data = UpdateRolesRequest(roleIds=role_ids)
+        if not isinstance(roles, List):
+            roles = [roles]
+
+        roles = [self._get_id_by_name(role) for role in roles]
+
         response = self._parent.session.put(
-            f"/v1/users/{user_id}/roles", json=data.dict()
+            f"/v1/users/{user_id}/roles", json={"roleIds": roles}
+        )
+        return UpdateRolesResponse.parse_response(response)
+
+    def add_roles(
+        self, user_id: str, roles: Union[str, List[str]]
+    ) -> UpdateRolesResponse:
+        """
+        Add a role, or multiple roles, to a user's existing roles.
+
+        **Parameters**:
+
+        * **user_id**: `str` (required) - The unique ID for the user.
+        * **roles**: `str | List[str]` The roles to add to the user. Accepts either role IDs or role names (case-sensitive)."
+
+        **Returns**: A [`UpdateRolesResponse`][updaterolesresponse-model] object.
+        """
+        roles = self._update_role_ids_for_user(roles, user_id, add=True)
+        response = self._parent.session.put(
+            f"/v1/users/{user_id}/roles", json={"roleIds": roles}
+        )
+        return UpdateRolesResponse.parse_response(response)
+
+    def remove_roles(
+        self, user_id: str, roles: Union[str, List[str]]
+    ) -> UpdateRolesResponse:
+        """
+        Remove a role, or multiple roles, from a user's current roles.
+
+        **Parameters**:
+
+        * **user_id**: `str` (required) - The unique ID for the user.
+        * **roles**: `str | List[str]` The roles to remove from the user. Accepts either role IDs or role names."
+        """
+        roles = self._update_role_ids_for_user(roles, user_id, add=False)
+        response = self._parent.session.put(
+            f"/v1/users/{user_id}/roles", json={"roleIds": roles}
         )
         return UpdateRolesResponse.parse_response(response)
 
@@ -191,9 +254,9 @@ class UsersV1:
 
         **Returns**: A `requests.Response` indicating success.
         """
-        data = MoveUserRequest(orgGuid=org_guid)
-
-        return self._parent.session.post(f"/v1/users/{user_id}/move", json=data.dict())
+        return self._parent.session.post(
+            f"/v1/users/{user_id}/move", json={"orgGuid": org_guid}
+        )
 
     def activate(self, user_id: str) -> Response:
         """
@@ -221,14 +284,132 @@ class UsersV1:
         """
         return self._parent.session.post(f"/v1/users/{user_id}/deactivate")
 
+    def list_roles(self) -> List[Role]:
+        """
+        Get a list of all available roles that can be assigned by the current user.
 
-class UsersClient:
-    def __init__(self, parent):
-        self._parent = parent
-        self._v1 = None
+        **Parameters**:
+
+        **Returns**: A list of [`UserRole`][role-model] objects.
+        """
+        response = self._parent.session.get("/v1/users/roles")
+        return parse_obj_as(List[Role], response.json())
+
+    def get_role(self, role: str) -> Role:
+        """
+        Get details for a single role.
+
+        **Parameters**:
+
+        * **role**: `str` (required) - Role ID or role name (case-sensitive).
+        """
+        response = self._parent.session.get(
+            f"/v1/users/roles/{self._get_id_by_name(role)}"
+        )
+        return Role.parse_response(response)
+
+    def _get_id_by_name(self, role_name: str):
+        """
+        Get a role ID by its name.
+
+        Returns the role ID unchanged if it doesn't match any names of available roles.
+        """
+        if not self._available_roles:
+            self._lookup_roles()
+        for name, id_ in self._available_roles.items():
+            if (role_name == name) or (role_name == id_):
+                return id_
+        raise RoleNotFoundError(role_name)
+
+    def _update_role_ids_for_user(self, roles, user_id, add=True):
+        """
+        Adds or removes a role ID specified by `role` to the list of user's role IDs,
+        which can be passed to the update roles method.
+
+        Where `role_name` is either a role name or a role ID.
+
+        Returns the updated list of role IDs for a user.
+        """
+        errors = []
+
+        role_ids = [i.role_id for i in self.list_user_roles(user_id)]
+
+        if not self._available_roles:
+            self._lookup_roles()
+
+        if not isinstance(roles, List):
+            roles = [roles]
+
+        for role in roles:
+            try:
+                id_ = self._get_id_by_name(role)
+            except RoleNotFoundError as err:
+                errors.append(err)
+                continue
+            if add:
+                role_ids.append(id_)
+            else:
+                try:
+                    role_ids.remove(id_)
+                except ValueError:
+                    errors.append(UserNotAssignedRoleError(id_))
+
+        if errors:
+            raise RoleProcessingError(errors)
+
+        return role_ids
+
+    def _lookup_roles(self):
+        """Map role names to role ID."""
+        self._available_roles = {}
+        available_roles = self.list_roles()
+        for r in available_roles:
+            self._available_roles[r.role_name] = r.role_id
+
+
+class RoleProcessingError(Exception):
+    """
+    Outputs list of errors that arose during processing.
+
+    Example output:
+        incydr._users.client.RoleProcessingError: The following errors arose during role processing:
+            * User is not currently assigned the following role: 'alert-emails'. Role cannot be removed.
+            * No role matching the following was found: 'fake', or you do not have permission to assign this role.
+    """
+
+    def __init__(self, errors):
+        message = (
+            "The following errors arose during role processing:\n\t* "
+            + "\n\t* ".join([str(e) for e in errors])
+        )
+        super().__init__(message)
+        self._errors = errors
 
     @property
-    def v1(self):
-        if self._v1 is None:
-            self._v1 = UsersV1(self._parent)
-        return self._v1
+    def errors(self):
+        """List of errors that arose during role processing."""
+        return self._errors
+
+
+class UserNotAssignedRoleError(Exception):
+    def __init__(self, role):
+        message = f"User is not currently assigned the following role: '{role}'. Role cannot be removed."
+        super().__init__(message)
+        self._role = role
+
+    @property
+    def role(self):
+        """The role which cannot be assigned."""
+        return self._role
+
+
+class RoleNotFoundError(Exception):
+    def __init__(self, role):
+        message = f"No role matching the following was found: '{role}', or you do not have permission to assign this role. Roles can be specified by case-sensitive name (ie. 'Cloud Admin') or ID (ie. cloud-admin)."
+        super().__init__(message)
+        self._role = role
+
+    @property
+    def role(self):
+        """The role which could not be found"""
+        return self._role

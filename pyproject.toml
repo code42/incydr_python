@@ -23,6 +23,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
+  "boltons",
   "requests",
   "requests-toolbelt",
   "rich",
@@ -31,10 +32,16 @@ dependencies = [
 ]
 dynamic = ["version"]
 
+[project.optional-dependencies]
+cli = ["click", "chardet"]
+
 [project.urls]
 Documentation = "https://github.com/code42/incydr_python#readme"
 Issues = "https://github.com/code42/incydr_python/issues"
 Source = "https://github.com/code42/incydr_python/incydr"
+
+[project.scripts]
+incydr = "incydr.cli.main:incydr"
 
 [tool.hatch.version]
 path = "incydr/__about__.py"
@@ -52,9 +59,11 @@ check-no-diff = "pre-commit run --all-files"
 
 [tool.hatch.envs.docs]
 dependencies = [
+  "chardet",
   "mkdocs-autorefs",
   "mkdocs-material",
   "mkautodoc",
+  "mkdocs-click",
 ]
 [tool.hatch.envs.docs.scripts]
 build = "mkdocs build"
@@ -62,17 +71,17 @@ serve = "mkdocs serve"
 publish = "mkdocs gh-deploy --force"
 svg = "python docs/example_logging.py"
 
-[tool.hatch.envs.default]
-dependencies = []
-[tool.hatch.envs.default.scripts]
 
 [[tool.hatch.envs.test.matrix]]
-python = ["37", "38", "39", "310"]
+python = ["37", "38", "39", "310","311"]
 [tool.hatch.envs.test]
 dependencies = [
   "pytest",
   "pytest-cov",
   "pytest-httpserver",
+  "pytest-lazy-fixture",
+  "click",
+  "chardet"
 ]
 [tool.hatch.envs.test.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=incydr"

@@ -14,6 +14,7 @@ class SortKeys(_Enum):
 class CaseStatus(_Enum):
     CLOSED = "CLOSED"
     OPEN = "OPEN"
+    ARCHIVED = "ARCHIVED"
 
 
 class FileAvailability(_Enum):

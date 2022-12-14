@@ -9,6 +9,7 @@ from incydr._audit_log.models import QueryAuditLogRequest
 from incydr._audit_log.models import QueryExportRequest
 from incydr._audit_log.models import UserTypes
 from incydr._core.utils import get_filename_from_content_disposition
+from incydr._queries.utils import parse_timestamp_to_posix_timestamp
 
 
 class AuditLogClient:
@@ -44,8 +45,8 @@ class AuditLogV1:
         actor_ids: Union[List[str], str] = None,
         actor_ip_addresses: Union[List[str], str] = None,
         actor_names: Union[List[str], str] = None,
-        start_time: datetime = None,
-        end_time: datetime = None,
+        start_time: Union[str, datetime] = None,
+        end_time: Union[str, datetime] = None,
         event_types: Union[List[str], str] = None,
         resource_ids: Union[List[str], str] = None,
         user_types: Union[List[UserTypes], UserTypes] = None,
@@ -58,13 +59,13 @@ class AuditLogV1:
         * **page_num**: `int` - page_num number for results, starting at 1.
         * **page_size**: `int` - Max number of results to return per page. Defaults to client's `page_size` setting.
             Maximum page size is 10,000.
-        * **actor_ids**: `List[str]`, `str` - Finds events whose actor_id is one of the given ids.
-        * **actor_ip_addresses**: `List[str]`, `str` - Finds events whose actor_ip_address is one of the given IP addresses.
-        * **actor_names**: `List[str]`, `str` - Finds events whose actor_name is one of the given names.
-        * **start_time**: `datetime` - Search for events within a date range.  Start time for this date range.
-        * **end_time**: `datetime` - Search for events within a date range.  End time for this date range.
-        * **event_types**: `List[str]`, `str` - Finds events whose type is one of the given types.
-        * **resource_ids**: `List[str]`, `str` - Filters searchable events that match resource_id.
+        * **actor_ids**: `List[str] | str` - Finds events whose actor_id is one of the given ids.
+        * **actor_ip_addresses**: `List[str] | str` - Finds events whose actor_ip_address is one of the given IP addresses.
+        * **actor_names**: `List[str] | str` - Finds events whose actor_name is one of the given names.
+        * **start_time**: `datetime | str` - Search for events within a date range.  Start time for this date range.
+        * **end_time**: `datetime | str` - Search for events within a date range.  End time for this date range.
+        * **event_types**: `List[str] | str` - Finds events whose type is one of the given types.
+        * **resource_ids**: `List[str] | str` - Filters searchable events that match resource_id.
         * **user_types**: `List[UserTypes]` - Filters searchable events that match actor type.
 
         **Returns**: A [`AuditEventsPage`][auditeventspage-model] object representing the search response.
@@ -91,57 +92,6 @@ class AuditLogV1:
 
         return AuditEventsPage.parse_response(response)
 
-    def search_events(
-        self,
-        actor_ids: Union[List[str], str] = None,
-        actor_ip_addresses: Union[List[str], str] = None,
-        actor_names: Union[List[str], str] = None,
-        start_time: datetime = None,
-        end_time: datetime = None,
-        event_types: Union[List[str], str] = None,
-        resource_ids: Union[List[str], str] = None,
-        user_types: Union[List[UserTypes], UserTypes] = None,
-    ) -> AuditEventsPage:
-        """
-        Search audit log entries, specifically for large return sets without paging.
-
-        Returns up to 100,000 events that match the search criteria provided.
-
-        Default: returns most recent 100,000 events.
-
-        **Parameters:**
-
-        * **actor_ids**: `List[str]`, `str` - Finds events whose actor_id is one of the given ids.
-        * **actor_ip_addresses**: `List[str]`, `str` - Finds events whose actor_ip_address is one of the given IP addresses.
-        * **actor_names**: `List[str]`, `str` - Finds events whose actor_name is one of the given names.
-        * **start_time**: `datetime` - Search for events within a date range.  Start time for this date range.
-        * **end_time**: `datetime` - Search for events within a date range.  End time for this date range.
-        * **event_types**: `List[str]`, `str` - Finds events whose type is one of the given types.
-        * **resource_ids**: `List[str]`, `str` - Filters searchable events that match resource_id.
-        * **user_types**: `List[UserTypes]` - Filters searchable events that match actor type.
-
-        **Returns**: A [`AuditEventsPage`][auditeventspage-model] object representing the search response.
-        """
-
-        request = _build_query_request(
-            page_num=0,
-            page_size=0,
-            actor_ids=actor_ids,
-            actor_ip_addresses=actor_ip_addresses,
-            actor_names=actor_names,
-            start_time=start_time,
-            end_time=end_time,
-            event_types=event_types,
-            resource_ids=resource_ids,
-            user_types=user_types,
-        )
-
-        response = self._parent.session.post(
-            "/v1/audit/search-results-export", json=request.dict()
-        )
-
-        return AuditEventsPage.parse_response(response)
-
     def get_event_count(
         self,
         page_num: int = 0,
@@ -149,8 +99,8 @@ class AuditLogV1:
         actor_ids: Union[List[str], str] = None,
         actor_ip_addresses: Union[List[str], str] = None,
         actor_names: Union[List[str], str] = None,
-        start_time: datetime = None,
-        end_time: datetime = None,
+        start_time: Union[str, datetime] = None,
+        end_time: Union[str, datetime] = None,
         event_types: Union[List[str], str] = None,
         resource_ids: Union[List[str], str] = None,
         user_types: Union[List[UserTypes], UserTypes] = None,
@@ -162,13 +112,13 @@ class AuditLogV1:
 
         * **page_num**: `int` - Page number for results, starting at 1.
         * **page_size**: `int` - Max number of results to return per page.
-        * **actor_ids**: `List[str]`, `str` - Finds events whose actor_id is one of the given ids.
-        * **actor_ip_addresses**: `List[str]`, `str` - Finds events whose actor_ip_address is one of the given IP addresses.
-        * **actor_names**: `List[str]`, `str` - Finds events whose actor_name is one of the given names.
-        * **start_time**: `datetime` - Search for events within a date range.  Start time for this date range.
-        * **end_time**: `datetime` - Search for events within a date range.  End time for this date range.
-        * **event_types**: `List[str]`, `str` - Finds events whose type is one of the given types.
-        * **resource_ids**: `List[str]`, `str` - Filters searchable events that match resource_id.
+        * **actor_ids**: `List[str] | str` - Finds events whose actor_id is one of the given ids.
+        * **actor_ip_addresses**: `List[str] | str` - Finds events whose actor_ip_address is one of the given IP addresses.
+        * **actor_names**: `List[str] | str` - Finds events whose actor_name is one of the given names.
+        * **start_time**: `datetime | str` - Search for events within a date range.  Start time for this date range.
+        * **end_time**: `datetime | str` - Search for events within a date range.  End time for this date range.
+        * **event_types**: `List[str] | str` - Finds events whose type is one of the given types.
+        * **resource_ids**: `List[str] | str` - Filters searchable events that match resource_id.
         * **user_types**: `List[UserTypes]` - Filters searchable events that match actor type.
 
         **Returns**: An `int` indicating the number of resulting audit log events from search.
@@ -201,8 +151,8 @@ class AuditLogV1:
         actor_ids: Union[List[str], str] = None,
         actor_ip_addresses: Union[List[str], str] = None,
         actor_names: Union[List[str], str] = None,
-        start_time: datetime = None,
-        end_time: datetime = None,
+        start_time: Union[str, datetime] = None,
+        end_time: Union[str, datetime] = None,
         event_types: Union[List[str], str] = None,
         resource_ids: Union[List[str], str] = None,
         user_types: Union[List[UserTypes], UserTypes] = None,
@@ -214,13 +164,13 @@ class AuditLogV1:
 
         * **target_folder**: `Path, str` (required) - A string or `pathlib.Path` object that represents the folder
         which the file will be saved to.
-        * **actor_ids**: `List[str]`, `str` - Finds events whose actor_id is one of the given ids.
-        * **actor_ip_addresses**: `List[str]`, `str` - Finds events whose actor_ip_address is one of the given IP addresses.
-        * **actor_names**: `List[str]`, `str` - Finds events whose actor_name is one of the given names.
-        * **start_time**: `datetime` - Search for events within a date range.  Start time for this date range.
-        * **end_time**: `datetime` - Search for events within a date range.  End time for this date range.
-        * **event_types**: `List[str]`, `str` - Finds events whose type is one of the given types.
-        * **resource_ids**: `List[str]`, `str` - Filters searchable events that match resource_id.
+        * **actor_ids**: `List[str] | str` - Finds events whose actor_id is one of the given ids.
+        * **actor_ip_addresses**: `List[str] | str` - Finds events whose actor_ip_address is one of the given IP addresses.
+        * **actor_names**: `List[str] | str` - Finds events whose actor_name is one of the given names.
+        * **start_time**: `datetime | str` - Search for events within a date range.  Start time for this date range.
+        * **end_time**: `datetime | str` - Search for events within a date range.  End time for this date range.
+        * **event_types**: `List[str] | str` - Finds events whose type is one of the given types.
+        * **resource_ids**: `List[str] | str` - Filters searchable events that match resource_id.
         * **user_types**: `List[UserTypes]` - Filters searchable events that match actor type.
 
         **Returns**: A `pathlib.Path` object representing location of the downloaded csv file.
@@ -228,9 +178,9 @@ class AuditLogV1:
 
         date_range = DateRange()
         if start_time:
-            date_range.startTime = start_time.timestamp()
+            date_range.startTime = parse_timestamp_to_posix_timestamp(start_time)
         if end_time:
-            date_range.endTime = end_time.timestamp()
+            date_range.endTime = parse_timestamp_to_posix_timestamp(end_time)
 
         data = QueryExportRequest(
             actorIds=[actor_ids] if isinstance(actor_ids, str) else actor_ids,
@@ -251,7 +201,6 @@ class AuditLogV1:
             raise ValueError(
                 f"`target_folder` argument must resolve to a folder: {target_folder}"
             )
-
         export_response = self._parent.session.post(
             "/v1/audit/export", json=data.dict()
         )
@@ -275,17 +224,17 @@ def _build_query_request(
     actor_ids: Union[List[str], str] = None,
     actor_ip_addresses: Union[List[str], str] = None,
     actor_names: Union[List[str], str] = None,
-    start_time: datetime = None,
-    end_time: datetime = None,
+    start_time: Union[str, datetime] = None,
+    end_time: Union[str, datetime] = None,
     event_types: Union[List[str], str] = None,
     resource_ids: Union[List[str], str] = None,
     user_types: Union[List[UserTypes], UserTypes] = None,
 ):
     date_range = DateRange()
     if start_time:
-        date_range.startTime = start_time.timestamp()
+        date_range.startTime = parse_timestamp_to_posix_timestamp(start_time)
     if end_time:
-        date_range.endTime = end_time.timestamp()
+        date_range.endTime = parse_timestamp_to_posix_timestamp(end_time)
 
     request = QueryAuditLogRequest(
         actorIds=[actor_ids] if isinstance(actor_ids, str) else actor_ids,

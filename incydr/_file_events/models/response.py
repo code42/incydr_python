@@ -174,17 +174,3 @@ class SavedSearch(ResponseModel):
     srt_key: Optional[str] = Field(
         alias="srtKey", description="Search term for sorting.", example="event.id"
     )
-
-
-class SavedSearchesPage(ResponseModel):
-    """
-    A model representing a page of `SavedSearch` objects.
-
-    **Fields**:
-
-    * **searches**: `List[SavedSearch]` The list of saved searches for your tenant.
-    """
-
-    searches: List[SavedSearch] = Field(
-        description="List of saved searches in the response."
-    )

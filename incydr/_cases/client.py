@@ -9,6 +9,7 @@ from typing import Union
 from requests import Response
 
 from incydr._cases.models import Case
+from incydr._cases.models import CaseDetail
 from incydr._cases.models import CaseFileEvents
 from incydr._cases.models import CasesPage
 from incydr._cases.models import CreateCaseRequest
@@ -43,7 +44,7 @@ class CasesV1:
         assignee: str = None,
         description: str = None,
         findings: str = None,
-    ) -> Case:
+    ) -> CaseDetail:
         """
         Create a case.
 
@@ -65,7 +66,7 @@ class CasesV1:
             description=description,
         )
         response = self._parent.session.post(url="/v1/cases", json=data.dict())
-        return Case.parse_response(response)
+        return CaseDetail.parse_response(response)
 
     def delete(self, case_number: Union[int, Case]) -> Response:
         """
@@ -90,7 +91,7 @@ class CasesV1:
             case_number = case_number.number
         return self._parent.session.delete(f"/v1/cases/{case_number}")
 
-    def get_case(self, case_number: int) -> Case:
+    def get_case(self, case_number: int) -> CaseDetail:
         """
         Get a single case.
 
@@ -101,7 +102,7 @@ class CasesV1:
         **Returns**: A [`Case`][case-model] object representing the case.
         """
         response = self._parent.session.get(f"/v1/cases/{case_number}")
-        return Case.parse_response(response)
+        return CaseDetail.parse_response(response)
 
     def get_page(
         self,
@@ -198,7 +199,7 @@ class CasesV1:
             if len(page.cases) < page_size:
                 break
 
-    def update(self, case: Case):
+    def update(self, case: Union[Case, CaseDetail]):
         """
         Updates a case.
         Valid updatable fields: name, assignee, description, findings, subject, status
@@ -219,7 +220,7 @@ class CasesV1:
         response = self._parent.session.put(
             f"/v1/cases/{case.number}", json=data.dict()
         )
-        return Case.parse_response(response)
+        return CaseDetail.parse_response(response)
 
     def download_summary_pdf(
         self, case_number: int, target_folder: Union[str, Path]

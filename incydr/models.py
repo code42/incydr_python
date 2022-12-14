@@ -17,7 +17,6 @@ from incydr._directory_groups.models import DirectoryGroupsPage
 from incydr._file_events.models.event import FileEventV2
 from incydr._file_events.models.response import FileEventsPage
 from incydr._file_events.models.response import SavedSearch
-from incydr._file_events.models.response import SavedSearchesPage
 from incydr._trusted_activities.models import TrustedActivitiesPage
 from incydr._trusted_activities.models import TrustedActivity
 from incydr._user_risk_profiles.models import UserRiskProfile
@@ -25,6 +24,7 @@ from incydr._user_risk_profiles.models import UserRiskProfilesPage
 from incydr._users.models import Role
 from incydr._users.models import UpdateRolesResponse
 from incydr._users.models import User
+from incydr._users.models import UserRole
 from incydr._users.models import UsersPage
 from incydr._watchlists.models.responses import ExcludedUsersList
 from incydr._watchlists.models.responses import IncludedDepartment
@@ -47,12 +47,12 @@ __all__ = [
     "Customer",
     "Device",
     "DevicesPage",
-    "SavedSearchesPage",
     "SavedSearch",
     "FileEventsPage",
     "FileEventV2",
     "User",
     "UsersPage",
+    "UserRole",
     "Role",
     "UpdateRolesResponse",
     "RuleUsersList",

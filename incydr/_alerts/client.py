@@ -1,3 +1,4 @@
+import itertools
 from itertools import count
 from typing import Iterator
 from typing import List
@@ -74,6 +75,9 @@ class AlertsV1:
         """
         Get full details for a set of alerts.
 
+        The `query-details` endpoint accepts a maximum of 100 ids per request, if `alert_ids` is > 100, multiple
+        requests will be made and results will be combined into a single list.
+
         **Parameters**:
 
         * **alert_ids**: `str | List[str]` (required) - Single alertId or list of alertId strings.
@@ -82,11 +86,19 @@ class AlertsV1:
         """
         if isinstance(alert_ids, str):
             alert_ids = [alert_ids]
-        data = AlertDetailsRequest(alertIds=alert_ids)
-        response = self._parent.session.post(
-            "/v1/alerts/query-details", json=data.dict(by_alias=True)
-        )
-        return parse_obj_as(List[AlertDetails], response.json()["alerts"])
+        results = []
+        ids = iter(alert_ids)
+        while True:
+            chunk = list(itertools.islice(ids, 100))
+            if not chunk:
+                break
+            else:
+                data = AlertDetailsRequest(alertIds=chunk)
+            response = self._parent.session.post(
+                "/v1/alerts/query-details", json=data.dict(by_alias=True)
+            )
+            results.extend(parse_obj_as(List[AlertDetails], response.json()["alerts"]))
+        return results
 
     def add_note(self, alert_id: str, note: str) -> requests.Response:
         """
@@ -111,7 +123,7 @@ class AlertsV1:
         self, alert_ids: Union[str, List[str]], state: AlertState, note: str = None
     ) -> requests.Response:
         """
-        Change the state of an alert (and optionally add note indicating reason for change in the same request).
+        Change the state of a set of alerts (and optionally add note indicating reason for change in the same request).
 
         **Parameters**:
 

@@ -2,14 +2,14 @@ from datetime import datetime
 from typing import List
 from typing import Optional
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from incydr._core.models import Model
 from incydr._core.models import ResponseModel
 from incydr.enums.file_events import ReportType
 
 
-class DestinationEmail(BaseModel):
+class DestinationEmail(Model):
     recipients: Optional[List[str]] = Field(
         description="The email addresses of those who received the email. Includes the To, Cc, and Bcc recipients.",
         example=["cody@example.com", "theboss@example.com"],
@@ -20,14 +20,14 @@ class DestinationEmail(BaseModel):
     )
 
 
-class DestinationUser(BaseModel):
+class DestinationUser(Model):
     email: Optional[List[str]] = Field(
         description="For endpoint events where a file in cloud storage is synced to a device, the email address of the user logged in to the cloud storage provider. For cloud events, the email addresses of users added as sharing recipients. In some case, OneDrive events may return multiple values, but this is often the same username formatted in different ways.",
         example=["first.last@example.com", "first_last_example_com"],
     )
 
 
-class FileClassification(BaseModel):
+class FileClassification(Model):
     value: Optional[str] = Field(
         description="The classification value applied to the file.",
         example="Classified",
@@ -38,7 +38,7 @@ class FileClassification(BaseModel):
     )
 
 
-class Hash(BaseModel):
+class Hash(Model):
     md5: Optional[str] = Field(
         description="The MD5 hash of the file contents.",
         example="a162591e78eb2c816a28907d3ac020f9",
@@ -55,7 +55,7 @@ class Hash(BaseModel):
     )
 
 
-class Process(BaseModel):
+class Process(Model):
     executable: Optional[str] = Field(
         description="The name of the process that accessed the file, as reported by the device’s operating system. Depending on your Code42 product plan, this value may be null for some event types.",
         example="bash",
@@ -66,7 +66,7 @@ class Process(BaseModel):
     )
 
 
-class RemovableMedia(BaseModel):
+class RemovableMedia(Model):
     bus_type: Optional[str] = Field(
         alias="busType",
         description="For events detected on removable media, indicates the communication system used to transfer data between the host and the removable device.",
@@ -106,7 +106,7 @@ class RemovableMedia(BaseModel):
     )
 
 
-class Report(BaseModel):
+class Report(Model):
     count: Optional[int] = Field(
         description="The total number of rows returned in the report.", example=20
     )
@@ -138,13 +138,11 @@ class Report(BaseModel):
         example="REPORT_TYPE_SAVED",
     )
 
-    class Config:
-        use_enum_values = True
 
-
-class RiskIndicator(BaseModel):
+class RiskIndicator(Model):
     name: Optional[str] = Field(
-        description="Name of the risk indicator.", example="Browser upload"
+        description="Name of the risk indicator.",
+        example="Browser upload",
     )
     weight: Optional[int] = Field(
         description="Configured weight of the risk indicator at the time this event was seen.",
@@ -152,7 +150,7 @@ class RiskIndicator(BaseModel):
     )
 
 
-class SourceEmail(BaseModel):
+class SourceEmail(Model):
     from_: Optional[str] = Field(
         alias="from",
         description='The display name of the sender, as it appears in the "From" field in the email. In many cases, this is the same as source.email.sender, but it can be different if the message is sent by a server or other mail agent on behalf of someone else.',
@@ -164,7 +162,15 @@ class SourceEmail(BaseModel):
     )
 
 
-class Tab(BaseModel):
+class SourceUser(Model):
+    email: Optional[List[str]] = Field(
+        None,
+        description="For endpoint events where a file in cloud storage is synced to a device, the email address of the user logged in to the cloud storage provider.",
+        example=["first.last@example.com", "first_last_example_com"],
+    )
+
+
+class Tab(Model):
     title: Optional[str] = Field(
         description="The title of this app or browser tab.",
         example="Example Domain",
@@ -175,7 +181,8 @@ class Tab(BaseModel):
         example="InsufficientPermissions",
     )
     url: Optional[str] = Field(
-        description="The URL of this browser tab.", example="https://example.com/"
+        description="The URL of this browser tab.",
+        example="https://example.com/",
     )
     url_error: Optional[str] = Field(
         alias="urlError",
@@ -184,7 +191,7 @@ class Tab(BaseModel):
     )
 
 
-class User(BaseModel):
+class User(Model):
     device_uid: Optional[str] = Field(
         alias="deviceUid",
         description="Unique identifier for the device. Null if the file event occurred on a cloud provider.",
@@ -200,7 +207,67 @@ class User(BaseModel):
     )
 
 
-class Destination(BaseModel):
+class AcquiredFrom(Model):
+    agent_timestamp: Optional[datetime] = Field(
+        None,
+        alias="agentTimestamp",
+        description="Date and time that the Code42 service on the device detected an event; based on the device’s system clock and reported in Coordinated Universal Time (UTC).",
+        example="2020-10-27T15:16:05.369203Z",
+    )
+    event_action: Optional[str] = Field(
+        None,
+        alias="eventAction",
+        description="The type of file event observed. For example: file-modified, application-read, removable-media-created.",
+        example="file-downloaded",
+    )
+    event_id: Optional[str] = Field(
+        None,
+        alias="eventId",
+        description="The unique identifier for the event.",
+        example="0_147e9445-2f30-4a91-8b2a-9455332e880a_973435567569502913_986467523038446097_163",
+    )
+    file_name: Optional[str] = Field(
+        None,
+        alias="fileName",
+        description="The name of the file, including the file extension.",
+        example="example.txt",
+    )
+    md5: Optional[str] = Field(
+        None,
+        description="The MD5 hash of the file contents.",
+        example="6123bbce7f3937667a368bbb9f3d79ce",
+    )
+    source_category: Optional[str] = Field(
+        None,
+        alias="sourceCategory",
+        description="General category of where the file originated. For example: Cloud Storage, Email, Social Media.",
+        example="Social Media",
+    )
+    source_domains: Optional[List[str]] = Field(
+        None,
+        alias="sourceDomains",
+        description="The domain section of the URLs reported in file.acquiredFrom.tabs.url.",
+        example="example.com",
+    )
+    source_name: Optional[str] = Field(
+        None,
+        alias="sourceName",
+        description="The name reported by the device's operating system.  This may be different than the device name in the Code42 console.",
+        example="Mari's MacBook",
+    )
+    tabs: Optional[List[Tab]] = Field(
+        None,
+        description="Metadata about the browser tab source.",
+    )
+    user_email: Optional[str] = Field(
+        None,
+        alias="userEmail",
+        description="The Code42 username used to sign in to the Code42 app on the device (for endpoint events) or the cloud service username of the person who caused the event (for cloud events).",
+        example="cody@example.com",
+    )
+
+
+class Destination(Model):
     account_name: Optional[str] = Field(
         alias="accountName",
         description="For cloud sync apps installed on user devices, the name of the cloud account where the event was observed. This can help identify if the activity occurred in a business or personal account.",
@@ -243,6 +310,7 @@ class Destination(BaseModel):
         description="For print events, the name of the printer the job was sent to.",
         example="OfficeJet",
     )
+    printed_files_backup_path: Optional[str] = Field(alias="printedFilesBackupPath")
     private_ip: Optional[List[str]] = Field(
         alias="privateIp",
         description="The IP address of the user's device on your internal network, including Network interfaces, Virtual Network Interface controllers (NICs), and Loopback/non-routable addresses.",
@@ -253,17 +321,15 @@ class Destination(BaseModel):
         description="Metadata about the removable media destination.",
     )
     tabs: Optional[List[Tab]] = Field(
-        description="Metadata about the browser tab destination."
+        description="Metadata about the browser tab destination.",
     )
     user: Optional[DestinationUser] = Field(
         description="Metadata about the destination user."
     )
 
-    class Config:
-        use_enum_values = True
 
-
-class File(BaseModel):
+class File(Model):
+    acquired_from: Optional[List[AcquiredFrom]] = Field(None, alias="acquiredFrom")
     category: Optional[str] = Field(
         description="A categorization of the file that is inferred from MIME type.",
         example="Audio",
@@ -277,6 +343,12 @@ class File(BaseModel):
         alias="categoryByExtension",
         description="A categorization of the file based on its extension.",
         example="Document",
+    )
+    change_type: Optional[str] = Field(
+        None,
+        alias="changeType",
+        description="The action that caused the event. For example: CREATED, MODIFIED, DELETED.",
+        example="CREATED",
     )
     classifications: Optional[List[FileClassification]] = Field(
         description="Data provided by an external file classification vendor."
@@ -335,7 +407,7 @@ class File(BaseModel):
     )
 
 
-class Risk(BaseModel):
+class Risk(Model):
     indicators: Optional[List[RiskIndicator]] = Field(
         description="List of risk indicators identified for this event. If more than one risk indicator applies to this event, the sum of all indicators determines the total risk score.",
     )
@@ -357,11 +429,18 @@ class Risk(BaseModel):
         example=True,
     )
 
-    class Config:
-        use_enum_values = True
 
-
-class Source(BaseModel):
+class Source(Model):
+    account_name: Optional[str] = Field(
+        None,
+        alias="accountName",
+        description="For cloud sync apps installed on user devices, the name of the cloud account where the event was observed. This can help identify if the activity occurred in a business or personal account.",
+    )
+    account_type: Optional[str] = Field(
+        None,
+        alias="accountType",
+        description="For cloud sync apps installed on user devices, the type of account where the event was observed. For example, ‘BUSINESS’ or ‘PERSONAL’.",
+    )
     category: Optional[str] = Field(
         description="General category of where the file originated. For example: Cloud Storage, Email, Social Media.",
         example="Social Media",
@@ -399,9 +478,12 @@ class Source(BaseModel):
     tabs: Optional[List[Tab]] = Field(
         description="Metadata about the browser tab source."
     )
+    user: Optional[SourceUser] = Field(
+        None, description="Metadata about the source user."
+    )
 
 
-class RelatedEvent(BaseModel):
+class RelatedEvent(Model):
     agent_timestamp: Optional[datetime] = Field(
         alias="agentTimestamp",
         description="Date and time that the Code42 service on the device detected an event; based on the device’s system clock and reported in Coordinated Universal Time (UTC).",
@@ -436,7 +518,7 @@ class RelatedEvent(BaseModel):
     )
 
 
-class Event(BaseModel):
+class Event(Model):
     action: Optional[str] = Field(
         description="The type of file event observed. For example: file-modified, application-read, removable-media-created.",
         example="file-downloaded",
@@ -466,6 +548,18 @@ class Event(BaseModel):
         description="Sharing types added by this event.",
         example=["SharedViaLink"],
     )
+    vector: Optional[str]
+
+
+class Git(Model):
+    event_id: Optional[str] = Field(None, alias="eventId")
+    last_commit_hash: Optional[str] = Field(None, alias="lastCommitHash")
+    repository_email: Optional[str] = Field(None, alias="repositoryEmail")
+    repository_endpoint_path: Optional[str] = Field(
+        None, alias="repositoryEndpointPath"
+    )
+    repository_uri: Optional[str] = Field(None, alias="repositoryUri")
+    repository_user: Optional[str] = Field(None, alias="repositoryUser")
 
 
 class FileEventV2(ResponseModel):
@@ -480,7 +574,8 @@ class FileEventV2(ResponseModel):
     * **report**: `Report` - A [`Report`] object containing metadata for reports from 3rd party sources, such Salesforce downloads.
     * **risk**: `Risk` - A [`Risk`] object containing metadata on risk factors associated with the event.
     * **source**: `Source` - A [`Source`] object containing metadata about the source of the file event.
-    * **user**: `User` - A [`User`] object containing metadata Attributes of the the Code42 username signed in to the Code42 app on the device.
+    * **user**: `User` - A [`User`] object containing metadata Attributes of the Code42 username signed in to the Code42 app on the device.
+    * **git**: `Git` - A [`Git`] object containing git details for the event (if applicable).
     """
 
     timestamp: Optional[datetime] = Field(
@@ -489,20 +584,29 @@ class FileEventV2(ResponseModel):
         example="2020-10-27T15:16:05.369203Z",
     )
     destination: Optional[Destination] = Field(
-        description="Metadata about the destination of the file event."
+        description="Metadata about the destination of the file event.",
     )
-    event: Optional[Event] = Field(description="Summary information about the event.")
-    file: Optional[File] = Field(description="Metadata about the file for this event.")
+    event: Optional[Event] = Field(
+        description="Summary information about the event.",
+    )
+    file: Optional[File] = Field(
+        description="Metadata about the file for this event.",
+    )
     process: Optional[Process] = Field(
-        description="Metadata about the process associated with the event."
+        description="Metadata about the process associated with the event.",
     )
     report: Optional[Report] = Field(
         description="Metadata for reports from 3rd party sources, such Salesforce downloads.",
     )
-    risk: Optional[Risk] = Field(description="Risk factor metadata.")
+    risk: Optional[Risk] = Field(
+        description="Risk factor metadata.",
+    )
     source: Optional[Source] = Field(
-        description="Metadata about the source of the file event."
+        description="Metadata about the source of the file event.",
     )
     user: Optional[User] = Field(
         description="Attributes of the the Code42 username signed in to the Code42 app on the device.",
+    )
+    git: Optional[Git] = Field(
+        description="Git details for the event.",
     )
