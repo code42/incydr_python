@@ -12,7 +12,7 @@ from incydr._alerts.models.response import AlertQueryPage
 from incydr._alerts.models.response import AlertSummary
 from incydr._queries.utils import parse_ts_to_posix_ts
 from incydr.cli.cmds.options.output_options import TableFormat
-from incydr.cli.cursor import BaseCursorStore
+from incydr.cli.cursor import CursorStore
 from incydr.cli.main import incydr
 
 TEST_ALERT_ID = "000-42-code"
@@ -355,7 +355,7 @@ def test_cli_search_with_checkpointing_stores_new_checkpoint(
         "/v1/alerts/query-alerts", method="POST", json=query
     ).respond_with_json(alerts_response)
 
-    mock_cursor = mocker.MagicMock(spec=BaseCursorStore)
+    mock_cursor = mocker.MagicMock(spec=CursorStore)
     mock_cursor.get.return_value = None
     with mock.patch(
         "incydr.cli.cmds.alerts._get_cursor_store", return_value=mock_cursor
@@ -419,7 +419,7 @@ def test_cli_search_with_checkpointing_ignores_start_param_and_uses_existing_che
         "/v1/alerts/query-alerts", method="POST", json=query
     ).respond_with_json(TEST_ALERTS_RESPONSE)
 
-    mock_cursor = mocker.MagicMock(spec=BaseCursorStore)
+    mock_cursor = mocker.MagicMock(spec=CursorStore)
     mock_cursor.get.return_value = CURSOR_TIMESTAMP
     with mock.patch(
         "incydr.cli.cmds.alerts._get_cursor_store", return_value=mock_cursor

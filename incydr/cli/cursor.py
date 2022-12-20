@@ -35,7 +35,7 @@ class Cursor:
             return f.read()
 
 
-class BaseCursorStore:
+class CursorStore:
     """
     Cursor store for checkpoints.
 

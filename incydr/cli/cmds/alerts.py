@@ -33,7 +33,7 @@ from incydr.cli.cmds.options.utils import checkpoint_option
 from incydr.cli.cmds.utils import warn_interrupt
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
-from incydr.cli.cursor import BaseCursorStore
+from incydr.cli.cursor import CursorStore
 from incydr.cli.cursor import get_user_project_path
 from incydr.cli.file_readers import AutoDecodedFile
 from incydr.cli.logger import get_server_logger
@@ -333,7 +333,7 @@ def _get_cursor_store(api_key):
         api_key,
         "alert_checkpoints",
     )
-    return BaseCursorStore(dir_path, "alerts")
+    return CursorStore(dir_path, "alerts")
 
 
 def _update_checkpoint(cursor, checkpoint_name, alerts_gen):

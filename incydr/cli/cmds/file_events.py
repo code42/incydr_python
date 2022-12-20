@@ -29,7 +29,7 @@ from incydr.cli.cmds.options.utils import checkpoint_option
 from incydr.cli.cmds.utils import warn_interrupt
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
-from incydr.cli.cursor import BaseCursorStore
+from incydr.cli.cursor import CursorStore
 from incydr.cli.cursor import get_user_project_path
 from incydr.cli.logger import get_server_logger
 from incydr.enums.file_events import RiskIndicators
@@ -302,7 +302,7 @@ def _get_cursor_store(api_key):
         api_key,
         "file_event_checkpoints",
     )
-    return BaseCursorStore(dir_path, "file_events")
+    return CursorStore(dir_path, "file_events")
 
 
 # Allows us to import individual command groups

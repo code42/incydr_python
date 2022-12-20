@@ -3,7 +3,7 @@ from os import path
 import click
 import pytest
 
-from incydr.cli.cursor import BaseCursorStore
+from incydr.cli.cursor import CursorStore
 from incydr.cli.cursor import get_user_project_path
 
 CURSOR_NAME = "testcursor"
@@ -70,19 +70,19 @@ def mock_isfile(mocker):
 
 class TestBaseCursorStore:
     def test_get_returns_expected_timestamp(self, mock_open):
-        store = BaseCursorStore(DIR_PATH, EVENT_KEY)
+        store = CursorStore(DIR_PATH, EVENT_KEY)
         checkpoint = store.get(CURSOR_NAME)
         assert checkpoint == "123456789"
 
     def test_get_when_profile_does_not_exist_returns_none(self, mocker):
-        store = BaseCursorStore(DIR_PATH, EVENT_KEY)
+        store = CursorStore(DIR_PATH, EVENT_KEY)
         checkpoint = store.get(CURSOR_NAME)
         mock_open = mocker.patch(f"{_NAMESPACE}.open")
         mock_open.side_effect = FileNotFoundError
         assert checkpoint is None
 
     def test_get_reads_expected_file(self, mock_open):
-        store = BaseCursorStore(DIR_PATH, EVENT_KEY)
+        store = CursorStore(DIR_PATH, EVENT_KEY)
         store.get(CURSOR_NAME)
         user_path = path.join(path.expanduser("~"), ".incydr")
         expected_path = path.join(
@@ -91,7 +91,7 @@ class TestBaseCursorStore:
         mock_open.assert_called_once_with(expected_path)
 
     def test_replace_writes_to_expected_file(self, mock_open):
-        store = BaseCursorStore(DIR_PATH, EVENT_KEY)
+        store = CursorStore(DIR_PATH, EVENT_KEY)
         store.replace("checkpointname", 123)
         user_path = path.join(path.expanduser("~"), ".incydr")
         expected_path = path.join(
@@ -100,14 +100,14 @@ class TestBaseCursorStore:
         mock_open.assert_called_once_with(expected_path, "w")
 
     def test_replace_writes_expected_content(self, mock_open):
-        store = BaseCursorStore(DIR_PATH, EVENT_KEY)
+        store = CursorStore(DIR_PATH, EVENT_KEY)
         store.replace("checkpointname", 123)
         user_path = path.join(path.expanduser("~"), ".incydr")
         path.join(user_path, PROFILE_NAME, CHECKPOINT_FOLDER_NAME, "checkpointname")
         mock_open.return_value.write.assert_called_once_with("123")
 
     def test_delete_calls_remove_on_expected_file(self, mock_open, mock_remove):
-        store = BaseCursorStore(DIR_PATH, EVENT_KEY)
+        store = CursorStore(DIR_PATH, EVENT_KEY)
         store.delete("deleteme")
         user_path = path.join(path.expanduser("~"), ".incydr")
         expected_path = path.join(
@@ -118,7 +118,7 @@ class TestBaseCursorStore:
     def test_delete_when_checkpoint_does_not_exist_raises_cli_error(
         self, mock_open, mock_remove
     ):
-        store = BaseCursorStore(DIR_PATH, EVENT_KEY)
+        store = CursorStore(DIR_PATH, EVENT_KEY)
         mock_remove.side_effect = FileNotFoundError
         with pytest.raises(click.UsageError):
             store.delete("deleteme")
@@ -127,7 +127,7 @@ class TestBaseCursorStore:
         self, mock_open, mock_remove, mock_listdir, mock_isfile
     ):
         mock_listdir.return_value = ["fileone", "filetwo", "filethree"]
-        store = BaseCursorStore(DIR_PATH, EVENT_KEY)
+        store = CursorStore(DIR_PATH, EVENT_KEY)
         store.clean()
         assert mock_remove.call_count == 3
 
@@ -135,7 +135,7 @@ class TestBaseCursorStore:
         self, mock_open, mock_listdir, mock_isfile
     ):
         mock_listdir.return_value = ["fileone", "filetwo", "filethree"]
-        store = BaseCursorStore(DIR_PATH, EVENT_KEY)
+        store = CursorStore(DIR_PATH, EVENT_KEY)
         cursors = store.get_all_cursors()
         assert len(cursors) == 3
         assert cursors[0].name == "fileone"
@@ -143,12 +143,12 @@ class TestBaseCursorStore:
         assert cursors[2].name == "filethree"
 
     def test_get_items_returns_expected_list(self, mock_open_events):
-        store = BaseCursorStore(DIR_PATH, EVENT_KEY)
+        store = CursorStore(DIR_PATH, EVENT_KEY)
         event_list = store.get_items(CURSOR_NAME)
         assert event_list == [AUDIT_LOG_EVENT_HASH_1, AUDIT_LOG_EVENT_HASH_2]
 
     def test_get_items_reads_expected_file(self, mock_open):
-        store = BaseCursorStore(DIR_PATH, EVENT_KEY)
+        store = CursorStore(DIR_PATH, EVENT_KEY)
         store.get_items(CURSOR_NAME)
         user_path = path.join(path.expanduser("~"), ".incydr")
         expected_filename = CURSOR_NAME + "_events"
@@ -158,7 +158,7 @@ class TestBaseCursorStore:
         mock_open.assert_called_once_with(expected_path)
 
     def test_get_items_when_profile_does_not_exist_returns_empty_list(self, mocker):
-        store = BaseCursorStore(DIR_PATH, EVENT_KEY)
+        store = CursorStore(DIR_PATH, EVENT_KEY)
         event_list = store.get_items(CURSOR_NAME)
         mock_open = mocker.patch(f"{_NAMESPACE}.open")
         mock_open.side_effect = FileNotFoundError
@@ -166,12 +166,12 @@ class TestBaseCursorStore:
 
     def test_get_items_when_checkpoint_not_valid_json_returns_empty_list(self, mocker):
         mocker.patch("builtins.open", mocker.mock_open(read_data="invalid_json"))
-        store = BaseCursorStore(DIR_PATH, EVENT_KEY)
+        store = CursorStore(DIR_PATH, EVENT_KEY)
         event_list = store.get_items(CURSOR_NAME)
         assert event_list == []
 
     def test_replace_items_writes_to_expected_file(self, mock_open):
-        store = BaseCursorStore(DIR_PATH, EVENT_KEY)
+        store = CursorStore(DIR_PATH, EVENT_KEY)
         store.replace_items("checkpointname", ["hash1", "hash2"])
         user_path = path.join(path.expanduser("~"), ".incydr")
         expected_path = path.join(
@@ -183,7 +183,7 @@ class TestBaseCursorStore:
         mock_open.assert_called_once_with(expected_path, "w")
 
     def test_replace_items_writes_expected_content(self, mock_open_events):
-        store = BaseCursorStore(DIR_PATH, EVENT_KEY)
+        store = CursorStore(DIR_PATH, EVENT_KEY)
         store.replace_items("checkpointname", ["hash1", "hash2"])
         user_path = path.join(path.expanduser("~"), ".incydr")
         path.join(

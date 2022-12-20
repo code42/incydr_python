@@ -15,7 +15,7 @@ from incydr._file_events.models.response import SearchFilter
 from incydr._file_events.models.response import SearchFilterGroup
 from incydr._queries.file_events import EventQuery
 from incydr.cli.cmds.options.output_options import TableFormat
-from incydr.cli.cursor import BaseCursorStore
+from incydr.cli.cursor import CursorStore
 from incydr.cli.main import incydr
 
 MICROSECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -566,7 +566,7 @@ def test_cli_search_with_checkpointing_stores_new_checkpoint(
         }
     )
 
-    mock_cursor = mocker.MagicMock(spec=BaseCursorStore)
+    mock_cursor = mocker.MagicMock(spec=CursorStore)
     mock_cursor.get.return_value = None
     with mock.patch(
         "incydr.cli.cmds.file_events._get_cursor_store", return_value=mock_cursor
@@ -615,7 +615,7 @@ def test_cli_search_with_checkpointing_ignores_params_and_uses_existing_checkpoi
         }
     )
 
-    mock_cursor = mocker.MagicMock(spec=BaseCursorStore)
+    mock_cursor = mocker.MagicMock(spec=CursorStore)
     mock_cursor.get.return_value = json.dumps(query.dict())
     with mock.patch(
         "incydr.cli.cmds.file_events._get_cursor_store", return_value=mock_cursor

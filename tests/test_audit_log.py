@@ -10,7 +10,7 @@ from incydr._audit_log.models import AuditEventsPage
 from incydr._queries.utils import parse_ts_to_posix_ts
 from incydr.cli.cmds.audit_log import _hash_event
 from incydr.cli.cmds.options.output_options import TableFormat
-from incydr.cli.cursor import BaseCursorStore
+from incydr.cli.cursor import CursorStore
 from incydr.cli.main import incydr
 
 TEST_AL_ENTRY_1 = {
@@ -207,7 +207,7 @@ def test_cli_search_with_checkpointing_stores_new_checkpoint(
         "/v1/audit/search-audit-log", method="POST", json=data
     ).respond_with_json(audit_events_data)
 
-    mock_cursor = mocker.MagicMock(spec=BaseCursorStore)
+    mock_cursor = mocker.MagicMock(spec=CursorStore)
     mock_cursor.get.return_value = None
     with mock.patch(
         "incydr.cli.cmds.audit_log._get_cursor_store", return_value=mock_cursor
@@ -259,7 +259,7 @@ def test_cli_search_with_checkpointing_ignores_start_param_and_uses_existing_che
         "/v1/audit/search-audit-log", method="POST", json=data
     ).respond_with_json(audit_events_data)
 
-    mock_cursor = mocker.MagicMock(spec=BaseCursorStore)
+    mock_cursor = mocker.MagicMock(spec=CursorStore)
     mock_cursor.get.return_value = ts
     with mock.patch(
         "incydr.cli.cmds.audit_log._get_cursor_store", return_value=mock_cursor
