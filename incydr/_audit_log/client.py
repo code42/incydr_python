@@ -113,7 +113,7 @@ class AuditLogV1:
         **Returns**: A generator yielding individual `dict` objects representing audit log events.
         """
         page_size = page_size or self._parent.settings.page_size
-        for page_num in count(1):
+        for page_num in count(0):
             page = self.get_page(
                 page_num=page_num,
                 page_size=page_size,
@@ -148,7 +148,7 @@ class AuditLogV1:
 
         **Parameters:**
 
-        * **page_num**: `int` - Page number for results, starting at 1.
+        * **page_num**: `int` - Page number for results, starting at 0.
         * **page_size**: `int` - Max number of results to return per page.
         * **actor_ids**: `List[str] | str` - Finds events whose actor_id is one of the given ids.
         * **actor_ip_addresses**: `List[str] | str` - Finds events whose actor_ip_address is one of the given IP addresses.
@@ -282,7 +282,7 @@ def _build_query_request(
         actorNames=[actor_names] if isinstance(actor_names, str) else actor_names,
         dateRange=date_range,
         eventTypes=[event_types] if isinstance(event_types, str) else event_types,
-        pageNum=page_num,
+        page=page_num,
         pageSize=page_size,
         resourceIds=[resource_ids] if isinstance(resource_ids, str) else resource_ids,
         userTypes=[user_types] if isinstance(user_types, str) else user_types,

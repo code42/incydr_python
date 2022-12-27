@@ -97,7 +97,7 @@ def search(
 
         def yield_all_events(request_):
             for page_num in count(0):
-                request_.pageNum = page_num
+                request_.page = page_num
                 page = client.session.post(
                     "/v1/audit/search-audit-log", json=request_.dict()
                 )
@@ -110,7 +110,7 @@ def search(
 
         def yield_all_events(request_):
             for page_num in count(0):
-                request_.pageNum = page_num
+                request_.page = page_num
                 page = client.session.post(
                     "/v1/audit/search-audit-log", json=request_.dict()
                 )
@@ -140,7 +140,7 @@ def search(
             startTime=start or None,
             endTime=parse_ts_to_posix_ts(end) if end else None,
         ),
-        pageNum=0,
+        page=0,
         pageSize=100,
     )
     events_gen = yield_all_events(request)

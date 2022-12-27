@@ -342,14 +342,13 @@ def _update_checkpoint(cursor, checkpoint_name, alerts_gen):
 
     Since using the timestamp of the last event
     processed as the `--start` time of the next run causes the last event to show up again in the
-    next results, we hash the last event(s) of each run and store those hashes in the cursor to
+    next results, store the last alert IDs in the cursor to
     filter out on the next run.
 
     It's also possible that two events have the exact same timestamp, so
-    `checkpoint_events` needs to be a list of hashes so we can filter out everything that's actually
+    `checkpoint_alerts` needs to be a list of alert IDs so we can filter out everything that's actually
     been processed.
     """
-    # TODO: do we need to hash these?
     checkpoint_alerts = cursor.get_items(checkpoint_name)
     new_timestamp = None
     new_alerts = []
