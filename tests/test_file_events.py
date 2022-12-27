@@ -540,7 +540,12 @@ def test_get_saved_search_returns_expected_data(mock_get_saved_search):
 
 format_arg = pytest.mark.parametrize(
     "format_",
-    [TableFormat.json, TableFormat.raw_json, TableFormat.csv, TableFormat.table],
+    [
+        TableFormat.json_pretty,
+        TableFormat.json_lines,
+        TableFormat.csv,
+        TableFormat.table,
+    ],
 )
 
 

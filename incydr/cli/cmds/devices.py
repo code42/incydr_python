@@ -69,7 +69,7 @@ def list_(
         render.table(Device, devices, columns=columns, flat=False)
     elif format_ == TableFormat.csv:
         render.csv(Device, devices, columns=columns, flat=True)
-    elif format_ == TableFormat.json:
+    elif format_ == TableFormat.json_pretty:
         for device in devices:
             console.print_json(device.json())
     else:
@@ -92,7 +92,7 @@ def show(ctx: Context, device_id: str, format_: SingleFormat = None):
         console.print(
             Panel.fit(model_as_card(device), title=f"Device {device.device_id}")
         )
-    elif format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json_pretty:
         console.print_json(device.json())
-    else:  # format == "raw-json"
+    else:
         click.echo(device.json())

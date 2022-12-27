@@ -593,7 +593,7 @@ def test_move_returns_expected_data(mock_move):
 # ************************************************ CLI ************************************************
 
 
-@pytest.mark.parametrize("format_", ["table", "csv", "json", "raw-json"])
+@pytest.mark.parametrize("format_", ["table", "csv", "json-pretty", "json-lines"])
 def test_cli_list_when_no_results_returns_expected_message(
     httpserver_auth, runner, format_
 ):

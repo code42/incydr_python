@@ -60,7 +60,7 @@ def list_(ctx: Context, format_: TableFormat = None, columns: str = None):
         render.table(RuleDetails, rules, columns=columns, flat=False)
     elif format_ == TableFormat.csv:
         render.csv(RuleDetails, rules, columns=columns, flat=True)
-    elif format_ == TableFormat.json:
+    elif format_ == TableFormat.json_pretty:
         for rule in rules:
             console.print_json(rule.json())
     else:
@@ -81,10 +81,10 @@ def show(ctx: Context, rule_id: str, format_: SingleFormat = None):
     client = ctx.obj()
     rule = client.alert_rules.v2.get_rule(rule_id)
 
-    if format_ == SingleFormat.json:
+    if format_ == SingleFormat.json_pretty:
         console.print_json(rule.json())
         return
-    if format_ == SingleFormat.raw_json:
+    if format_ == SingleFormat.json_lines:
         click.echo(rule.json())
         return
 
@@ -217,7 +217,7 @@ def list_users(ctx: Context, rule_id: str, format_: SingleFormat = None):
                 title=f"{'Include' if username_filter.mode == '0' else 'Exclude'}d Usernames",
             )
         )
-    elif format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json_pretty:
         console.print_json(username_filter.json())
     else:
         click.echo(username_filter.json())

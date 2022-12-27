@@ -103,11 +103,11 @@ def list_(
         render.table(User, users_, columns=columns, flat=False)
     else:
         printed = False
-        if format_ == TableFormat.json:
+        if format_ == TableFormat.json_pretty:
             for item in users_:
                 printed = True
                 console.print_json(item.json())
-        else:  # raw-json
+        else:
             for item in users_:
                 printed = True
                 click.echo(item.json())
@@ -130,9 +130,9 @@ def show(ctx: Context, user, format_: SingleFormat):
 
     if format_ == SingleFormat.rich and client.settings.use_rich:
         console.print(Panel.fit(model_as_card(user), title=f"User {user.username}"))
-    elif format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json_pretty:
         console.print_json(user.json())
-    else:  # format == "raw-json"
+    else:
         click.echo(user.json())
 
 
@@ -163,10 +163,10 @@ def list_devices(ctx: Context, user, format_: TableFormat, columns: str = None):
             "login_date",
         ]
         render.table(Device, devices, columns=columns, flat=False)
-    elif format_ == TableFormat.json:
+    elif format_ == TableFormat.json_pretty:
         for item in devices:
             console.print_json(item.json())
-    else:  # raw-json
+    else:
         for item in devices:
             click.echo(item.json())
 
@@ -187,10 +187,10 @@ def list_user_roles(ctx: Context, user: str, format_: TableFormat, columns: str 
         render.csv(UserRole, roles, columns=columns, flat=True)
     elif format_ == TableFormat.table:
         render.table(UserRole, roles, columns=columns, flat=False)
-    elif format_ == TableFormat.json:
+    elif format_ == TableFormat.json_pretty:
         for item in roles:
             console.print_json(item.json())
-    else:  # raw-json
+    else:
         for item in roles:
             click.echo(item.json())
 
@@ -289,9 +289,9 @@ def show_role(ctx: Context, role, format_: SingleFormat = None):
     role = client.users.v1.get_role(role)
     if format_ == SingleFormat.rich and client.settings.use_rich:
         console.print(Panel.fit(model_as_card(role), title=role.role_name))
-    elif format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json_pretty:
         console.print_json(role.json())
-    else:  # format == "raw-json"
+    else:
         click.echo(role.json())
 
 
@@ -308,10 +308,10 @@ def list_roles(ctx: Context, format_: TableFormat = None):
         render.csv(Role, roles, flat=True)
     elif format_ == TableFormat.table:
         render.table(Role, roles, flat=False)
-    elif format_ == TableFormat.json:
+    elif format_ == TableFormat.json_pretty:
         for item in roles:
             console.print_json(item.json())
-    else:  # raw-json
+    else:
         for item in roles:
             click.echo(item.json())
 
@@ -422,7 +422,7 @@ def bulk_activate(ctx: Context, file: Path, format_: str):
 
     if format_ == "csv":
         models = UserCSV.parse_csv(file)
-    else:  # format_ == "json-lines":
+    else:
         models = UserJSON.parse_json_lines(file)
 
     try:
@@ -463,7 +463,7 @@ def bulk_deactivate(ctx: Context, file: Path, format_: str):
 
     if format_ == "csv":
         models = UserCSV.parse_csv(file)
-    else:  # format_ == "json-lines":
+    else:
         models = UserJSON.parse_json_lines(file)
 
     try:
@@ -515,7 +515,7 @@ def bulk_move(ctx: Context, file: Path, format_: str):
 
     if format_ == "csv":
         models = UserMoveCSV.parse_csv(file)
-    else:  # format_ == "json-lines":
+    else:
         models = UserMoveJSON.parse_json_lines(file)
 
     try:

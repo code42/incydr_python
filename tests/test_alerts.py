@@ -360,7 +360,12 @@ def test_alert_change_state_single(httpserver_auth: HTTPServer):
 
 format_arg = pytest.mark.parametrize(
     "format_",
-    [TableFormat.json, TableFormat.raw_json, TableFormat.csv, TableFormat.table],
+    [
+        TableFormat.json_pretty,
+        TableFormat.json_lines,
+        TableFormat.csv,
+        TableFormat.table,
+    ],
 )
 
 
@@ -541,7 +546,6 @@ def test_cli_alerts_search_when_default_params_makes_expected_api_call(
     assert result.exit_code == 0
 
 
-# TODO
 def test_cli_alerts_search_when_custom_params_makes_expected_api_call(
     httpserver_auth: HTTPServer, runner
 ):

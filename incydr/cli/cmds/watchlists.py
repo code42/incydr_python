@@ -32,6 +32,15 @@ from incydr.utils import model_as_card
 
 MAX_USER_DISPLAY_COUNT = 25
 
+input_format_option = click.option(
+    "--format",
+    "-f",
+    "format_",
+    type=click.Choice(["csv", "json-lines"]),
+    default="csv",
+    help="Specify format of input file(s): 'csv' or 'json-lines'. Defaults to 'csv'. Multiple input files must all be the same format.",
+)
+
 
 class UserCSV(CSVModel):
     user: str = Field(csv_aliases=["user", "user_id", "username", "id", "userId"])
@@ -283,14 +292,7 @@ def update(
     "Individual users from the directory groups will be added as watchlist members, where group information comes "
     "from SCIM or User Directory Sync.",
 )
-@click.option(
-    "--format",
-    "-f",
-    "format_",
-    type=click.Choice(["csv", "json-lines"]),
-    default="csv",
-    help="Specify format of input file(s): 'csv' or 'json-lines'. Defaults to 'csv'. Multiple input files must all be the same format.",
-)
+@input_format_option
 @click.pass_context
 def add(
     ctx: Context,
@@ -387,9 +389,7 @@ def add(
     "Individual users from the directory groups will be added as watchlist members, where group information comes "
     "from SCIM or User Directory Sync.",
 )
-@click.option(  # TODO: help message
-    "--format", "-f", "format_", type=click.Choice(["csv", "json-lines"]), default="csv"
-)
+@input_format_option
 @click.pass_context
 def remove(
     ctx: Context,
@@ -574,9 +574,9 @@ def _output_results(results, model, format_, columns=None):
         render.csv(model, results, columns=columns, flat=True)
     elif format_ == TableFormat.table:
         render.table(model, results, columns=columns, flat=False)
-    elif format_ == TableFormat.json:
+    elif format_ == TableFormat.json_pretty:
         for item in results:
             console.print_json(item.json())
-    else:  # raw-json
+    else:
         for item in results:
             console.print(item.json(), highlight=False)

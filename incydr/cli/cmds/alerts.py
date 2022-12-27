@@ -94,7 +94,7 @@ def search(
     cursor = _get_cursor_store(client.settings.api_client_id)
 
     if output:
-        format_ = TableFormat.raw_json
+        format_ = TableFormat.json_lines
 
     # Use stored checkpoint timestamp for start filter if applicable
     if checkpoint_name:
@@ -154,7 +154,7 @@ def search(
             printed = False
             for alert_ in alerts_gen:
                 printed = True
-                if format_ == TableFormat.json:
+                if format_ == TableFormat.json_pretty:
                     console.print_json(alert_.json())
                 elif output:
                     logger = get_server_logger(output, certs, ignore_cert_validation)
@@ -188,9 +188,9 @@ def show(ctx: Context, alert_id: str, format_: SingleFormat = None):
     alert = client.alerts.v1.get_details(alert_id)[0]
     if format_ == SingleFormat.rich:
         console.print(Panel.fit(model_as_card(alert)))
-    elif format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json_pretty:
         console.print_json(alert.json())
-    else:  # raw-json
+    else:
         click.echo(alert.json())
 
 

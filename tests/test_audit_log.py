@@ -177,7 +177,7 @@ def test_download_events_when_default_params_makes_expected_calls(
 
 # ************************************************ CLI ************************************************
 format_arg = pytest.mark.parametrize(
-    "format_", [TableFormat.json, TableFormat.raw_json, TableFormat.csv]
+    "format_", [TableFormat.json_pretty, TableFormat.json_lines, TableFormat.csv]
 )
 
 

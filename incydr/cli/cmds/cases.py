@@ -157,7 +157,7 @@ def list_(
         render.table(Case, cases_, columns=columns)
     elif format_ == TableFormat.csv:
         render.csv(Case, cases_, columns=columns)
-    elif format_ == TableFormat.json:
+    elif format_ == TableFormat.json_pretty:
         for case in cases_:
             console.print_json(case.json())
     else:
@@ -177,7 +177,7 @@ def show(ctx: Context, case_number: int, format_: SingleFormat):
     case = client.cases.v1.get_case(case_number)
     if format_ == SingleFormat.rich and client.settings.use_rich:
         console.print(Panel.fit(model_as_card(case), title="Case", width=120))
-    elif format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json_pretty:
         console.print_json(case.json())
     else:
         click.echo(case.json())
@@ -282,7 +282,7 @@ def bulk_update(ctx: Context, file: Path, format_: str):
 
     if format_ == "csv":
         models = UpdateCaseCSV.parse_csv(file)
-    else:  # format_ == "json-lines":
+    else:
         models = CaseDetail.parse_json_lines(file)
     try:
         for updated in track(models, description="Updating cases...", transient=True):
@@ -407,7 +407,7 @@ def show_file_event(
 
     if format_ == SingleFormat.rich and client.settings.use_rich:
         console.print(Panel.fit(model_as_card(event)))
-    elif format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json_pretty:
         console.print_json(event.json())
     else:
         click.echo(event.json())
@@ -448,12 +448,12 @@ def list_file_events(
 
     else:
         printed = False
-        if format_ == TableFormat.json:
+        if format_ == TableFormat.json_pretty:
             for event in response.events:
                 printed = True
                 console.print_json(event.json())
 
-        else:  # raw-json
+        else:
             for event in response.events:
                 printed = True
                 click.echo(event.json())

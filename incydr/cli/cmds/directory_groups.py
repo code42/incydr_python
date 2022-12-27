@@ -44,7 +44,7 @@ def list_(ctx: Context, format_: TableFormat, name: Optional[str] = None):
         render.table(DirectoryGroup, groups)
     elif format_ == TableFormat.csv:
         render.csv(DirectoryGroup, groups)
-    elif format_ == TableFormat.json:
+    elif format_ == TableFormat.json_pretty:
         for group in groups:
             console.print_json(group.json())
     else:

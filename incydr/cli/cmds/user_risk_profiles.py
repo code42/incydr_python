@@ -107,11 +107,11 @@ def list_(
         render.table(UserRiskProfile, profiles, columns=columns, flat=False)
     else:
         printed = False
-        if format_ == TableFormat.json:
+        if format_ == TableFormat.json_pretty:
             for p in profiles:
                 printed = True
                 console.print_json(p.json())
-        else:  # raw-json
+        else:
             for p in profiles:
                 printed = True
                 click.echo(p.json())
@@ -135,9 +135,9 @@ def show(ctx: Context, user: str, format_: SingleFormat):
         console.print(
             Panel.fit(model_as_card(profile), title=f"Risk Profile {profile.username}")
         )
-    elif format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json_pretty:
         console.print_json(profile.json())
-    else:  # format == "raw-json"
+    else:
         click.echo(profile.json())
 
 
@@ -290,7 +290,7 @@ def bulk_add_cloud_aliases(ctx: Context, file: Path, format_: str):
 
     if format_ == "csv":
         models = UpdateCloudAliasesCSV.parse_csv(file)
-    else:  # format_ == "json-lines":
+    else:
         models = UpdateCloudAliasesJSON.parse_json_lines(file)
 
     try:
@@ -338,7 +338,7 @@ def bulk_remove_cloud_aliases(ctx: Context, file: Path, format_: str):
 
     if format_ == "csv":
         models = UpdateCloudAliasesCSV.parse_csv(file)
-    else:  # format_ == "json-lines":
+    else:
         models = UpdateCloudAliasesJSON.parse_json_lines(file)
 
     try:

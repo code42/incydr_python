@@ -818,7 +818,7 @@ def test_cli_update_users_when_csv_makes_expected_call(
 
 
 @user_params
-def test_cli_update_users_when_json_makes_expected_call(  # TODO:  rename raw-json to jsonlines
+def test_cli_update_users_when_json_makes_expected_call(
     httpserver_auth: HTTPServer,
     runner,
     option,

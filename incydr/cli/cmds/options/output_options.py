@@ -8,15 +8,15 @@ from incydr.cli.logger import ServerProtocol
 
 class TableFormat(str, Enum):
     table = "table"
-    json = "json"
-    raw_json = "raw-json"
+    json_pretty = "json-pretty"
+    json_lines = "json-lines"
     csv = "csv"
 
 
 class SingleFormat(str, Enum):
     rich = "rich"
-    json = "json"
-    raw_json = "raw-json"
+    json_pretty = "json-pretty"
+    json_lines = "json-lines"
 
 
 input_format_option = click.option(
@@ -33,7 +33,7 @@ table_format_option = click.option(
     "-f",
     "format_",
     type=TableFormat,
-    help="Format to print result. One of 'table', 'json', 'raw-json', or 'csv. If environment has INCYDR_USE_RICH=false set, defaults to 'raw-json', else defaults to 'table'.",
+    help="Format to print result. One of 'table', 'json-pretty', 'json-lines', or 'csv. If environment has INCYDR_USE_RICH=false set, defaults to 'json-lines', else defaults to 'table'.",
     default=TableFormat.table,
 )
 single_format_option = click.option(
@@ -42,7 +42,7 @@ single_format_option = click.option(
     "format_",
     default="rich",
     type=SingleFormat,
-    help="Format to print result. One of 'rich', 'json', or 'raw-json'. If environment has INCYDR_USE_RICH=false set, defaults to 'raw-json', else defaults to 'rich'.",
+    help="Format to print result. One of 'rich', 'json-pretty', or 'json-lines'. If environment has INCYDR_USE_RICH=false set, defaults to 'json-lines', else defaults to 'rich'.",
 )
 
 columns_option = click.option(
