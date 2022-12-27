@@ -55,7 +55,7 @@ def show(ctx: Context, activity_id: str, format_: SingleFormat = None):
 @click.pass_context
 def list_(
     ctx: Context,
-    activity_type: ActivityType = None,  # TODO: ?
+    activity_type: ActivityType = None,
     format_: TableFormat = None,
     columns: str = None,
 ):

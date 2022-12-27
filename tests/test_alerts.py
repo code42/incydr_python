@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from unittest import mock
 
 import pytest
 from pytest_httpserver import HTTPServer
@@ -9,6 +10,9 @@ from incydr import Client
 from incydr._alerts.models.response import AlertDetails
 from incydr._alerts.models.response import AlertQueryPage
 from incydr._alerts.models.response import AlertSummary
+from incydr._queries.utils import parse_ts_to_posix_ts
+from incydr.cli.cmds.options.output_options import TableFormat
+from incydr.cli.cursor import CursorStore
 from incydr.cli.main import incydr
 
 TEST_ALERT_ID = "000-42-code"
@@ -38,7 +42,7 @@ TEST_ALERTS_RESPONSE = {
                 }
             ],
             "id": "d020eee5-0a2d-4255-9f09-83aa7015dabc",
-            "createdAt": "2022-09-15T20:48:25.5198280Z",
+            "createdAt": "2022-09-15T20:48:25.519828Z",
             "state": "OPEN",
         },
         {
@@ -63,7 +67,7 @@ TEST_ALERTS_RESPONSE = {
                 }
             ],
             "id": "259a5d1a-8cbb-45e2-af94-28a3a55f2902",
-            "createdAt": "2022-09-15T20:48:25.5756820Z",
+            "createdAt": "2022-09-15T20:48:25.575682Z",
             "state": "OPEN",
         },
     ],
@@ -87,7 +91,7 @@ TEST_ALERT_DETAILS_RESPONSE = {
             "riskSeverity": "LOW",
             "ruleId": "9fdfec5b-afe1-4531-a8a3-61e1aa2edb91",
             "id": "7239dede-da58-4214-8bc0-275e0ba8fda5",
-            "createdAt": "2022-08-11T20:30:29.7890180Z",
+            "createdAt": "2022-08-11T20:30:29.789018Z",
             "state": "OPEN",
             "observations": [
                 {
@@ -112,7 +116,7 @@ TEST_ALERT_DETAILS_RESPONSE = {
             "riskSeverity": "CRITICAL",
             "ruleId": "9fdfec5b-afe1-4531-a8a3-61e1aa2edb91",
             "id": "8bcaef3b-4aa7-46ab-85ae-a2a0191927d9",
-            "createdAt": "2022-08-09T14:04:43.0587210Z",
+            "createdAt": "2022-08-09T14:04:43.058721Z",
             "state": "OPEN",
             "observations": [
                 {
@@ -133,6 +137,9 @@ TEST_ALERT_DETAILS_RESPONSE = {
         },
     ],
 }
+
+TIMESTAMP = TEST_ALERTS_RESPONSE["alerts"][0]["createdAt"]
+CURSOR_TIMESTAMP = parse_ts_to_posix_ts(TIMESTAMP)
 
 
 def test_alert_query_class(httpserver_auth: HTTPServer):
@@ -310,6 +317,130 @@ def test_alert_change_state_single(httpserver_auth: HTTPServer):
 
 # ************************************************ CLI ************************************************
 
+format_arg = pytest.mark.parametrize(
+    "format_",
+    [TableFormat.json, TableFormat.raw_json, TableFormat.csv, TableFormat.table],
+)
+
+
+@format_arg
+def test_cli_search_with_checkpointing_stores_new_checkpoint(
+    httpserver_auth, runner, mocker, format_
+):
+    query = {
+        "tenantId": "abcd-1234",
+        "groupClause": "AND",
+        "groups": [
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "CreatedAt",
+                        "operator": "ON_OR_AFTER",
+                        "value": "2022-06-01T00:00:00.000Z",
+                    },
+                ],
+            },
+        ],
+        "pgNum": 0,
+        "pgSize": 100,
+        "srtDirection": "DESC",
+        "srtKey": "CreatedAt",
+    }
+
+    # Only return one alert so `cursor.replace` is only called once.
+    alerts_response = TEST_ALERTS_RESPONSE.copy()
+    alerts_response["alerts"] = [TEST_ALERTS_RESPONSE["alerts"][0]]
+    httpserver_auth.expect_request(
+        "/v1/alerts/query-alerts", method="POST", json=query
+    ).respond_with_json(alerts_response)
+
+    mock_cursor = mocker.MagicMock(spec=CursorStore)
+    mock_cursor.get.return_value = None
+    with mock.patch(
+        "incydr.cli.cmds.alerts._get_cursor_store", return_value=mock_cursor
+    ) as mock_get_store, mock.patch.object(
+        mock_cursor, "replace"
+    ) as mock_replace, mock.patch.object(
+        mock_cursor, "replace_items"
+    ) as mock_replace_items:
+        result = runner.invoke(
+            incydr,
+            [
+                "alerts",
+                "search",
+                "--start",
+                "2022-06-01",
+                "--checkpoint",
+                "test-chkpt",
+                "-f",
+                format_,
+            ],
+        )
+    httpserver_auth.check()
+
+    mock_get_store.assert_called()
+    mock_replace.assert_called_once_with(
+        "test-chkpt",
+        parse_ts_to_posix_ts(TEST_ALERTS_RESPONSE["alerts"][0]["createdAt"]),
+    )
+    mock_replace_items.assert_called_once_with(
+        "test-chkpt", [TEST_ALERTS_RESPONSE["alerts"][0]["id"]]
+    )
+    assert result.exit_code == 0
+
+
+@format_arg
+def test_cli_search_with_checkpointing_ignores_start_param_and_uses_existing_checkpoint(
+    httpserver_auth, runner, mocker, format_
+):
+    query = {
+        "tenantId": "abcd-1234",
+        "groupClause": "AND",
+        "groups": [
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "CreatedAt",
+                        "operator": "ON_OR_AFTER",
+                        "value": TIMESTAMP[:-4] + "Z",
+                    },
+                ],
+            },
+        ],
+        "pgNum": 0,
+        "pgSize": 100,
+        "srtDirection": "DESC",
+        "srtKey": "CreatedAt",
+    }
+
+    httpserver_auth.expect_request(
+        "/v1/alerts/query-alerts", method="POST", json=query
+    ).respond_with_json(TEST_ALERTS_RESPONSE)
+
+    mock_cursor = mocker.MagicMock(spec=CursorStore)
+    mock_cursor.get.return_value = CURSOR_TIMESTAMP
+    with mock.patch(
+        "incydr.cli.cmds.alerts._get_cursor_store", return_value=mock_cursor
+    ) as mock_get_store:
+        result = runner.invoke(
+            incydr,
+            [
+                "alerts",
+                "search",
+                "--start",
+                "2022-06-01",
+                "--checkpoint",
+                "test-chkpt",
+                "-f",
+                format_,
+            ],
+        )
+    httpserver_auth.check()
+    mock_get_store.assert_called()
+    assert result.exit_code == 0
+
 
 def test_search_when_no_start_or_on_param_raises_bad_option_usage_exception(
     runner, httpserver_auth: HTTPServer
@@ -323,7 +454,7 @@ def test_search_when_no_start_or_on_param_raises_bad_option_usage_exception(
     )
     assert result.exit_code == 2
     assert (
-        "--start, --end, or --on options are required if not using the --advanced-query option."
+        "--start, --end, or --on options are required if not using the --advanced-query option or using an existing checkpoint."
         in result.output
     )
 

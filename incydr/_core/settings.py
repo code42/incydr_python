@@ -172,7 +172,7 @@ class IncydrSettings(BaseSettings):
             rich_handler.setFormatter(_rich_log_formatter)
             logger.addHandler(rich_handler)
 
-        if log_stderr and not use_rich:
+        elif log_stderr and not use_rich:
             std_handler = logging.StreamHandler()
             std_handler.setFormatter(_std_log_formatter)
             logger.addHandler(std_handler)
@@ -185,7 +185,7 @@ class IncydrSettings(BaseSettings):
             rich_file_handler.setFormatter(_rich_log_formatter)
             logger.addHandler(rich_file_handler)
 
-        if log_file and not use_rich:
+        elif log_file and not use_rich:
             if isinstance(log_file, str):
                 std_file_handler = logging.FileHandler(
                     filename=log_file, encoding="utf-8"

@@ -1,11 +1,16 @@
 import datetime
 from pathlib import Path
+from unittest import mock
 
 import pytest
 from pytest_httpserver import HTTPServer
 
 from incydr import Client
 from incydr._audit_log.models import AuditEventsPage
+from incydr._queries.utils import parse_ts_to_posix_ts
+from incydr.cli.cmds.audit_log import _hash_event
+from incydr.cli.cmds.options.output_options import TableFormat
+from incydr.cli.cursor import CursorStore
 from incydr.cli.main import incydr
 
 TEST_AL_ENTRY_1 = {
@@ -49,7 +54,7 @@ def mock_search(httpserver_auth: HTTPServer):
         "actorNames": None,
         "dateRange": {"endTime": None, "startTime": None},
         "eventTypes": None,
-        "pageNum": 0,
+        "page": 0,
         "pageSize": 100,
         "resourceIds": None,
         "userTypes": None,
@@ -75,7 +80,7 @@ def mock_export(httpserver_auth: HTTPServer):
         "actorNames": None,
         "dateRange": {"endTime": None, "startTime": None},
         "eventTypes": None,
-        "pageNum": 0,
+        "page": 0,
         "pageSize": 0,
         "resourceIds": None,
         "userTypes": None,
@@ -171,6 +176,110 @@ def test_download_events_when_default_params_makes_expected_calls(
 
 
 # ************************************************ CLI ************************************************
+format_arg = pytest.mark.parametrize(
+    "format_", [TableFormat.json, TableFormat.raw_json, TableFormat.csv]
+)
+
+
+@format_arg
+def test_cli_search_with_checkpointing_stores_new_checkpoint(
+    httpserver_auth, runner, mocker, format_
+):
+    audit_events_data = {
+        "events": [
+            TEST_AL_ENTRY_1,
+        ],
+        "pagination_range_start_index": 0,
+        "pagination_range_end_index": 1,
+    }
+    data = {
+        "actorIds": None,
+        "actorIpAddresses": None,
+        "actorNames": None,
+        "dateRange": {"endTime": None, "startTime": None},
+        "eventTypes": None,
+        "page": 0,
+        "pageSize": 100,
+        "resourceIds": None,
+        "userTypes": None,
+    }
+    httpserver_auth.expect_request(
+        "/v1/audit/search-audit-log", method="POST", json=data
+    ).respond_with_json(audit_events_data)
+
+    mock_cursor = mocker.MagicMock(spec=CursorStore)
+    mock_cursor.get.return_value = None
+    with mock.patch(
+        "incydr.cli.cmds.audit_log._get_cursor_store", return_value=mock_cursor
+    ) as mock_get_store, mock.patch.object(
+        mock_cursor, "replace"
+    ) as mock_replace, mock.patch.object(
+        mock_cursor, "replace_items"
+    ) as mock_replace_items:
+        result = runner.invoke(
+            incydr,
+            ["audit-log", "search", "--checkpoint", "test-chkpt", "-f", format_],
+        )
+    httpserver_auth.check()
+    mock_get_store.assert_called()
+    mock_replace.assert_called_once_with(
+        "test-chkpt", parse_ts_to_posix_ts(TEST_AL_ENTRY_1["timestamp"])
+    )
+    mock_replace_items.assert_called_once_with(
+        "test-chkpt", [_hash_event(TEST_AL_ENTRY_1)]
+    )
+    assert result.exit_code == 0
+
+
+@format_arg
+def test_cli_search_with_checkpointing_ignores_start_param_and_uses_existing_checkpoint(
+    httpserver_auth, runner, mocker, format_
+):
+    audit_events_data = {
+        "events": [
+            TEST_AL_ENTRY_1,
+            TEST_AL_ENTRY_2,
+        ],
+        "pagination_range_start_index": 0,
+        "pagination_range_end_index": 2,
+    }
+    ts = parse_ts_to_posix_ts(TEST_AL_ENTRY_1["timestamp"])
+    data = {
+        "actorIds": None,
+        "actorIpAddresses": None,
+        "actorNames": None,
+        "dateRange": {"endTime": None, "startTime": ts},
+        "eventTypes": None,
+        "page": 0,
+        "pageSize": 100,
+        "resourceIds": None,
+        "userTypes": None,
+    }
+    httpserver_auth.expect_request(
+        "/v1/audit/search-audit-log", method="POST", json=data
+    ).respond_with_json(audit_events_data)
+
+    mock_cursor = mocker.MagicMock(spec=CursorStore)
+    mock_cursor.get.return_value = ts
+    with mock.patch(
+        "incydr.cli.cmds.audit_log._get_cursor_store", return_value=mock_cursor
+    ) as mock_get_store:
+        result = runner.invoke(
+            incydr,
+            [
+                "audit-log",
+                "search",
+                "--start",
+                "2022-06-01",
+                "--checkpoint",
+                "test-chkpt",
+                "-f",
+                format_,
+            ],
+        )
+    httpserver_auth.check()
+    mock_get_store.assert_called()
+    assert result.exit_code == 0
 
 
 def test_cli_search_when_default_params_makes_expected_call(runner, mock_search):
@@ -195,7 +304,7 @@ def test_cli_search_when_custom_params_makes_expected_call(
         "actorNames": ["foo2", "bar2"],
         "dateRange": {"endTime": 1666296001.0, "startTime": 1662768000.0},
         "eventTypes": ["foo3", "bar3"],
-        "pageNum": 0,
+        "page": 0,
         "pageSize": 100,
         "resourceIds": ["foo4", "bar4"],
         "userTypes": ["USER"],

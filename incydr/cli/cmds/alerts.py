@@ -1,3 +1,5 @@
+from contextlib import nullcontext
+from datetime import timezone
 from typing import Optional
 
 import click
@@ -27,10 +29,14 @@ from incydr.cli.cmds.options.output_options import single_format_option
 from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
-from incydr.cli.cmds.utils import output_format_logger
+from incydr.cli.cmds.options.utils import checkpoint_option
+from incydr.cli.cmds.utils import warn_interrupt
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
+from incydr.cli.cursor import CursorStore
+from incydr.cli.cursor import get_user_project_path
 from incydr.cli.file_readers import AutoDecodedFile
+from incydr.cli.logger import get_server_logger
 from incydr.utils import model_as_card
 
 
@@ -44,6 +50,7 @@ def alerts(ctx, log_level, log_file):
 
 
 @alerts.command(cls=IncydrCommand)
+@checkpoint_option
 @click.pass_context
 @columns_option
 @table_format_option
@@ -70,17 +77,37 @@ def search(
     state: Optional[str],
     rule_id: Optional[str],
     alert_severity: Optional[str],
+    checkpoint_name: Optional[str],
 ):
     """
-    Search alerts.
+    Search alerts.  Various options are provided to filter query results.
+
+    Results will be output to the console by default, use the `--output` option to send data to a server.
+
+    Checkpointing is available through the --checkpoint <checkpoint-name> option and will only return new results
+    on subsequent queries with that same checkpoint.  Checkpointing filters by timestamp, additional filter
+    options will need to be included in each run.
     """
+    client = ctx.obj()
+    cursor = _get_cursor_store(client.settings.api_client_id)
+
+    if output:
+        format_ = TableFormat.raw_json
+
+    # Use stored checkpoint timestamp for start filter if applicable
+    if checkpoint_name:
+        checkpoint = cursor.get(checkpoint_name)
+        if checkpoint:
+            start = float(checkpoint)
+
     if advanced_query:
         query = AlertQuery.parse_raw(advanced_query)
     else:
         if not any([start, on, end]):
             raise BadOptionUsage(
                 "start",
-                "--start, --end, or --on options are required if not using the --advanced-query option.",
+                "--start, --end, or --on options are required if not using the --advanced-query option "
+                "or using an existing checkpoint.",
             )
         query = _create_query(
             start=start,
@@ -96,42 +123,52 @@ def search(
             rule_id=rule_id,
             alert_severity=alert_severity,
         )
+    alerts_gen = client.alerts.v1.iter_all(query)
 
+    if checkpoint_name:
+        alerts_gen = _update_checkpoint(cursor, checkpoint_name, alerts_gen)
+
+    with warn_interrupt() if checkpoint_name else nullcontext():
+        if format_ == TableFormat.table:
+            columns = columns or [
+                "created_at",
+                "risk_severity",
+                "state",
+                "actor",
+                "actor_id",
+                "name",
+                "description",
+                "watchlists",
+                "state_last_modified_by",
+                "state_last_modified_at",
+                "id",
+            ]
+            render.table(AlertSummary, alerts_gen, columns=columns, flat=False)
+        elif format_ == TableFormat.csv:
+            render.csv(AlertSummary, alerts_gen, columns=columns, flat=True)
+        else:
+            printed = False
+            for alert_ in alerts_gen:
+                printed = True
+                if format_ == TableFormat.json:
+                    console.print_json(alert_.json())
+                elif output:
+                    logger = get_server_logger(output, certs, ignore_cert_validation)
+                    logger.info(alert_.json())
+                else:
+                    click.echo(alert_.json())
+            if not printed:
+                console.print("No results found.")
+
+
+@alerts.command()
+@click.argument("checkpoint-name")
+@click.pass_context
+def clear_checkpoint(ctx: Context, checkpoint_name: str):
+    """Remove the saved alerts checkpoint from searches made with `--checkpoint` mode."""
     client = ctx.obj()
-    alert_summaries = client.alerts.v1.iter_all(query)
-
-    if output:
-        output_format_logger(
-            (a.dict() for a in alert_summaries),
-            output,
-            columns,
-            certs,
-            ignore_cert_validation,
-        )
-        return
-    if format_ == TableFormat.table:
-        columns = columns or [
-            "created_at",
-            "risk_severity",
-            "state",
-            "actor",
-            "actor_id",
-            "name",
-            "description",
-            "watchlists",
-            "state_last_modified_by",
-            "state_last_modified_at",
-            "id",
-        ]
-        render.table(AlertSummary, alert_summaries, columns=columns, flat=False)
-    elif format_ == TableFormat.csv:
-        render.csv(AlertSummary, alert_summaries, columns=columns, flat=True)
-    elif format_ == TableFormat.json:
-        for alert in alert_summaries:
-            console.print_json(alert.json())
-    else:  # raw-json
-        for alert in alert_summaries:
-            click.echo(alert.json())
+    cursor = _get_cursor_store(client.settings.api_client_id)
+    cursor.delete(checkpoint_name)
 
 
 # Future enhancement: add functionality to show human-readable summaries for multiple alerts
@@ -224,14 +261,14 @@ def bulk_update_state(ctx: Context, file, format_, state, note):
 
     client = ctx.obj()
     if format_ == "csv":
-        alerts = AlertBulkCSV.parse_csv(file)
+        alerts_ = AlertBulkCSV.parse_csv(file)
 
     else:
-        alerts = AlertBulkJSON.parse_json_lines(file)
+        alerts_ = AlertBulkJSON.parse_json_lines(file)
 
     # group alerts where state and note are the same, so we can batch API calls
     buckets = bucketize(
-        alerts,
+        alerts_,
         key=lambda alert: (state or alert.state, note or alert.note),
         value_transform=lambda alert: alert.alert_id,
     )
@@ -286,3 +323,43 @@ def _create_query(**kwargs):
                 continue
             query = query.equals(field_option_map[k], v)
     return query
+
+
+def _get_cursor_store(api_key):
+    """
+    Get cursor store for alerts search checkpoints.
+    """
+    dir_path = get_user_project_path(
+        api_key,
+        "alert_checkpoints",
+    )
+    return CursorStore(dir_path, "alerts")
+
+
+def _update_checkpoint(cursor, checkpoint_name, alerts_gen):
+    """
+    De-duplicates events across checkpointed runs.
+
+    Since using the timestamp of the last event
+    processed as the `--start` time of the next run causes the last event to show up again in the
+    next results, store the last alert IDs in the cursor to
+    filter out on the next run.
+
+    It's also possible that two events have the exact same timestamp, so
+    `checkpoint_alerts` needs to be a list of alert IDs so we can filter out everything that's actually
+    been processed.
+    """
+    checkpoint_alerts = cursor.get_items(checkpoint_name)
+    new_timestamp = None
+    new_alerts = []
+    for alert in alerts_gen:
+        alert_id = alert.id
+        if alert_id not in checkpoint_alerts:
+            if not new_timestamp or alert.created_at > new_timestamp:
+                new_timestamp = alert.created_at
+                new_alerts.clear()
+            new_alerts.append(alert_id)
+            yield alert
+            new_timestamp.replace(tzinfo=timezone.utc)
+            cursor.replace(checkpoint_name, new_timestamp.timestamp())
+            cursor.replace_items(checkpoint_name, new_alerts)

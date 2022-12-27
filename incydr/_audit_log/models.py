@@ -71,7 +71,7 @@ class QueryAuditLogRequest(Model):
     actorNames: Optional[List[str]]
     dateRange: Optional[DateRange]
     eventTypes: Optional[List[str]]
-    pageNum: int
+    page: int
     pageSize: int
     resourceIds: Optional[List[str]]
     userTypes: Optional[List[UserTypes]]

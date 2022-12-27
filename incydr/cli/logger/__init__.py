@@ -42,7 +42,7 @@ def get_logger_for_server(protocol, hostname, port, certs):
     return logger
 
 
-def try_get_logger_for_server(output, certs, ignore_cert_validation):
+def get_server_logger(output, certs, ignore_cert_validation):
 
     # parse output
     output = output.split(":")
