@@ -1,11 +1,16 @@
+from functools import lru_cache
+from pathlib import Path
 from typing import Optional
 
 import click
 from click import Context
+from pydantic import Field
 from requests import HTTPError
 from rich.panel import Panel
 from rich.progress import track
 
+from incydr._core.models import CSVModel
+from incydr._core.models import Model
 from incydr._user_risk_profiles.client import DateParseError
 from incydr._user_risk_profiles.models import UserRiskProfile
 from incydr.cli import console
@@ -14,6 +19,7 @@ from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
 from incydr.cli.cmds.options.output_options import columns_option
+from incydr.cli.cmds.options.output_options import input_format_option
 from incydr.cli.cmds.options.output_options import single_format_option
 from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
@@ -26,7 +32,16 @@ from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
 from incydr.utils import model_as_card
-from incydr.utils import read_dict_from_csv
+
+
+class UpdateCloudAliasesCSV(CSVModel):
+    user: str = Field(csv_aliases=["user", "user_id", "username", "id", "userId"])
+    cloud_alias: str = Field(csv_aliases=["cloudAlias", "cloud_alias", "alias"])
+
+
+class UpdateCloudAliasesJSON(Model):
+    user: str
+    cloud_alias: str
 
 
 @users.group(cls=IncydrGroup)
@@ -246,65 +261,96 @@ def remove_cloud_alias(ctx: Context, user, cloud_alias):
 
 
 @risk_profiles.command(cls=IncydrCommand)
-@click.argument("csv")
+@click.argument("file", type=click.File())
+@input_format_option
 @click.pass_context
-def bulk_add_cloud_aliases(ctx: Context, csv):
+def bulk_add_cloud_aliases(ctx: Context, file: Path, format_: str):
     """
     Bulk add cloud aliases to user risk profiles.
 
-    Takes a single arg `CSV` which specifies the path to the file.
+    Takes a single arg `FILE` which specifies the path to the file (use "-" to read from stdin).
 
-    Requires the following columns:
+    File format can either be CSV or [JSON Lines format](https://jsonlines.org) (Default is CSV).
+
+    Required CSV columns:
+
      * `user` - User ID or username of the user risk profile. Performs an additional lookup if username is passed.
-     * `cloud_alias` - The cloud alias to add to the profile.
+     * `cloud_alias` - The cloud alias to remove from the profile.
     """
     client = ctx.obj()
-    username_cache = {}
+
+    @lru_cache()
+    def resolve_username(user):
+        if user is None:
+            return
+        elif "@" in user:
+            return user_lookup(client, user)
+        else:  # assume user_id
+            return user
+
+    if format_ == "csv":
+        models = UpdateCloudAliasesCSV.parse_csv(file)
+    else:  # format_ == "json-lines":
+        models = UpdateCloudAliasesJSON.parse_json_lines(file)
+
     try:
         for row in track(
-            read_dict_from_csv(csv),
+            models,
             description="Adding cloud aliases...",
             transient=True,
         ):
-            user = row.get("user")
-            if user and "@" in user:
-                user = username_cache.get(row["user"])
-                if not user:
-                    user = username_cache[row["user"]] = user_lookup(
-                        client, row["user"]
-                    )
-
-            client.user_risk_profiles.v1.add_cloud_alias(user, row["cloud_alias"])
-
+            client.user_risk_profiles.v1.add_cloud_alias(
+                resolve_username(row.user), row.cloud_alias
+            )
+    except ValueError as err:
+        console.print(f"[red]Error:[/red] {err}")
     except HTTPError as err:
         console.print(f"[red]Error:[/red] {err.response.text}")
 
 
 @risk_profiles.command(cls=IncydrCommand)
-@click.argument("csv")
+@click.argument("file", type=click.File())
+@input_format_option
 @click.pass_context
-def bulk_remove_cloud_aliases(ctx: Context, csv):
+def bulk_remove_cloud_aliases(ctx: Context, file: Path, format_: str):
     """
     Bulk remove cloud aliases from user risk profiles.
 
-    Takes a single arg `CSV` which specifies the path to the file.
+    Takes a single arg `FILE` which specifies the path to the file (use "-" to read from stdin).
 
-    Requires the following columns:
+    File format can either be CSV or [JSON Lines format](https://jsonlines.org) (Default is CSV).
+
+    Required CSV columns:
+
      * `user` - User ID or username of the user risk profile. Performs an additional lookup if username is passed.
      * `cloud_alias` - The cloud alias to remove from the profile.
     """
     client = ctx.obj()
+
+    @lru_cache()
+    def resolve_username(user):
+        if user is None:
+            return
+        elif "@" in user:
+            return user_lookup(client, user)
+        else:  # assume user_id
+            return user
+
+    if format_ == "csv":
+        models = UpdateCloudAliasesCSV.parse_csv(file)
+    else:  # format_ == "json-lines":
+        models = UpdateCloudAliasesJSON.parse_json_lines(file)
+
     try:
         for row in track(
-            read_dict_from_csv(csv),
-            description="Adding cloud aliases...",
+            models,
+            description="Removing cloud aliases...",
             transient=True,
         ):
-            user = row.get("user")
-            if user and "@" in user:
-                user = user_lookup(client, row["user"])
-
-            client.user_risk_profiles.v1.delete_cloud_alias(user, row["cloud_alias"])
-
+            client.user_risk_profiles.v1.delete_cloud_alias(
+                resolve_username(row.user), row.cloud_alias
+            )
+    except ValueError as err:
+        console.print(f"[red]Error:[/red] {err}")
     except HTTPError as err:
         console.print(f"[red]Error:[/red] {err.response.text}")

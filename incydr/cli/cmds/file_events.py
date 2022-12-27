@@ -1,10 +1,12 @@
 import json
 from contextlib import nullcontext
 from typing import Optional
+from typing import Union
 
 import click
 from click import BadOptionUsage
 from click import Context
+from click import File
 from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.table import Table
@@ -82,7 +84,7 @@ def search(
     output: Optional[str],
     certs: Optional[str],
     ignore_cert_validation: Optional[bool],
-    advanced_query: Optional[str],
+    advanced_query: Optional[Union[str, File]],
     saved_search: Optional[str],
     start: Optional[str],
     end: Optional[str],
@@ -123,6 +125,8 @@ def search(
         saved_search = client.file_events.v2.get_saved_search(saved_search)
         query = EventQuery.from_saved_search(saved_search)
     elif advanced_query:
+        if not isinstance(advanced_query, str):
+            advanced_query = advanced_query.read()
         query = EventQuery.parse_raw(advanced_query)
     else:
         if not start:

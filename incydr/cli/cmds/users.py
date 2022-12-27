@@ -1,4 +1,5 @@
 from functools import lru_cache
+from pathlib import Path
 from typing import Optional
 
 import click
@@ -35,9 +36,16 @@ from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
 from incydr.cli.file_readers import AutoDecodedFile
 from incydr.utils import model_as_card
-from incydr.utils import read_dict_from_csv
 
 user_arg = click.argument("user", callback=user_lookup_callback)
+
+
+class UserCSV(CSVModel):
+    user: str = Field(csv_aliases=["user", "user_id", "username", "id", "userId"])
+
+
+class UserJSON(Model):
+    user: str
 
 
 @click.group(cls=IncydrGroup)
@@ -334,6 +342,7 @@ def bulk_update_roles(ctx: Context, file, update_method=None, format_=None):
 
             incydr users bulk-update-roles path/to/file.json --add --format json-lines
     """
+    client = ctx.obj()
 
     @lru_cache()
     def resolve_username(user):
@@ -359,7 +368,6 @@ def bulk_update_roles(ctx: Context, file, update_method=None, format_=None):
     else:
         roles_file = RoleUpdateJSON.parse_json_lines(file)
 
-    client = ctx.obj()
     if update_method == "add":
         update_func = client.users.v1.add_roles
     elif update_method == "remove":
@@ -388,78 +396,134 @@ def bulk_update_roles(ctx: Context, file, update_method=None, format_=None):
 
 
 @users.command(cls=IncydrCommand)
-@click.argument("csv")
+@click.argument("file", type=click.File())
+@input_format_option
 @click.pass_context
-def bulk_activate(ctx: Context, csv):
+def bulk_activate(ctx: Context, file: Path, format_: str):
     """
     Bulk activate users.
 
-    Takes a single arg `CSV` which specifies the path to the file.
-    Requires a single `user` column that contains either the user IDs or the usernames of the users to be activated.
+    Takes a single arg `FILE` which specifies the path to the file (use "-" to read from stdin).
+
+    File format can either be CSV or [JSON Lines format](https://jsonlines.org) (Default is CSV).
+
+    Requires a single `user` column or field that contains either the user IDs or the usernames of the users to be activated.
     """
     client = ctx.obj()
+
+    @lru_cache()
+    def resolve_username(user):
+        if user is None:
+            return
+        elif "@" in user:
+            return user_lookup(client, user)
+        else:  # assume user_id
+            return user
+
+    if format_ == "csv":
+        models = UserCSV.parse_csv(file)
+    else:  # format_ == "json-lines":
+        models = UserJSON.parse_json_lines(file)
+
     try:
         for row in track(
-            read_dict_from_csv(csv),
+            models,
             description="Activating users...",
             transient=True,
         ):
-            user = row.get("user")
-            if user and "@" in user:
-                user = user_lookup(client, row["user"])
-            client.users.v1.activate(user)
+            client.users.v1.activate(resolve_username(row.user))
     except HTTPError as err:
         console.print(f"[red]Error:[/red] {err.response.text}")
 
 
 @users.command(cls=IncydrCommand)
-@click.argument("csv")
+@click.argument("file", type=click.File())
+@input_format_option
 @click.pass_context
-def bulk_deactivate(ctx: Context, csv):
+def bulk_deactivate(ctx: Context, file: Path, format_: str):
     """
     Bulk deactivate users.
 
-    Takes a single arg `CSV` which specifies the path to the file.
-    Requires a single `user` column that contains either the user IDs or the usernames of the users to be deactivated.
+    Takes a single arg `FILE` which specifies the path to the file (use "-" to read from stdin).
+
+    File format can either be CSV or [JSON Lines format](https://jsonlines.org) (Default is CSV).
+
+    Requires a single `user` column or field that contains either the user IDs or the usernames of the users to be deactivated.
     """
     client = ctx.obj()
+
+    @lru_cache()
+    def resolve_username(user):
+        if user is None:
+            return
+        elif "@" in user:
+            return user_lookup(client, user)
+        else:  # assume user_id
+            return user
+
+    if format_ == "csv":
+        models = UserCSV.parse_csv(file)
+    else:  # format_ == "json-lines":
+        models = UserJSON.parse_json_lines(file)
+
     try:
         for row in track(
-            read_dict_from_csv(csv),
+            models,
             description="Deactivating users...",
             transient=True,
         ):
-            user = row.get("user")
-            if user and "@" in user:
-                user = user_lookup(client, row["user"])
-            client.users.v1.deactivate(user)
+            client.users.v1.deactivate(resolve_username(row.user))
     except HTTPError as err:
         console.print(f"[red]Error:[/red] {err.response.text}")
 
 
 @users.command(cls=IncydrCommand)
-@click.argument("csv")
+@click.argument("file", type=click.File())
+@input_format_option
 @click.pass_context
-def bulk_move(ctx: Context, csv):
+def bulk_move(ctx: Context, file: Path, format_: str):
     """
     Bulk move multiple users to specified organizations.
 
-    Takes a single arg `CSV` which specifies the path to the file.
+    Takes a single arg `FILE` which specifies the path to the file (use "-" to read from stdin).
+
+    File format can either be CSV or [JSON Lines format](https://jsonlines.org) (Default is CSV).
+
     Requires the following columns:
 
     * `user` - User ID or username of the user who will be moved to the new organization. Performs an additional lookup if username is passed.
     * `org_guid` - GUID for the user's new organization.
     """
     client = ctx.obj()
+
+    class UserMoveCSV(CSVModel):
+        user: str = Field(csv_aliases=["user", "user_id", "username", "id", "userId"])
+        org_guid: str = Field(csv_aliases=["org_guid", "orgGuid", "org"])
+
+    class UserMoveJSON(Model):
+        user: str
+        org_guid: str
+
+    @lru_cache()
+    def resolve_username(user):
+        if user is None:
+            return
+        elif "@" in user:
+            return user_lookup(client, user)
+        else:  # assume user_id
+            return user
+
+    if format_ == "csv":
+        models = UserMoveCSV.parse_csv(file)
+    else:  # format_ == "json-lines":
+        models = UserMoveJSON.parse_json_lines(file)
+
     try:
         for row in track(
-            read_dict_from_csv(csv),
+            models,
             description="Moving users...",
             transient=True,
         ):
-            user = row.get("user")
-            if user and "@" in user:
-                user = user_lookup(client, row["user"])
-            client.users.v1.move(user, row["org_guid"])
+            client.users.v1.move(resolve_username(row.user), row.org_guid)
     except HTTPError as err:
         console.print(f"[red]Error:[/red] {err.response.text}")

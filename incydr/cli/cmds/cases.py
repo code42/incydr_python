@@ -21,6 +21,7 @@ from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
 from incydr.cli.cmds.options.output_options import columns_option
+from incydr.cli.cmds.options.output_options import input_format_option
 from incydr.cli.cmds.options.output_options import single_format_option
 from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
@@ -73,7 +74,6 @@ path_option = click.option(
 @click.pass_context
 def cases(ctx: Context, log_level, log_file):
     """View and manage cases."""
-    ...
 
 
 @cases.command(cls=IncydrCommand)
@@ -249,9 +249,7 @@ def update(
 
 @cases.command(cls=IncydrCommand)
 @click.argument("file", type=click.File())
-@click.option(
-    "--format", "-f", "format_", type=click.Choice(["csv", "json-lines"]), default="csv"
-)
+@input_format_option
 @click.pass_context
 def bulk_update(ctx: Context, file: Path, format_: str):
     """
@@ -270,7 +268,6 @@ def bulk_update(ctx: Context, file: Path, format_: str):
     * `name` - Case name.
     * `status` - Case status. One of `ARCHIVED`, `CLOSED` or `OPEN`.
     * `subject` - User ID or username of the case subject. Performs an additional lookup if a username is passed.
-
     """
     client = ctx.obj()
 
@@ -515,9 +512,7 @@ def add(ctx: Context, case_number: int, event_ids: FileOrString, format_: str):
 @file_events.command(cls=IncydrCommand)
 @click.argument("case_number")
 @click.argument("event_ids", type=FileOrString())
-@click.option(
-    "--format", "-f", "format_", type=click.Choice(["csv", "json-lines"]), default="csv"
-)
+@input_format_option
 @click.pass_context
 def remove(ctx: Context, case_number: int, event_ids: str, format_: str):
     """

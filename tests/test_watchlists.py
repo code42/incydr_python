@@ -791,7 +791,7 @@ def test_cli_update_users_when_list_makes_expected_call(
 
 
 @user_params
-def test_cli_update_users_when_filename_makes_expected_call(
+def test_cli_update_users_when_csv_makes_expected_call(
     httpserver_auth: HTTPServer,
     runner,
     option,
@@ -812,6 +812,41 @@ def test_cli_update_users_when_filename_makes_expected_call(
     result = runner.invoke(
         incydr,
         ["watchlists", command, TEST_WATCHLIST_ID, "--" + option, "@" + str(p)],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+@user_params
+def test_cli_update_users_when_json_makes_expected_call(  # TODO:  rename raw-json to jsonlines
+    httpserver_auth: HTTPServer,
+    runner,
+    option,
+    command,
+    url_path,
+    path_group,
+    expected_request,
+    tmp_path,
+):
+    p = tmp_path / "users.json"
+    p.write_text("\n".join([f'{{ "user": "{u}" }}' for u in USER_IDS]))
+
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/{path_group}/{url_path}",
+        method="POST",
+        json=expected_request,
+    ).respond_with_data()
+    result = runner.invoke(
+        incydr,
+        [
+            "watchlists",
+            command,
+            TEST_WATCHLIST_ID,
+            "--" + option,
+            "@" + str(p),
+            "--format",
+            "json-lines",
+        ],
     )
     httpserver_auth.check()
     assert result.exit_code == 0

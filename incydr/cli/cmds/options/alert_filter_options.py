@@ -1,6 +1,7 @@
 import click
 
 from incydr.cli.core import incompatible_with
+from incydr.cli.file_readers import FileOrString
 
 # did not include the following fields to filter by:
 # Description, HasAuthSignificantWatchlist, Target, LastModifiedAt,
@@ -86,6 +87,7 @@ severity_option = click.option(
 
 advanced_query_option = click.option(
     "--advanced-query",
+    type=FileOrString(),
     default=None,
     help=(
         "A raw JSON alerts query. Useful for when the provided query parameters do not satisfy your requirements.  "

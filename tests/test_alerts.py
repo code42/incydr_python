@@ -138,6 +138,47 @@ TEST_ALERT_DETAILS_RESPONSE = {
     ],
 }
 
+TEST_DICT_QUERY = {
+    "tenantId": "abcd-1234",
+    "groupClause": "AND",
+    "groups": [
+        {
+            "filterClause": "AND",
+            "filters": [
+                {
+                    "term": "CreatedAt",
+                    "operator": "ON_OR_AFTER",
+                    "value": "2022-06-01T00:00:00.000Z",
+                },
+            ],
+        },
+        {
+            "filterClause": "AND",
+            "filters": [
+                {
+                    "term": "Name",
+                    "operator": "IS",
+                    "value": "foo",
+                },
+            ],
+        },
+        {
+            "filterClause": "AND",
+            "filters": [
+                {
+                    "term": "State",
+                    "operator": "IS",
+                    "value": "OPEN",
+                },
+            ],
+        },
+    ],
+    "pgNum": 0,
+    "pgSize": 100,
+    "srtDirection": "DESC",
+    "srtKey": "CreatedAt",
+}
+
 TIMESTAMP = TEST_ALERTS_RESPONSE["alerts"][0]["createdAt"]
 CURSOR_TIMESTAMP = parse_ts_to_posix_ts(TIMESTAMP)
 
@@ -496,19 +537,198 @@ def test_cli_alerts_search_when_default_params_makes_expected_api_call(
             "2022-06-01",
         ],
     )
+    httpserver_auth.check()
     assert result.exit_code == 0
 
 
+# TODO
 def test_cli_alerts_search_when_custom_params_makes_expected_api_call(
     httpserver_auth: HTTPServer, runner
 ):
-    pass
+    query = {
+        "tenantId": "abcd-1234",
+        "groupClause": "AND",
+        "groups": [
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "CreatedAt",
+                        "operator": "ON_OR_AFTER",
+                        "value": "2022-06-01T00:00:00.000Z",
+                    },
+                    {
+                        "term": "CreatedAt",
+                        "operator": "ON_OR_BEFORE",
+                        "value": "2022-07-02T00:00:00.000Z",
+                    },
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "AlertId",
+                        "operator": "IS",
+                        "value": "bar",
+                    },
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "Type",
+                        "operator": "IS",
+                        "value": "alert",
+                    },
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "Name",
+                        "operator": "IS",
+                        "value": "foo",
+                    },
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "Actor",
+                        "operator": "IS",
+                        "value": "foo@bar.com",
+                    },
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "ActorId",
+                        "operator": "IS",
+                        "value": "foo-42",
+                    },
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "RiskSeverity",
+                        "operator": "IS",
+                        "value": "LOW",
+                    },
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "State",
+                        "operator": "IS",
+                        "value": "OPEN",
+                    },
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "RuleId",
+                        "operator": "IS",
+                        "value": "baz",
+                    },
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "AlertSeverity",
+                        "operator": "IS",
+                        "value": "HIGH",
+                    },
+                ],
+            },
+        ],
+        "pgNum": 0,
+        "pgSize": 100,
+        "srtDirection": "DESC",
+        "srtKey": "CreatedAt",
+    }
+
+    httpserver_auth.expect_request(
+        "/v1/alerts/query-alerts", method="POST", json=query
+    ).respond_with_json(TEST_ALERTS_RESPONSE)
+
+    result = runner.invoke(
+        incydr,
+        [
+            "alerts",
+            "search",
+            "--start",
+            "2022-06-01",
+            "--end",
+            "2022-07-02",
+            "--alert-id",
+            "bar",
+            "--type",
+            "alert",
+            "--name",
+            "foo",
+            "--actor",
+            "foo@bar.com",
+            "--actor-id",
+            "foo-42",
+            "--risk-severity",
+            "LOW",
+            "--state",
+            "OPEN",
+            "--rule-id",
+            "baz",
+            "--alert-severity",
+            "HIGH",
+        ],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
 
 
 def test_cli_alerts_search_when_advanced_query_makes_expected_api_call(
     httpserver_auth: HTTPServer, runner
 ):
-    pass
+    httpserver_auth.expect_request(
+        "/v1/alerts/query-alerts", method="POST", json=TEST_DICT_QUERY
+    ).respond_with_json(TEST_ALERTS_RESPONSE)
+
+    result = runner.invoke(
+        incydr,
+        ["alerts", "search", "--advanced-query", json.dumps(TEST_DICT_QUERY)],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_alerts_search_when_advanced_query_from_file_makes_expected_api_call(
+    httpserver_auth: HTTPServer, runner, tmp_path
+):
+    httpserver_auth.expect_request(
+        "/v1/alerts/query-alerts", method="POST", json=TEST_DICT_QUERY
+    ).respond_with_json(TEST_ALERTS_RESPONSE)
+
+    p = tmp_path / "query.json"
+    p.write_text(json.dumps(TEST_DICT_QUERY))
+
+    result = runner.invoke(
+        incydr,
+        ["alerts", "search", "--advanced-query", "@" + str(p)],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
 
 
 def test_cli_alerts_show_makes_expected_call(httpserver_auth: HTTPServer, runner):

@@ -977,7 +977,7 @@ def test_cli_bulk_remove_roles_makes_expected_call(
 @pytest.mark.parametrize(
     "command,uri", [("bulk-activate", "activate"), ("bulk-deactivate", "deactivate")]
 )
-def test_cli_bulk_activate_and_deactivate_makes_expected_call(
+def test_cli_bulk_activate_and_deactivate_when_csv_makes_expected_call(
     httpserver_auth: HTTPServer, runner, tmp_path, command, uri, mock_user_lookup
 ):
     httpserver_auth.expect_request(
@@ -997,7 +997,32 @@ def test_cli_bulk_activate_and_deactivate_makes_expected_call(
     assert result.exit_code == 0
 
 
-def test_cli_bulk_move_makes_expected_call(
+@pytest.mark.parametrize(
+    "command,uri", [("bulk-activate", "activate"), ("bulk-deactivate", "deactivate")]
+)
+def test_cli_bulk_activate_and_deactivate_when_json_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, tmp_path, command, uri, mock_user_lookup
+):
+    httpserver_auth.expect_request(
+        f"/v1/users/test-user-id/{uri}", method="POST"
+    ).respond_with_data()
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/{uri}", method="POST"
+    ).respond_with_data()
+    httpserver_auth.expect_request(
+        f"/v1/users/test-user-id-1/{uri}", method="POST"
+    ).respond_with_data()
+
+    p = tmp_path / "users.csv"
+    p.write_text(
+        '{"user": "test-user-id"}\n{"user": "foo@bar.com"}\n{"user": "test-user-id-1"}'
+    )
+    result = runner.invoke(incydr, ["users", command, str(p), "-f", "json-lines"])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_bulk_move_when_csv_makes_expected_call(
     httpserver_auth: HTTPServer, runner, tmp_path, mock_user_lookup
 ):
     httpserver_auth.expect_request(
@@ -1015,6 +1040,30 @@ def test_cli_bulk_move_makes_expected_call(
         f"user,org_guid\ntest-user-id,42\nfoo@bar.com,{TEST_ORG_GUID}\ntest-user-id-1,44"
     )
     result = runner.invoke(incydr, ["users", "bulk-move", str(p)])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_bulk_move_when_json_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, tmp_path, mock_user_lookup
+):
+    httpserver_auth.expect_request(
+        "/v1/users/test-user-id/move", method="POST", json={"orgGuid": "42"}
+    ).respond_with_data()
+    httpserver_auth.expect_request(
+        f"/v1/users/{TEST_USER_ID}/move", method="POST", json={"orgGuid": TEST_ORG_GUID}
+    ).respond_with_data()
+    httpserver_auth.expect_request(
+        "/v1/users/test-user-id-1/move", method="POST", json={"orgGuid": "44"}
+    ).respond_with_data()
+
+    p = tmp_path / "users.csv"
+    p.write_text(
+        '{"user": "test-user-id", "org_guid": "42"}\n{"user": "foo@bar.com", "org_guid": "orgGuid-1"}\n{"user": "test-user-id-1", "org_guid": "44"}'
+    )
+    result = runner.invoke(
+        incydr, ["users", "bulk-move", str(p), "--format", "json-lines"]
+    )
     httpserver_auth.check()
     assert result.exit_code == 0
 

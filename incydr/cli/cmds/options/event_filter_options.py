@@ -1,6 +1,7 @@
 import click
 
 from incydr.cli.core import incompatible_with
+from incydr.cli.file_readers import FileOrString
 
 AdvancedQueryAndSavedSearchIncompatible = incompatible_with(
     ["advanced_query", "saved_search"]
@@ -102,6 +103,7 @@ saved_search_option = click.option(
 advanced_query_option = click.option(  # TODO: update file input
     "--advanced-query",
     default=None,
+    type=FileOrString(),
     help=(
         "Get events from a raw JSON file events query. Useful for when the provided query parameters do not satisfy your requirements.  "
         "Argument can be passed as a string, read from stdin by passing '-', or from a filename if prefixed with '@',"

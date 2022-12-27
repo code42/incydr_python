@@ -1,6 +1,7 @@
 from contextlib import nullcontext
 from datetime import timezone
 from typing import Optional
+from typing import Union
 
 import click
 import requests
@@ -8,6 +9,7 @@ from boltons.iterutils import bucketize
 from boltons.iterutils import chunked
 from click import BadOptionUsage
 from click import Context
+from click import File
 from pydantic import Field
 from rich.panel import Panel
 
@@ -64,7 +66,7 @@ def search(
     output: Optional[str],
     certs: Optional[str],
     ignore_cert_validation: Optional[bool],
-    advanced_query: Optional[str],
+    advanced_query: Optional[Union[str, File]],
     start: Optional[str],
     end: Optional[str],
     on: Optional[str],
@@ -101,6 +103,8 @@ def search(
             start = float(checkpoint)
 
     if advanced_query:
+        if not isinstance(advanced_query, str):
+            advanced_query = advanced_query.read()
         query = AlertQuery.parse_raw(advanced_query)
     else:
         if not any([start, on, end]):

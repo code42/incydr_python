@@ -903,6 +903,30 @@ def test_cli_search_when_advanced_query_makes_expected_api_call(
     assert result.exit_code == 0
 
 
+def test_cli_search_when_advanced_query_from_file_makes_expected_api_call(
+    runner, httpserver_auth, tmp_path
+):
+    event_data = {
+        "fileEvents": [TEST_EVENT_1, TEST_EVENT_2],
+        "nextPgToken": None,
+        "problems": None,
+        "totalCount": 2,
+    }
+    httpserver_auth.expect_request(
+        "/v2/file-events", method="POST", json=TEST_DICT_QUERY
+    ).respond_with_json(event_data)
+
+    p = tmp_path / "query.json"
+    p.write_text(json.dumps(TEST_DICT_QUERY))
+
+    result = runner.invoke(
+        incydr,
+        ["file-events", "search", "--advanced-query", "@" + str(p)],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
 def test_cli_search_when_saved_search_makes_expected_api_call(
     runner, mock_get_saved_search, httpserver_auth
 ):
