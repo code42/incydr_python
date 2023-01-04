@@ -1015,7 +1015,7 @@ def test_cli_bulk_activate_and_deactivate_when_json_makes_expected_call(
 
     p = tmp_path / "users.csv"
     p.write_text(
-        '{"user": "test-user-id"}\n{"user": "foo@bar.com"}\n{"user": "test-user-id-1"}'
+        '{"userId": "test-user-id"}\n{"username": "foo@bar.com"}\n{"userId": "test-user-id-1"}'
     )
     result = runner.invoke(incydr, ["users", command, str(p), "-f", "json-lines"])
     httpserver_auth.check()
@@ -1059,7 +1059,7 @@ def test_cli_bulk_move_when_json_makes_expected_call(
 
     p = tmp_path / "users.csv"
     p.write_text(
-        '{"user": "test-user-id", "org_guid": "42"}\n{"user": "foo@bar.com", "org_guid": "orgGuid-1"}\n{"user": "test-user-id-1", "org_guid": "44"}'
+        '{"userId": "test-user-id", "org_guid": "42"}\n{"username": "foo@bar.com", "org_guid": "orgGuid-1"}\n{"userId": "test-user-id-1", "org_guid": "44"}'
     )
     result = runner.invoke(
         incydr, ["users", "bulk-move", str(p), "--format", "json-lines"]

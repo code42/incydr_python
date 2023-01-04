@@ -2,12 +2,9 @@ from uuid import UUID
 
 import click
 from click import Context
-from pydantic import Field
 from rich.progress import track
 from rich.table import Table
 
-from incydr._core.models import CSVModel
-from incydr._core.models import Model
 from incydr._watchlists.models.responses import IncludedDepartment
 from incydr._watchlists.models.responses import IncludedDirectoryGroup
 from incydr._watchlists.models.responses import Watchlist
@@ -17,6 +14,8 @@ from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
+from incydr.cli.cmds.models import UserCSV
+from incydr.cli.cmds.models import UserJSON
 from incydr.cli.cmds.options.output_options import columns_option
 from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
@@ -40,15 +39,6 @@ input_format_option = click.option(
     default="csv",
     help="Specify format of input file(s): 'csv' or 'json-lines'. Defaults to 'csv'. Multiple input files must all be the same format.",
 )
-
-
-class UserCSV(CSVModel):
-    user: str = Field(csv_aliases=["user", "user_id", "username", "id", "userId"])
-
-
-# TODO: what should this field be called?
-class UserJSON(Model):
-    user: str
 
 
 def get_watchlist_id_callback(ctx, param, value):

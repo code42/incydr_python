@@ -10,8 +10,6 @@ from requests import HTTPError
 from rich.panel import Panel
 from rich.progress import track
 
-from incydr._core.models import CSVModel
-from incydr._core.models import Model
 from incydr._devices.models import Device
 from incydr._users.client import RoleNotFoundError
 from incydr._users.client import RoleProcessingError
@@ -24,6 +22,8 @@ from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
+from incydr.cli.cmds.models import UserCSV
+from incydr.cli.cmds.models import UserJSON
 from incydr.cli.cmds.options.output_options import columns_option
 from incydr.cli.cmds.options.output_options import input_format_option
 from incydr.cli.cmds.options.output_options import single_format_option
@@ -38,14 +38,6 @@ from incydr.cli.file_readers import AutoDecodedFile
 from incydr.utils import model_as_card
 
 user_arg = click.argument("user", callback=user_lookup_callback)
-
-
-class UserCSV(CSVModel):
-    user: str = Field(csv_aliases=["user", "user_id", "username", "id", "userId"])
-
-
-class UserJSON(Model):
-    user: str
 
 
 @click.group(cls=IncydrGroup)
@@ -353,15 +345,13 @@ def bulk_update_roles(ctx: Context, file, update_method=None, format_=None):
         else:  # assume user_id
             return user
 
-    class RoleUpdateCSV(CSVModel):
-        user: str = Field(csv_aliases=["user", "user_id", "username", "id", "userId"])
+    class RoleUpdateCSV(UserCSV):
         role: str = Field(
             csv_aliases=["role", "role_id", "role_name", "roleId", "roleName"]
         )
 
-    class RoleUpdateJSON(Model):
-        user: str
-        role: str
+    class RoleUpdateJSON(UserJSON):
+        role: str = Field(alias="roleId")
 
     if format_ == "csv":
         roles_file = RoleUpdateCSV.parse_csv(file)
@@ -496,13 +486,11 @@ def bulk_move(ctx: Context, file: Path, format_: str):
     """
     client = ctx.obj()
 
-    class UserMoveCSV(CSVModel):
-        user: str = Field(csv_aliases=["user", "user_id", "username", "id", "userId"])
+    class UserMoveCSV(UserCSV):
         org_guid: str = Field(csv_aliases=["org_guid", "orgGuid", "org"])
 
-    class UserMoveJSON(Model):
-        user: str
-        org_guid: str
+    class UserMoveJSON(UserJSON):
+        org_guid: str = Field(alias="orgGuid")
 
     @lru_cache()
     def resolve_username(user):

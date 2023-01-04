@@ -23,6 +23,7 @@ per-file-ignores =
     incydr/__init__.py: F401
     incydr/_core/enums.py: F401
     incydr/_core/settings.py: B902
+    incydr/cli/cmds/models.py: B902
     incydr/_queries/_file_events/enums.py: B902
     incydr/cli/*: B008
     incydr/utils.py: B905

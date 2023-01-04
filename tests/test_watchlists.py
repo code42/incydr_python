@@ -829,7 +829,7 @@ def test_cli_update_users_when_json_makes_expected_call(
     tmp_path,
 ):
     p = tmp_path / "users.json"
-    p.write_text("\n".join([f'{{ "user": "{u}" }}' for u in USER_IDS]))
+    p.write_text("\n".join([f'{{ "userId": "{u}" }}' for u in USER_IDS]))
 
     httpserver_auth.expect_request(
         f"/v1/watchlists/{TEST_WATCHLIST_ID}/{path_group}/{url_path}",

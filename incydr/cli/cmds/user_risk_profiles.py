@@ -9,8 +9,6 @@ from requests import HTTPError
 from rich.panel import Panel
 from rich.progress import track
 
-from incydr._core.models import CSVModel
-from incydr._core.models import Model
 from incydr._user_risk_profiles.client import DateParseError
 from incydr._user_risk_profiles.models import UserRiskProfile
 from incydr.cli import console
@@ -18,6 +16,8 @@ from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
+from incydr.cli.cmds.models import UserCSV
+from incydr.cli.cmds.models import UserJSON
 from incydr.cli.cmds.options.output_options import columns_option
 from incydr.cli.cmds.options.output_options import input_format_option
 from incydr.cli.cmds.options.output_options import single_format_option
@@ -34,14 +34,12 @@ from incydr.cli.core import IncydrGroup
 from incydr.utils import model_as_card
 
 
-class UpdateCloudAliasesCSV(CSVModel):
-    user: str = Field(csv_aliases=["user", "user_id", "username", "id", "userId"])
+class UpdateCloudAliasesCSV(UserCSV):
     cloud_alias: str = Field(csv_aliases=["cloudAlias", "cloud_alias", "alias"])
 
 
-class UpdateCloudAliasesJSON(Model):
-    user: str
-    cloud_alias: str
+class UpdateCloudAliasesJSON(UserJSON):
+    cloud_alias: str = Field(alias="cloudAlias")
 
 
 @users.group(cls=IncydrGroup)
