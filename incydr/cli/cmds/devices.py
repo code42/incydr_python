@@ -1,12 +1,10 @@
 import click
-from click import Context
 from rich.panel import Panel
 
+from incydr._core.client import Client
 from incydr._devices.models import Device
 from incydr.cli import console
-from incydr.cli import init_client
-from incydr.cli import log_file_option
-from incydr.cli import log_level_option
+from incydr.cli import logging_options
 from incydr.cli import render
 from incydr.cli.cmds.options.output_options import columns_option
 from incydr.cli.cmds.options.output_options import single_format_option
@@ -19,12 +17,9 @@ from incydr.utils import model_as_card
 
 
 @click.group(cls=IncydrGroup)
-@log_level_option
-@log_file_option
-@click.pass_context
-def devices(ctx, log_level, log_file):
+@logging_options
+def devices():
     """View devices."""
-    init_client(ctx, log_level, log_file)
 
 
 @devices.command("list", cls=IncydrCommand)
@@ -40,9 +35,8 @@ def devices(ctx, log_level, log_file):
 )
 @table_format_option
 @columns_option
-@click.pass_context
+@logging_options
 def list_(
-    ctx: Context,
     active: bool = None,
     blocked: bool = None,
     format_: TableFormat = None,
@@ -51,7 +45,7 @@ def list_(
     """
     List devices.
     """
-    client = ctx.obj()
+    client = Client()
     devices = client.devices.v1.iter_all(active, blocked)
 
     if format_ == TableFormat.table:
@@ -80,12 +74,15 @@ def list_(
 @devices.command(cls=IncydrCommand)
 @click.argument("device_id")
 @single_format_option
-@click.pass_context
-def show(ctx: Context, device_id: str, format_: SingleFormat = None):
+@logging_options
+def show(
+    device_id: str,
+    format_: SingleFormat,
+):
     """
     Show details for a single device.
     """
-    client = ctx.obj()
+    client = Client()
     device = client.devices.v1.get_device(device_id)
 
     if format_ == SingleFormat.rich and client.settings.use_rich:

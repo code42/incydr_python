@@ -875,7 +875,7 @@ def test_cli_search_when_filter_params_makes_expected_api_call(
             "--risk-severity",
             "HIGH",
             "--risk-score",
-            10,
+            "10",
         ],
     )
     httpserver_auth.check()

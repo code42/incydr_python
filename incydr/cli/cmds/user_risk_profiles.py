@@ -3,18 +3,16 @@ from pathlib import Path
 from typing import Optional
 
 import click
-from click import Context
 from pydantic import Field
 from requests import HTTPError
 from rich.panel import Panel
 from rich.progress import track
 
+from incydr._core.client import Client
 from incydr._user_risk_profiles.client import DateParseError
 from incydr._user_risk_profiles.models import UserRiskProfile
 from incydr.cli import console
-from incydr.cli import init_client
-from incydr.cli import log_file_option
-from incydr.cli import log_level_option
+from incydr.cli import logging_options
 from incydr.cli import render
 from incydr.cli.cmds.models import UserCSV
 from incydr.cli.cmds.models import UserJSON
@@ -43,21 +41,17 @@ class UpdateCloudAliasesJSON(UserJSON):
 
 
 @users.group(cls=IncydrGroup)
-@log_level_option
-@log_file_option
-@click.pass_context
-def risk_profiles(ctx, log_level, log_file):
+@logging_options
+def risk_profiles():
     """View and manage user risk profiles."""
-    init_client(ctx, log_level, log_file)
 
 
 @risk_profiles.command("list", cls=IncydrCommand)
 @table_format_option
 @columns_option
 @profile_filter_options
-@click.pass_context
+@logging_options
 def list_(
-    ctx: Context,
     format_: TableFormat,
     columns: Optional[str],
     manager: Optional[str],
@@ -75,7 +69,7 @@ def list_(
     """
     List user risk profiles.
     """
-    client = ctx.obj()
+    client = Client()
     profiles = client.user_risk_profiles.v1.iter_all(
         manager_id=manager,
         title=title,
@@ -120,14 +114,17 @@ def list_(
 @risk_profiles.command(cls=IncydrCommand)
 @click.argument("user", callback=user_lookup_callback)
 @single_format_option
-@click.pass_context
-def show(ctx: Context, user: str, format_: SingleFormat):
+@logging_options
+def show(
+    user: str,
+    format_: SingleFormat,
+):
     """
     Show details for a user risk profile.
 
     Accepts a user ID or a username.  Performs an additional lookup if a username is passed.
     """
-    client = ctx.obj()
+    client = Client()
     profile = client.user_risk_profiles.v1.get_user_risk_profile(user)
     if format_ == SingleFormat.rich and client.settings.use_rich:
         console.print(
@@ -175,9 +172,8 @@ def show(ctx: Context, user: str, format_: SingleFormat):
     help="Clear the notes on a user's profile. Incompatible with --notes.",
     cls=incompatible_with("notes"),
 )
-@click.pass_context
+@logging_options
 def update(
-    ctx: Context,
     user,
     start_date=None,
     end_date=None,
@@ -199,7 +195,7 @@ def update(
             "is required to update a user risk profile."
         )
 
-    client = ctx.obj()
+    client = Client()
 
     if clear_start_date:
         start_date = ""
@@ -227,8 +223,11 @@ def update(
 @risk_profiles.command(cls=IncydrCommand)
 @click.argument("user", callback=user_lookup_callback)
 @click.argument("cloud-alias")
-@click.pass_context
-def add_cloud_alias(ctx: Context, user, cloud_alias):
+@logging_options
+def add_cloud_alias(
+    user: str,
+    cloud_alias: str,
+):
     """
     Add a cloud alias to a user risk profile.
 
@@ -238,7 +237,7 @@ def add_cloud_alias(ctx: Context, user, cloud_alias):
     Adding a cloud alias allows Incydr to link a user's cloud activity with their Code42 username.
     Each user has a default cloud alias of their Code42 username. You can add one additional alias.
     """
-    client = ctx.obj()
+    client = Client()
     client.user_risk_profiles.v1.add_cloud_alias(user, cloud_alias)
     console.print(f"Cloud alias successfully added to user '{user}")
 
@@ -246,14 +245,17 @@ def add_cloud_alias(ctx: Context, user, cloud_alias):
 @risk_profiles.command(cls=IncydrCommand)
 @click.argument("user", callback=user_lookup_callback)
 @click.argument("cloud-alias")
-@click.pass_context
-def remove_cloud_alias(ctx: Context, user, cloud_alias):
+@logging_options
+def remove_cloud_alias(
+    user: str,
+    cloud_alias: str,
+):
     """
     Remove a cloud alias from a user risk profile.
 
     Accepts a user ID or a username.  Performs an additional lookup if a username is passed.
     """
-    client = ctx.obj()
+    client = Client()
     client.user_risk_profiles.v1.delete_cloud_alias(user, cloud_alias)
     console.print(f"Cloud alias successfully removed from user '{user}")
 
@@ -261,8 +263,9 @@ def remove_cloud_alias(ctx: Context, user, cloud_alias):
 @risk_profiles.command(cls=IncydrCommand)
 @click.argument("file", type=click.File())
 @input_format_option
-@click.pass_context
-def bulk_add_cloud_aliases(ctx: Context, file: Path, format_: str):
+@logging_options
+def bulk_add_cloud_aliases(file: Path, format_: str):
+
     """
     Bulk add cloud aliases to user risk profiles.
 
@@ -275,7 +278,7 @@ def bulk_add_cloud_aliases(ctx: Context, file: Path, format_: str):
      * `user` - User ID or username of the user risk profile. Performs an additional lookup if username is passed.
      * `cloud_alias` - The cloud alias to remove from the profile.
     """
-    client = ctx.obj()
+    client = Client()
 
     @lru_cache()
     def resolve_username(user):
@@ -309,8 +312,8 @@ def bulk_add_cloud_aliases(ctx: Context, file: Path, format_: str):
 @risk_profiles.command(cls=IncydrCommand)
 @click.argument("file", type=click.File())
 @input_format_option
-@click.pass_context
-def bulk_remove_cloud_aliases(ctx: Context, file: Path, format_: str):
+@logging_options
+def bulk_remove_cloud_aliases(file: Path, format_: str):
     """
     Bulk remove cloud aliases from user risk profiles.
 
@@ -323,7 +326,7 @@ def bulk_remove_cloud_aliases(ctx: Context, file: Path, format_: str):
      * `user` - User ID or username of the user risk profile. Performs an additional lookup if username is passed.
      * `cloud_alias` - The cloud alias to remove from the profile.
     """
-    client = ctx.obj()
+    client = Client()
 
     @lru_cache()
     def resolve_username(user):

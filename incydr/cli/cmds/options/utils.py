@@ -1,5 +1,6 @@
 import click
 
+from incydr._core.client import Client
 from incydr.cli.cmds.utils import user_lookup
 
 checkpoint_option = click.option(
@@ -18,5 +19,5 @@ def user_lookup_callback(ctx, param, value):
         return
     # only call user_lookup if username to prevent unnecessary client inits with obj()
     if "@" in str(value):
-        return user_lookup(ctx.obj(), value)
+        return user_lookup(Client(), value)
     return value

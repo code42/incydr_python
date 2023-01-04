@@ -1,13 +1,13 @@
+from typing import Optional
+
 import click
-from click import Context
 from rich.table import Table
 
 from incydr._alert_rules.client import MissingUsernameCriterionError
 from incydr._alert_rules.models.response import RuleDetails
+from incydr._core.client import Client
 from incydr.cli import console
-from incydr.cli import init_client
-from incydr.cli import log_file_option
-from incydr.cli import log_level_option
+from incydr.cli import logging_options
 from incydr.cli import render
 from incydr.cli.cmds.options.output_options import columns_option
 from incydr.cli.cmds.options.output_options import single_format_option
@@ -25,23 +25,23 @@ MAX_USER_DISPLAY_COUNT = 25
 
 
 @click.group(cls=IncydrGroup)
-@log_level_option
-@log_file_option
-@click.pass_context
-def alert_rules(ctx, log_level, log_file):
+@logging_options
+def alert_rules():
     """View and manage alert rules."""
-    init_client(ctx, log_level, log_file)
 
 
 @alert_rules.command("list", cls=IncydrCommand)
 @table_format_option
 @columns_option
-@click.pass_context
-def list_(ctx: Context, format_: TableFormat = None, columns: str = None):
+@logging_options
+def list_(
+    format_: TableFormat,
+    columns: Optional[str],
+):
     """
     List all rules.
     """
-    client = ctx.obj()
+    client = Client()
     rules = client.alert_rules.v2.iter_all()
 
     if format_ == TableFormat.table:
@@ -71,14 +71,17 @@ def list_(ctx: Context, format_: TableFormat = None, columns: str = None):
 @alert_rules.command(cls=IncydrCommand)
 @single_format_option
 @click.argument("rule-id")
-@click.pass_context
-def show(ctx: Context, rule_id: str, format_: SingleFormat = None):
+@logging_options
+def show(
+    rule_id: str,
+    format_: SingleFormat,
+):
     """
     Show details for a single rule.
 
     If using `rich`, also retrieve the username filter for the rule (if it exists).
     """
-    client = ctx.obj()
+    client = Client()
     rule = client.alert_rules.v2.get_rule(rule_id)
 
     if format_ == SingleFormat.json_pretty:
@@ -145,41 +148,47 @@ def show(ctx: Context, rule_id: str, format_: SingleFormat = None):
 
 @alert_rules.command(cls=IncydrCommand)
 @click.argument("rule-ids")
-@click.pass_context
-def enable(ctx: Context, rule_ids: str):
+@logging_options
+def enable(
+    rule_ids: str,
+):
     """
     Enable a single rule or a set of rules.
 
     Where RULE-IDS is a comma-delimited list of rule IDs to enable.
     """
-    client = ctx.obj()
+    client = Client()
     client.alert_rules.v2.enable_rules([r.strip() for r in rule_ids.split(",")])
     console.print("Successfully enabled rule(s).")
 
 
 @alert_rules.command(cls=IncydrCommand)
 @click.argument("rule-ids")
-@click.pass_context
-def disable(ctx: Context, rule_ids: str):
+@logging_options
+def disable(
+    rule_ids: str,
+):
     """
     Disable a single rule or a set of rules.
     """
-    client = ctx.obj()
+    client = Client()
     client.alert_rules.v2.disable_rules([r.strip() for r in rule_ids.split(",")])
     console.print("Successfully disabled rule(s).")
 
 
 @alert_rules.command(cls=IncydrCommand)
 @click.argument("rule-id")
-@click.pass_context
-def remove_all_users(ctx: Context, rule_id: str):
+@logging_options
+def remove_all_users(
+    rule_id: str,
+):
     """
     Remove ALL users from a rule's username filter.
 
     Note that the removed users could become either included or excluded from the rule,
     depending on the rule's configuration.
     """
-    client = ctx.obj()
+    client = Client()
     client.alert_rules.v2.remove_all_users(rule_id)
     console.print(f"Successfully removed all users from rule '{rule_id}'.")
 
@@ -187,14 +196,17 @@ def remove_all_users(ctx: Context, rule_id: str):
 @alert_rules.command(cls=IncydrCommand)
 @click.argument("rule-id")
 @single_format_option
-@click.pass_context
-def list_users(ctx: Context, rule_id: str, format_: SingleFormat = None):
+@logging_options
+def list_users(
+    rule_id: str,
+    format_: SingleFormat,
+):
     """
     Lists the usernames on the rule's username filter.
 
     Note that users could either be included on or excluded from the rule depending on the rule's configuration.
     """
-    client = ctx.obj()
+    client = Client()
     try:
         username_filter = client.alert_rules.v2.get_users(rule_id)
     except MissingUsernameCriterionError:

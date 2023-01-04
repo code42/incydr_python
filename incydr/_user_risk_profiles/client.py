@@ -11,14 +11,15 @@ from incydr._user_risk_profiles.models import QueryUserRiskProfilesRequest
 from incydr._user_risk_profiles.models import UpdateUserRiskProfileRequest
 from incydr._user_risk_profiles.models import UserRiskProfile
 from incydr._user_risk_profiles.models import UserRiskProfilesPage
+from incydr.exceptions import IncydrException
 
 
-class DateParseError(Exception):
+class DateParseError(IncydrException):
     """An error raised when the date data cannot be parsed."""
 
     def __init__(self, date):
         super().__init__(
-            f"Error parsing time data. Date '{date}' does not match format {DATE_STR_FORMAT}."
+            f"Date Parse Error: Error parsing time data. Date '{date}' does not match format {DATE_STR_FORMAT}."
         )
 
 

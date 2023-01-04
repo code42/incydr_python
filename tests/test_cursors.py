@@ -3,14 +3,15 @@ from os import path
 import click
 import pytest
 
+from incydr.cli import get_user_project_path
 from incydr.cli.cursor import CursorStore
-from incydr.cli.cursor import get_user_project_path
 
 CURSOR_NAME = "testcursor"
 EVENT_KEY = "events"
 CHECKPOINT_FOLDER_NAME = "alert_checkpoints"
 PROFILE_NAME = "key-42"  # should be an api key
 DIR_PATH = get_user_project_path(
+    "checkpoints",
     PROFILE_NAME,
     CHECKPOINT_FOLDER_NAME,
 )
@@ -86,7 +87,7 @@ class TestBaseCursorStore:
         store.get(CURSOR_NAME)
         user_path = path.join(path.expanduser("~"), ".incydr")
         expected_path = path.join(
-            user_path, PROFILE_NAME, CHECKPOINT_FOLDER_NAME, CURSOR_NAME
+            user_path, "checkpoints", PROFILE_NAME, CHECKPOINT_FOLDER_NAME, CURSOR_NAME
         )
         mock_open.assert_called_once_with(expected_path)
 
@@ -95,7 +96,11 @@ class TestBaseCursorStore:
         store.replace("checkpointname", 123)
         user_path = path.join(path.expanduser("~"), ".incydr")
         expected_path = path.join(
-            user_path, PROFILE_NAME, CHECKPOINT_FOLDER_NAME, "checkpointname"
+            user_path,
+            "checkpoints",
+            PROFILE_NAME,
+            CHECKPOINT_FOLDER_NAME,
+            "checkpointname",
         )
         mock_open.assert_called_once_with(expected_path, "w")
 
@@ -103,7 +108,13 @@ class TestBaseCursorStore:
         store = CursorStore(DIR_PATH, EVENT_KEY)
         store.replace("checkpointname", 123)
         user_path = path.join(path.expanduser("~"), ".incydr")
-        path.join(user_path, PROFILE_NAME, CHECKPOINT_FOLDER_NAME, "checkpointname")
+        path.join(
+            user_path,
+            "checkpoints",
+            PROFILE_NAME,
+            CHECKPOINT_FOLDER_NAME,
+            "checkpointname",
+        )
         mock_open.return_value.write.assert_called_once_with("123")
 
     def test_delete_calls_remove_on_expected_file(self, mock_open, mock_remove):
@@ -111,7 +122,7 @@ class TestBaseCursorStore:
         store.delete("deleteme")
         user_path = path.join(path.expanduser("~"), ".incydr")
         expected_path = path.join(
-            user_path, PROFILE_NAME, CHECKPOINT_FOLDER_NAME, "deleteme"
+            user_path, "checkpoints", PROFILE_NAME, CHECKPOINT_FOLDER_NAME, "deleteme"
         )
         mock_remove.assert_called_once_with(expected_path)
 
@@ -153,7 +164,11 @@ class TestBaseCursorStore:
         user_path = path.join(path.expanduser("~"), ".incydr")
         expected_filename = CURSOR_NAME + "_events"
         expected_path = path.join(
-            user_path, PROFILE_NAME, CHECKPOINT_FOLDER_NAME, expected_filename
+            user_path,
+            "checkpoints",
+            PROFILE_NAME,
+            CHECKPOINT_FOLDER_NAME,
+            expected_filename,
         )
         mock_open.assert_called_once_with(expected_path)
 
@@ -176,6 +191,7 @@ class TestBaseCursorStore:
         user_path = path.join(path.expanduser("~"), ".incydr")
         expected_path = path.join(
             user_path,
+            "checkpoints",
             PROFILE_NAME,
             CHECKPOINT_FOLDER_NAME,
             "checkpointname_events",
@@ -188,6 +204,7 @@ class TestBaseCursorStore:
         user_path = path.join(path.expanduser("~"), ".incydr")
         path.join(
             user_path,
+            "checkpoints",
             PROFILE_NAME,
             CHECKPOINT_FOLDER_NAME,
             "checkpointname_events",

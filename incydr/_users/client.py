@@ -16,6 +16,7 @@ from incydr._users.models import UserRole
 from incydr._users.models import UsersPage
 from incydr.enums import SortDirection
 from incydr.enums.devices import SortKeys
+from incydr.exceptions import IncydrException
 
 
 class UsersClient:
@@ -367,7 +368,7 @@ class UsersV1:
             self._available_roles[r.role_name] = r.role_id
 
 
-class RoleProcessingError(Exception):
+class RoleProcessingError(IncydrException):
     """
     Outputs list of errors that arose during processing.
 
@@ -391,9 +392,9 @@ class RoleProcessingError(Exception):
         return self._errors
 
 
-class UserNotAssignedRoleError(Exception):
+class UserNotAssignedRoleError(IncydrException):
     def __init__(self, role):
-        message = f"User is not currently assigned the following role: '{role}'. Role cannot be removed."
+        message = f"User Not Assigned Role Error: User is not currently assigned the following role: '{role}'. Role cannot be removed."
         super().__init__(message)
         self._role = role
 
@@ -403,9 +404,9 @@ class UserNotAssignedRoleError(Exception):
         return self._role
 
 
-class RoleNotFoundError(Exception):
+class RoleNotFoundError(IncydrException):
     def __init__(self, role):
-        message = f"No role matching the following was found: '{role}', or you do not have permission to assign this role. Roles can be specified by case-sensitive name (ie. 'Cloud Admin') or ID (ie. cloud-admin)."
+        message = f"Role Not Found Error: No role matching the following was found: '{role}', or you do not have permission to assign this role. Roles can be specified by case-sensitive name (ie. 'Cloud Admin') or ID (ie. cloud-admin)."
         super().__init__(message)
         self._role = role
 

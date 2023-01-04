@@ -2,13 +2,11 @@ import json
 from typing import Optional
 
 import click
-from click import Context
 from click import echo
 
+from incydr._core.client import Client
 from incydr.cli import console
-from incydr.cli import init_client
-from incydr.cli import log_file_option
-from incydr.cli import log_level_option
+from incydr.cli import logging_options
 from incydr.cli.cmds.options.output_options import single_format_option
 from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.core import IncydrCommand
@@ -17,12 +15,9 @@ from incydr.utils import list_as_panel
 
 
 @click.group(cls=IncydrGroup)
-@log_level_option
-@log_file_option
-@click.pass_context
-def departments(ctx, log_level, log_file):
+@logging_options
+def departments():
     """View departments."""
-    init_client(ctx, log_level, log_file)
 
 
 @departments.command("list", cls=IncydrCommand)
@@ -30,14 +25,17 @@ def departments(ctx, log_level, log_file):
 @click.option(
     "--name", default=None, help="Filter by departments with a matching name."
 )
-@click.pass_context
-def list_(ctx: Context, format_: SingleFormat, name: Optional[str] = None):
+@logging_options
+def list_(
+    format_: SingleFormat,
+    name: Optional[str],
+):
     """
     Retrieve departments that have been pushed to Code42 from SCIM or User Directory Sync.
 
     The results can then be used with the watchlists commands to automatically assign users to watchlists by department.
     """
-    client = ctx.obj()
+    client = Client()
     if not client.settings.use_rich and format_ == SingleFormat.rich:
         format_ = SingleFormat.json_lines
     deps = list(client.departments.v1.iter_all(name=name))

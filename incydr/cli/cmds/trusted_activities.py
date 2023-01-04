@@ -1,13 +1,11 @@
 import click
-from click import Context
 from rich.table import Table
 
+from incydr._core.client import Client
 from incydr._trusted_activities.client import MissingActivityActionGroupsError
 from incydr._trusted_activities.models import TrustedActivity
 from incydr.cli import console
-from incydr.cli import init_client
-from incydr.cli import log_file_option
-from incydr.cli import log_level_option
+from incydr.cli import logging_options
 from incydr.cli import render
 from incydr.cli.cmds.options.output_options import columns_option
 from incydr.cli.cmds.options.output_options import single_format_option
@@ -21,19 +19,19 @@ from incydr.utils import model_as_card
 
 
 @click.group(cls=IncydrGroup)
-@log_level_option
-@log_file_option
-@click.pass_context
-def trusted_activities(ctx, log_level, log_file):
+@logging_options
+def trusted_activities():
     """View and manage trusted activities."""
-    init_client(ctx, log_level, log_file)
 
 
 @trusted_activities.command(cls=IncydrCommand)
 @click.argument("activity_id")
 @single_format_option
-@click.pass_context
-def show(ctx: Context, activity_id: str, format_: SingleFormat = None):
+@logging_options
+def show(
+    activity_id: str,
+    format_: SingleFormat,
+):
     """
     Show details for a single trusted activity.
 
@@ -41,7 +39,7 @@ def show(ctx: Context, activity_id: str, format_: SingleFormat = None):
     various trusted service configurations (if applicable). For example, a trusted domain may include an activity
     action group indicating `GMAIL` as a trusted email sharing service.
     """
-    client = ctx.obj()
+    client = Client()
     trusted_activity = client.trusted_activities.v2.get_trusted_activity(activity_id)
     _output_trusted_activity(
         trusted_activity, format_, use_rich=client.settings.use_rich
@@ -52,9 +50,8 @@ def show(ctx: Context, activity_id: str, format_: SingleFormat = None):
 @click.option("--activity-type", type=ActivityType, default=None, help="")
 @table_format_option
 @columns_option
-@click.pass_context
+@logging_options
 def list_(
-    ctx: Context,
     activity_type: ActivityType = None,
     format_: TableFormat = None,
     columns: str = None,
@@ -62,7 +59,7 @@ def list_(
     """
     List all trusted activities.
     """
-    client = ctx.obj()
+    client = Client()
     activities = client.trusted_activities.v2.iter_all(activity_type=activity_type)
     if format_ == TableFormat.table:
         columns = columns or [
@@ -93,9 +90,8 @@ def list_(
 @click.option("--description", default=None)
 @click.option("--high-value-source", type=bool, default=None)
 @single_format_option
-@click.pass_context
+@logging_options
 def update(
-    ctx: Context,
     activity_id: str,
     type_: str = None,
     value: str = None,
@@ -111,7 +107,7 @@ def update(
             "At least one command option must be provided to update a trusted activity.  Use `trusted-activities update --help` to see available options."
         )
     # left off updating activity-action-groups for now, they're very complex
-    client = ctx.obj()
+    client = Client()
     trusted_activity = client.trusted_activities.v2.get_trusted_activity(activity_id)
     if type_:
         trusted_activity.type = type_
@@ -127,17 +123,20 @@ def update(
 
 @trusted_activities.command(cls=IncydrCommand)
 @click.argument("activity_id")
-@click.pass_context
-def delete(ctx: Context, activity_id: str):
+@logging_options
+def delete(
+    activity_id: str,
+):
     """
     Delete a trusted activity.
     """
-    client = ctx.obj()
+    client = Client()
     client.trusted_activities.v2.delete(activity_id)
     console.print(f"Successfully deleted trusted activity {activity_id}.")
 
 
 @trusted_activities.group(cls=IncydrGroup)
+@logging_options
 def add():
     """Add a new trusted activity."""
 
@@ -182,9 +181,8 @@ def add():
     multiple=True,
 )
 @single_format_option
-@click.pass_context
+@logging_options
 def domain_(
-    ctx: Context,
     domain: str,
     description: str = None,
     file_upload: bool = False,
@@ -224,7 +222,7 @@ def domain_(
         trusted-activities add domain --file-upload --cloud-sync-services BOX --cloud-sync-services ICLOUD
 
     """
-    client = ctx.obj()
+    client = Client()
     try:
         activity = client.trusted_activities.v2.add_domain(
             domain,
@@ -246,14 +244,16 @@ def domain_(
 @click.argument("url_path")
 @click.option("--description", default=None, help="Optional description.")
 @single_format_option
-@click.pass_context
+@logging_options
 def url_path_(
-    ctx: Context, url_path: str, description: str = None, format_: SingleFormat = None
+    url_path: str,
+    description: str = None,
+    format_: SingleFormat = None,
 ):
     """
     Trust browser uploads to only part of a domain by trusting a specific URL_PATH (ex: my-domain.com/path).
     """
-    client = ctx.obj()
+    client = Client()
     activity = client.trusted_activities.v2.add_url_path(url_path, description)
     _output_trusted_activity(activity, format_, client.settings.use_rich)
 
@@ -262,9 +262,8 @@ def url_path_(
 @click.argument("workspace_name")
 @click.option("--description", default=None, help="Optional description.")
 @single_format_option
-@click.pass_context
+@logging_options
 def slack_workspace(
-    ctx: Context,
     workspace_name: str,
     description: str = None,
     format_: SingleFormat = None,
@@ -272,7 +271,7 @@ def slack_workspace(
     """
     Trust activity uploaded through a slack workspace specified by WORKSPACE_NAME.
     """
-    client = ctx.obj()
+    client = Client()
     activity = client.trusted_activities.v2.add_slack_workspace(
         workspace_name, description=description
     )
@@ -295,9 +294,8 @@ def slack_workspace(
     help="Trust OneDrive as a cloud sync service.",
 )
 @single_format_option
-@click.pass_context
+@logging_options
 def account(
-    ctx: Context,
     account_name: str,
     description: str = None,
     dropbox: bool = False,
@@ -309,7 +307,7 @@ def account(
 
     Use the --dropbox and/or --one-drive options to indicate trusted cloud sync services for this account.
     """
-    client = ctx.obj()
+    client = Client()
     activity = client.trusted_activities.v2.add_account_name(
         account_name, description=description, dropbox=dropbox, one_drive=one_drive
     )
@@ -320,14 +318,16 @@ def account(
 @click.argument("git_uri")
 @click.option("--description", default=None, help="Optional description.")
 @single_format_option
-@click.pass_context
+@logging_options
 def git_repo(
-    ctx: Context, git_uri: str, description: str = None, format_: SingleFormat = None
+    git_uri: str,
+    description: str = None,
+    format_: SingleFormat = None,
 ):
     """
     Trust file upload activity to a git repository.  Requires a git URI path (ex: bitbucket.org:exampleent/myrepo).
     """
-    client = ctx.obj()
+    client = Client()
     activity = client.trusted_activities.v2.add_git_repository(
         git_uri, description=description
     )
