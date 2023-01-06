@@ -1,7 +1,10 @@
+from functools import lru_cache
+from pathlib import Path
 from typing import Optional
 
 import click
 from click import Context
+from pydantic import Field
 from requests import HTTPError
 from rich.panel import Panel
 from rich.progress import track
@@ -13,7 +16,10 @@ from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
+from incydr.cli.cmds.models import UserCSV
+from incydr.cli.cmds.models import UserJSON
 from incydr.cli.cmds.options.output_options import columns_option
+from incydr.cli.cmds.options.output_options import input_format_option
 from incydr.cli.cmds.options.output_options import single_format_option
 from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
@@ -26,7 +32,14 @@ from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
 from incydr.utils import model_as_card
-from incydr.utils import read_dict_from_csv
+
+
+class UpdateCloudAliasesCSV(UserCSV):
+    cloud_alias: str = Field(csv_aliases=["cloudAlias", "cloud_alias", "alias"])
+
+
+class UpdateCloudAliasesJSON(UserJSON):
+    cloud_alias: str = Field(alias="cloudAlias")
 
 
 @users.group(cls=IncydrGroup)
@@ -92,11 +105,11 @@ def list_(
         render.table(UserRiskProfile, profiles, columns=columns, flat=False)
     else:
         printed = False
-        if format_ == TableFormat.json:
+        if format_ == TableFormat.json_pretty:
             for p in profiles:
                 printed = True
                 console.print_json(p.json())
-        else:  # raw-json
+        else:
             for p in profiles:
                 printed = True
                 click.echo(p.json())
@@ -120,9 +133,9 @@ def show(ctx: Context, user: str, format_: SingleFormat):
         console.print(
             Panel.fit(model_as_card(profile), title=f"Risk Profile {profile.username}")
         )
-    elif format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json_pretty:
         console.print_json(profile.json())
-    else:  # format == "raw-json"
+    else:
         click.echo(profile.json())
 
 
@@ -246,65 +259,96 @@ def remove_cloud_alias(ctx: Context, user, cloud_alias):
 
 
 @risk_profiles.command(cls=IncydrCommand)
-@click.argument("csv")
+@click.argument("file", type=click.File())
+@input_format_option
 @click.pass_context
-def bulk_add_cloud_aliases(ctx: Context, csv):
+def bulk_add_cloud_aliases(ctx: Context, file: Path, format_: str):
     """
     Bulk add cloud aliases to user risk profiles.
 
-    Takes a single arg `CSV` which specifies the path to the file.
+    Takes a single arg `FILE` which specifies the path to the file (use "-" to read from stdin).
 
-    Requires the following columns:
+    File format can either be CSV or [JSON Lines format](https://jsonlines.org) (Default is CSV).
+
+    Required CSV columns:
+
      * `user` - User ID or username of the user risk profile. Performs an additional lookup if username is passed.
-     * `cloud_alias` - The cloud alias to add to the profile.
+     * `cloud_alias` - The cloud alias to remove from the profile.
     """
     client = ctx.obj()
-    username_cache = {}
+
+    @lru_cache()
+    def resolve_username(user):
+        if user is None:
+            return
+        elif "@" in user:
+            return user_lookup(client, user)
+        else:  # assume user_id
+            return user
+
+    if format_ == "csv":
+        models = UpdateCloudAliasesCSV.parse_csv(file)
+    else:
+        models = UpdateCloudAliasesJSON.parse_json_lines(file)
+
     try:
         for row in track(
-            read_dict_from_csv(csv),
+            models,
             description="Adding cloud aliases...",
             transient=True,
         ):
-            user = row.get("user")
-            if user and "@" in user:
-                user = username_cache.get(row["user"])
-                if not user:
-                    user = username_cache[row["user"]] = user_lookup(
-                        client, row["user"]
-                    )
-
-            client.user_risk_profiles.v1.add_cloud_alias(user, row["cloud_alias"])
-
+            client.user_risk_profiles.v1.add_cloud_alias(
+                resolve_username(row.user), row.cloud_alias
+            )
+    except ValueError as err:
+        console.print(f"[red]Error:[/red] {err}")
     except HTTPError as err:
         console.print(f"[red]Error:[/red] {err.response.text}")
 
 
 @risk_profiles.command(cls=IncydrCommand)
-@click.argument("csv")
+@click.argument("file", type=click.File())
+@input_format_option
 @click.pass_context
-def bulk_remove_cloud_aliases(ctx: Context, csv):
+def bulk_remove_cloud_aliases(ctx: Context, file: Path, format_: str):
     """
     Bulk remove cloud aliases from user risk profiles.
 
-    Takes a single arg `CSV` which specifies the path to the file.
+    Takes a single arg `FILE` which specifies the path to the file (use "-" to read from stdin).
 
-    Requires the following columns:
+    File format can either be CSV or [JSON Lines format](https://jsonlines.org) (Default is CSV).
+
+    Required CSV columns:
+
      * `user` - User ID or username of the user risk profile. Performs an additional lookup if username is passed.
      * `cloud_alias` - The cloud alias to remove from the profile.
     """
     client = ctx.obj()
+
+    @lru_cache()
+    def resolve_username(user):
+        if user is None:
+            return
+        elif "@" in user:
+            return user_lookup(client, user)
+        else:  # assume user_id
+            return user
+
+    if format_ == "csv":
+        models = UpdateCloudAliasesCSV.parse_csv(file)
+    else:
+        models = UpdateCloudAliasesJSON.parse_json_lines(file)
+
     try:
         for row in track(
-            read_dict_from_csv(csv),
-            description="Adding cloud aliases...",
+            models,
+            description="Removing cloud aliases...",
             transient=True,
         ):
-            user = row.get("user")
-            if user and "@" in user:
-                user = user_lookup(client, row["user"])
-
-            client.user_risk_profiles.v1.delete_cloud_alias(user, row["cloud_alias"])
-
+            client.user_risk_profiles.v1.delete_cloud_alias(
+                resolve_username(row.user), row.cloud_alias
+            )
+    except ValueError as err:
+        console.print(f"[red]Error:[/red] {err}")
     except HTTPError as err:
         console.print(f"[red]Error:[/red] {err.response.text}")

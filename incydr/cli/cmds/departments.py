@@ -39,7 +39,7 @@ def list_(ctx: Context, format_: SingleFormat, name: Optional[str] = None):
     """
     client = ctx.obj()
     if not client.settings.use_rich and format_ == SingleFormat.rich:
-        format_ = SingleFormat.raw_json
+        format_ = SingleFormat.json_lines
     deps = list(client.departments.v1.iter_all(name=name))
 
     if not deps:
@@ -48,7 +48,7 @@ def list_(ctx: Context, format_: SingleFormat, name: Optional[str] = None):
 
     if format_ == SingleFormat.rich:
         console.print(list_as_panel(deps, expand=False, title="Departments"))
-    elif format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json_pretty:
         console.print_json(data=deps)
     else:
         click.echo(json.dumps(deps))

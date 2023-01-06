@@ -1,6 +1,7 @@
 from contextlib import nullcontext
 from datetime import timezone
 from typing import Optional
+from typing import Union
 
 import click
 import requests
@@ -8,6 +9,7 @@ from boltons.iterutils import bucketize
 from boltons.iterutils import chunked
 from click import BadOptionUsage
 from click import Context
+from click import File
 from pydantic import Field
 from rich.panel import Panel
 
@@ -64,7 +66,7 @@ def search(
     output: Optional[str],
     certs: Optional[str],
     ignore_cert_validation: Optional[bool],
-    advanced_query: Optional[str],
+    advanced_query: Optional[Union[str, File]],
     start: Optional[str],
     end: Optional[str],
     on: Optional[str],
@@ -92,7 +94,7 @@ def search(
     cursor = _get_cursor_store(client.settings.api_client_id)
 
     if output:
-        format_ = TableFormat.raw_json
+        format_ = TableFormat.json_lines
 
     # Use stored checkpoint timestamp for start filter if applicable
     if checkpoint_name:
@@ -101,6 +103,8 @@ def search(
             start = float(checkpoint)
 
     if advanced_query:
+        if not isinstance(advanced_query, str):
+            advanced_query = advanced_query.read()
         query = AlertQuery.parse_raw(advanced_query)
     else:
         if not any([start, on, end]):
@@ -150,7 +154,7 @@ def search(
             printed = False
             for alert_ in alerts_gen:
                 printed = True
-                if format_ == TableFormat.json:
+                if format_ == TableFormat.json_pretty:
                     console.print_json(alert_.json())
                 elif output:
                     logger = get_server_logger(output, certs, ignore_cert_validation)
@@ -184,9 +188,9 @@ def show(ctx: Context, alert_id: str, format_: SingleFormat = None):
     alert = client.alerts.v1.get_details(alert_id)[0]
     if format_ == SingleFormat.rich:
         console.print(Panel.fit(model_as_card(alert)))
-    elif format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json_pretty:
         console.print_json(alert.json())
-    else:  # raw-json
+    else:
         click.echo(alert.json())
 
 

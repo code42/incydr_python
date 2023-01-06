@@ -1,10 +1,12 @@
 import json
 from contextlib import nullcontext
 from typing import Optional
+from typing import Union
 
 import click
 from click import BadOptionUsage
 from click import Context
+from click import File
 from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.table import Table
@@ -82,7 +84,7 @@ def search(
     output: Optional[str],
     certs: Optional[str],
     ignore_cert_validation: Optional[bool],
-    advanced_query: Optional[str],
+    advanced_query: Optional[Union[str, File]],
     saved_search: Optional[str],
     start: Optional[str],
     end: Optional[str],
@@ -115,7 +117,7 @@ def search(
     additional filters on subsequent runs will be ignored.
     """
     if output:
-        format_ = TableFormat.raw_json
+        format_ = TableFormat.json_lines
 
     client = ctx.obj()
 
@@ -123,6 +125,8 @@ def search(
         saved_search = client.file_events.v2.get_saved_search(saved_search)
         query = EventQuery.from_saved_search(saved_search)
     elif advanced_query:
+        if not isinstance(advanced_query, str):
+            advanced_query = advanced_query.read()
         query = EventQuery.parse_raw(advanced_query)
     else:
         if not start:
@@ -166,7 +170,7 @@ def search(
         checkpoint_func = None
 
     # skip pydantic modeling when output will just be json
-    if format_ in ("json", "raw-json"):
+    if format_ in (TableFormat.json_pretty, TableFormat.json_lines):
 
         def yield_all_events(q: EventQuery):
             while q.page_token is not None:
@@ -200,7 +204,7 @@ def search(
             printed = False
             for event in events:
                 printed = True
-                if format_ == TableFormat.json:
+                if format_ == TableFormat.json_pretty:
                     console.print_json(data=event)
                 elif output:
                     logger = get_server_logger(output, certs, ignore_cert_validation)
@@ -233,9 +237,9 @@ def show_saved_search(ctx: Context, search_id: str, format_: SingleFormat):
     saved_search = client.file_events.v2.get_saved_search(search_id)
     if format_ == SingleFormat.rich:
         console.print(Panel.fit(model_as_card(saved_search)))
-    elif format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json_pretty:
         console.print_json(saved_search.json())
-    else:  # raw-json
+    else:
         click.echo(saved_search.json())
 
 
@@ -257,7 +261,7 @@ def list_saved_searches(
         render.table(SavedSearch, searches, columns=columns, flat=False)
     elif format_ == TableFormat.csv:
         render.csv(SavedSearch, searches, columns=columns, flat=True)
-    elif format_ == TableFormat.json:
+    elif format_ == TableFormat.json_pretty:
         for s in searches:
             console.print_json(s.json())
     else:

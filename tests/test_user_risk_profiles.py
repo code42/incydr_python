@@ -349,14 +349,17 @@ def test_cli_remove_cloud_alias_makes_expected_call(
     assert result.exit_code == 0
 
 
-@pytest.mark.parametrize(
+cloud_alias_params = pytest.mark.parametrize(
     "url_path,command",
     [
         ("add-cloud-aliases", "bulk-add-cloud-aliases"),
         ("delete-cloud-aliases", "bulk-remove-cloud-aliases"),
     ],
 )
-def test_cli_bulk_update_cloud_aliases_when_user_id_or_username_makes_expected_call(
+
+
+@cloud_alias_params
+def test_cli_bulk_update_cloud_aliases_when_csv_makes_expected_call(
     httpserver_auth: HTTPServer, runner, tmp_path, mock_user_lookup, url_path, command
 ):
     httpserver_auth.expect_request(
@@ -375,5 +378,31 @@ def test_cli_bulk_update_cloud_aliases_when_user_id_or_username_makes_expected_c
         "user,cloud_alias\ntest-user-id,test-alias-1\nfoo@bar.com,test-alias-2\n"
     )
     result = runner.invoke(incydr, ["users", "risk-profiles", command, str(p)])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+@cloud_alias_params
+def test_cli_bulk_update_cloud_aliases_when_json_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, tmp_path, mock_user_lookup, url_path, command
+):
+    httpserver_auth.expect_request(
+        f"/v1/user-risk-profiles/test-user-id/{url_path}",
+        method="POST",
+        json={"userId": "test-user-id", "cloudAliases": ["test-alias-1"]},
+    ).respond_with_json(TEST_USER_RISK_PROFILE_1)
+    httpserver_auth.expect_request(
+        f"/v1/user-risk-profiles/{TEST_USER_ID}/{url_path}",
+        method="POST",
+        json={"userId": TEST_USER_ID, "cloudAliases": ["test-alias-2"]},
+    ).respond_with_json(TEST_USER_RISK_PROFILE_2)
+
+    p = tmp_path / "user_aliases.csv"
+    p.write_text(
+        '{ "user": "test-user-id", "cloud_alias": "test-alias-1" }\n{ "user": "foo@bar.com", "cloud_alias": "test-alias-2"}'
+    )
+    result = runner.invoke(
+        incydr, ["users", "risk-profiles", command, str(p), "--format", "json-lines"]
+    )
     httpserver_auth.check()
     assert result.exit_code == 0

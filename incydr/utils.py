@@ -261,22 +261,6 @@ def read_models_from_csv(
         raise error
 
 
-def read_dict_from_csv(
-    path: Union[str, Path, IOBase], field_names: List[str] = None
-) -> Generator[dict, None, None]:
-    if isinstance(path, IOBase):
-        file = path
-    else:
-        path = Path(path)
-        file = path.open(mode="r", encoding="utf-8")
-    reader = DictReader(file, fieldnames=field_names)
-    for row in reader:
-        for key, val in row.items():
-            if val == "":
-                row[key] = None
-        yield row  # noqa
-
-
 def write_models_to_csv(
     models: Iterable[BaseModel],
     path: Union[str, Path, IOBase, TextIO],

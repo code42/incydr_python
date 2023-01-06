@@ -78,7 +78,7 @@ def list_(
         render.table(TrustedActivity, activities, columns=columns)
     elif format_ == TableFormat.csv:
         render.csv(TrustedActivity, activities, columns=columns)
-    elif format_ == TableFormat.json:
+    elif format_ == TableFormat.json_pretty:
         for activity in activities:
             console.print_json(activity.json())
     else:
@@ -354,7 +354,7 @@ def _output_trusted_activity(
         )
 
         console.print(t)
-    elif format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json_pretty:
         console.print_json(model.json())
     else:
         click.echo(model.json())

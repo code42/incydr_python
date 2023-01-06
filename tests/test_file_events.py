@@ -540,7 +540,12 @@ def test_get_saved_search_returns_expected_data(mock_get_saved_search):
 
 format_arg = pytest.mark.parametrize(
     "format_",
-    [TableFormat.json, TableFormat.raw_json, TableFormat.csv, TableFormat.table],
+    [
+        TableFormat.json_pretty,
+        TableFormat.json_lines,
+        TableFormat.csv,
+        TableFormat.table,
+    ],
 )
 
 
@@ -898,6 +903,30 @@ def test_cli_search_when_advanced_query_makes_expected_api_call(
             "--advanced-query",
             json.dumps(TEST_DICT_QUERY),
         ],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_search_when_advanced_query_from_file_makes_expected_api_call(
+    runner, httpserver_auth, tmp_path
+):
+    event_data = {
+        "fileEvents": [TEST_EVENT_1, TEST_EVENT_2],
+        "nextPgToken": None,
+        "problems": None,
+        "totalCount": 2,
+    }
+    httpserver_auth.expect_request(
+        "/v2/file-events", method="POST", json=TEST_DICT_QUERY
+    ).respond_with_json(event_data)
+
+    p = tmp_path / "query.json"
+    p.write_text(json.dumps(TEST_DICT_QUERY))
+
+    result = runner.invoke(
+        incydr,
+        ["file-events", "search", "--advanced-query", "@" + str(p)],
     )
     httpserver_auth.check()
     assert result.exit_code == 0

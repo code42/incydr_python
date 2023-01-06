@@ -14,6 +14,8 @@ from incydr.cli import init_client
 from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
+from incydr.cli.cmds.models import UserCSV
+from incydr.cli.cmds.models import UserJSON
 from incydr.cli.cmds.options.output_options import columns_option
 from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
@@ -22,13 +24,21 @@ from incydr.cli.cmds.utils import user_lookup
 from incydr.cli.core import incompatible_with
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
+from incydr.cli.file_readers import FileOrString
 from incydr.cli.render import measure_renderable
 from incydr.cli.render import models_as_table
-from incydr.types import file_or_str_cls
 from incydr.utils import model_as_card
-from incydr.utils import read_dict_from_csv
 
 MAX_USER_DISPLAY_COUNT = 25
+
+input_format_option = click.option(
+    "--format",
+    "-f",
+    "format_",
+    type=click.Choice(["csv", "json-lines"]),
+    default="csv",
+    help="Specify format of input file(s): 'csv' or 'json-lines'. Defaults to 'csv'. Multiple input files must all be the same format.",
+)
 
 
 def get_watchlist_id_callback(ctx, param, value):
@@ -243,7 +253,7 @@ def update(
 @click.option(
     "--users",
     default=None,
-    type=file_or_str_cls,
+    type=FileOrString(),
     help="List of user IDs or usernames to include on the watchlist. "
     "An additional lookup is performed if a username is passed. Argument can be "
     "passed as a comma-delimited string or from a CSV file with a single 'user' "
@@ -252,7 +262,7 @@ def update(
 @click.option(
     "--excluded-users",
     default=None,
-    type=file_or_str_cls,
+    type=FileOrString(),
     help="List of user IDs or usernames to exclude from the watchlist. "
     "An additional lookup is performed if a username is passed. Argument can be "
     "passed as a comma-delimited string or from a CSV file with a single 'user' "
@@ -261,7 +271,6 @@ def update(
 @click.option(
     "--departments",
     default=None,
-    type=file_or_str_cls,
     help="Comma-delimited string of department names to include on the watchlist. "
     "Individual users from the departments will be added as watchlist members, where department information comes "
     "from SCIM or User Directory Sync.",
@@ -269,11 +278,11 @@ def update(
 @click.option(
     "--directory-groups",
     default=None,
-    type=file_or_str_cls,
     help="Comma-delimited string of directory group IDs to include on the watchlist. "
     "Individual users from the directory groups will be added as watchlist members, where group information comes "
     "from SCIM or User Directory Sync.",
 )
+@input_format_option
 @click.pass_context
 def add(
     ctx: Context,
@@ -282,6 +291,7 @@ def add(
     excluded_users=None,
     departments=None,
     directory_groups=None,
+    format_=None,
 ):
     """
     Manage watchlist membership by including or excluding individual users and/or groups.
@@ -298,12 +308,10 @@ def add(
     """
     client = ctx.obj()
 
-    # TODO: file input refactor
-
     # Add included users
     if users:
         client.watchlists.v1.add_included_users(
-            watchlist, _get_user_ids(client, users, _is_path(users))
+            watchlist, _get_user_ids(client, users, format_=format_)
         )
         console.print(
             f"Successfully included users on watchlist with ID: '{watchlist}'"
@@ -312,7 +320,7 @@ def add(
     # Add excluded users
     if excluded_users:
         client.watchlists.v1.add_excluded_users(
-            watchlist, _get_user_ids(client, excluded_users, _is_path(excluded_users))
+            watchlist, _get_user_ids(client, excluded_users, format_=format_)
         )
         console.print(
             f"Successfully excluded users from watchlist with ID: '{watchlist}'"
@@ -342,7 +350,7 @@ def add(
 @click.option(
     "--users",
     default=None,
-    type=file_or_str_cls,
+    type=FileOrString(),
     help="List of included user IDs or usernames to remove from the watchlist. "
     "An additional lookup is performed if a username is passed. Argument can be "
     "passed as a comma-delimited string or from a CSV file with a single 'user' "
@@ -351,7 +359,7 @@ def add(
 @click.option(
     "--excluded-users",
     default=None,
-    type=file_or_str_cls,
+    type=FileOrString(),
     help="List of excluded user IDs or usernames to remove from the watchlist. "
     "An additional lookup is performed if a username is passed. Argument can be "
     "passed as a comma-delimited string or from a CSV file with a single 'user' "
@@ -360,7 +368,6 @@ def add(
 @click.option(
     "--departments",
     default=None,
-    type=file_or_str_cls,
     help="Comma-delimited string of department names to remove from the watchlist. "
     "Individual users from the departments will be added as watchlist members, where department information comes "
     "from SCIM or User Directory Sync.",
@@ -368,11 +375,11 @@ def add(
 @click.option(
     "--directory-groups",
     default=None,
-    type=file_or_str_cls,
     help="Comma-delimited string of directory group IDs to remove from the watchlist. "
     "Individual users from the directory groups will be added as watchlist members, where group information comes "
     "from SCIM or User Directory Sync.",
 )
+@input_format_option
 @click.pass_context
 def remove(
     ctx: Context,
@@ -381,6 +388,7 @@ def remove(
     excluded_users=None,
     departments=None,
     directory_groups=None,
+    format_=None,
 ):
     """
     Manage watchlist membership by removing individual users and/or groups.
@@ -397,12 +405,10 @@ def remove(
     """
     client = ctx.obj()
 
-    # TODO: file input refactor
-
     # Remove included users
     if users:
         client.watchlists.v1.remove_included_users(
-            watchlist, _get_user_ids(client, users, _is_path(users))
+            watchlist, _get_user_ids(client, users, format_=format_)
         )
         console.print(
             f"Successfully removed included users on watchlist with ID: '{watchlist}'"
@@ -411,7 +417,7 @@ def remove(
     # Remove excluded users
     if excluded_users:
         client.watchlists.v1.remove_excluded_users(
-            watchlist, _get_user_ids(client, excluded_users, _is_path(excluded_users))
+            watchlist, _get_user_ids(client, excluded_users, format_=format_)
         )
         console.print(
             f"Successfully removed excluded users from watchlist with ID: '{watchlist}'"
@@ -535,17 +541,21 @@ def list_departments(
     _output_results(deps.included_departments, IncludedDepartment, format_, columns)
 
 
-def _get_user_ids(client, users, csv=False):
-    if csv:
+def _get_user_ids(client, users, format_=None):
+    if isinstance(users, str):
+        ids = [user_lookup(client, i.strip()) for i in users.split(",")]
+    else:
+        if format_ == "csv":
+            users = UserCSV.parse_csv(users)
+        else:
+            users = UserJSON.parse_json_lines(users)
         ids = []
         for row in track(
-            read_dict_from_csv(users),
+            users,
             description="Reading users...",
             transient=True,
         ):
-            ids.append(user_lookup(client, row["user"]))
-    else:
-        ids = [user_lookup(client, i.strip()) for i in users.split(",")]
+            ids.append(user_lookup(client, row.user))
     return ids
 
 
@@ -554,13 +564,9 @@ def _output_results(results, model, format_, columns=None):
         render.csv(model, results, columns=columns, flat=True)
     elif format_ == TableFormat.table:
         render.table(model, results, columns=columns, flat=False)
-    elif format_ == TableFormat.json:
+    elif format_ == TableFormat.json_pretty:
         for item in results:
             console.print_json(item.json())
-    else:  # format_ == "raw-json"/TableFormat.raw_json
+    else:
         for item in results:
             console.print(item.json(), highlight=False)
-
-
-def _is_path(users: str):
-    return users.lower().endswith(".csv")

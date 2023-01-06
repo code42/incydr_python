@@ -48,11 +48,14 @@ def audit_log(ctx, log_level, log_file):
     "--format",
     "-f",
     "format_",
-    type=click.Choice([TableFormat.csv, TableFormat.raw_json, TableFormat.json]),
-    help="Format to print result. One of 'json', 'raw-json', or 'csv. "
+    type=click.Choice(
+        [TableFormat.csv, TableFormat.json_lines, TableFormat.json_pretty]
+    ),
+    help="Format to print result. One of 'json-pretty', 'json-lines', or 'csv. "
     "'table' format is unavailable due to long processing times for very large data sets."
-    "If environment has INCYDR_USE_RICH=false set, defaults to 'raw-json', else defaults to 'json'.",
-    default=TableFormat.json,
+    "If environment has INCYDR_USE_RICH=false set, defaults to 'json-lines', else defaults to 'json-pretty'."
+    "CSV output includes limited fields, use audit-log download for a more comprehensive CSV download.",
+    default=TableFormat.json_pretty,
 )
 @filter_options
 @columns_option
@@ -90,10 +93,10 @@ def search(
     cursor = _get_cursor_store(client.settings.api_client_id)
 
     if output:
-        format_ = TableFormat.raw_json
+        format_ = TableFormat.json_lines
 
     # skip pydantic modeling when output will just be json
-    if format_ in ("json", "raw-json"):
+    if format_ in (TableFormat.json_pretty, TableFormat.json_lines):
 
         def yield_all_events(request_):
             for page_num in count(0):
@@ -156,7 +159,7 @@ def search(
             printed = False
             for event in events_gen:  # Generator of audit log events in dict format
                 printed = True
-                if format_ == TableFormat.json:
+                if format_ == TableFormat.json_pretty:
                     console.print_json(data=event)
                 elif output:
                     logger = get_server_logger(output, certs, ignore_cert_validation)

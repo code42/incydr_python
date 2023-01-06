@@ -21,6 +21,7 @@ from incydr.cli import log_file_option
 from incydr.cli import log_level_option
 from incydr.cli import render
 from incydr.cli.cmds.options.output_options import columns_option
+from incydr.cli.cmds.options.output_options import input_format_option
 from incydr.cli.cmds.options.output_options import single_format_option
 from incydr.cli.cmds.options.output_options import SingleFormat
 from incydr.cli.cmds.options.output_options import table_format_option
@@ -73,7 +74,6 @@ path_option = click.option(
 @click.pass_context
 def cases(ctx: Context, log_level, log_file):
     """View and manage cases."""
-    ...
 
 
 @cases.command(cls=IncydrCommand)
@@ -157,7 +157,7 @@ def list_(
         render.table(Case, cases_, columns=columns)
     elif format_ == TableFormat.csv:
         render.csv(Case, cases_, columns=columns)
-    elif format_ == TableFormat.json:
+    elif format_ == TableFormat.json_pretty:
         for case in cases_:
             console.print_json(case.json())
     else:
@@ -177,7 +177,7 @@ def show(ctx: Context, case_number: int, format_: SingleFormat):
     case = client.cases.v1.get_case(case_number)
     if format_ == SingleFormat.rich and client.settings.use_rich:
         console.print(Panel.fit(model_as_card(case), title="Case", width=120))
-    elif format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json_pretty:
         console.print_json(case.json())
     else:
         click.echo(case.json())
@@ -249,9 +249,7 @@ def update(
 
 @cases.command(cls=IncydrCommand)
 @click.argument("file", type=click.File())
-@click.option(
-    "--format", "-f", "format_", type=click.Choice(["csv", "json-lines"]), default="csv"
-)
+@input_format_option
 @click.pass_context
 def bulk_update(ctx: Context, file: Path, format_: str):
     """
@@ -270,7 +268,6 @@ def bulk_update(ctx: Context, file: Path, format_: str):
     * `name` - Case name.
     * `status` - Case status. One of `ARCHIVED`, `CLOSED` or `OPEN`.
     * `subject` - User ID or username of the case subject. Performs an additional lookup if a username is passed.
-
     """
     client = ctx.obj()
 
@@ -285,7 +282,7 @@ def bulk_update(ctx: Context, file: Path, format_: str):
 
     if format_ == "csv":
         models = UpdateCaseCSV.parse_csv(file)
-    else:  # format_ == "json-lines":
+    else:
         models = CaseDetail.parse_json_lines(file)
     try:
         for updated in track(models, description="Updating cases...", transient=True):
@@ -410,7 +407,7 @@ def show_file_event(
 
     if format_ == SingleFormat.rich and client.settings.use_rich:
         console.print(Panel.fit(model_as_card(event)))
-    elif format_ == SingleFormat.json:
+    elif format_ == SingleFormat.json_pretty:
         console.print_json(event.json())
     else:
         click.echo(event.json())
@@ -451,12 +448,12 @@ def list_file_events(
 
     else:
         printed = False
-        if format_ == TableFormat.json:
+        if format_ == TableFormat.json_pretty:
             for event in response.events:
                 printed = True
                 console.print_json(event.json())
 
-        else:  # raw-json
+        else:
             for event in response.events:
                 printed = True
                 click.echo(event.json())
@@ -515,9 +512,7 @@ def add(ctx: Context, case_number: int, event_ids: FileOrString, format_: str):
 @file_events.command(cls=IncydrCommand)
 @click.argument("case_number")
 @click.argument("event_ids", type=FileOrString())
-@click.option(
-    "--format", "-f", "format_", type=click.Choice(["csv", "json-lines"]), default="csv"
-)
+@input_format_option
 @click.pass_context
 def remove(ctx: Context, case_number: int, event_ids: str, format_: str):
     """
