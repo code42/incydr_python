@@ -54,11 +54,6 @@ class ExceptionHandlingGroup(IncydrGroup):
     """A `click.Group` subclass to add custom exception handling."""
 
     _original_args = None
-    client = None
-
-    def __init__(self, *args, **kwargs):
-        self.client = Client()
-        super().__init__(*args, **kwargs)
 
     def make_context(self, info_name, args, parent=None, **extra):
         # grab the original command line arguments for logging purposes
@@ -77,19 +72,22 @@ class ExceptionHandlingGroup(IncydrGroup):
             raise
         except IncydrException as err:
             # log error and raise custom error to print error message to console
-            self.client._log_error(err)
+            client = Client()
+            client._log_error(err)
             raise IncydrException(err.args[0])
         except click.ClickException:
             raise
         except HTTPError as err:
             # log error with traceback and print error code with brief error message to console
-            self.client._log_verbose_error(self._original_args, err.request)
+            client = Client()
+            client._log_verbose_error(self._original_args, err.request)
             raise LoggedCLIError(err.args[0])
         except OSError:
             raise
         except Exception:
             # log error with traceback and print message pointing user to logs
-            self.client._log_verbose_error()
+            client = Client()
+            client._log_verbose_error()
             raise LoggedCLIError("Unknown problem occurred.")
 
     @staticmethod
