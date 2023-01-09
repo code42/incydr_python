@@ -72,21 +72,21 @@ class ExceptionHandlingGroup(IncydrGroup):
             raise
         except IncydrException as err:
             # log error and raise custom error to print error message to console
-            client = Client()
+            client = Client(skip_auth=True)
             client._log_error(err)
             raise IncydrException(err.args[0])
         except click.ClickException:
             raise
         except HTTPError as err:
             # log error with traceback and print error code with brief error message to console
-            client = Client()
+            client = Client(skip_auth=True)
             client._log_verbose_error(self._original_args, err.request)
             raise LoggedCLIError(err.args[0])
         except OSError:
             raise
         except Exception:
             # log error with traceback and print message pointing user to logs
-            client = Client()
+            client = Client(skip_auth=True)
             client._log_verbose_error()
             raise LoggedCLIError("Unknown problem occurred.")
 

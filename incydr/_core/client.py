@@ -54,6 +54,7 @@ class Client:
         url: str = None,
         api_client_id: str = None,
         api_client_secret: str = None,
+        skip_auth: bool = False,
         **settings_kwargs,
     ):
         self._settings = IncydrSettings(
@@ -100,7 +101,8 @@ class Client:
         self._user_risk_profiles = UserRiskProfiles(self)
         self._watchlists = WatchlistsClient(self)
 
-        self._session.auth.refresh()
+        if not skip_auth:
+            self._session.auth.refresh()
 
     @property
     def tenant_id(self):
