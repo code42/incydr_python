@@ -105,14 +105,14 @@ def search(
     """
     Search file events. Various options are provided to filter query results.
 
-    Use the `--saved-search` and `--advanced-query` options if the available filters don't satisfy your requirements.
+    Use the `--saved-search` or the `--advanced-query` option if the available filters don't satisfy your requirements.
 
     Defaults to returning events with a risk score >= 1.  Add the `--risk-score 0` filter to return all events,
     including those with no risk associated with them.
 
     Results will be output to the console by default, use the `--output` option to send data to a server.
 
-    Checkpointing is available through the --checkpoint <checkpoint-name> option and will only return new results
+    Checkpointing is available through the `--checkpoint <checkpoint-name>` option and will only return new results
     on subsequent queries with that same checkpoint.  Checkpointing stores the original query it was run with, so
     additional filters on subsequent runs will be ignored.
     """

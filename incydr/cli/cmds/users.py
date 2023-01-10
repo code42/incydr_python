@@ -205,9 +205,9 @@ def update_roles(ctx: Context, user, roles, update_method):
 
     ROLES is a comma-delimited list of role IDs and/or role names to replace that user's roles.
 
-    Use the "--remove" flag to remove the specified role(s) from a user's existing roles.
+    Use the `--remove` flag to remove the specified role(s) from a user's existing roles.
 
-    Alternatively, use the "--add" flag to assign additional roles to a user's existing roles.
+    Alternatively, use the `--add` flag to assign additional roles to a user's existing roles.
     """
     client = ctx.obj()
 
@@ -316,12 +316,14 @@ def list_roles(ctx: Context, format_: TableFormat = None):
 @click.pass_context
 def bulk_update_roles(ctx: Context, file, update_method=None, format_=None):
     """
-    Bulk update roles associated with multiple users with a CSV or JSON file.
+    Bulk update roles associated with multiple users from a file.
 
-     By default, the provided roles will replace the specified user's existing roles.
-     Use the --add flag or the --remove flag to add or remove roles, respectively, from a user's existing roles.
+    By default, the provided roles will replace the specified user's existing roles.
+    Use the `--add` flag or the `--remove` flag to add or remove roles, respectively, from a user's existing roles.
 
-    Takes a single arg FILE which specifies the path to the file.  Use the --format option to specify the format of your input file.  Defaults to csv.
+    Takes a single arg `FILE` which specifies the path to the file (use "-" to read from stdin).
+
+    File format can either be CSV or [JSON Lines format](https://jsonlines.org) (Default is CSV).
 
     Requires the following CSV columns or JSON keys:
 

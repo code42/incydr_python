@@ -85,7 +85,7 @@ def search(
 
     Results will be output to the console by default, use the `--output` option to send data to a server.
 
-    Checkpointing is available through the --checkpoint <checkpoint-name> option and will only return new results
+    Checkpointing is available through the `--checkpoint <checkpoint-name>` option and will only return new results
     on subsequent queries with that same checkpoint. Checkpointing filters by timestamp, additional filter
     options will need to be included in each run.
     """

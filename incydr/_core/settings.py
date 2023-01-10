@@ -69,7 +69,7 @@ class IncydrSettings(BaseSettings):
     * **page_size**: `int` The default page size for all paginated requests. Defaults to 100. env_var=`INCYDR_PAGE_SIZE`
     * **max_response_history**: `int` The maximum number of responses the `incydr.Client.response_history` list will
         store. Defaults to 5. env_var=`INCYDR_MAX_RESPONSE_HISTORY`
-    * **log_file**: `str` The file path or file-liek object to write log output to. Defaults to None.
+    * **log_file**: `str` The file path or file-like object to write log output to. Defaults to None.
     * **log_level**: `int` The level for logging messages. Defaults to `logging.WARNING`. env_var=`INCYDR_LOG_LEVEL`
     * **logger**: `logging.Logger` The logger used for client logging. Cannot be defined via environment variable. Can
         be replaced with a custom `logging.Logger`. If a custom `Logger` is supplied, the other log settings will have
