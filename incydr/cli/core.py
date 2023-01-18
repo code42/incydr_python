@@ -73,7 +73,7 @@ class ExceptionHandlingGroup(IncydrGroup):
         except IncydrException as err:
             # log error and raise custom error to print error message to console
             client = Client(skip_auth=True)
-            client._log_error(err)
+            client._log_error(err, self._original_args)
             raise IncydrException(err.args[0])
         except click.ClickException:
             raise
@@ -87,7 +87,7 @@ class ExceptionHandlingGroup(IncydrGroup):
         except Exception:
             # log error with traceback and print message pointing user to logs
             client = Client(skip_auth=True)
-            client._log_verbose_error()
+            client._log_verbose_error(self._original_args)
             raise LoggedCLIError("Unknown problem occurred.")
 
     @staticmethod

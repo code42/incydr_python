@@ -321,8 +321,10 @@ class Client:
             self._settings.logger.debug(f"Error dumping request/response info: {err}")
             self._settings.logger.debug(response)
 
-    def _log_error(self, err):
+    def _log_error(self, err, invocation_str=None):
         message = str(err) if err else None
+        if invocation_str:
+            message = f"Exception occurred from input: '{invocation_str}'.\n" + message
         if message:
             self._settings.logger.error(message)
 

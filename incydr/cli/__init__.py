@@ -35,8 +35,6 @@ def log_stderr_callback(ctx, param, value):
     return value
 
 
-# TODO: do we want these options to be hidden from --help (add hidden=True to each def)
-
 log_level_option = click.option(
     "--log-level",
     help="Set level for Incydr client logging.",
