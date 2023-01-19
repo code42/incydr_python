@@ -60,5 +60,6 @@ hatch run docs:serve
 
 ```python
 from incydr import Client
+
 client = Client(url="api-gateway-url.code42.com", api_client_id="key-42", api_client_secret="c42")
 ```

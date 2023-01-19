@@ -57,15 +57,16 @@ If a query results in more results than the configured page size of the query (m
 
 ```python
 from datetime import timedelta
-import incydr
-client = incydr.Client(**kwargs)
+from incydr import Client, AlertQuery
 
-query = incydr.AlertQuery(start_date=timedelta(days=10))
+client = Client(**kwargs)
+
+query = AlertQuery(start_date=timedelta(days=10))
 first_page = client.alerts.v1.search(query)
 if first_page.total_count > query.page_size:
     query.page_num += 1
 second_page = client.alerts.v1.search(query)
-... # continue until all alerts are retrieved
+...  # continue until all alerts are retrieved
 ```
 
 Alternately, the `client.alerts.v1.iter_all()` method will automatically request pages until all the results are complete

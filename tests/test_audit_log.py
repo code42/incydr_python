@@ -3,15 +3,14 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
-from pytest_httpserver import HTTPServer
-
+from _cli.cmds.audit_log import _hash_event
+from _cli.cmds.options.output_options import TableFormat
+from _cli.cursor import CursorStore
+from _client.audit_log.models import AuditEventsPage
+from _client.queries.utils import parse_ts_to_posix_ts
 from incydr import Client
-from incydr._audit_log.models import AuditEventsPage
-from incydr._queries.utils import parse_ts_to_posix_ts
-from incydr.cli.cmds.audit_log import _hash_event
-from incydr.cli.cmds.options.output_options import TableFormat
-from incydr.cli.cursor import CursorStore
-from incydr.cli.main import incydr
+from incydr.cli import incydr
+from pytest_httpserver import HTTPServer
 
 TEST_AL_ENTRY_1 = {
     "type$": "audit_log::logged_in/1",
@@ -210,7 +209,7 @@ def test_cli_search_with_checkpointing_stores_new_checkpoint(
     mock_cursor = mocker.MagicMock(spec=CursorStore)
     mock_cursor.get.return_value = None
     with mock.patch(
-        "incydr.cli.cmds.audit_log._get_cursor_store", return_value=mock_cursor
+        "_cli.cmds.audit_log._get_cursor_store", return_value=mock_cursor
     ) as mock_get_store, mock.patch.object(
         mock_cursor, "replace"
     ) as mock_replace, mock.patch.object(
@@ -262,7 +261,7 @@ def test_cli_search_with_checkpointing_ignores_start_param_and_uses_existing_che
     mock_cursor = mocker.MagicMock(spec=CursorStore)
     mock_cursor.get.return_value = ts
     with mock.patch(
-        "incydr.cli.cmds.audit_log._get_cursor_store", return_value=mock_cursor
+        "_cli.cmds.audit_log._get_cursor_store", return_value=mock_cursor
     ) as mock_get_store:
         result = runner.invoke(
             incydr,

@@ -5,18 +5,17 @@ from typing import List
 from unittest import mock
 
 import pytest
+from _cli.cmds.options.output_options import TableFormat
+from _cli.cursor import CursorStore
+from _client.core.client import Client
+from _client.file_events.models.event import FileEventV2
+from _client.file_events.models.response import FileEventsPage
+from _client.file_events.models.response import SavedSearch
+from _client.file_events.models.response import SearchFilter
+from _client.file_events.models.response import SearchFilterGroup
+from _client.queries.file_events import EventQuery
+from incydr.cli import incydr
 from pytest_httpserver import HTTPServer
-
-from incydr._core.client import Client
-from incydr._file_events.models.event import FileEventV2
-from incydr._file_events.models.response import FileEventsPage
-from incydr._file_events.models.response import SavedSearch
-from incydr._file_events.models.response import SearchFilter
-from incydr._file_events.models.response import SearchFilterGroup
-from incydr._queries.file_events import EventQuery
-from incydr.cli.cmds.options.output_options import TableFormat
-from incydr.cli.cursor import CursorStore
-from incydr.cli.main import incydr
 
 MICROSECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 TEST_EVENT_1 = {
@@ -574,7 +573,7 @@ def test_cli_search_with_checkpointing_stores_new_checkpoint(
     mock_cursor = mocker.MagicMock(spec=CursorStore)
     mock_cursor.get.return_value = None
     with mock.patch(
-        "incydr.cli.cmds.file_events._get_cursor_store", return_value=mock_cursor
+        "_cli.cmds.file_events._get_cursor_store", return_value=mock_cursor
     ) as mock_get_store, mock.patch.object(mock_cursor, "replace") as mock_replace:
         result = runner.invoke(
             incydr,
@@ -623,7 +622,7 @@ def test_cli_search_with_checkpointing_ignores_params_and_uses_existing_checkpoi
     mock_cursor = mocker.MagicMock(spec=CursorStore)
     mock_cursor.get.return_value = json.dumps(query.dict())
     with mock.patch(
-        "incydr.cli.cmds.file_events._get_cursor_store", return_value=mock_cursor
+        "_cli.cmds.file_events._get_cursor_store", return_value=mock_cursor
     ) as mock_get_store:
         result = runner.invoke(
             incydr,

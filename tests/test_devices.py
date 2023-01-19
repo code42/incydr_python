@@ -3,14 +3,13 @@ from datetime import datetime
 from urllib.parse import urlencode
 
 import pytest
-from pytest_httpserver import HTTPServer
-
+from _client.devices.models import Device
+from _client.devices.models import DevicesPage
+from _client.enums import SortDirection
+from _client.enums.devices import SortKeys
 from incydr import Client
-from incydr._devices.models import Device
-from incydr._devices.models import DevicesPage
-from incydr.cli.main import incydr
-from incydr.enums import SortDirection
-from incydr.enums.devices import SortKeys
+from incydr.cli import incydr
+from pytest_httpserver import HTTPServer
 
 TEST_DEVICE_ID = "device-1"
 
