@@ -2,6 +2,7 @@ import base64
 import json
 import logging
 import re
+import traceback
 from collections import deque
 from textwrap import indent
 
@@ -53,6 +54,7 @@ class Client:
         url: str = None,
         api_client_id: str = None,
         api_client_secret: str = None,
+        skip_auth: bool = False,
         **settings_kwargs,
     ):
         self._settings = IncydrSettings(
@@ -99,7 +101,8 @@ class Client:
         self._user_risk_profiles = UserRiskProfiles(self)
         self._watchlists = WatchlistsClient(self)
 
-        self._session.auth.refresh()
+        if not skip_auth:
+            self._session.auth.refresh()
 
     @property
     def tenant_id(self):
@@ -317,3 +320,24 @@ class Client:
         except Exception as err:
             self._settings.logger.debug(f"Error dumping request/response info: {err}")
             self._settings.logger.debug(response)
+
+    def _log_error(self, err, invocation_str=None):
+        message = str(err) if err else None
+        if invocation_str:
+            message = f"Exception occurred from input: '{invocation_str}'.\n" + message
+        if message:
+            self._settings.logger.error(message)
+
+    def _log_verbose_error(self, invocation_str=None, http_request=None):
+        """For logging traces, invocation strs, and request parameters during exceptions to the
+        error log file."""
+        prefix = (
+            "Exception occurred."
+            if not invocation_str
+            else f"Exception occurred from input: '{invocation_str}'."
+        )
+        message = f"{prefix}. See error below."
+        self._log_error(message)
+        self._log_error(traceback.format_exc())
+        if http_request:
+            self._log_error(f"Request parameters: {http_request.body}")

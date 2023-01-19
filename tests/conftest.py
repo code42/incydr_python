@@ -4,13 +4,28 @@ import pytest
 from click.testing import CliRunner
 from pytest_httpserver import HTTPServer
 
-from tests.test_users import TEST_USER_1
-
 TEST_SERVER_ADDRESS = "127.0.0.1:8042"
 TEST_HOST = f"http://{TEST_SERVER_ADDRESS}"
 
 # dummy token with only one claim {"tenantUid": "abcd-1234"}
 TEST_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRVaWQiOiJhYmNkLTEyMzQifQ.QouLd4K4pEIphqMZNfY1RuchnltWeQvDOuDsUP69Zkc"
+
+TEST_USER = {
+    "legacyUserId": "legacyUserId-1",
+    "userId": "user-1",
+    "username": "username-1",
+    "firstName": "firstName-1",
+    "lastName": "lastName-1",
+    "legacyOrgId": "legacyOrgId-1",
+    "orgId": "orgId-1",
+    "orgGuid": "orgGuid-1",
+    "orgName": "orgName-1",
+    "notes": "notes-1",
+    "active": True,
+    "blocked": True,
+    "creationDate": "2022-07-14T16:49:11.166000Z",
+    "modificationDate": "2022-07-14T17:05:44.524000Z",
+}
 
 
 @pytest.fixture(scope="session")
@@ -50,7 +65,7 @@ def mock_user_lookup(httpserver_auth):
         "pageSize": 100,
     }
 
-    data_1 = {"users": [TEST_USER_1], "totalCount": 1}
+    data_1 = {"users": [TEST_USER], "totalCount": 1}
     httpserver_auth.expect_request(
         "/v1/users", method="GET", query_string=urlencode(query_1)
     ).respond_with_json(data_1)

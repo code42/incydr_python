@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Optional
 
 import click
-from click import Context
 from pydantic import Field
 from pydantic import root_validator
 from requests.exceptions import HTTPError
@@ -14,11 +13,11 @@ from rich.progress import track
 from incydr._cases.models import Case
 from incydr._cases.models import CaseDetail
 from incydr._cases.models import FileEvent
+from incydr._core.client import Client
 from incydr._core.models import CSVModel
 from incydr._file_events.models.event import FileEventV2
 from incydr.cli import console
-from incydr.cli import log_file_option
-from incydr.cli import log_level_option
+from incydr.cli import logging_options
 from incydr.cli import render
 from incydr.cli.cmds.options.output_options import columns_option
 from incydr.cli.cmds.options.output_options import input_format_option
@@ -69,10 +68,8 @@ path_option = click.option(
 
 
 @click.group(cls=IncydrGroup)
-@log_level_option
-@log_file_option
-@click.pass_context
-def cases(ctx: Context, log_level, log_file):
+@logging_options
+def cases():
     """View and manage cases."""
 
 
@@ -94,9 +91,8 @@ def cases(ctx: Context, log_level, log_file):
 @click.option(
     "--findings", help="Markdown formatted details of case notes.", default=None
 )
-@click.pass_context
+@logging_options
 def create(
-    ctx: Context,
     name: str,
     description: str,
     subject: str,
@@ -106,7 +102,7 @@ def create(
     """
     Create a case.
     """
-    client = ctx.obj()
+    client = Client()
     try:
         case = client.cases.v1.create(
             name,
@@ -125,15 +121,12 @@ def create(
 
 @cases.command(cls=IncydrCommand)
 @click.argument("case_number")
-@click.pass_context
-def delete(
-    ctx: Context,
-    case_number: int,
-):
+@logging_options
+def delete(case_number: int):
     """
     Delete a case.
     """
-    client = ctx.obj()
+    client = Client()
     client.cases.v1.delete(case_number)
     console.print(f"Case number '{case_number}' successfully deleted.")
 
@@ -141,16 +134,15 @@ def delete(
 @cases.command("list", cls=IncydrCommand)
 @table_format_option
 @columns_option
-@click.pass_context
+@logging_options
 def list_(
-    ctx: Context,
     format_: TableFormat,
     columns: Optional[str],
 ):
     """
     List all cases.
     """
-    client = ctx.obj()
+    client = Client()
     cases_ = client.cases.v1.iter_all()
 
     if format_ == TableFormat.table:
@@ -168,12 +160,15 @@ def list_(
 @cases.command(cls=IncydrCommand)
 @click.argument("case_number")
 @single_format_option
-@click.pass_context
-def show(ctx: Context, case_number: int, format_: SingleFormat):
+@logging_options
+def show(
+    case_number: int,
+    format_: SingleFormat,
+):
     """
     Show details for a single case.
     """
-    client = ctx.obj()
+    client = Client()
     case = client.cases.v1.get_case(case_number)
     if format_ == SingleFormat.rich and client.settings.use_rich:
         console.print(Panel.fit(model_as_card(case), title="Case", width=120))
@@ -207,9 +202,8 @@ def show(ctx: Context, case_number: int, format_: SingleFormat):
     help="The case subject. Takes a user ID or a username.  Performs an additional lookup if a username is passed.",
     callback=user_lookup_callback,
 )
-@click.pass_context
+@logging_options
 def update(
-    ctx: Context,
     case_number: str,
     assignee: Optional[str] = None,
     description: Optional[str] = None,
@@ -226,7 +220,7 @@ def update(
             "At least one command option must be provided to update a case.  Use `cases update --help` to see available options."
         )
 
-    client = ctx.obj()
+    client = Client()
     case = client.cases.v1.get_case(case_number)
     if assignee:
         case.assignee = assignee
@@ -250,8 +244,11 @@ def update(
 @cases.command(cls=IncydrCommand)
 @click.argument("file", type=click.File())
 @input_format_option
-@click.pass_context
-def bulk_update(ctx: Context, file: Path, format_: str):
+@logging_options
+def bulk_update(
+    file: Path,
+    format_: str,
+):
     """
     Bulk update cases from a file.
 
@@ -269,7 +266,7 @@ def bulk_update(ctx: Context, file: Path, format_: str):
     * `status` - Case status. One of `ARCHIVED`, `CLOSED` or `OPEN`.
     * `subject` - User ID or username of the case subject. Performs an additional lookup if a username is passed.
     """
-    client = ctx.obj()
+    client = Client()
 
     @lru_cache()
     def resolve_username(user):
@@ -335,9 +332,8 @@ def bulk_update(ctx: Context, file: Path, format_: str):
     help="Download a source file for a specific event. Takes the event ID. Incompatible with other download options.",
     cls=incompatible_with(["summary", "file_events", "source_files"]),
 )
-@click.pass_context
+@logging_options
 def download(
-    ctx: Context,
     case_number: int,
     path: str,
     summary: bool = None,
@@ -352,7 +348,7 @@ def download(
 
     If more than one file is specified the download will be in ZIP format.
     """
-    client = ctx.obj()
+    client = Client()
 
     # download source file for specific event
     if source_file:
@@ -395,14 +391,16 @@ def file_events():
 @click.argument("case_number")
 @click.argument("event_id")
 @single_format_option
-@click.pass_context
+@logging_options
 def show_file_event(
-    ctx: Context, case_number: int, event_id: str, format_: SingleFormat
+    case_number: int,
+    event_id: str,
+    format_: SingleFormat,
 ):
     """
     Show details for a file event attached to a case.
     """
-    client = ctx.obj()
+    client = Client()
     event = client.cases.v1.get_file_event_detail(case_number, event_id)
 
     if format_ == SingleFormat.rich and client.settings.use_rich:
@@ -417,14 +415,16 @@ def show_file_event(
 @click.argument("case_number")
 @table_format_option
 @columns_option
-@click.pass_context
+@logging_options
 def list_file_events(
-    ctx: Context, case_number: int, format_: TableFormat, columns: str
+    case_number: int,
+    format_: TableFormat,
+    columns: str,
 ):
     """
     List file events attached to a case.
     """
-    client = ctx.obj()
+    client = Client()
     response = client.cases.v1.get_file_events(case_number)
 
     if format_ == TableFormat.table:
@@ -472,8 +472,12 @@ csv_option = click.option(
 @click.option(
     "--format", "-f", "format_", type=click.Choice(["csv", "json-lines"]), default="csv"
 )
-@click.pass_context
-def add(ctx: Context, case_number: int, event_ids: FileOrString, format_: str):
+@logging_options
+def add(
+    case_number: int,
+    event_ids: FileOrString,
+    format_: str,
+):
     """
     Attach file events to a case specified by CASE_NUMBER.
 
@@ -495,7 +499,7 @@ def add(ctx: Context, case_number: int, event_ids: FileOrString, format_: str):
         incydr file-events search SEARCH_OPTIONS --format json-lines | incydr cases add CASE_NUMBER --format json-lines -
 
     """
-    client = ctx.obj()
+    client = Client()
     if isinstance(event_ids, str):
         event_ids = [e.strip() for e in event_ids.split(",")]
     elif format_ == "csv":
@@ -513,8 +517,15 @@ def add(ctx: Context, case_number: int, event_ids: FileOrString, format_: str):
 @click.argument("case_number")
 @click.argument("event_ids", type=FileOrString())
 @input_format_option
-@click.pass_context
-def remove(ctx: Context, case_number: int, event_ids: str, format_: str):
+@click.option(
+    "--format", "-f", "format_", type=click.Choice(["csv", "json-lines"]), default="csv"
+)
+@logging_options
+def remove(
+    case_number: int,
+    event_ids: str,
+    format_: str,
+):
     """
     Remove file events from a case specified by CASE_NUMBER.
 
@@ -536,7 +547,7 @@ def remove(ctx: Context, case_number: int, event_ids: str, format_: str):
         incydr cases file-events list CASE_NUMBER --format json-lines | incydr cases remove CASE_NUMBER --format json-lines -
 
     """
-    client = ctx.obj()
+    client = Client()
     if isinstance(event_ids, str):
         event_ids = [e.strip() for e in event_ids.split(",")]
     elif format_ == "csv":

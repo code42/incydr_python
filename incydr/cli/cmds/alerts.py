@@ -8,19 +8,18 @@ import requests
 from boltons.iterutils import bucketize
 from boltons.iterutils import chunked
 from click import BadOptionUsage
-from click import Context
 from click import File
 from pydantic import Field
 from rich.panel import Panel
 
 from incydr._alerts.models.alert import AlertSummary
+from incydr._core.client import Client
 from incydr._core.models import CSVModel
 from incydr._core.models import Model
 from incydr._queries.alerts import AlertQuery
 from incydr.cli import console
-from incydr.cli import init_client
-from incydr.cli import log_file_option
-from incydr.cli import log_level_option
+from incydr.cli import get_user_project_path
+from incydr.cli import logging_options
 from incydr.cli import render
 from incydr.cli.cmds.options.alert_filter_options import advanced_query_option
 from incydr.cli.cmds.options.alert_filter_options import filter_options
@@ -36,31 +35,26 @@ from incydr.cli.cmds.utils import warn_interrupt
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
 from incydr.cli.cursor import CursorStore
-from incydr.cli.cursor import get_user_project_path
 from incydr.cli.file_readers import AutoDecodedFile
 from incydr.cli.logger import get_server_logger
 from incydr.utils import model_as_card
 
 
 @click.group(cls=IncydrGroup)
-@log_level_option
-@log_file_option
-@click.pass_context
-def alerts(ctx, log_level, log_file):
+@logging_options
+def alerts():
     """View and manage alerts."""
-    init_client(ctx, log_level, log_file)
 
 
 @alerts.command(cls=IncydrCommand)
 @checkpoint_option
-@click.pass_context
+@logging_options
 @columns_option
 @table_format_option
 @output_options
 @advanced_query_option
 @filter_options
 def search(
-    ctx: Context,
     format_: TableFormat,
     columns: Optional[str],
     output: Optional[str],
@@ -90,7 +84,7 @@ def search(
     on subsequent queries with that same checkpoint.  Checkpointing filters by timestamp, additional filter
     options will need to be included in each run.
     """
-    client = ctx.obj()
+    client = Client()
     cursor = _get_cursor_store(client.settings.api_client_id)
 
     if output:
@@ -167,24 +161,26 @@ def search(
 
 @alerts.command()
 @click.argument("checkpoint-name")
-@click.pass_context
-def clear_checkpoint(ctx: Context, checkpoint_name: str):
+def clear_checkpoint(checkpoint_name: str):
     """Remove the saved alerts checkpoint from searches made with `--checkpoint` mode."""
-    client = ctx.obj()
+    client = Client()
     cursor = _get_cursor_store(client.settings.api_client_id)
     cursor.delete(checkpoint_name)
 
 
 # Future enhancement: add functionality to show human-readable summaries for multiple alerts
 @alerts.command(cls=IncydrCommand)
-@click.pass_context
+@logging_options
 @single_format_option
 @click.argument("alert-id")
-def show(ctx: Context, alert_id: str, format_: SingleFormat = None):
+def show(
+    alert_id: str,
+    format_: SingleFormat,
+):
     """
     Show the details of a single alert.
     """
-    client = ctx.obj()
+    client = Client()
     alert = client.alerts.v1.get_details(alert_id)[0]
     if format_ == SingleFormat.rich:
         console.print(Panel.fit(model_as_card(alert)))
@@ -195,20 +191,23 @@ def show(ctx: Context, alert_id: str, format_: SingleFormat = None):
 
 
 @alerts.command(cls=IncydrCommand)
-@click.pass_context
+@logging_options
 @click.argument("alert-id")
 @click.argument("note")
-def add_note(ctx: Context, alert_id: str, note: str):
+def add_note(
+    alert_id: str,
+    note: str,
+):
     """
     Add an optional note to an alert.
     """
-    client = ctx.obj()
+    client = Client()
     client.alerts.v1.add_note(alert_id, note)
     console.print("Note added.")
 
 
 @alerts.command(cls=IncydrCommand)
-@click.pass_context
+@logging_options
 @click.argument("alert-id")
 @click.argument("state")
 @click.option(
@@ -216,11 +215,15 @@ def add_note(ctx: Context, alert_id: str, note: str):
     default=None,
     help="Optional note to indicate the reason for the state change.",
 )
-def update_state(ctx: Context, alert_id: str, state: str, note: str = None):
+def update_state(
+    alert_id: str,
+    state: str,
+    note: Optional[str],
+):
     """
     Change the state of an alert, and optionally add a note.
     """
-    client = ctx.obj()
+    client = Client()
     client.alerts.v1.change_state(alert_id, state, note)
     console.print("State changed successfully.")
 
@@ -234,8 +237,13 @@ def update_state(ctx: Context, alert_id: str, state: str, note: str = None):
     help="Override CSV/JSON input's `state` value with this value.",
 )
 @click.option("--note", help="Override CSV/JSON input's `note` value with this value.")
-@click.pass_context
-def bulk_update_state(ctx: Context, file, format_, state, note):
+@logging_options
+def bulk_update_state(
+    file,
+    format_,
+    state: str,
+    note: str,
+):
     """
     Bulk update multiple alerts from CSV or JSON Lines input.
 
@@ -263,7 +271,7 @@ def bulk_update_state(ctx: Context, file, format_, state, note):
         state: state_type
         note: Optional[str]
 
-    client = ctx.obj()
+    client = Client()
     if format_ == "csv":
         alerts_ = AlertBulkCSV.parse_csv(file)
 
@@ -334,6 +342,7 @@ def _get_cursor_store(api_key):
     Get cursor store for alerts search checkpoints.
     """
     dir_path = get_user_project_path(
+        "checkpoints",
         api_key,
         "alert_checkpoints",
     )

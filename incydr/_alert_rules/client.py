@@ -11,13 +11,16 @@ from incydr._alert_rules.models.request import GetRulesRequest
 from incydr._alert_rules.models.response import RuleDetails
 from incydr._alert_rules.models.response import RuleUsersList
 from incydr._user_risk_profiles.models import UserRiskProfile
+from incydr.exceptions import IncydrException
 
 
-class MissingUsernameCriterionError(Exception):
-    """An error raised when the date data cannot be parsed."""
+class MissingUsernameCriterionError(IncydrException):
+    """An error raised if an alert rule has no username filter."""
 
     def __init__(self, rule_id):
-        super().__init__(f"Rule '{rule_id}' has no username filter.")
+        super().__init__(
+            f"Missing Username Criterion Error: Rule '{rule_id}' has no username filter."
+        )
 
 
 class AlertRulesClient:

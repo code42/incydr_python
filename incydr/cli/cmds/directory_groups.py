@@ -1,12 +1,10 @@
 from typing import Optional
 
 import click
-from click import Context
 
+from incydr._core.client import Client
 from incydr.cli import console
-from incydr.cli import init_client
-from incydr.cli import log_file_option
-from incydr.cli import log_level_option
+from incydr.cli import logging_options
 from incydr.cli import render
 from incydr.cli.cmds.options.output_options import table_format_option
 from incydr.cli.cmds.options.output_options import TableFormat
@@ -16,12 +14,9 @@ from incydr.models import DirectoryGroup
 
 
 @click.group(cls=IncydrGroup)
-@log_level_option
-@log_file_option
-@click.pass_context
-def directory_groups(ctx, log_level, log_file):
+@logging_options
+def directory_groups():
     """View directory groups."""
-    init_client(ctx, log_level, log_file)
 
 
 # Did not provide columns option because there are only two columns [groupId, name]
@@ -30,14 +25,17 @@ def directory_groups(ctx, log_level, log_file):
 @click.option(
     "--name", default=None, help="Filter by directory groups with a matching name."
 )
-@click.pass_context
-def list_(ctx: Context, format_: TableFormat, name: Optional[str] = None):
+@logging_options
+def list_(
+    format_: TableFormat,
+    name: Optional[str],
+):
     """
     Retrieve directory group information that has been pushed to Code42 from SCIM or User Directory Sync.
 
     The results can then be used with the watchlists commands to automatically assign users to watchlists by directory group.
     """
-    client = ctx.obj()
+    client = Client()
     groups = client.directory_groups.v1.iter_all(name=name)
 
     if format_ == TableFormat.table:

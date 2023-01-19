@@ -762,7 +762,8 @@ def test_cli_download_summary_makes_expected_call(
         f"/v1/cases/{TEST_CASE_NUMBER}/export", method="GET"
     ).respond_with_data()
     result = runner.invoke(
-        incydr, ["cases", "download", TEST_CASE_NUMBER, "--path", tmp_path, "--summary"]
+        incydr,
+        ["cases", "download", TEST_CASE_NUMBER, "--path", str(tmp_path), "--summary"],
     )
     httpserver_auth.check()
     assert result.exit_code == 0
@@ -782,7 +783,7 @@ def test_cli_download_case_when_default_params_makes_expected_call(
         query_string=urlencode(params),
     ).respond_with_data()
     result = runner.invoke(
-        incydr, ["cases", "download", TEST_CASE_NUMBER, "--path", tmp_path]
+        incydr, ["cases", "download", TEST_CASE_NUMBER, "--path", str(tmp_path)]
     )
     httpserver_auth.check()
     assert result.exit_code == 0
@@ -808,7 +809,7 @@ def test_cli_download_case_when_custom_params_makes_expected_call(
             "download",
             TEST_CASE_NUMBER,
             "--path",
-            tmp_path,
+            str(tmp_path),
             "--source-files",
             "--summary",
         ],
@@ -825,7 +826,14 @@ def test_cli_download_events_makes_expected_call(
     ).respond_with_data()
     result = runner.invoke(
         incydr,
-        ["cases", "download", TEST_CASE_NUMBER, "--path", tmp_path, "--file-events"],
+        [
+            "cases",
+            "download",
+            TEST_CASE_NUMBER,
+            "--path",
+            str(tmp_path),
+            "--file-events",
+        ],
     )
     httpserver_auth.check()
     assert result.exit_code == 0
@@ -847,7 +855,7 @@ def test_cli_download_source_file_makes_expected_call(
             "--source-file",
             TEST_EVENT_ID,
             "--path",
-            tmp_path,
+            str(tmp_path),
         ],
     )
     httpserver_auth.check()

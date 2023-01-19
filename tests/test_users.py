@@ -7,9 +7,7 @@ from pytest_httpserver import HTTPServer
 
 from incydr import Client
 from incydr._devices.models import DevicesPage
-from incydr._users.client import RoleNotFoundError
 from incydr._users.client import RoleProcessingError
-from incydr._users.client import UserNotAssignedRoleError
 from incydr._users.models import Role
 from incydr._users.models import UpdateRolesResponse
 from incydr._users.models import User
@@ -745,9 +743,10 @@ def test_cli_update_roles_when_role_not_found_raises_role_not_found_error(
         incydr, ["users", "update-roles", TEST_USER_ID, test_role, "--add"]
     )
     assert result.exit_code == 1
-    assert isinstance(result.exception, RoleProcessingError)
-    assert len(result.exception.errors) == 1
-    assert isinstance(result.exception.errors[0], RoleNotFoundError)
+    assert (
+        "Role Not Found Error: No role matching the following was found: 'a nonexistant role', or you do not have permission to assign this role."
+        in result.output
+    )
 
 
 def test_cli_remove_roles_when_user_not_assigned_role_raises_user_not_assigned_role_error(
@@ -762,9 +761,10 @@ def test_cli_remove_roles_when_user_not_assigned_role_raises_user_not_assigned_r
         incydr, ["users", "update-roles", TEST_USER_ID, TEST_ROLE_ID, "--remove"]
     )
     assert result.exit_code == 1
-    assert isinstance(result.exception, RoleProcessingError)
-    assert len(result.exception.errors) == 1
-    assert isinstance(result.exception.errors[0], UserNotAssignedRoleError)
+    assert (
+        "User Not Assigned Role Error: User is not currently assigned the following role: 'test-role'. Role cannot be removed."
+        in result.output
+    )
 
 
 @user_input

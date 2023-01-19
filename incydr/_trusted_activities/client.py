@@ -19,6 +19,7 @@ from incydr.enums.trusted_activities import CloudSyncApps
 from incydr.enums.trusted_activities import EmailServices
 from incydr.enums.trusted_activities import Name
 from incydr.enums.trusted_activities import SortKeys
+from incydr.exceptions import IncydrException
 
 
 class TrustedActivitiesV2:
@@ -411,8 +412,10 @@ class TrustedActivitiesClient:
         return self._v2
 
 
-class MissingActivityActionGroupsError(Exception):
+class MissingActivityActionGroupsError(IncydrException):
     """An error raised when a trusted activity is missing trusted action groups."""
 
     def __init__(self):
-        super().__init__("At least 1 action for the domain must be trusted.")
+        super().__init__(
+            "Missing Activity Action Group(s) Error: At least 1 action for the domain must be trusted."
+        )
