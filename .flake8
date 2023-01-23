@@ -29,3 +29,4 @@ per-file-ignores =
     incydr/_queries/_file_events/enums.py: B902
     incydr/cli/*: B008
     incydr/utils.py: B905
+    incydr/cli/rich_utils.py: B905
