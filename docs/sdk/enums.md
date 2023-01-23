@@ -1,5 +1,23 @@
 # Enums
 
+Documentation on all available enums for the Incydr SDK.
+
+The following example command will import all enums:
+
+```python
+from incydr import enums
+
+open_alert_state = enums.alerts.AlertState.OPEN
+```
+
+Individual enum modules can also be imported:
+
+```python
+from incydr.enums import alerts
+
+open_alert_state = alerts.AlertState.OPEN
+```
+
 !!! note
     Incydr SDK's enums all inherit from Python's `str` class.  The `str` value for each enum can be used wherever that enum class is expected.
 

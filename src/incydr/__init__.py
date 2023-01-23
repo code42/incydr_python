@@ -5,6 +5,7 @@ from _client.core.client import Client
 from _client.models import *  # noqa
 from _client.queries.alerts import AlertQuery
 from _client.queries.file_events import EventQuery
+from _client.utils import *  # noqa
 
 __all__ = ["Client", "AlertQuery", "EventQuery"]
 
