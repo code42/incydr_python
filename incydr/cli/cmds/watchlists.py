@@ -1,18 +1,17 @@
+from typing import Optional
 from uuid import UUID
 
 import click
-from click import Context
 from rich.progress import track
 from rich.table import Table
 
+from incydr._core.client import Client
 from incydr._watchlists.models.responses import IncludedDepartment
 from incydr._watchlists.models.responses import IncludedDirectoryGroup
 from incydr._watchlists.models.responses import Watchlist
 from incydr._watchlists.models.responses import WatchlistUser
 from incydr.cli import console
-from incydr.cli import init_client
-from incydr.cli import log_file_option
-from incydr.cli import log_level_option
+from incydr.cli import logging_options
 from incydr.cli import render
 from incydr.cli.cmds.models import UserCSV
 from incydr.cli.cmds.models import UserJSON
@@ -49,15 +48,13 @@ def get_watchlist_id_callback(ctx, param, value):
         return value
     except ValueError:
         # if not an ID value
-        client = ctx.obj()
+        client = Client()
         return client.watchlists.v1.get_id_by_name(value)
 
 
 @click.group(cls=IncydrGroup)
-@log_level_option
-@log_file_option
-@click.pass_context
-def watchlists(ctx, log_level, log_file):
+@logging_options
+def watchlists():
     """
     View and manage watchlists.
 
@@ -76,7 +73,6 @@ def watchlists(ctx, log_level, log_file):
         * SUSPICIOUS_SYSTEM_ACTIVITY
         * CUSTOM
     """
-    init_client(ctx, log_level, log_file)
 
 
 watchlist_arg = click.argument("watchlist", callback=get_watchlist_id_callback)
@@ -94,22 +90,26 @@ csv_option = click.option(
 )
 @table_format_option
 @columns_option
-@click.pass_context
+@logging_options
 def list_(
-    ctx: Context, user: str = None, format_: TableFormat = None, columns: str = None
+    user: str = None,
+    format_: TableFormat = None,
+    columns: str = None,
 ):
     """
     List watchlists.
     """
-    client = ctx.obj()
+    client = Client()
     watchlists = client.watchlists.v1.iter_all(user_id=user)
     _output_results(watchlists, Watchlist, format_, columns)
 
 
 @watchlists.command(cls=IncydrCommand)
 @watchlist_arg
-@click.pass_context
-def show(ctx: Context, watchlist: str = None):
+@logging_options
+def show(
+    watchlist: str,
+):
     """
     Show details for a watchlist.
 
@@ -128,7 +128,7 @@ def show(ctx: Context, watchlist: str = None):
 
     If not using `rich`, outputs watchlist information in JSON without additional membership summary information.
     """
-    client = ctx.obj()
+    client = Client()
     watchlist_response = client.watchlists.v1.get(watchlist)
 
     if not client.settings.use_rich:
@@ -174,9 +174,11 @@ def show(ctx: Context, watchlist: str = None):
 @click.argument("watchlist-type")
 @click.option("--title", help="Required title for a CUSTOM watchlist.")
 @click.option("--description", help="Optional description for a CUSTOM watchlist.")
-@click.pass_context
+@logging_options
 def create(
-    ctx: Context, watchlist_type: str, title: str = None, description: str = None
+    watchlist_type: str,
+    title: str = None,
+    description: str = None,
 ):
     """
     Create a new watchlist.
@@ -196,7 +198,7 @@ def create(
 
     The `--title` (required) and `--description` (optional) options are exclusively for creating CUSTOM watchlists.
     """
-    client = ctx.obj()
+    client = Client()
     watchlist = client.watchlists.v1.create(watchlist_type, title, description)
     console.print(
         f"Successfully created {watchlist.list_type} watchlist with ID: '{watchlist.watchlist_id}'."
@@ -205,15 +207,17 @@ def create(
 
 @watchlists.command(cls=IncydrCommand)
 @watchlist_arg
-@click.pass_context
-def delete(ctx: Context, watchlist: str):
+@logging_options
+def delete(
+    watchlist: str,
+):
     """
     Delete a watchlist.
 
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
     """
-    client = ctx.obj()
+    client = Client()
     client.watchlists.v1.delete(watchlist)
     console.print(f"Successfully deleted watchlist with ID: '{watchlist}'.")
 
@@ -229,9 +233,8 @@ def delete(ctx: Context, watchlist: str):
     help="Clear the description on a CUSTOM watchlist.",
     cls=incompatible_with("description"),
 )
-@click.pass_context
+@logging_options
 def update(
-    ctx: Context,
     watchlist_id: str,
     title: str = None,
     description: str = None,
@@ -243,7 +246,7 @@ def update(
     if clear_description:
         description = ""
 
-    client = ctx.obj()
+    client = Client()
     client.watchlists.v1.update(watchlist_id, title, description)
     console.print(f"Successfully updated watchlist with ID: '{watchlist_id}'.")
 
@@ -283,9 +286,8 @@ def update(
     "from SCIM or User Directory Sync.",
 )
 @input_format_option
-@click.pass_context
+@logging_options
 def add(
-    ctx: Context,
     watchlist: str,
     users=None,
     excluded_users=None,
@@ -306,7 +308,7 @@ def add(
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
     """
-    client = ctx.obj()
+    client = Client()
 
     # Add included users
     if users:
@@ -382,9 +384,8 @@ def add(
     "from SCIM or User Directory Sync.",
 )
 @input_format_option
-@click.pass_context
+@logging_options
 def remove(
-    ctx: Context,
     watchlist: str,
     users=None,
     excluded_users=None,
@@ -405,7 +406,7 @@ def remove(
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
     """
-    client = ctx.obj()
+    client = Client()
 
     # Remove included users
     if users:
@@ -448,9 +449,11 @@ def remove(
 @watchlist_arg
 @columns_option
 @table_format_option
-@click.pass_context
+@logging_options
 def list_members(
-    ctx: Context, watchlist: str, format_: TableFormat, columns: str = None
+    watchlist: str,
+    format_: TableFormat,
+    columns: Optional[str],
 ):
     """
     List members of a watchlist.
@@ -460,7 +463,7 @@ def list_members(
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
     """
-    client = ctx.obj()
+    client = Client()
     members = client.watchlists.v1.list_members(watchlist)
     _output_results(members.watchlist_members, WatchlistUser, format_, columns)
 
@@ -469,9 +472,11 @@ def list_members(
 @watchlist_arg
 @table_format_option
 @columns_option
-@click.pass_context
+@logging_options
 def list_included_users(
-    ctx: Context, watchlist: str, format_: str, columns: str = None
+    watchlist: str,
+    format_: str,
+    columns: Optional[str],
 ):
     """
     List users explicitly included on a watchlist.
@@ -479,7 +484,7 @@ def list_included_users(
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
     """
-    client = ctx.obj()
+    client = Client()
     users = client.watchlists.v1.list_included_users(watchlist)
     _output_results(users.included_users, WatchlistUser, format_, columns)
 
@@ -488,9 +493,11 @@ def list_included_users(
 @watchlist_arg
 @table_format_option
 @columns_option
-@click.pass_context
+@logging_options
 def list_excluded_users(
-    ctx: Context, watchlist: str, format_: TableFormat, columns: str = None
+    watchlist: str,
+    format_: TableFormat,
+    columns: Optional[str],
 ):
     """
     List users excluded from a watchlist.
@@ -498,7 +505,7 @@ def list_excluded_users(
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
     """
-    client = ctx.obj()
+    client = Client()
     users = client.watchlists.v1.list_excluded_users(watchlist)
     _output_results(users.excluded_users, WatchlistUser, format_, columns)
 
@@ -507,9 +514,11 @@ def list_excluded_users(
 @watchlist_arg
 @table_format_option
 @columns_option
-@click.pass_context
+@logging_options
 def list_directory_groups(
-    ctx: Context, watchlist: str, format_: TableFormat, columns: str = None
+    watchlist: str,
+    format_: TableFormat,
+    columns: Optional[str],
 ):
     """
     List directory groups included on a watchlist.
@@ -517,7 +526,7 @@ def list_directory_groups(
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
     """
-    client = ctx.obj()
+    client = Client()
     groups = client.watchlists.v1.list_directory_groups(watchlist)
     _output_results(
         groups.included_directory_groups, IncludedDirectoryGroup, format_, columns
@@ -528,9 +537,11 @@ def list_directory_groups(
 @watchlist_arg
 @table_format_option
 @columns_option
-@click.pass_context
+@logging_options
 def list_departments(
-    ctx: Context, watchlist: str, format_: TableFormat, columns: str = None
+    watchlist: str,
+    format_: TableFormat,
+    columns: Optional[str],
 ):
     """
     List departments included on a watchlist.
@@ -538,7 +549,7 @@ def list_departments(
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
     """
-    client = ctx.obj()
+    client = Client()
     deps = client.watchlists.v1.list_departments(watchlist)
     _output_results(deps.included_departments, IncludedDepartment, format_, columns)
 

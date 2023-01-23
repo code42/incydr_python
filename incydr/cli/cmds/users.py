@@ -4,12 +4,12 @@ from typing import Optional
 
 import click
 from boltons.iterutils import bucketize
-from click import Context
 from pydantic import Field
 from requests import HTTPError
 from rich.panel import Panel
 from rich.progress import track
 
+from incydr._core.client import Client
 from incydr._devices.models import Device
 from incydr._users.client import RoleNotFoundError
 from incydr._users.client import RoleProcessingError
@@ -18,9 +18,7 @@ from incydr._users.models import Role
 from incydr._users.models import User
 from incydr._users.models import UserRole
 from incydr.cli import console
-from incydr.cli import init_client
-from incydr.cli import log_file_option
-from incydr.cli import log_level_option
+from incydr.cli import logging_options
 from incydr.cli import render
 from incydr.cli.cmds.models import UserCSV
 from incydr.cli.cmds.models import UserJSON
@@ -41,12 +39,9 @@ user_arg = click.argument("user", callback=user_lookup_callback)
 
 
 @click.group(cls=IncydrGroup)
-@log_level_option
-@log_file_option
-@click.pass_context
-def users(ctx, log_level, log_file):
+@logging_options
+def users():
     """View and manage users and user roles."""
-    init_client(ctx, log_level, log_file)
 
 
 @users.command("list", cls=IncydrCommand)
@@ -63,9 +58,8 @@ def users(ctx, log_level, log_file):
 @click.option("--username", default=None)
 @table_format_option
 @columns_option
-@click.pass_context
+@logging_options
 def list_(
-    ctx: Context,
     active: Optional[bool],
     blocked: Optional[bool],
     username: Optional[str],
@@ -75,7 +69,7 @@ def list_(
     """
     List users.
     """
-    client = ctx.obj()
+    client = Client()
     users_ = client.users.v1.iter_all(active=active, blocked=blocked, username=username)
 
     if format_ == TableFormat.csv:
@@ -110,14 +104,17 @@ def list_(
 @users.command(cls=IncydrCommand)
 @click.argument("user")  # don't need username callback, handled by client method
 @single_format_option
-@click.pass_context
-def show(ctx: Context, user, format_: SingleFormat):
+@logging_options
+def show(
+    user,
+    format_: SingleFormat,
+):
     """
     Show details for a user.
 
     Accepts a user ID or a username.  Performs an additional lookup if username is passed.
     """
-    client = ctx.obj()
+    client = Client()
     user = client.users.v1.get_user(user)
 
     if format_ == SingleFormat.rich and client.settings.use_rich:
@@ -132,12 +129,16 @@ def show(ctx: Context, user, format_: SingleFormat):
 @user_arg
 @table_format_option
 @columns_option
-@click.pass_context
-def list_devices(ctx: Context, user, format_: TableFormat, columns: str = None):
+@logging_options
+def list_devices(
+    user,
+    format_: TableFormat,
+    columns: Optional[str],
+):
     """
     List devices associated with a particular user.
     """
-    client = ctx.obj()
+    client = Client()
     devices = client.users.v1.get_devices(user).devices
 
     if format_ == TableFormat.csv:
@@ -167,12 +168,16 @@ def list_devices(ctx: Context, user, format_: TableFormat, columns: str = None):
 @user_arg
 @table_format_option
 @columns_option
-@click.pass_context
-def list_user_roles(ctx: Context, user: str, format_: TableFormat, columns: str = None):
+@logging_options
+def list_user_roles(
+    user: str,
+    format_: TableFormat,
+    columns: Optional[str],
+):
     """
     List roles associated with a particular user.
     """
-    client = ctx.obj()
+    client = Client()
     roles = client.users.v1.list_user_roles(user)
 
     if format_ == TableFormat.csv:
@@ -192,8 +197,12 @@ def list_user_roles(ctx: Context, user: str, format_: TableFormat, columns: str 
 @click.argument("roles")
 @click.option("--add", "update_method", flag_value="add", default=None)
 @click.option("--remove", "update_method", flag_value="remove", default=None)
-@click.pass_context
-def update_roles(ctx: Context, user, roles, update_method):
+@logging_options
+def update_roles(
+    user,
+    roles: str,
+    update_method: str,
+):
     """
     Update roles associated with a particular user.
 
@@ -209,7 +218,7 @@ def update_roles(ctx: Context, user, roles, update_method):
 
     Alternatively, use the `--add` flag to assign additional roles to a user's existing roles.
     """
-    client = ctx.obj()
+    client = Client()
 
     if update_method == "add":
         update_func = client.users.v1.add_roles
@@ -229,24 +238,28 @@ def update_roles(ctx: Context, user, roles, update_method):
 
 @users.command(cls=IncydrCommand)
 @user_arg
-@click.pass_context
-def activate(ctx: Context, user):
+@logging_options
+def activate(
+    user,
+):
     """
     Activate a user.
     """
-    client = ctx.obj()
+    client = Client()
     client.users.v1.activate(user)
     console.print(f"User '{user}' successfully activated.")
 
 
 @users.command(cls=IncydrCommand)
 @user_arg
-@click.pass_context
-def deactivate(ctx: Context, user):
+@logging_options
+def deactivate(
+    user,
+):
     """
     Deactivate a user.
     """
-    client = ctx.obj()
+    client = Client()
     client.users.v1.deactivate(user)
     console.print(f"User '{user}' successfully deactivated.")
 
@@ -254,12 +267,15 @@ def deactivate(ctx: Context, user):
 @users.command(cls=IncydrCommand)
 @user_arg
 @click.argument("org_guid")
-@click.pass_context
-def move(ctx: Context, user, org_guid):
+@logging_options
+def move(
+    user,
+    org_guid,
+):
     """
     Move a user to a specified organization.
     """
-    client = ctx.obj()
+    client = Client()
     client.users.v1.move(user, org_guid)
     console.print(f"User '{user}' successfully moved to org '{org_guid}'.")
 
@@ -272,12 +288,15 @@ def roles_():
 @roles_.command("show", cls=IncydrCommand)
 @single_format_option
 @click.argument("role")
-@click.pass_context
-def show_role(ctx: Context, role, format_: SingleFormat = None):
+@logging_options
+def show_role(
+    role,
+    format_: SingleFormat,
+):
     """
     Show details for a single role, specified by role name or role ID.
     """
-    client = ctx.obj()
+    client = Client()
     role = client.users.v1.get_role(role)
     if format_ == SingleFormat.rich and client.settings.use_rich:
         console.print(Panel.fit(model_as_card(role), title=role.role_name))
@@ -289,12 +308,14 @@ def show_role(ctx: Context, role, format_: SingleFormat = None):
 
 @roles_.command("list", cls=IncydrCommand)
 @table_format_option
-@click.pass_context
-def list_roles(ctx: Context, format_: TableFormat = None):
+@logging_options
+def list_roles(
+    format_: TableFormat,
+):
     """
     List all available roles that can be assigned by the current user.
     """
-    client = ctx.obj()
+    client = Client()
     roles = client.users.v1.list_roles()
     if format_ == TableFormat.csv:
         render.csv(Role, roles, flat=True)
@@ -313,8 +334,12 @@ def list_roles(ctx: Context, format_: TableFormat = None):
 @input_format_option
 @click.option("--add", "update_method", flag_value="add", default=None)
 @click.option("--remove", "update_method", flag_value="remove", default=None)
-@click.pass_context
-def bulk_update_roles(ctx: Context, file, update_method=None, format_=None):
+@logging_options
+def bulk_update_roles(
+    file,
+    update_method: str,
+    format_: Optional[str],
+):
     """
     Bulk update roles associated with multiple users from a file.
 
@@ -336,7 +361,7 @@ def bulk_update_roles(ctx: Context, file, update_method=None, format_=None):
 
             incydr users bulk-update-roles path/to/file.json --add --format json-lines
     """
-    client = ctx.obj()
+    client = Client()
 
     @lru_cache()
     def resolve_username(user):
@@ -390,8 +415,8 @@ def bulk_update_roles(ctx: Context, file, update_method=None, format_=None):
 @users.command(cls=IncydrCommand)
 @click.argument("file", type=click.File())
 @input_format_option
-@click.pass_context
-def bulk_activate(ctx: Context, file: Path, format_: str):
+@logging_options
+def bulk_activate(file: Path, format_: str):
     """
     Bulk activate users.
 
@@ -401,7 +426,7 @@ def bulk_activate(ctx: Context, file: Path, format_: str):
 
     Requires a single `user` column or field that contains either the user IDs or the usernames of the users to be activated.
     """
-    client = ctx.obj()
+    client = Client()
 
     @lru_cache()
     def resolve_username(user):
@@ -431,8 +456,8 @@ def bulk_activate(ctx: Context, file: Path, format_: str):
 @users.command(cls=IncydrCommand)
 @click.argument("file", type=click.File())
 @input_format_option
-@click.pass_context
-def bulk_deactivate(ctx: Context, file: Path, format_: str):
+@logging_options
+def bulk_deactivate(file: Path, format_: str):
     """
     Bulk deactivate users.
 
@@ -442,7 +467,7 @@ def bulk_deactivate(ctx: Context, file: Path, format_: str):
 
     Requires a single `user` column or field that contains either the user IDs or the usernames of the users to be deactivated.
     """
-    client = ctx.obj()
+    client = Client()
 
     @lru_cache()
     def resolve_username(user):
@@ -472,8 +497,9 @@ def bulk_deactivate(ctx: Context, file: Path, format_: str):
 @users.command(cls=IncydrCommand)
 @click.argument("file", type=click.File())
 @input_format_option
-@click.pass_context
-def bulk_move(ctx: Context, file: Path, format_: str):
+@logging_options
+def bulk_move(file: Path, format_: str):
+
     """
     Bulk move multiple users to specified organizations.
 
@@ -486,7 +512,7 @@ def bulk_move(ctx: Context, file: Path, format_: str):
     * `user` - User ID or username of the user who will be moved to the new organization. Performs an additional lookup if username is passed.
     * `org_guid` - GUID for the user's new organization.
     """
-    client = ctx.obj()
+    client = Client()
 
     class UserMoveCSV(UserCSV):
         org_guid: str = Field(csv_aliases=["org_guid", "orgGuid", "org"])

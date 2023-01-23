@@ -609,7 +609,7 @@ def test_get_id_by_name_when_no_id_raises_error(httpserver_auth: HTTPServer):
     with pytest.raises(WatchlistNotFoundError) as err:
         c.watchlists.v1.get_id_by_name("name")
     assert (
-        err.value.args[0] == "No watchlist matching the type or title 'name' was found."
+        "No watchlist matching the type or title 'name' was found." in err.value.args[0]
     )
 
 

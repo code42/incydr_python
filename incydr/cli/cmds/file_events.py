@@ -5,18 +5,17 @@ from typing import Union
 
 import click
 from click import BadOptionUsage
-from click import Context
 from click import File
 from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.table import Table
 
+from incydr._core.client import Client
 from incydr._file_events.models.response import SavedSearch
 from incydr._queries.file_events import EventQuery
 from incydr.cli import console
-from incydr.cli import init_client
-from incydr.cli import log_file_option
-from incydr.cli import log_level_option
+from incydr.cli import get_user_project_path
+from incydr.cli import logging_options
 from incydr.cli import render
 from incydr.cli.cmds.options.event_filter_options import advanced_query_option
 from incydr.cli.cmds.options.event_filter_options import event_filter_options
@@ -32,7 +31,6 @@ from incydr.cli.cmds.utils import warn_interrupt
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
 from incydr.cli.cursor import CursorStore
-from incydr.cli.cursor import get_user_project_path
 from incydr.cli.logger import get_server_logger
 from incydr.enums.file_events import RiskIndicators
 from incydr.enums.file_events import RiskSeverity
@@ -60,12 +58,9 @@ def render_search(search_: SavedSearch):
 
 
 @click.group(cls=IncydrGroup)
-@log_level_option
-@log_file_option
-@click.pass_context
-def file_events(ctx, log_level, log_file):
+@logging_options
+def file_events():
     """View and manage file events."""
-    init_client(ctx, log_level, log_file)
 
 
 @file_events.command(cls=IncydrCommand)
@@ -76,9 +71,8 @@ def file_events(ctx, log_level, log_file):
 @advanced_query_option
 @saved_search_option
 @event_filter_options
-@click.pass_context
+@logging_options
 def search(
-    ctx: Context,
     format_: TableFormat,
     columns: Optional[str],
     output: Optional[str],
@@ -119,7 +113,7 @@ def search(
     if output:
         format_ = TableFormat.json_lines
 
-    client = ctx.obj()
+    client = Client()
 
     if saved_search:
         saved_search = client.file_events.v2.get_saved_search(saved_search)
@@ -217,10 +211,9 @@ def search(
 
 @file_events.command()
 @click.argument("checkpoint-name")
-@click.pass_context
-def clear_checkpoint(ctx: Context, checkpoint_name: str):
+def clear_checkpoint(checkpoint_name: str):
     """Remove the saved file events checkpoint from searches made with `--checkpoint` mode."""
-    client = ctx.obj()
+    client = Client()
     cursor = _get_cursor_store(client.settings.api_client_id)
     cursor.delete(checkpoint_name)
 
@@ -228,12 +221,15 @@ def clear_checkpoint(ctx: Context, checkpoint_name: str):
 @file_events.command(cls=IncydrCommand)
 @single_format_option
 @click.argument("search-id")
-@click.pass_context
-def show_saved_search(ctx: Context, search_id: str, format_: SingleFormat):
+@logging_options
+def show_saved_search(
+    search_id: str,
+    format_: SingleFormat,
+):
     """
     Show details for a single saved search.
     """
-    client = ctx.obj()
+    client = Client()
     saved_search = client.file_events.v2.get_saved_search(search_id)
     if format_ == SingleFormat.rich:
         console.print(Panel.fit(model_as_card(saved_search)))
@@ -246,16 +242,15 @@ def show_saved_search(ctx: Context, search_id: str, format_: SingleFormat):
 @file_events.command(cls=IncydrCommand)
 @table_format_option
 @columns_option
-@click.pass_context
+@logging_options
 def list_saved_searches(
-    ctx: Context,
     format_: TableFormat,
     columns: Optional[str],
 ):
     """
     List saved searches.
     """
-    client = ctx.obj()
+    client = Client()
     searches = client.file_events.v2.list_saved_searches()
     if format_ == TableFormat.table:
         render.table(SavedSearch, searches, columns=columns, flat=False)
@@ -303,6 +298,7 @@ def _get_cursor_store(api_key):
     Get cursor store for file event search checkpoints.
     """
     dir_path = get_user_project_path(
+        "checkpoints",
         api_key,
         "file_event_checkpoints",
     )

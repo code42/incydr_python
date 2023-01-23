@@ -24,7 +24,7 @@ class TestLogLevels:
         self, httpserver_auth: HTTPServer, monkeypatch, capsys, level_string, expected
     ):
         monkeypatch.setenv("incydr_log_level", level_string)
-        client = Client()
+        client = Client(log_stderr=True)
         captured = capsys.readouterr()
         assert client.settings.log_level == expected
         assert client.settings.logger.getEffectiveLevel() == expected
@@ -48,9 +48,10 @@ class TestLogLevels:
         assert client.settings.log_level == expected
 
     def test_modifying_log_level_setting_affects_logging(
-        self, httpserver_auth: HTTPServer, capsys
+        self, httpserver_auth: HTTPServer, capsys, tmp_path
     ):
-        client = Client()
+        client = Client(log_stderr=True)
+        client.settings.log_file = tmp_path / "test.log"
         assert client.settings.log_level == logging.WARNING
 
         client.settings.logger.info("SHOULD NOT LOG")
@@ -80,8 +81,7 @@ class TestRich:
     def test_modifying_use_rich_setting_affects_logging(
         self, httpserver_auth: HTTPServer, capsys
     ):
-        client = Client()
-
+        client = Client(log_stderr=True)
         client.settings.use_rich = False
         client.settings.logger.warning("Log should not match Rich format.")
         captured = capsys.readouterr()

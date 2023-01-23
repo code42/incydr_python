@@ -16,6 +16,8 @@ ignore =
     W503
     # exception chaining
     B904
+    # !r conversion flag
+    B907
 # up to 88 allowed by bugbear B950
 max-line-length = 80
 per-file-ignores =

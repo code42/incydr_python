@@ -368,6 +368,6 @@ def test_cli_download_makes_expected_call(
         "/v1/audit/redeemDownloadToken", query_string=export_event_data
     ).respond_with_json(redeem_events_data)
 
-    result = runner.invoke(incydr, ["audit-log", "download", "--path", tmp_path])
+    result = runner.invoke(incydr, ["audit-log", "download", "--path", str(tmp_path)])
     httpserver_auth.check()
     assert result.exit_code == 0

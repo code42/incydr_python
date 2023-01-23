@@ -7,18 +7,17 @@ from itertools import count
 from typing import Optional
 
 import click
-from click import Context
 from pydantic import Field
 
 from incydr._audit_log.models import DateRange
 from incydr._audit_log.models import QueryAuditLogRequest
+from incydr._core.client import Client
 from incydr._core.models import Model
 from incydr._queries.utils import parse_str_to_dt
 from incydr._queries.utils import parse_ts_to_posix_ts
 from incydr.cli import console
-from incydr.cli import init_client
-from incydr.cli import log_file_option
-from incydr.cli import log_level_option
+from incydr.cli import get_user_project_path
+from incydr.cli import logging_options
 from incydr.cli import render
 from incydr.cli.cmds.options.audit_log_filter_options import filter_options
 from incydr.cli.cmds.options.output_options import columns_option
@@ -29,17 +28,13 @@ from incydr.cli.cmds.utils import warn_interrupt
 from incydr.cli.core import IncydrCommand
 from incydr.cli.core import IncydrGroup
 from incydr.cli.cursor import CursorStore
-from incydr.cli.cursor import get_user_project_path
 from incydr.cli.logger import get_server_logger
 
 
 @click.group(cls=IncydrGroup)
-@log_level_option
-@log_file_option
-@click.pass_context
-def audit_log(ctx, log_level, log_file):
+@logging_options
+def audit_log():
     """View audit log events."""
-    init_client(ctx, log_level, log_file)
 
 
 @audit_log.command("search", cls=IncydrCommand)
@@ -60,9 +55,8 @@ def audit_log(ctx, log_level, log_file):
 @filter_options
 @columns_option
 @output_options
-@click.pass_context
+@logging_options
 def search(
-    ctx: Context,
     format_: TableFormat,
     columns: Optional[str],
     output: Optional[str],
@@ -89,7 +83,7 @@ def search(
     on subsequent queries with that same checkpoint. Checkpointing filters by timestamp, additional filter
     options will need to be included in each run.
     """
-    client = ctx.obj()
+    client = Client()
     cursor = _get_cursor_store(client.settings.api_client_id)
 
     if output:
@@ -172,10 +166,9 @@ def search(
 
 @audit_log.command()
 @click.argument("checkpoint-name")
-@click.pass_context
-def clear_checkpoint(ctx: Context, checkpoint_name: str):
+def clear_checkpoint(checkpoint_name: str):
     """Remove the saved audit log checkpoint from searches made with `--checkpoint` mode."""
-    client = ctx.obj()
+    client = Client()
     cursor = _get_cursor_store(client.settings.api_client_id)
     cursor.delete(checkpoint_name)
 
@@ -188,9 +181,8 @@ def clear_checkpoint(ctx: Context, checkpoint_name: str):
     type=click.Path(exists=True, file_okay=False, dir_okay=True),
     default=os.getcwd(),
 )
-@click.pass_context
+@logging_options
 def download(
-    ctx: Context,
     path: Optional[str],
     start: Optional[str],
     end: Optional[str],
@@ -206,7 +198,7 @@ def download(
 
     Use the --path option to specify where to save the CSV.  Defaults to the current directory if not specified.
     """
-    client = ctx.obj()
+    client = Client()
 
     # convert str to list
     actor_ids = actor_ids.split(",") if isinstance(actor_ids, str) else None
@@ -277,6 +269,7 @@ def _get_cursor_store(api_key):
     Get cursor store for audit log search checkpoints.
     """
     dir_path = get_user_project_path(
+        "checkpoints",
         api_key,
         "audit_log_checkpoints",
     )

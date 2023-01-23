@@ -7,7 +7,6 @@ from pytest_httpserver import HTTPServer
 from requests import Response
 
 from incydr import Client
-from incydr._user_risk_profiles.client import DateParseError
 from incydr._user_risk_profiles.models import UserRiskProfile
 from incydr._user_risk_profiles.models import UserRiskProfilesPage
 from incydr.cli.main import incydr
@@ -303,7 +302,7 @@ def test_cli_update_when_incorrect_date_format_raises_date_parse_exception(
         ["users", "risk-profiles", "update", TEST_USER_ID, date_option, date_input],
     )
     assert result.exit_code == 1
-    assert isinstance(result.exception, DateParseError)
+    assert "Date Parse Error: Error parsing time data." in result.output
 
 
 def test_cli_update_when_no_options_raises_usage_error(
