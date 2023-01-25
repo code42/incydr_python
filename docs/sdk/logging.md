@@ -37,6 +37,7 @@ To disable logging to stderr, you can do any of the following:
 
 
 ### Disable Rich formatting
+
 To disable Rich formatting in your log output, you can do any of the following:
 
 - Set `INCYDR_USE_RICH=false` in your environment

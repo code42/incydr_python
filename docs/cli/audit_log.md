@@ -2,8 +2,5 @@
 
 ::: mkdocs-click
     :module: incydr.cli.cmds.audit_log
-    :command: search
-
-::: mkdocs-click
-    :module: incydr.cli.cmds.audit_log
-    :command: download
+    :command: audit_log
+    :list_subcommands:

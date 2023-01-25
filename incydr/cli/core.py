@@ -10,10 +10,11 @@ from incydr.exceptions import LoggedCLIError
 
 _DIFFLIB_CUT_OFF = 0.6
 
+
 try:
     import rich
 
-    from typer import rich_utils
+    from incydr.cli import rich_utils
 
 except ImportError:  # pragma: nocover
     rich = None  # type: ignore

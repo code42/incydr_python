@@ -80,7 +80,7 @@ def search(
 
     Results will be output to the console by default, use the `--output` option to send data to a server.
 
-    Checkpointing is available through the --checkpoint <checkpoint-name> option and will only return new results
+    Checkpointing is available through the `--checkpoint <checkpoint-name>` option and will only return new results
     on subsequent queries with that same checkpoint.  Checkpointing filters by timestamp, additional filter
     options will need to be included in each run.
     """
@@ -245,9 +245,11 @@ def bulk_update_state(
     note: str,
 ):
     """
-    Bulk update multiple alerts from CSV or JSON Lines input.
+    Bulk update multiple alerts from a file.
 
-    FILE argument specifies the path to the file (use "-" to read from stdin).
+    Takes a single arg `FILE` which specifies the path to the file (use "-" to read from stdin).
+
+    File format can either be CSV or [JSON Lines format](https://jsonlines.org) (Default is CSV).
 
     The --state and --note options to this command will override respective columns/keys in the CSV/JSON input.
 

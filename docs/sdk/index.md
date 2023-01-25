@@ -27,7 +27,7 @@ client = incydr.Client(
 )
 ```
 
-1.  Any arguments that are not provided to the `incydr.Client` will attempt to be loaded from environment variables or
+Any arguments that are not provided to the `incydr.Client` will attempt to be loaded from environment variables or
    .env files. See [Settings](/settings) for more details
 
 

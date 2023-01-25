@@ -2,4 +2,5 @@
 
 ::: mkdocs-click
     :module: incydr.cli.cmds.directory_groups
-    :command: list_
+    :command: directory_groups
+    :list_subcommands:
