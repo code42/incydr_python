@@ -12,9 +12,10 @@ from _client.users.models import UpdateRolesResponse
 from _client.users.models import User
 from _client.users.models import UserRole
 from _client.users.models import UsersPage
+from pytest_httpserver import HTTPServer
+
 from incydr import Client
 from incydr.cli import incydr
-from pytest_httpserver import HTTPServer
 
 TEST_USER_ID = "user-1"
 TEST_ORG_GUID = "orgGuid-1"

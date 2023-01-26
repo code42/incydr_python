@@ -1,3 +1,3 @@
-::: incydr._alert_rules.client.AlertRulesV2
+::: _client.alert_rules.client.AlertRulesV2
     :docstring:
     :members:

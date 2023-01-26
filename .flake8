@@ -30,3 +30,5 @@ per-file-ignores =
     src/_client/queries/_file_events/enums.py: B902
     src/_cli/*: B008
     src/_client/core/enums.py: F401
+    src/_client/utils.py: B905
+    src/_cli/rich_utils.py: B905

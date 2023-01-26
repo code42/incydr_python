@@ -7,9 +7,10 @@ from _client.devices.models import Device
 from _client.devices.models import DevicesPage
 from _client.enums import SortDirection
 from _client.enums.devices import SortKeys
+from pytest_httpserver import HTTPServer
+
 from incydr import Client
 from incydr.cli import incydr
-from pytest_httpserver import HTTPServer
 
 TEST_DEVICE_ID = "device-1"
 

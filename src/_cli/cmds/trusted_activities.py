@@ -192,31 +192,22 @@ def domain_(
     format_: SingleFormat = None,
 ):
     """
-    Trust activity across an entire DOMAIN (ex: my-domain.com).
+    Trust activity across an entire `DOMAIN` (ex: `my-domain.com`).
 
     The following activities can be configured:
 
-    --file-upload
-        Trust file uploads to this domain.  Defaults to false.
-
-    --git-push
-        Trust git push events to this domain.  Defaults to false.
-
-    --cloud-sync-services [BOX|GOOGLE_DRIVE|ICLOUD|ONE_DRIVE]
-        Trust cloud sync activity from the specified service(s) if the username signed into the sync app is on this domain.
+    * `--file-upload` - Trust file uploads to this domain.  Defaults to false.
+    * `--git-push` - Trust git push events to this domain.  Defaults to false.
+    * `--cloud-sync-services` [`BOX|GOOGLE_DRIVE|ICLOUD|ONE_DRIVE`] - Trust cloud sync activity from the specified service(s) if the username signed into the sync app is on this domain.
         If you want to only trust activity for a specific corporate account, add a trusted account name instead.
-
-    --cloud-share-services [BOX|GOOGLE_DRIVE|ONE_DRIVE]
-        Trust cloud share activity from the specified service(s) if the user its shared with is on this domain.
+    * `--cloud-share-services` [`BOX|GOOGLE_DRIVE|ONE_DRIVE`] - Trust cloud share activity from the specified service(s) if the user its shared with is on this domain.
         You must have a cloud connector configured for your tenant to support this trusted action.
-
-    --email-share-services [GMAIL|MICROSOFT_365]
-        Trust email share activity from the specified service(s) if the email recipient is on this domain.
+    * `--email-share-services` [`GMAIL|MICROSOFT_365`] - Trust email share activity from the specified service(s) if the email recipient is on this domain.
         You must have an email connector configured for your tenant to support this trusted action.
 
     Multiple options can be supplied to specify cloud-share, cloud-sync, and email-share services.
 
-    For example, the following command will create a trusted domain that trusts file-uploads to the domain and cloud sync events from BOX and ICLOUD.
+    For example, the following command will create a trusted domain that trusts file-uploads to the domain and cloud sync events from `BOX` and `ICLOUD`.
 
         trusted-activities add domain --file-upload --cloud-sync-services BOX --cloud-sync-services ICLOUD
 
@@ -250,7 +241,7 @@ def url_path_(
     format_: SingleFormat = None,
 ):
     """
-    Trust browser uploads to only part of a domain by trusting a specific URL_PATH (ex: my-domain.com/path).
+    Trust browser uploads to only part of a domain by trusting a specific `URL_PATH` (ex: `my-domain.com/path`).
     """
     client = Client()
     activity = client.trusted_activities.v2.add_url_path(url_path, description)
@@ -268,7 +259,7 @@ def slack_workspace(
     format_: SingleFormat = None,
 ):
     """
-    Trust activity uploaded through a slack workspace specified by WORKSPACE_NAME.
+    Trust activity uploaded through a slack workspace specified by `WORKSPACE_NAME`.
     """
     client = Client()
     activity = client.trusted_activities.v2.add_slack_workspace(
@@ -302,9 +293,9 @@ def account(
     format_: SingleFormat = None,
 ):
     """
-    Trust activity for a specific corporate account specified by ACCOUNT_NAME for cloud sync apps installed on user devices.
+    Trust activity for a specific corporate account specified by `ACCOUNT_NAME` for cloud sync apps installed on user devices.
 
-    Use the --dropbox and/or --one-drive options to indicate trusted cloud sync services for this account.
+    Use the `--dropbox` and/or `--one-drive` options to indicate trusted cloud sync services for this account.
     """
     client = Client()
     activity = client.trusted_activities.v2.add_account_name(
@@ -324,7 +315,7 @@ def git_repo(
     format_: SingleFormat = None,
 ):
     """
-    Trust file upload activity to a git repository.  Requires a git URI path (ex: bitbucket.org:exampleent/myrepo).
+    Trust file upload activity to a git repository.  Requires a `GIT_URI` path (ex: `bitbucket.org:exampleent/myrepo`).
     """
     client = Client()
     activity = client.trusted_activities.v2.add_git_repository(

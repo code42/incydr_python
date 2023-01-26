@@ -1,4 +1,4 @@
-# incydr
+# Incydr
 
 [![PyPI - Version](https://img.shields.io/pypi/v/incydr.svg)](https://pypi.org/project/incydr)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/incydr.svg)](https://pypi.org/project/incydr)
@@ -21,36 +21,24 @@ Documentation during the beta can be found at https://code42.github.io/incydr_py
 
 ## Installation
 
+Install the Incydr SDK with the following command:
+
 ```console
 pip install incydr
 ```
 
-# Contributing
+Use either of the following to install Incydr CLI extension alongside the SDK:
 
-## Install hatch
-
-```console
-pip install hatch
+```bash
+$ pip install 'incydr[cli]'
 ```
 
-#### Run style checks
-
-```console
-hatch run style:check
+```bash
+$ pip install 'incydr[all]'.
 ```
 
-#### Run tests with coverage
-
-```console
-hatch run test:cov
-```
-
-#### Serve docs locally
-
-```console
-hatch run docs:serve
-```
-
+For more details see the [SDK Documentation](docs/sdk/index.md) and the [CLI Documentation](docs/cli/getting_started.md).
+.
 ## License
 
 `incydr` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.

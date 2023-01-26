@@ -1,5 +1,6 @@
 # Departments Commands
 
 ::: mkdocs-click
-    :module: incydr.cli.cmds.departments
-    :command: list_
+    :module: _cli.cmds.departments
+    :command: departments
+    :list_subcommands:

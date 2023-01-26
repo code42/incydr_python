@@ -14,8 +14,9 @@ from _client.file_events.models.response import SavedSearch
 from _client.file_events.models.response import SearchFilter
 from _client.file_events.models.response import SearchFilterGroup
 from _client.queries.file_events import EventQuery
-from incydr.cli import incydr
 from pytest_httpserver import HTTPServer
+
+from incydr.cli import incydr
 
 MICROSECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 TEST_EVENT_1 = {

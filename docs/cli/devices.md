@@ -1,9 +1,6 @@
 # Devices Commands
 
 ::: mkdocs-click
-    :module: incydr.cli.cmds.devices
-    :command: list_
-
-::: mkdocs-click
-    :module: incydr.cli.cmds.devices
-    :command: show
+    :module: _cli.cmds.devices
+    :command: devices
+    :list_subcommands:

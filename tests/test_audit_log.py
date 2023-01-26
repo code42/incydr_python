@@ -8,9 +8,10 @@ from _cli.cmds.options.output_options import TableFormat
 from _cli.cursor import CursorStore
 from _client.audit_log.models import AuditEventsPage
 from _client.queries.utils import parse_ts_to_posix_ts
+from pytest_httpserver import HTTPServer
+
 from incydr import Client
 from incydr.cli import incydr
-from pytest_httpserver import HTTPServer
 
 TEST_AL_ENTRY_1 = {
     "type$": "audit_log::logged_in/1",

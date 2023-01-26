@@ -4,8 +4,9 @@ from urllib.parse import urlencode
 from _client.core.client import Client
 from _client.directory_groups.models import DirectoryGroup
 from _client.directory_groups.models import DirectoryGroupsPage
-from incydr.cli import incydr
 from pytest_httpserver import HTTPServer
+
+from incydr.cli import incydr
 
 
 def test_get_page_when_default_params_returns_expected_data(

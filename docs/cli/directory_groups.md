@@ -1,5 +1,6 @@
 # Directory Groups Commands
 
 ::: mkdocs-click
-    :module: incydr.cli.cmds.directory_groups
-    :command: list_
+    :module: _cli.cmds.directory_groups
+    :command: directory_groups
+    :list_subcommands:

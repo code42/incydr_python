@@ -1,3 +1,3 @@
-::: incydr._users.client.UsersV1
+::: _client.users.client.UsersV1
     :docstring:
     :members:

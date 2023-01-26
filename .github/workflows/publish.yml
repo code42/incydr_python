@@ -78,3 +78,12 @@ jobs:
         HATCH_INDEX_AUTH: ${{ secrets.PYPI_ACCESS_TOKEN }}
       run: |
         hatch publish dist/*
+
+    - name: Notify Slack Action
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        fields: repo,message,commit,author,action,workflow
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: failure()

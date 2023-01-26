@@ -1,3 +1,3 @@
-::: incydr._devices.client.DevicesV1
+::: _client.devices.client.DevicesV1
     :docstring:
     :members:

@@ -10,11 +10,11 @@ from _client.cases.models import CaseFileEvents
 from _client.cases.models import CasesPage
 from _client.cases.models import FileEvent
 from _client.file_events.models.event import FileEventV2
-from incydr import Client
-from incydr.cli import incydr
 from pydantic import ValidationError
 from pytest_httpserver import HTTPServer
 
+from incydr import Client
+from incydr.cli import incydr
 from tests.test_file_events import TEST_EVENT_1
 from tests.test_users import TEST_USER_1
 from tests.test_users import TEST_USER_2

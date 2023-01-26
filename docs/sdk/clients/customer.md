@@ -1,3 +1,3 @@
-::: incydr._customer.client.CustomerV1
+::: _client.customer.client.CustomerV1
     :docstring:
     :members:

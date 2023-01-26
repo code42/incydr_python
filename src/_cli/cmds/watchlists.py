@@ -353,9 +353,10 @@ def add(
     default=None,
     type=FileOrString(),
     help="List of included user IDs or usernames to remove from the watchlist. "
-    "An additional lookup is performed if a username is passed. Argument can be "
-    "passed as a comma-delimited string or from a CSV file with a single 'user' "
-    "column if prefixed with '@', e.g. '--users @users.csv'.",
+    "An additional lookup is performed if a username is passed.Argument can be "
+    "passed as a comma-delimited string or as a file if prefixed with '@', e.g. '--users @users.csv'. "
+    "File should have a single 'user' field.  File format can either be CSV or JSON Lines format, "
+    "as specified with the --format option (Default is CSV).",
 )
 @click.option(
     "--excluded-users",
@@ -363,8 +364,9 @@ def add(
     type=FileOrString(),
     help="List of excluded user IDs or usernames to remove from the watchlist. "
     "An additional lookup is performed if a username is passed. Argument can be "
-    "passed as a comma-delimited string or from a CSV file with a single 'user' "
-    "column if prefixed with '@', e.g. '--users @users.csv'.",
+    "passed as a comma-delimited string or as a file if prefixed with '@', e.g. '--users @users.csv'. "
+    "File should have a single 'user' field.  File format can either be CSV or JSON Lines format, "
+    "as specified with the --format option (Default is CSV).",
 )
 @click.option(
     "--departments",
