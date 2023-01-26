@@ -55,23 +55,23 @@ columns_option = click.option(
 output_option = click.option(
     "--output",
     default=None,
-    type=ServerProtocol,
     help="Use to send the raw-json data in to a syslog server.  Pass a string in the format PROTOCOL:HOSTNAME:PORT to output "
-    "to the specified server endpoint, where format is either UDP, TCP or TLS_TCP.  Also accepts strings of the format HOSTNAME "
-    "and HOSTNAME:PORT where port will default to 514 and protocol will default to UDP.  "
-    "The --certs or --ignore-cert-validation option can be used with TLS_TCP format.",
+    "to the specified server endpoint, where format is either TCP, TLS-TCP, or UDP (ex: TCP:localhost:5000). "
+    "Also accepts strings of the format HOSTNAME and HOSTNAME:PORT. Defaults to TCP protocol on port 601. "
+    "The --certs or --ignore-cert-validation option can be used with TLS-TCP format.  Note that most data will be too large to be sent "
+    "via UDP protocol.",
     cls=incompatible_with(["format"]),
 )
 ignore_cert_validation_option = click.option(
     "--ignore-cert-validation",
     default=False,
-    help="Set to skip CA certificate validation. Incompatible with the 'certs' option.",
+    help="Set to skip CA certificate validation for the TLS-TCP protocol. Incompatible with the 'certs' option.",
     cls=incompatible_with(["certs"]),
 )
 certs_option = click.option(
     "--certs",
     default=None,
-    help="A CA certificates-chain file for the TCP-TLS protocol.",
+    help="A CA certificates-chain file for the TLS-TCP protocol.",
 )
 
 

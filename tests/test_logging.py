@@ -1,6 +1,6 @@
-import logging
 import re
 import sys
+import logging
 
 import pytest
 from incydr import Client

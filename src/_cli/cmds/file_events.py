@@ -189,6 +189,12 @@ def search(
     events = yield_all_events(query)
 
     with warn_interrupt() if checkpoint_name else nullcontext():
+        if output:
+            logger = get_server_logger(output, certs, ignore_cert_validation)
+            for event in events:
+                logger.info(json.dumps(event))
+            return
+
         if format_ == TableFormat.csv:
             render.csv(FileEventV2, events, columns=columns, flat=True)
         elif format_ == TableFormat.table:
@@ -199,9 +205,6 @@ def search(
                 printed = True
                 if format_ == TableFormat.json_pretty:
                     console.print_json(data=event)
-                elif output:
-                    logger = get_server_logger(output, certs, ignore_cert_validation)
-                    logger.info(json.dumps(event))
                 else:
                     click.echo(json.dumps(event))
             if not printed:

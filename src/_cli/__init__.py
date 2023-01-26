@@ -59,7 +59,7 @@ log_file_option = click.option(
 log_stderr_option = click.option(
     "--log-stderr",
     "log_stderr",
-    help="Silence logging to stderr.",
+    help="Enable logging to stderr.",
     default=False,
     is_flag=True,
     callback=log_stderr_callback,
