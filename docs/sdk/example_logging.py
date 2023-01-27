@@ -1,9 +1,8 @@
 from pathlib import Path
 from time import sleep
 
-from _client._core.settings import _incydr_console
-
 import incydr
+from _client._core.settings import _incydr_console
 
 print("Updating doc svg images...")
 

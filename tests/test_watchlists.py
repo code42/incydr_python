@@ -16,12 +16,12 @@ from _client.watchlists.models.responses import Watchlist
 from _client.watchlists.models.responses import WatchlistMembersList
 from _client.watchlists.models.responses import WatchlistsPage
 from _client.watchlists.models.responses import WatchlistUser
+from incydr.cli import incydr
 from pytest_httpserver import HTTPServer
 from pytest_lazyfixture import (
     lazy_fixture,
 )  # lazy_fixture allows us to pass a fixture as a value in @pytest.mark.parametrize
 
-from incydr.cli import incydr
 from tests.conftest import TEST_TOKEN
 
 TEST_WATCHLIST_ID = "1c7dd799-1aa0-4f3a-bae8-1d3242fc2af6"

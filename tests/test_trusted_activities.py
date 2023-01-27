@@ -6,11 +6,10 @@ from _client.enums.trusted_activities import ActivityType
 from _client.trusted_activities.client import MissingActivityActionGroupsError
 from _client.trusted_activities.models import TrustedActivitiesPage
 from _client.trusted_activities.models import TrustedActivity
-from pytest_httpserver import HTTPServer
-from requests import Response
-
 from incydr import Client
 from incydr.cli import incydr
+from pytest_httpserver import HTTPServer
+from requests import Response
 
 TEST_ACTIVITY_ID = "1234"
 

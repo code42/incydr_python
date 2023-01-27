@@ -9,7 +9,7 @@ from _cli.cmds.options.output_options import TableFormat
 from _cli.core import IncydrCommand
 from _cli.core import IncydrGroup
 from _client.core.client import Client
-from _client.models import DirectoryGroup
+from incydr.models import DirectoryGroup
 
 
 @click.group(cls=IncydrGroup)

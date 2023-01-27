@@ -3,11 +3,11 @@ from io import StringIO
 import pytest
 from _client.core.models import CSVModel
 from _client.core.models import Model
+from incydr import Client
 from pydantic import Field
 from pytest_httpserver import HTTPServer
 
 from .conftest import TEST_HOST
-from incydr import Client
 
 
 def test_client_init_reads_environment_vars_when_no_arguments_passed(

@@ -9,11 +9,10 @@ from _client.alerts.models.response import AlertDetails
 from _client.alerts.models.response import AlertQueryPage
 from _client.alerts.models.response import AlertSummary
 from _client.queries.utils import parse_ts_to_posix_ts
-from pytest_httpserver import HTTPServer
-
 from incydr import AlertQuery
 from incydr import Client
 from incydr.cli import incydr
+from pytest_httpserver import HTTPServer
 
 TEST_ALERT_ID = "000-42-code"
 

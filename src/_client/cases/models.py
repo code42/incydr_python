@@ -192,6 +192,14 @@ class FileEvent(Model):
 
 
 class CaseFileEvents(ResponseModel):
+    """A model representing file events associated with a case.
+
+    **Fields**:
+
+    * **events**: `List[FileEvent]` - List of events in the response..
+    * **total_count**: `int` - Total number of events associated with the case.
+    """
+
     events: Optional[List[FileEvent]] = Field(
         None, description="List of events in the response."
     )

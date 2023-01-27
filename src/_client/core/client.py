@@ -6,7 +6,6 @@ import traceback
 from collections import deque
 from textwrap import indent
 
-from _client.__about__ import __version__
 from _client.alert_rules.client import AlertRulesClient
 from _client.alerts.client import AlertsClient
 from _client.audit_log.client import AuditLogClient
@@ -21,6 +20,7 @@ from _client.file_events.client import FileEventsClient
 from _client.trusted_activities.client import TrustedActivitiesClient
 from _client.user_risk_profiles.client import UserRiskProfiles
 from _client.users.client import UsersClient
+from _client.version import __version__
 from _client.watchlists.client import WatchlistsClient
 from requests_toolbelt import user_agent
 from requests_toolbelt.sessions import BaseUrlSession

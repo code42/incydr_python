@@ -9,9 +9,8 @@ from _client.alert_rules.models.response import RuleDetails
 from _client.alert_rules.models.response import RuleUser
 from _client.alert_rules.models.response import RuleUsersList
 from _client.core.client import Client
-from pytest_httpserver import HTTPServer
-
 from incydr.cli import incydr
+from pytest_httpserver import HTTPServer
 
 TEST_RULE_ID = "test-rule-id"
 
