@@ -4,7 +4,7 @@
 
 This is a brief user guide for getting started with Incydr CLI tool.  For more details on installation see [Incydr CLI](index.md).
 
-For details on how to migrate from the original Code42 CLI to the Incydr CLI, see [Migration](migration.md).
+For details on how to migrate from the original [Code42 CLI](https://clidocs.code42.com/en/stable/) to the Incydr CLI, see [Migration](migration.md).
 
 ## Authentication
 
