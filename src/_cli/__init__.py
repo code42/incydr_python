@@ -5,6 +5,9 @@ from _cli.utils import get_user_project_path
 from rich.console import Console
 
 ERROR_LOG_FILE_NAME = "incydr_cli.log"
+LOG_LEVEL_DEFAULT = "WARNING"
+LOG_FILE_DEFAULT = str(os.path.join(get_user_project_path("log"), ERROR_LOG_FILE_NAME))
+LOG_STDERR_DEFAULT = "FALSE"
 
 console = Console()
 
@@ -12,14 +15,18 @@ console = Console()
 def log_level_callback(ctx, param, value):
     """callback to update log_level environment variable"""
     if not value:
+        if not os.environ.get("INCYDR_LOG_LEVEL"):
+            os.environ.update({"INCYDR_LOG_LEVEL": LOG_LEVEL_DEFAULT})
         return
     os.environ.update({"INCYDR_LOG_LEVEL": value})
     return value
 
 
 def log_file_callback(ctx, param, value):
-    """callback to update log_file and log_stderr environment variable"""
+    """callback to update log_file environment variable"""
     if not value:
+        if not os.environ.get("INCYDR_LOG_FILE"):
+            os.environ.update({"INCYDR_LOG_FILE": LOG_FILE_DEFAULT})
         return
     os.environ.update({"INCYDR_LOG_FILE": value})
     return value
@@ -28,8 +35,9 @@ def log_file_callback(ctx, param, value):
 def log_stderr_callback(ctx, param, value):
     """callback to update log_stderr environment variable"""
     if not value:
-        os.environ.update({"INCYDR_LOG_STDERR": "FALSE"})
-        return
+        if not os.environ.get("INCYDR_LOG_STDERR"):
+            os.environ.update({"INCYDR_LOG_STDERR": LOG_STDERR_DEFAULT})
+        return value
     os.environ.update({"INCYDR_LOG_STDERR": "TRUE"})
     return value
 
@@ -37,7 +45,6 @@ def log_stderr_callback(ctx, param, value):
 log_level_option = click.option(
     "--log-level",
     help="Set level for Incydr client logging.",
-    default="WARNING",
     callback=log_level_callback,
     expose_value=False,
 )
@@ -45,7 +52,6 @@ log_level_option = click.option(
 log_file_option = click.option(
     "--log-file",
     help="Specify file path to write log output to.",
-    default=str(os.path.join(get_user_project_path("log"), ERROR_LOG_FILE_NAME)),
     callback=log_file_callback,
     expose_value=False,
 )
