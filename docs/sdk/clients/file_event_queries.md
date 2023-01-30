@@ -1,4 +1,4 @@
-# Querying File Events
+# File Event Querying
 
 ## EventQuery Class
 

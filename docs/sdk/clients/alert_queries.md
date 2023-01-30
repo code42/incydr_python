@@ -1,4 +1,4 @@
-# Querying Alerts
+# Alert Querying
 
 Use the `AlertQuery` class to create a query for searching and filtering Incydr alerts.  More details on how to use the `AlertQuery` class can be found in the [Query Building](#query-building) section below.
 

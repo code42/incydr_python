@@ -1,13 +1,13 @@
 # Introduction
 
 The Incydr CLI is a command line tool for interacting with the [Code42 Incydr API](https://developer.code42.com/api) created with [Click](https://click.palletsprojects.com/en/8.1.x/).
-Its built on top of the [Incydr SDK](../sdk/index.md) Python client and the [Requests](https://requests.readthedocs.io/en/latest/) HTTP library.
+It's built on top of the [Incydr SDK](../sdk/index.md) Python client and the [Requests](https://requests.readthedocs.io/en/latest/) HTTP library.
 
 ## Installation
 
 ---
 
-Install the CLI extension to the Incydr SDK with pip use the following commands:
+Install the CLI extension to the Incydr SDK with pip.  Use the following command:
 
 ```bash
 $ pip install 'incydr[cli]'

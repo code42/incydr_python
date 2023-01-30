@@ -238,11 +238,11 @@ class TrustedActivitiesV2:
         description: str = None,
     ) -> TrustedActivity:
         """
-        Trust activity uploaded through a slack workspace.
+        Trust activity uploaded through a Slack workspace.
 
         **Parameters:**
 
-        * **workspace_name**: `str` (required) - Name of the slack workspace to trust.
+        * **workspace_name**: `str` (required) - Name of the Slack workspace to trust.
         * **description**: `str` - Optional description of the trusted activity.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
@@ -374,7 +374,7 @@ class TrustedActivitiesV2:
         The following fields can be updated:
 
         * `description`: A description of the trusted activity.
-        * `value`: The value of the trusted activity, e.g. domain name or slack workspace name.
+        * `value`: The value of the trusted activity, e.g. domain name or Slack workspace name.
         * `type`: The type of the trusted activity.  One of [`ActivityType`][activity-types].
         * `activity_action_group`: The list of actions associated with the activity.
 

@@ -2,7 +2,7 @@
 
 ---
 
-Documentation on notable changes from the original Code42CLI tool.
+Documentation on notable changes from the original [Code42 CLI](https://clidocs.code42.com/en/stable/) tool.
 
 ## Authentication
 
@@ -18,7 +18,7 @@ Stored checkpoints are associated with the API Client ID used for authentication
 
 ## Unsupported Functionality
 
-Several commands and other functionality included in the original Code42 CLI is no longer supported in the Incydr CLI.
+Several commands and other functionality included in the original Code42 CLI are no longer supported in the Incydr CLI.
 
 The Incydr CLI is focused exclusively on security-related functionality and only supports actions that correspond with our publicly documented APIs on the [Developer Portal](https://developer.code42.com/).
 Commands that were previously supported in the original Code42 CLI but are no longer present in the Incydr CLI may have been preservation-related, or they may have leveraged internal and/or deprecated APIs.
@@ -41,7 +41,7 @@ The commands listed below are unavailable in the Incydr CLI and do not currently
 
 * Backup data is not included in `devices list` and `devices show`.
 * `send-to` commands are not available.  Server logging is now done with the `--output PROTOCOL:HOSTNAME:PORT` option on the `alerts search`, `audit-log search`, and `file-event search` commands.
-* `departing-employee`, `high-risk-employee`, and `detection-lists` commands have been deprecated in the original CLI and not available.
+* `departing-employee`, `high-risk-employee`, and `detection-lists` commands have been deprecated in the original CLI and not available. Use [Watchlist](watchlists.md) commands instead.
 * The V1 file event data model is no longer supported. The Incydr CLI uses the latest V2 file event data model.  Previously, you had to opt into this by enabling the `use-v2-file-events` profile setting in the Code42 CLI.
-* User token authentication via a username and password is no longer supported.  API clients should be used for authentication.
+* User token authentication via a username and password is no longer supported. Use API clients for authentication.
 * File event checkpointing now stores the original query it was run with and subsequent runs with the same checkpoint will ignore any additional filters.  All queries require a `--start` value as fallback for the `checkpoint`.

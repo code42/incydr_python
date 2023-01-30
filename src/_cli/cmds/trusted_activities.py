@@ -259,7 +259,7 @@ def slack_workspace(
     format_: SingleFormat = None,
 ):
     """
-    Trust activity uploaded through a slack workspace specified by `WORKSPACE_NAME`.
+    Trust activity uploaded through a Slack workspace specified by `WORKSPACE_NAME`.
     """
     client = Client()
     activity = client.trusted_activities.v2.add_slack_workspace(
