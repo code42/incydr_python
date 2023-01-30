@@ -1,13 +1,12 @@
 from typing import Optional
 
 import pytest
+from _client.utils import flatten_fields
+from _client.utils import get_field_value_and_info
+from _client.utils import get_fields
+from _client.utils import iter_model_formatted
 from pydantic import BaseModel
 from pydantic import Field
-
-from incydr.utils import flatten_fields
-from incydr.utils import get_field_value_and_info
-from incydr.utils import get_fields
-from incydr.utils import iter_model_formatted
 
 
 class GrandChildTestModel(BaseModel):

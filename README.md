@@ -38,7 +38,7 @@ $ pip install 'incydr[all]'.
 ```
 
 For more details see the [SDK Documentation](docs/sdk/index.md) and the [CLI Documentation](docs/cli/getting_started.md).
-.
+
 ## License
 
 `incydr` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.

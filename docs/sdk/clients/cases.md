@@ -1,3 +1,3 @@
-::: incydr._cases.client.CasesV1
+::: _client.cases.client.CasesV1
     :docstring:
     :members:

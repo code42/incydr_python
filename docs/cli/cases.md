@@ -1,6 +1,6 @@
 # Cases Commands
 
 ::: mkdocs-click
-    :module: incydr.cli.cmds.cases
+    :module: _cli.cmds.cases
     :command: cases
     :list_subcommands:

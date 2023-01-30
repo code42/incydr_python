@@ -41,10 +41,10 @@ Issues = "https://github.com/code42/incydr_python/issues"
 Source = "https://github.com/code42/incydr_python/incydr"
 
 [project.scripts]
-incydr = "incydr.cli.main:incydr"
+incydr = "incydr.cli:incydr"
 
 [tool.hatch.version]
-path = "incydr/__about__.py"
+path = "src/_client/version.py"
 
 [tool.hatch.build.targets.sdist]
 [tool.hatch.build.targets.wheel]
@@ -92,9 +92,8 @@ no-cov = "cov --no-cov"
 [tool.coverage.run]
 branch = true
 parallel = true
-omit = [
-  "incydr/__about__.py",
-]
+omit = []
+
 [tool.coverage.report]
 exclude_lines = [
   "no cov",

@@ -22,11 +22,13 @@ ignore =
 max-line-length = 80
 per-file-ignores =
     # <file>: <comma-separated-error-codes>
-    incydr/__init__.py: F401
-    incydr/_core/enums.py: F401
-    incydr/_core/settings.py: B902
-    incydr/cli/cmds/models.py: B902
-    incydr/_queries/_file_events/enums.py: B902
-    incydr/cli/*: B008
-    incydr/utils.py: B905
-    incydr/cli/rich_utils.py: B905
+    src/incydr/__init__.py: F401
+    src/incydr/enums/__init__.py: F401
+    src/_client/core/enums.py: F401
+    src/_client/core/settings.py: B902
+    src/_cli/cmds/models.py: B902
+    src/_client/queries/_file_events/enums.py: B902
+    src/_cli/*: B008
+    src/_client/core/enums.py: F401
+    src/_client/utils.py: B905
+    src/_cli/rich_utils.py: B905

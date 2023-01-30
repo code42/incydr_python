@@ -1,3 +1,3 @@
-::: incydr._departments.client.DepartmentsV1
+::: _client.departments.client.DepartmentsV1
     :docstring:
     :members:

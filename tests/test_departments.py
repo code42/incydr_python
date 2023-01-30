@@ -1,10 +1,9 @@
 from urllib.parse import urlencode
 
-from pytest_httpserver import HTTPServer
-
+from _client.departments.models import DepartmentsPage
 from incydr import Client
-from incydr._departments.models import DepartmentsPage
-from incydr.cli.main import incydr
+from incydr.cli import incydr
+from pytest_httpserver import HTTPServer
 
 
 def test_get_page_when_default_params_returns_expected_data(

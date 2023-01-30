@@ -2,15 +2,14 @@ import json
 from urllib.parse import urlencode
 
 import pytest
+from _client.enums.trusted_activities import ActivityType
+from _client.trusted_activities.client import MissingActivityActionGroupsError
+from _client.trusted_activities.models import TrustedActivitiesPage
+from _client.trusted_activities.models import TrustedActivity
+from incydr import Client
+from incydr.cli import incydr
 from pytest_httpserver import HTTPServer
 from requests import Response
-
-from incydr import Client
-from incydr._trusted_activities.client import MissingActivityActionGroupsError
-from incydr._trusted_activities.models import TrustedActivitiesPage
-from incydr._trusted_activities.models import TrustedActivity
-from incydr.cli.main import incydr
-from incydr.enums.trusted_activities import ActivityType
 
 TEST_ACTIVITY_ID = "1234"
 
@@ -214,7 +213,7 @@ def test_add_domain_when_invalid_trusted_provider_value_raises_error(
             cloud_sync_services=["invalid-value"],
         )
     assert (
-        "'invalid-value' is not a valid incydr.enums.trusted_activities.CloudSyncApps. Expected one of ['BOX', 'GOOGLE_DRIVE', 'ICLOUD', 'ONE_DRIVE']"
+        "'invalid-value' is not a valid CloudSyncApps. Expected one of ['BOX', 'GOOGLE_DRIVE', 'ICLOUD', 'ONE_DRIVE']"
         in str(e.value)
     )
 

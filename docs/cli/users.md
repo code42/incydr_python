@@ -1,6 +1,6 @@
 # Users Commands
 
 ::: mkdocs-click
-    :module: incydr.cli.cmds.users
+    :module: _cli.cmds.users
     :command: users
     :list_subcommands:

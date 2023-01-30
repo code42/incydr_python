@@ -1,6 +1,6 @@
 # Watchlist Commands
 
 ::: mkdocs-click
-    :module: incydr.cli.cmds.watchlists
+    :module: _cli.cmds.watchlists
     :command: watchlists
     :list_subcommands:

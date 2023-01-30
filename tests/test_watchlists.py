@@ -3,25 +3,25 @@ import json
 from urllib.parse import urlencode
 
 import pytest
+from _client.core.client import Client
+from _client.enums.watchlists import WatchlistType
+from _client.exceptions import WatchlistNotFoundError
+from _client.watchlists.models.responses import ExcludedUsersList
+from _client.watchlists.models.responses import IncludedDepartment
+from _client.watchlists.models.responses import IncludedDepartmentsList
+from _client.watchlists.models.responses import IncludedDirectoryGroup
+from _client.watchlists.models.responses import IncludedDirectoryGroupsList
+from _client.watchlists.models.responses import IncludedUsersList
+from _client.watchlists.models.responses import Watchlist
+from _client.watchlists.models.responses import WatchlistMembersList
+from _client.watchlists.models.responses import WatchlistsPage
+from _client.watchlists.models.responses import WatchlistUser
+from incydr.cli import incydr
 from pytest_httpserver import HTTPServer
 from pytest_lazyfixture import (
     lazy_fixture,
 )  # lazy_fixture allows us to pass a fixture as a value in @pytest.mark.parametrize
 
-from incydr._core.client import Client
-from incydr._watchlists.models.responses import ExcludedUsersList
-from incydr._watchlists.models.responses import IncludedDepartment
-from incydr._watchlists.models.responses import IncludedDepartmentsList
-from incydr._watchlists.models.responses import IncludedDirectoryGroup
-from incydr._watchlists.models.responses import IncludedDirectoryGroupsList
-from incydr._watchlists.models.responses import IncludedUsersList
-from incydr._watchlists.models.responses import Watchlist
-from incydr._watchlists.models.responses import WatchlistMembersList
-from incydr._watchlists.models.responses import WatchlistsPage
-from incydr._watchlists.models.responses import WatchlistUser
-from incydr.cli.main import incydr
-from incydr.enums.watchlists import WatchlistType
-from incydr.exceptions import WatchlistNotFoundError
 from tests.conftest import TEST_TOKEN
 
 TEST_WATCHLIST_ID = "1c7dd799-1aa0-4f3a-bae8-1d3242fc2af6"

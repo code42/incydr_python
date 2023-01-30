@@ -1,2 +1,2 @@
-::: incydr._core.settings.IncydrSettings
+::: _client.core.settings.IncydrSettings
     :docstring:

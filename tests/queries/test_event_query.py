@@ -2,11 +2,10 @@ from datetime import datetime
 from datetime import timedelta
 
 import pytest
-from pydantic import ValidationError
-
+from _client.queries.file_events import Filter
+from _client.queries.file_events import FilterGroup
 from incydr import EventQuery
-from incydr._queries.file_events import Filter
-from incydr._queries.file_events import FilterGroup
+from pydantic import ValidationError
 
 TEST_START_DATE = "P1D"
 TEST_TIMESTAMP = "2020-09-10 11:12:13"
@@ -139,7 +138,7 @@ def test_event_query_is_when_invalid_value_for_term_raises_type_error():
             "file.category", ["Document", "Invalid-term"]
         )
     assert (
-        "'Invalid-term' is not a valid incydr.enums.file_events.FileCategory. Expected one of ['Audio', 'Document', 'Executable', 'Image', 'Pdf', 'Presentation', 'Script', 'SourceCode', 'Spreadsheet', 'Video', 'VirtualDiskImage', 'Archive']"
+        "'Invalid-term' is not a valid FileCategory. Expected one of ['Audio', 'Document', 'Executable', 'Image', 'Pdf', 'Presentation', 'Script', 'SourceCode', 'Spreadsheet', 'Video', 'VirtualDiskImage', 'Archive']"
         in str(e.value)
     )
 

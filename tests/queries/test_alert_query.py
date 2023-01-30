@@ -1,9 +1,8 @@
 import json
 
 import pytest
-
+from _client.enums.alerts import AlertTerm
 from incydr import AlertQuery
-from incydr.enums.alerts import AlertTerm
 
 
 def test_base_query():
