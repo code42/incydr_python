@@ -32,28 +32,7 @@ from _client.queries.file_events import EventQuery
 from _client.utils import model_as_card
 from click import BadOptionUsage
 from click import File
-from rich.markdown import Markdown
 from rich.panel import Panel
-from rich.table import Table
-
-
-def render_search(search_: SavedSearch):
-    field_table = Table.grid(padding=(0, 1), expand=False)
-    field_table.title = f"Saved Search {search_.id}"
-    for name, _field in search_.__fields__.items():
-        if name == "id":
-            continue
-        if name == "notes" and search_.notes is not None:
-            field_table.add_row(
-                Panel(
-                    Markdown(search_.notes, justify="left"),
-                    title="Notes",
-                    width=80,
-                )
-            )
-        else:
-            field_table.add_row(f"{name} = {getattr(search_, name)}")
-    console.print(Panel.fit(field_table))
 
 
 @click.group(cls=IncydrGroup)
