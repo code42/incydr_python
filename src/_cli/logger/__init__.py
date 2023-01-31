@@ -6,6 +6,8 @@ from _cli.logger.enums import ServerProtocol
 from _cli.logger.handlers import NoPrioritySysLogHandler
 from click import BadOptionUsage
 
+import logging
+
 logging.raiseExceptions = False
 
 logger_deps_lock = Lock()

@@ -3,7 +3,6 @@ import warnings
 from io import IOBase
 from pathlib import Path
 from typing import Union
-import logging
 
 from _client.enums import _Enum
 from pydantic import BaseSettings
@@ -14,6 +13,8 @@ from pydantic import validator
 from rich import pretty
 from rich.console import Console
 from rich.logging import RichHandler
+
+import logging
 
 # capture default displayhook so we can "uninstall" rich
 _sys_displayhook = sys.displayhook

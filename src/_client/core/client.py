@@ -25,6 +25,8 @@ from requests_toolbelt import user_agent
 from requests_toolbelt.sessions import BaseUrlSession
 from requests_toolbelt.utils.dump import dump_response
 
+import logging
+
 _base_user_agent = user_agent("incydr", __version__)
 _auth_header_regex = re.compile(r"Authorization: (Bearer|Basic) \S+")
 

@@ -1,10 +1,11 @@
 import socket
 import ssl
 import sys
-import logging
-from logging.handlers import SysLogHandler
+
 from _cli.logger import ServerProtocol
 
+import logging
+from logging.handlers import SysLogHandler
 
 
 class SyslogServerNetworkConnectionError(Exception):

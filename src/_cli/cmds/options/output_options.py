@@ -2,7 +2,6 @@ from enum import Enum
 
 import click
 from _cli.core import incompatible_with
-from _cli.logger import ServerProtocol
 
 
 class TableFormat(str, Enum):
