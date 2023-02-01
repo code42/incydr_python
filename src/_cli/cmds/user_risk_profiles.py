@@ -22,7 +22,7 @@ from _cli.core import incompatible_with
 from _cli.core import IncydrCommand
 from _cli.core import IncydrGroup
 from _client.core.client import Client
-from _client.user_risk_profiles.client import DateParseError
+from _client.exceptions import DateParseError
 from _client.user_risk_profiles.models import UserRiskProfile
 from _client.utils import model_as_card
 from pydantic import Field

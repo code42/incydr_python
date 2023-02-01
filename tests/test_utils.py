@@ -1,6 +1,8 @@
+import datetime
 from typing import Optional
 
 import pytest
+from _client.queries.utils import parse_str_to_dt
 from _client.utils import flatten_fields
 from _client.utils import get_field_value_and_info
 from _client.utils import get_fields
@@ -200,3 +202,27 @@ def test_get_field_value_and_info():
     )
     assert grandchild_value is None
     assert "table" in grandchild_field.field_info.extra
+
+
+@pytest.mark.parametrize(
+    "ts_str,expected",
+    [
+        ("2022-01-02", datetime.datetime(2022, 1, 2, tzinfo=datetime.timezone.utc)),
+        (
+            "2022-02-01 10:30:50",
+            datetime.datetime(2022, 2, 1, 10, 30, 50, tzinfo=datetime.timezone.utc),
+        ),
+        (
+            "2022-02-01T10:30:50Z",
+            datetime.datetime(2022, 2, 1, 10, 30, 50, tzinfo=datetime.timezone.utc),
+        ),
+        (
+            "2022-02-01T10:30:50.12345Z",
+            datetime.datetime(
+                2022, 2, 1, 10, 30, 50, 123450, tzinfo=datetime.timezone.utc
+            ),
+        ),
+    ],
+)
+def test_parse_str_to_dt(ts_str, expected):
+    assert parse_str_to_dt(ts_str) == expected

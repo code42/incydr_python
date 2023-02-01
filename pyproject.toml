@@ -29,6 +29,7 @@ dependencies = [
   "rich",
   "pydantic[dotenv]",
   "isodate",
+  "python-dateutil",
 ]
 dynamic = ["version"]
 
@@ -83,6 +84,7 @@ dependencies = [
   "pytest-lazy-fixture",
   "click",
   "chardet",
+  "python-dateutil",
 ]
 [tool.hatch.envs.test.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=incydr"

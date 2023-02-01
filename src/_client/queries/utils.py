@@ -3,6 +3,9 @@ from datetime import datetime
 from datetime import timezone
 from typing import Union
 
+from _client.exceptions import DateParseError
+from dateutil import parser
+
 MICROSECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 DATETIME_STR_FORMAT = "%Y-%m-%d %H:%M:%S"
 DATE_STR_FORMAT = "%Y-%m-%d"
@@ -33,18 +36,16 @@ def parse_ts_to_posix_ts(timestamp: Union[str, datetime]):
     """
     Parse POSIX timestamp from DATE/DATETIME str or datetime obj.
     """
-    date_time = (
-        timestamp if isinstance(timestamp, datetime) else parse_str_to_dt(timestamp)
-    )
-    return date_time.timestamp()
+    dt = timestamp if isinstance(timestamp, datetime) else parse_str_to_dt(timestamp)
+    return dt.timestamp()
 
 
 def parse_str_to_dt(timestamp: str):
-    for fmt in (MICROSECOND_FORMAT, DATETIME_STR_FORMAT, DATE_STR_FORMAT):
-        try:
-            return datetime.strptime(timestamp, fmt).replace(tzinfo=timezone.utc)
-        except ValueError:
-            pass
-    raise ValueError(
-        f"Time data '{timestamp}' does not match any of the following formats: {DATETIME_STR_FORMAT} | {DATE_STR_FORMAT} | {MICROSECOND_FORMAT}"
-    )
+    try:
+        dt = parser.parse(timestamp)
+        return dt.replace(tzinfo=timezone.utc)
+    except ValueError:
+        raise DateParseError(
+            timestamp,
+            f"DateParseError: Time data '{timestamp}' does not match any known formats.  Ex: {DATETIME_STR_FORMAT}",
+        )
