@@ -302,7 +302,7 @@ def test_cli_update_when_incorrect_date_format_raises_date_parse_exception(
         ["users", "risk-profiles", "update", TEST_USER_ID, date_option, date_input],
     )
     assert result.exit_code == 1
-    assert "Date Parse Error: Error parsing time data." in result.output
+    assert "DateParseError: Error parsing time data." in result.output
 
 
 def test_cli_update_when_no_options_raises_usage_error(

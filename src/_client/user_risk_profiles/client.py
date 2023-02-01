@@ -3,7 +3,7 @@ from itertools import count
 from typing import Iterator
 from typing import Union
 
-from _client.exceptions import IncydrException
+from _client.exceptions import DateParseError
 from _client.queries.utils import DATE_STR_FORMAT
 from _client.user_risk_profiles.models import Date
 from _client.user_risk_profiles.models import QueryUserRiskProfilesRequest
@@ -11,15 +11,6 @@ from _client.user_risk_profiles.models import UpdateUserRiskProfileRequest
 from _client.user_risk_profiles.models import UserRiskProfile
 from _client.user_risk_profiles.models import UserRiskProfilesPage
 from requests import Response
-
-
-class DateParseError(IncydrException):
-    """An error raised when the date data cannot be parsed."""
-
-    def __init__(self, date):
-        super().__init__(
-            f"Date Parse Error: Error parsing time data. Date '{date}' does not match format {DATE_STR_FORMAT}."
-        )
 
 
 class UserRiskProfiles:
@@ -252,5 +243,8 @@ def _create_date(date: Union[datetime, str]):
         try:
             date = datetime.strptime(date, DATE_STR_FORMAT)
         except ValueError:
-            raise DateParseError(date)
+            raise DateParseError(
+                date,
+                msg=f"DateParseError: Error parsing time data. Date '{date}' does not match format {DATE_STR_FORMAT}.",
+            )
     return Date(day=date.day, month=date.month, year=date.year)
