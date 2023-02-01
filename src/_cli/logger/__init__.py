@@ -65,9 +65,9 @@ def get_server_logger(output, certs, ignore_cert_validation):
         raise BadOptionUsage(
             "output",
             "Error parsing output string.  Pass a string in the format PROTOCOL:HOSTNAME:PORT to output "
-            "to the specified server endpoint, where format is either UDP, TCP or TLS-TCP. "
+            "to the specified server endpoint, where format is either TCP, TLS-TCP, or UDP. "
             "Also accepts strings of the format HOSTNAME and HOSTNAME:PORT where port will default to 601 "
-            "and protocol will default to UDP.",
+            "and protocol will default to TCP.",
         )
 
     # certs and ignore-cert-validation only compatible with TLS-TCP
