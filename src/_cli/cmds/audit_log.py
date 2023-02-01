@@ -146,6 +146,12 @@ def search(
         events_gen = _update_checkpoint(cursor, checkpoint_name, events_gen)
 
     with warn_interrupt() if checkpoint_name else nullcontext():
+        if output:
+            logger = get_server_logger(output, certs, ignore_cert_validation)
+            for event in events_gen:
+                logger.info(json.dumps(event))
+            return
+
         if format_ == TableFormat.csv:
             render.csv(DefaultAuditEvent, events_gen, columns=columns, flat=True)
         else:
@@ -154,9 +160,6 @@ def search(
                 printed = True
                 if format_ == TableFormat.json_pretty:
                     console.print_json(data=event)
-                elif output:
-                    logger = get_server_logger(output, certs, ignore_cert_validation)
-                    logger.info(json.dumps(event))
                 else:
                     click.echo(json.dumps(event))
             if not printed:

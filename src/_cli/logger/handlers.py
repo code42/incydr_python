@@ -1,10 +1,11 @@
-import logging
 import socket
 import ssl
 import sys
-from logging.handlers import SysLogHandler
 
 from _cli.logger import ServerProtocol
+
+import logging
+from logging.handlers import SysLogHandler
 
 
 class SyslogServerNetworkConnectionError(Exception):
@@ -129,7 +130,7 @@ def _try_get_socket_type_from_protocol(protocol):
     if socket_type is None:
         raise ValueError(
             "Could not determine socket type. "
-            f"Expected one of {list(ServerProtocol())}, but got {protocol}."
+            f"Expected one of {list(ServerProtocol)}, but got {protocol}."
         )
     return socket_type
 

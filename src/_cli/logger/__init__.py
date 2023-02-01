@@ -1,11 +1,12 @@
 # prevent loggers from printing stacks to stderr if a pipe is broken
-import logging
 from threading import Lock
 
 import click
 from _cli.logger.enums import ServerProtocol
 from _cli.logger.handlers import NoPrioritySysLogHandler
 from click import BadOptionUsage
+
+import logging
 
 logging.raiseExceptions = False
 
@@ -14,7 +15,7 @@ logger_deps_lock = Lock()
 
 def _init_logger(logger, handler):
     logger.setLevel(logging.INFO)
-    handler.setFormatter(logging.Formatter())
+    handler.setFormatter(logging.Formatter(fmt="%(message)s"))
     logger.addHandler(handler)
     return logger
 
@@ -24,18 +25,20 @@ def get_logger_for_server(protocol, hostname, port, certs):
 
     Args:
         hostname: The hostname of the server. It may include the port.
+        port: The port for the server.  Defaults to 601.
         protocol: The transfer protocol for sending logs.
         certs: Use for passing SSL/TLS certificates when connecting to the server.
     """
     logger = logging.getLogger("incydr_syslog")
     if len(logger.handlers):  # if logger has handlers
-        return logger.handlers
+        return logger
 
     with logger_deps_lock:
         hostname = hostname
-        port = port or 514
+        port = port or 601
+        protocol = protocol.value if isinstance(protocol, ServerProtocol) else protocol
         if not len(logger.handlers):
-            handler = NoPrioritySysLogHandler(hostname, port, protocol, certs)
+            handler = NoPrioritySysLogHandler(hostname, int(port), protocol, certs)
             handler.connect_socket()
             return _init_logger(logger, handler)
     return logger
@@ -46,8 +49,8 @@ def get_server_logger(output, certs, ignore_cert_validation):
     # parse output
     output = output.split(":")
 
-    protocol = ServerProtocol.UDP
-    port = 514
+    protocol = ServerProtocol.TCP
+    port = 601
 
     if len(output) == 1:  # HOSTNAME
         hostname = output[0]
@@ -62,21 +65,22 @@ def get_server_logger(output, certs, ignore_cert_validation):
         raise BadOptionUsage(
             "output",
             "Error parsing output string.  Pass a string in the format PROTOCOL:HOSTNAME:PORT to output "
-            "to the specified server endpoint, where format is either UDP, TCP or TLS_TCP.  Also accepts strings of the format HOSTNAME "
-            "and HOSTNAME:PORT where port will default to 514 and protocol will default to UDP.",
+            "to the specified server endpoint, where format is either TCP, TLS-TCP, or UDP. "
+            "Also accepts strings of the format HOSTNAME and HOSTNAME:PORT where port will default to 601 "
+            "and protocol will default to TCP.",
         )
 
-    # certs and ignore-cert-validation only compatible with TLS_TCP
+    # certs and ignore-cert-validation only compatible with TLS-TCP
     if protocol != ServerProtocol.TLS_TCP:
         arg = None
         if ignore_cert_validation:
-            arg = ("ignore-cert-validation",)
+            arg = "ignore-cert-validation"
         elif certs is not None:
             arg = "certs"
         if arg is not None:
             raise click.BadOptionUsage(
                 arg,
-                f"'{arg}' can only be used with '--protocol {ServerProtocol.TLS_TCP}'.",
+                f"'{arg}' can only be used with '{ServerProtocol.TLS_TCP}' protocol.",
             )
 
     if ignore_cert_validation:

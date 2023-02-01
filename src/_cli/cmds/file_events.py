@@ -32,28 +32,7 @@ from _client.queries.file_events import EventQuery
 from _client.utils import model_as_card
 from click import BadOptionUsage
 from click import File
-from rich.markdown import Markdown
 from rich.panel import Panel
-from rich.table import Table
-
-
-def render_search(search_: SavedSearch):
-    field_table = Table.grid(padding=(0, 1), expand=False)
-    field_table.title = f"Saved Search {search_.id}"
-    for name, _field in search_.__fields__.items():
-        if name == "id":
-            continue
-        if name == "notes" and search_.notes is not None:
-            field_table.add_row(
-                Panel(
-                    Markdown(search_.notes, justify="left"),
-                    title="Notes",
-                    width=80,
-                )
-            )
-        else:
-            field_table.add_row(f"{name} = {getattr(search_, name)}")
-    console.print(Panel.fit(field_table))
 
 
 @click.group(cls=IncydrGroup)
@@ -189,6 +168,12 @@ def search(
     events = yield_all_events(query)
 
     with warn_interrupt() if checkpoint_name else nullcontext():
+        if output:
+            logger = get_server_logger(output, certs, ignore_cert_validation)
+            for event in events:
+                logger.info(json.dumps(event))
+            return
+
         if format_ == TableFormat.csv:
             render.csv(FileEventV2, events, columns=columns, flat=True)
         elif format_ == TableFormat.table:
@@ -199,9 +184,6 @@ def search(
                 printed = True
                 if format_ == TableFormat.json_pretty:
                     console.print_json(data=event)
-                elif output:
-                    logger = get_server_logger(output, certs, ignore_cert_validation)
-                    logger.info(json.dumps(event))
                 else:
                     click.echo(json.dumps(event))
             if not printed:

@@ -126,6 +126,12 @@ def search(
         alerts_gen = _update_checkpoint(cursor, checkpoint_name, alerts_gen)
 
     with warn_interrupt() if checkpoint_name else nullcontext():
+        if output:
+            logger = get_server_logger(output, certs, ignore_cert_validation)
+            for alert_ in alerts_gen:
+                logger.info(alert_.json())
+            return
+
         if format_ == TableFormat.table:
             columns = columns or [
                 "created_at",
@@ -149,9 +155,6 @@ def search(
                 printed = True
                 if format_ == TableFormat.json_pretty:
                     console.print_json(alert_.json())
-                elif output:
-                    logger = get_server_logger(output, certs, ignore_cert_validation)
-                    logger.info(alert_.json())
                 else:
                     click.echo(alert_.json())
             if not printed:
