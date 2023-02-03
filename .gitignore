@@ -40,3 +40,6 @@ coverage.xml
 # docs build files
 site/
 *.csv
+
+# node
+node_modules/
