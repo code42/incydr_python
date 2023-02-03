@@ -3,8 +3,6 @@ from datetime import datetime
 from unittest import mock
 
 import pytest
-from pytest_httpserver import HTTPServer
-
 from _incydr_cli.cmds.options.output_options import TableFormat
 from _incydr_cli.cursor import CursorStore
 from _incydr_cli.main import incydr
@@ -14,6 +12,7 @@ from _incydr_sdk.alerts.models.response import AlertSummary
 from _incydr_sdk.queries.utils import parse_ts_to_posix_ts
 from incydr import AlertQuery
 from incydr import Client
+from pytest_httpserver import HTTPServer
 
 
 TEST_ALERT_ID = "000-42-code"

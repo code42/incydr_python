@@ -15,7 +15,7 @@ class UserJSON(Model):
     userId: Optional[str]
 
     @root_validator(pre=True)
-    def _validate(cls, values):
+    def _validate(cls, values):  # noqa
         if "username" not in values and "userId" not in values:
             raise ValueError("A json key of 'username' or 'userId' is required")
         return values

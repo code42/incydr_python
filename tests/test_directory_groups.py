@@ -1,12 +1,11 @@
 import json
 from urllib.parse import urlencode
 
-from pytest_httpserver import HTTPServer
-
 from _incydr_cli.main import incydr
 from _incydr_sdk.core.client import Client
 from _incydr_sdk.directory_groups.models import DirectoryGroup
 from _incydr_sdk.directory_groups.models import DirectoryGroupsPage
+from pytest_httpserver import HTTPServer
 
 
 def test_get_page_when_default_params_returns_expected_data(

@@ -5,8 +5,6 @@ from typing import List
 from unittest import mock
 
 import pytest
-from pytest_httpserver import HTTPServer
-
 from _incydr_cli.cmds.options.output_options import TableFormat
 from _incydr_cli.cursor import CursorStore
 from _incydr_cli.main import incydr
@@ -17,6 +15,7 @@ from _incydr_sdk.file_events.models.response import SavedSearch
 from _incydr_sdk.file_events.models.response import SearchFilter
 from _incydr_sdk.file_events.models.response import SearchFilterGroup
 from _incydr_sdk.queries.file_events import EventQuery
+from pytest_httpserver import HTTPServer
 
 
 MICROSECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"

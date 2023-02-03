@@ -1,3 +1,4 @@
+import logging
 import ssl
 from socket import IPPROTO_TCP
 from socket import IPPROTO_UDP
@@ -10,8 +11,6 @@ import pytest
 from _incydr_cli.logger.enums import ServerProtocol
 from _incydr_cli.logger.handlers import NoPrioritySysLogHandler
 from _incydr_cli.logger.handlers import SyslogServerNetworkConnectionError
-
-import logging
 
 _TEST_HOST = "example.com"
 _TEST_PORT = 5000

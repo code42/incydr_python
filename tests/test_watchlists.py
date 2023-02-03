@@ -3,7 +3,6 @@ import json
 from urllib.parse import urlencode
 
 import pytest
-
 from _incydr_cli.main import incydr
 from _incydr_sdk.core.client import Client
 from _incydr_sdk.enums.watchlists import WatchlistType
@@ -18,7 +17,6 @@ from _incydr_sdk.watchlists.models.responses import Watchlist
 from _incydr_sdk.watchlists.models.responses import WatchlistMembersList
 from _incydr_sdk.watchlists.models.responses import WatchlistsPage
 from _incydr_sdk.watchlists.models.responses import WatchlistUser
-
 from pytest_httpserver import HTTPServer
 from pytest_lazyfixture import (
     lazy_fixture,

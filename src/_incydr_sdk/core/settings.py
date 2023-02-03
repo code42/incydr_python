@@ -1,3 +1,4 @@
+import logging
 import sys
 import warnings
 from io import IOBase
@@ -13,8 +14,6 @@ from pydantic import validator
 from rich import pretty
 from rich.console import Console
 from rich.logging import RichHandler
-
-import logging
 
 # capture default displayhook so we can "uninstall" rich
 _sys_displayhook = sys.displayhook
@@ -110,7 +109,7 @@ class IncydrSettings(BaseSettings):
         custom_logger = False
 
     @validator("log_level", pre=True, always=True)
-    def _validate_log_level(cls, value, **kwargs):
+    def _validate_log_level(cls, value, **kwargs):  # noqa
         try:
             return int(value)
         except ValueError:
@@ -119,7 +118,7 @@ class IncydrSettings(BaseSettings):
             return _log_level_map[value]
 
     @validator("log_file")
-    def _validate_log_file(cls, value, **kwargs):
+    def _validate_log_file(cls, value, **kwargs):  # noqa
         if isinstance(value, (str, Path)):
             p = Path(value)
             # existing file OK
@@ -133,7 +132,7 @@ class IncydrSettings(BaseSettings):
         return value
 
     @validator("use_rich")
-    def _validate_use_rich(cls, value, **kwargs):
+    def _validate_use_rich(cls, value, **kwargs):  # noqa
         if value:
             pretty.install()
         else:
@@ -141,7 +140,7 @@ class IncydrSettings(BaseSettings):
         return value
 
     @validator("logger")
-    def _validate_logger(cls, value, **kwargs):
+    def _validate_logger(cls, value, **kwargs):  # noqa
         if value is None:
             logger = logging.getLogger("incydr")
             # flag the logger we create with a custom attribute so we can detect user-provided loggers later
@@ -153,7 +152,7 @@ class IncydrSettings(BaseSettings):
             raise ValueError(f"{value} is not a `logging.Logger`.")
 
     @root_validator(skip_on_failure=True)
-    def configure_logging(cls, values):
+    def configure_logging(cls, values):  # noqa
         use_rich = values["use_rich"]
         log_file = values["log_file"]
         log_stderr = values["log_stderr"]

@@ -1,5 +1,6 @@
 class IncydrException(Exception):
     """Base class for all Incydr specific exceptions."""
+
     ...
 
 

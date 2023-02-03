@@ -5,6 +5,7 @@ from _incydr_sdk.__version__ import __version__
 from _incydr_sdk.core.client import Client
 from _incydr_sdk.queries.alerts import AlertQuery
 from _incydr_sdk.queries.file_events import EventQuery
+
 from . import models
 
 __all__ = ["__version__", "Client", "AlertQuery", "EventQuery", "models"]

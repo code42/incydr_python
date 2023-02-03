@@ -3,10 +3,9 @@ import re
 import sys
 
 import pytest
+from incydr import Client
 from pytest_httpserver import HTTPServer
 from rich.logging import RichHandler
-
-from incydr import Client
 
 
 class TestLogLevels:

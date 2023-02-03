@@ -1,13 +1,12 @@
 import logging
-
-# prevent loggers from printing stacks to stderr if a pipe is broken
 from threading import Lock
 
 import click
-from click import BadOptionUsage
-
 from _incydr_cli.logger.enums import ServerProtocol
 from _incydr_cli.logger.handlers import NoPrioritySysLogHandler
+from click import BadOptionUsage
+
+# prevent loggers from printing stacks to stderr if a pipe is broken
 
 
 logging.raiseExceptions = False
