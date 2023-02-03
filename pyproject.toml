@@ -42,10 +42,18 @@ Issues = "https://github.com/code42/incydr_python/issues"
 Source = "https://github.com/code42/incydr_python/incydr"
 
 [project.scripts]
-incydr = "incydr.cli:incydr"
+incydr = "incydr.__main__:incydr"
 
 [tool.hatch.version]
-path = "src/_client/version.py"
+path = "src/incydr/__version__.py"
+
+[tool.hatch.build]
+sources = ["src"]
+include = [
+  "incydr",
+  "_incydr_sdk",
+  "_incydr_cli",
+]
 
 [tool.hatch.build.targets.sdist]
 [tool.hatch.build.targets.wheel]

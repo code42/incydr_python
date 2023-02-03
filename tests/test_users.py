@@ -3,18 +3,19 @@ from datetime import datetime
 from urllib.parse import urlencode
 
 import pytest
-from _client.devices.models import DevicesPage
-from _client.enums import SortDirection
-from _client.enums.devices import SortKeys
-from _client.users.client import RoleProcessingError
-from _client.users.models import Role
-from _client.users.models import UpdateRolesResponse
-from _client.users.models import User
-from _client.users.models import UserRole
-from _client.users.models import UsersPage
-from incydr import Client
-from incydr.cli import incydr
 from pytest_httpserver import HTTPServer
+
+from _incydr_cli.main import incydr
+from _incydr_sdk.devices.models import DevicesPage
+from _incydr_sdk.enums import SortDirection
+from _incydr_sdk.enums.devices import SortKeys
+from _incydr_sdk.users.client import RoleProcessingError
+from _incydr_sdk.users.models import Role
+from _incydr_sdk.users.models import UpdateRolesResponse
+from _incydr_sdk.users.models import User
+from _incydr_sdk.users.models import UserRole
+from _incydr_sdk.users.models import UsersPage
+from incydr import Client
 
 TEST_USER_ID = "user-1"
 TEST_ORG_GUID = "orgGuid-1"

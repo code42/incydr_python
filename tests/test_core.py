@@ -1,8 +1,8 @@
 from io import StringIO
 
 import pytest
-from _client.core.models import CSVModel
-from _client.core.models import Model
+from _incydr_sdk.core.models import CSVModel
+from _incydr_sdk.core.models import Model
 from incydr import Client
 from pydantic import Field
 from pytest_httpserver import HTTPServer

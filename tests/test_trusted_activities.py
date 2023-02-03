@@ -2,14 +2,15 @@ import json
 from urllib.parse import urlencode
 
 import pytest
-from _client.enums.trusted_activities import ActivityType
-from _client.trusted_activities.client import MissingActivityActionGroupsError
-from _client.trusted_activities.models import TrustedActivitiesPage
-from _client.trusted_activities.models import TrustedActivity
-from incydr import Client
-from incydr.cli import incydr
 from pytest_httpserver import HTTPServer
 from requests import Response
+
+from _incydr_cli.main import incydr
+from _incydr_sdk.enums.trusted_activities import ActivityType
+from _incydr_sdk.trusted_activities.client import MissingActivityActionGroupsError
+from _incydr_sdk.trusted_activities.models import TrustedActivitiesPage
+from _incydr_sdk.trusted_activities.models import TrustedActivity
+from incydr import Client
 
 TEST_ACTIVITY_ID = "1234"
 

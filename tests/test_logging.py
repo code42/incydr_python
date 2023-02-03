@@ -1,12 +1,12 @@
+import logging
 import re
 import sys
 
 import pytest
-from incydr import Client
 from pytest_httpserver import HTTPServer
 from rich.logging import RichHandler
 
-import logging
+from incydr import Client
 
 
 class TestLogLevels:
@@ -29,7 +29,7 @@ class TestLogLevels:
         assert client.settings.log_level == expected
         assert client.settings.logger.getEffectiveLevel() == expected
         if expected < logging.INFO:
-            assert "DEBUG    POST /v1/oauth HTTP/1.1" in captured.err
+            assert re.match(r".*DEBUG.*POST /v1/oauth HTTP/1.1", captured.err)
 
     @pytest.mark.parametrize(
         ["env_level", "init_level", "expected"],

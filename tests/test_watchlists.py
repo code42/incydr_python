@@ -3,20 +3,22 @@ import json
 from urllib.parse import urlencode
 
 import pytest
-from _client.core.client import Client
-from _client.enums.watchlists import WatchlistType
-from _client.exceptions import WatchlistNotFoundError
-from _client.watchlists.models.responses import ExcludedUsersList
-from _client.watchlists.models.responses import IncludedDepartment
-from _client.watchlists.models.responses import IncludedDepartmentsList
-from _client.watchlists.models.responses import IncludedDirectoryGroup
-from _client.watchlists.models.responses import IncludedDirectoryGroupsList
-from _client.watchlists.models.responses import IncludedUsersList
-from _client.watchlists.models.responses import Watchlist
-from _client.watchlists.models.responses import WatchlistMembersList
-from _client.watchlists.models.responses import WatchlistsPage
-from _client.watchlists.models.responses import WatchlistUser
-from incydr.cli import incydr
+
+from _incydr_cli.main import incydr
+from _incydr_sdk.core.client import Client
+from _incydr_sdk.enums.watchlists import WatchlistType
+from _incydr_sdk.exceptions import WatchlistNotFoundError
+from _incydr_sdk.watchlists.models.responses import ExcludedUsersList
+from _incydr_sdk.watchlists.models.responses import IncludedDepartment
+from _incydr_sdk.watchlists.models.responses import IncludedDepartmentsList
+from _incydr_sdk.watchlists.models.responses import IncludedDirectoryGroup
+from _incydr_sdk.watchlists.models.responses import IncludedDirectoryGroupsList
+from _incydr_sdk.watchlists.models.responses import IncludedUsersList
+from _incydr_sdk.watchlists.models.responses import Watchlist
+from _incydr_sdk.watchlists.models.responses import WatchlistMembersList
+from _incydr_sdk.watchlists.models.responses import WatchlistsPage
+from _incydr_sdk.watchlists.models.responses import WatchlistUser
+
 from pytest_httpserver import HTTPServer
 from pytest_lazyfixture import (
     lazy_fixture,

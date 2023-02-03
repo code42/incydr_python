@@ -2,8 +2,8 @@ from os import path
 
 import click
 import pytest
-from _cli import get_user_project_path
-from _cli.cursor import CursorStore
+from _incydr_cli import get_user_project_path
+from _incydr_cli.cursor import CursorStore
 
 CURSOR_NAME = "testcursor"
 EVENT_KEY = "events"
@@ -16,7 +16,7 @@ DIR_PATH = get_user_project_path(
 )
 
 
-_NAMESPACE = "_cli.cursor"
+_NAMESPACE = "_incydr_cli.cursor"
 
 
 @pytest.fixture

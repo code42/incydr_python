@@ -2,13 +2,14 @@ import datetime
 from typing import Optional
 
 import pytest
-from _client.queries.utils import parse_str_to_dt
-from _client.utils import flatten_fields
-from _client.utils import get_field_value_and_info
-from _client.utils import get_fields
-from _client.utils import iter_model_formatted
 from pydantic import BaseModel
 from pydantic import Field
+
+from _incydr_sdk.queries.utils import parse_str_to_dt
+from _incydr_sdk.utils import flatten_fields
+from _incydr_sdk.utils import get_field_value_and_info
+from _incydr_sdk.utils import get_fields
+from _incydr_sdk.utils import iter_model_formatted
 
 
 class GrandChildTestModel(BaseModel):

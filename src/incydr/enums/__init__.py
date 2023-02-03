@@ -1,3 +1,3 @@
-from _client.enums import SortDirection
+from _incydr_sdk.enums import SortDirection
 
 __all__ = ["SortDirection"]

@@ -1,6 +1,6 @@
 import json
 
-from _client.customer.models import Customer
+from _incydr_sdk.customer.models import Customer
 from incydr import Client
 from pytest_httpserver import HTTPServer
 

@@ -7,9 +7,9 @@ from socket import socket
 from socket import SocketKind
 
 import pytest
-from _cli.logger.enums import ServerProtocol
-from _cli.logger.handlers import NoPrioritySysLogHandler
-from _cli.logger.handlers import SyslogServerNetworkConnectionError
+from _incydr_cli.logger.enums import ServerProtocol
+from _incydr_cli.logger.handlers import NoPrioritySysLogHandler
+from _incydr_cli.logger.handlers import SyslogServerNetworkConnectionError
 
 import logging
 
@@ -42,7 +42,7 @@ def socket_mocks(mocker):
     mocks.SSLMocks.mock_ssl_context = mocker.MagicMock(ssl.SSLContext)
     mocks.SSLMocks.mock_ssl_context.wrap_socket.return_value = new_socket
     mocks.SSLMocks.context_creator = mocker.patch(
-        "_cli.logger.handlers.ssl.create_default_context"
+        "_incydr_cli.logger.handlers.ssl.create_default_context"
     )
     mocks.SSLMocks.context_creator.return_value = mocks.SSLMocks.mock_ssl_context
     return mocks
@@ -50,7 +50,7 @@ def socket_mocks(mocker):
 
 @pytest.fixture()
 def system_exception_info(mocker):
-    return mocker.patch("_cli.logger.handlers.sys.exc_info")
+    return mocker.patch("_incydr_cli.logger.handlers.sys.exc_info")
 
 
 @pytest.fixture()
@@ -66,7 +66,9 @@ def connection_reset_error(system_exception_info):
 
 
 def _get_normal_socket_initializer_mocks(mocker, new_socket):
-    new_socket_magic_method = mocker.patch("_cli.logger.handlers.socket.socket.__new__")
+    new_socket_magic_method = mocker.patch(
+        "_incydr_cli.logger.handlers.socket.socket.__new__"
+    )
     new_socket_magic_method.return_value = new_socket
     return new_socket_magic_method
 
@@ -242,7 +244,7 @@ class TestNoPrioritySysLogHandler:
         assert not handler.socket.unwrap.call_count
 
     def test_close_globally_closes(self, mocker):
-        global_close = mocker.patch("_cli.logger.handlers.logging.Handler.close")
+        global_close = mocker.patch("_incydr_cli.logger.handlers.logging.Handler.close")
         handler = NoPrioritySysLogHandler(
             _TEST_HOST, _TEST_PORT, ServerProtocol.UDP, None
         )
