@@ -2,11 +2,12 @@ import difflib
 import re
 
 import click
+from requests import HTTPError
+
 from _incydr_cli.exceptions import IncydrCLIException
 from _incydr_cli.exceptions import LoggedCLIError
 from _incydr_sdk.core.client import Client
 from _incydr_sdk.exceptions import IncydrException
-from requests import HTTPError
 
 _DIFFLIB_CUT_OFF = 0.6
 

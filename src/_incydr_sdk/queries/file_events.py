@@ -4,6 +4,14 @@ from typing import List
 from typing import Optional
 from typing import Union
 
+from isodate import duration_isoformat
+from isodate import parse_duration
+from pydantic import BaseModel
+from pydantic import conint
+from pydantic import Field
+from pydantic import root_validator
+from pydantic import validate_arguments
+
 from _incydr_sdk.core.models import Model
 from _incydr_sdk.enums.file_events import Category
 from _incydr_sdk.enums.file_events import EventAction
@@ -17,13 +25,6 @@ from _incydr_sdk.enums.file_events import ShareType
 from _incydr_sdk.enums.file_events import TrustReason
 from _incydr_sdk.file_events.models.response import SavedSearch
 from _incydr_sdk.queries.utils import parse_ts_to_ms_str
-from isodate import duration_isoformat
-from isodate import parse_duration
-from pydantic import BaseModel
-from pydantic import conint
-from pydantic import Field
-from pydantic import root_validator
-from pydantic import validate_arguments
 
 _term_enum_map = {
     "file.category": FileCategory,

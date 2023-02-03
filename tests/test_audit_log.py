@@ -3,6 +3,8 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
+from pytest_httpserver import HTTPServer
+
 from _incydr_cli.cmds.audit_log import _hash_event
 from _incydr_cli.cmds.options.output_options import TableFormat
 from _incydr_cli.cursor import CursorStore
@@ -10,7 +12,6 @@ from _incydr_cli.main import incydr
 from _incydr_sdk.audit_log.models import AuditEventsPage
 from _incydr_sdk.queries.utils import parse_ts_to_posix_ts
 from incydr import Client
-from pytest_httpserver import HTTPServer
 
 TEST_AL_ENTRY_1 = {
     "type$": "audit_log::logged_in/1",

@@ -4,6 +4,8 @@ import site
 import sys
 
 import click
+from requests.exceptions import HTTPError
+
 from _incydr_cli import console
 from _incydr_cli import logging_options
 from _incydr_cli.cmds.alert_rules import alert_rules
@@ -20,7 +22,6 @@ from _incydr_cli.cmds.users import users
 from _incydr_cli.cmds.watchlists import watchlists
 from _incydr_cli.core import ExceptionHandlingGroup
 from _incydr_sdk.__version__ import __version__
-from requests.exceptions import HTTPError
 
 if platform.system() in ("Darwin", "Linux"):
     os.environ["MANPAGER"] = "less -S"

@@ -1,8 +1,9 @@
 import os
 
 import click
-from _incydr_cli.utils import get_user_project_path
 from rich.console import Console
+
+from _incydr_cli.utils import get_user_project_path
 
 
 ERROR_LOG_FILE_NAME = "incydr_cli.log"

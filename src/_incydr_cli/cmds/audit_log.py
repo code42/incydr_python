@@ -7,6 +7,8 @@ from itertools import count
 from typing import Optional
 
 import click
+from pydantic import Field
+
 from _incydr_cli import console
 from _incydr_cli import get_user_project_path
 from _incydr_cli import logging_options
@@ -27,7 +29,6 @@ from _incydr_sdk.core.client import Client
 from _incydr_sdk.core.models import Model
 from _incydr_sdk.queries.utils import parse_str_to_dt
 from _incydr_sdk.queries.utils import parse_ts_to_posix_ts
-from pydantic import Field
 
 
 @click.group(cls=IncydrGroup)

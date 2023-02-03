@@ -4,6 +4,12 @@ from pathlib import Path
 from typing import Optional
 
 import click
+from pydantic import Field
+from pydantic import root_validator
+from requests.exceptions import HTTPError
+from rich.panel import Panel
+from rich.progress import track
+
 from _incydr_cli import console
 from _incydr_cli import logging_options
 from _incydr_cli import render
@@ -26,11 +32,6 @@ from _incydr_sdk.core.client import Client
 from _incydr_sdk.core.models import CSVModel
 from _incydr_sdk.file_events.models.event import FileEventV2
 from _incydr_sdk.utils import model_as_card
-from pydantic import Field
-from pydantic import root_validator
-from requests.exceptions import HTTPError
-from rich.panel import Panel
-from rich.progress import track
 
 
 class UpdateCaseCSV(CSVModel):

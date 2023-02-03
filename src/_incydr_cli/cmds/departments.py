@@ -2,6 +2,8 @@ import json
 from typing import Optional
 
 import click
+from click import echo
+
 from _incydr_cli import console
 from _incydr_cli import logging_options
 from _incydr_cli.cmds.options.output_options import single_format_option
@@ -10,7 +12,6 @@ from _incydr_cli.core import IncydrCommand
 from _incydr_cli.core import IncydrGroup
 from _incydr_sdk.core.client import Client
 from _incydr_sdk.utils import list_as_panel
-from click import echo
 
 
 @click.group(cls=IncydrGroup)

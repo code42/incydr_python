@@ -5,10 +5,11 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
-from _incydr_sdk.core.models import Model
-from _incydr_sdk.core.models import ResponseModel
 from pydantic import BaseModel
 from pydantic import Field
+
+from _incydr_sdk.core.models import Model
+from _incydr_sdk.core.models import ResponseModel
 
 
 class UserTypes(str, Enum):

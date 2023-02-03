@@ -1,10 +1,11 @@
 from typing import Optional
 
-from _incydr_sdk.core.models import AuthResponse
 from pydantic import SecretStr
 from requests import Session
 from requests.auth import AuthBase
 from requests.auth import HTTPBasicAuth
+
+from _incydr_sdk.core.models import AuthResponse
 
 
 class APIClientAuth(AuthBase):

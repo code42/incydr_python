@@ -1,6 +1,7 @@
 from typing import Optional
 
 import click
+
 from _incydr_cli import console
 from _incydr_cli import logging_options
 from _incydr_cli import render

@@ -5,6 +5,13 @@ from typing import Union
 
 import click
 import requests
+from boltons.iterutils import bucketize
+from boltons.iterutils import chunked
+from click import BadOptionUsage
+from click import File
+from pydantic import Field
+from rich.panel import Panel
+
 from _incydr_cli import console
 from _incydr_cli import get_user_project_path
 from _incydr_cli import logging_options
@@ -31,12 +38,6 @@ from _incydr_sdk.core.models import CSVModel
 from _incydr_sdk.core.models import Model
 from _incydr_sdk.queries.alerts import AlertQuery
 from _incydr_sdk.utils import model_as_card
-from boltons.iterutils import bucketize
-from boltons.iterutils import chunked
-from click import BadOptionUsage
-from click import File
-from pydantic import Field
-from rich.panel import Panel
 
 
 @click.group(cls=IncydrGroup)

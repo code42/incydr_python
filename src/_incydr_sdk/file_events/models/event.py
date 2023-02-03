@@ -2,10 +2,11 @@ from datetime import datetime
 from typing import List
 from typing import Optional
 
+from pydantic import Field
+
 from _incydr_sdk.core.models import Model
 from _incydr_sdk.core.models import ResponseModel
 from _incydr_sdk.enums.file_events import ReportType
-from pydantic import Field
 
 
 class DestinationEmail(Model):

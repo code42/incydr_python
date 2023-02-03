@@ -8,6 +8,7 @@ from socket import socket
 from socket import SocketKind
 
 import pytest
+
 from _incydr_cli.logger.enums import ServerProtocol
 from _incydr_cli.logger.handlers import NoPrioritySysLogHandler
 from _incydr_cli.logger.handlers import SyslogServerNetworkConnectionError

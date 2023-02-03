@@ -3,8 +3,9 @@ from datetime import datetime
 from datetime import timezone
 from typing import Union
 
-from _incydr_sdk.exceptions import DateParseError
 from dateutil import parser
+
+from _incydr_sdk.exceptions import DateParseError
 
 MICROSECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 DATETIME_STR_FORMAT = "%Y-%m-%d %H:%M:%S"

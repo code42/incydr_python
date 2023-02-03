@@ -2,10 +2,11 @@ from datetime import datetime
 from typing import List
 from typing import Optional
 
+from pydantic import Field
+
 from _incydr_sdk.core.models import ResponseModel
 from _incydr_sdk.enums import SortDirection
 from _incydr_sdk.file_events.models.event import FileEventV2
-from pydantic import Field
 
 
 class SearchFilter(ResponseModel):

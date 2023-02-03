@@ -1,9 +1,10 @@
 import os
 
 import click
+from click._compat import get_text_stderr
+
 from _incydr_cli import ERROR_LOG_FILE_NAME
 from _incydr_cli import get_user_project_path
-from click._compat import get_text_stderr
 
 
 class IncydrCLIException(click.ClickException):

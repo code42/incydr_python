@@ -7,15 +7,16 @@ from typing import Iterable
 from typing import List
 from typing import Type
 
-from _incydr_cli import console
-from _incydr_sdk.utils import get_fields
-from _incydr_sdk.utils import iter_model_formatted
-from _incydr_sdk.utils import model_as_card
 from pydantic import BaseModel
 from rich.console import Console
 from rich.console import ConsoleRenderable
 from rich.console import RichCast
 from rich.table import Table
+
+from _incydr_cli import console
+from _incydr_sdk.utils import get_fields
+from _incydr_sdk.utils import iter_model_formatted
+from _incydr_sdk.utils import model_as_card
 
 
 def date(dt: datetime):

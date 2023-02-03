@@ -1,4 +1,6 @@
 import click
+from rich.table import Table
+
 from _incydr_cli import console
 from _incydr_cli import logging_options
 from _incydr_cli import render
@@ -14,7 +16,6 @@ from _incydr_sdk.enums.trusted_activities import ActivityType
 from _incydr_sdk.trusted_activities.client import MissingActivityActionGroupsError
 from _incydr_sdk.trusted_activities.models import TrustedActivity
 from _incydr_sdk.utils import model_as_card
-from rich.table import Table
 
 
 @click.group(cls=IncydrGroup)

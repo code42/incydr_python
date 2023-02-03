@@ -2,6 +2,9 @@ from typing import Optional
 from uuid import UUID
 
 import click
+from rich.progress import track
+from rich.table import Table
+
 from _incydr_cli import console
 from _incydr_cli import logging_options
 from _incydr_cli import render
@@ -24,8 +27,6 @@ from _incydr_sdk.watchlists.models.responses import IncludedDepartment
 from _incydr_sdk.watchlists.models.responses import IncludedDirectoryGroup
 from _incydr_sdk.watchlists.models.responses import Watchlist
 from _incydr_sdk.watchlists.models.responses import WatchlistUser
-from rich.progress import track
-from rich.table import Table
 
 MAX_USER_DISPLAY_COUNT = 25
 

@@ -3,6 +3,8 @@ from itertools import count
 from typing import Iterator
 from typing import Union
 
+from requests import Response
+
 from _incydr_sdk.exceptions import DateParseError
 from _incydr_sdk.queries.utils import DATE_STR_FORMAT
 from _incydr_sdk.user_risk_profiles.models import Date
@@ -10,7 +12,6 @@ from _incydr_sdk.user_risk_profiles.models import QueryUserRiskProfilesRequest
 from _incydr_sdk.user_risk_profiles.models import UpdateUserRiskProfileRequest
 from _incydr_sdk.user_risk_profiles.models import UserRiskProfile
 from _incydr_sdk.user_risk_profiles.models import UserRiskProfilesPage
-from requests import Response
 
 
 class UserRiskProfiles:

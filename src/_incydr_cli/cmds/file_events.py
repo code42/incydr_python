@@ -4,6 +4,10 @@ from typing import Optional
 from typing import Union
 
 import click
+from click import BadOptionUsage
+from click import File
+from rich.panel import Panel
+
 from _incydr_cli import console
 from _incydr_cli import get_user_project_path
 from _incydr_cli import logging_options
@@ -30,9 +34,6 @@ from _incydr_sdk.file_events.models.event import FileEventV2
 from _incydr_sdk.file_events.models.response import SavedSearch
 from _incydr_sdk.queries.file_events import EventQuery
 from _incydr_sdk.utils import model_as_card
-from click import BadOptionUsage
-from click import File
-from rich.panel import Panel
 
 
 @click.group(cls=IncydrGroup)

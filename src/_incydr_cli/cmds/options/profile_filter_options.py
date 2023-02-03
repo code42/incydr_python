@@ -1,4 +1,5 @@
 import click
+
 from _incydr_cli.cmds.options.utils import user_lookup_callback
 
 manager_option = click.option(

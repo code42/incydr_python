@@ -1,12 +1,12 @@
 from typing import List
 
-from _incydr_sdk.queries.file_events import EventQuery
 from pydantic import parse_obj_as
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
 from .models.response import FileEventsPage
 from .models.response import SavedSearch
+from _incydr_sdk.queries.file_events import EventQuery
 
 
 class FileEventsV2:

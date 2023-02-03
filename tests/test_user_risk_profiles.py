@@ -3,13 +3,13 @@ import json
 from urllib.parse import urlencode
 
 import pytest
+from pytest_httpserver import HTTPServer
+from requests import Response
+
 from _incydr_cli.main import incydr
 from _incydr_sdk.user_risk_profiles.models import UserRiskProfile
 from _incydr_sdk.user_risk_profiles.models import UserRiskProfilesPage
 from incydr import Client
-from pytest_httpserver import HTTPServer
-from requests import Response
-
 from tests.test_users import TEST_USER_1
 
 TEST_USER_ID = "user-1"

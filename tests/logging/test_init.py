@@ -1,6 +1,7 @@
 import logging
 
 import pytest
+
 from _incydr_cli.logger import _init_logger
 from _incydr_cli.logger import get_logger_for_server
 from _incydr_cli.logger.enums import ServerProtocol

@@ -3,6 +3,12 @@ from pathlib import Path
 from typing import Optional
 
 import click
+from boltons.iterutils import bucketize
+from pydantic import Field
+from requests import HTTPError
+from rich.panel import Panel
+from rich.progress import track
+
 from _incydr_cli import console
 from _incydr_cli import logging_options
 from _incydr_cli import render
@@ -28,11 +34,6 @@ from _incydr_sdk.users.models import Role
 from _incydr_sdk.users.models import User
 from _incydr_sdk.users.models import UserRole
 from _incydr_sdk.utils import model_as_card
-from boltons.iterutils import bucketize
-from pydantic import Field
-from requests import HTTPError
-from rich.panel import Panel
-from rich.progress import track
 
 user_arg = click.argument("user", callback=user_lookup_callback)
 

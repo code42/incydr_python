@@ -3,6 +3,8 @@ from datetime import datetime
 from urllib.parse import urlencode
 
 import pytest
+from pytest_httpserver import HTTPServer
+
 from _incydr_cli.main import incydr
 from _incydr_sdk.devices.models import DevicesPage
 from _incydr_sdk.enums import SortDirection
@@ -14,7 +16,6 @@ from _incydr_sdk.users.models import User
 from _incydr_sdk.users.models import UserRole
 from _incydr_sdk.users.models import UsersPage
 from incydr import Client
-from pytest_httpserver import HTTPServer
 
 TEST_USER_ID = "user-1"
 TEST_ORG_GUID = "orgGuid-1"

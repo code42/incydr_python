@@ -3,6 +3,9 @@ from typing import Iterator
 from typing import List
 from typing import Union
 
+from pydantic import parse_obj_as
+from requests import Response
+
 from _incydr_sdk.devices.models import DevicesPage
 from _incydr_sdk.devices.models import QueryDevicesRequest
 from _incydr_sdk.enums import SortDirection
@@ -14,8 +17,6 @@ from _incydr_sdk.users.models import UpdateRolesResponse
 from _incydr_sdk.users.models import User
 from _incydr_sdk.users.models import UserRole
 from _incydr_sdk.users.models import UsersPage
-from pydantic import parse_obj_as
-from requests import Response
 
 
 class UsersClient:

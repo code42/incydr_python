@@ -4,6 +4,9 @@ from copy import copy
 from urllib.parse import urlencode
 
 import pytest
+from pydantic import ValidationError
+from pytest_httpserver import HTTPServer
+
 from _incydr_cli.main import incydr
 from _incydr_sdk.cases.models import Case
 from _incydr_sdk.cases.models import CaseDetail
@@ -12,9 +15,6 @@ from _incydr_sdk.cases.models import CasesPage
 from _incydr_sdk.cases.models import FileEvent
 from _incydr_sdk.file_events.models.event import FileEventV2
 from incydr import Client
-from pydantic import ValidationError
-from pytest_httpserver import HTTPServer
-
 from tests.test_file_events import TEST_EVENT_1
 from tests.test_users import TEST_USER_1
 from tests.test_users import TEST_USER_2

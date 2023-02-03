@@ -1,4 +1,5 @@
 import click
+
 from _incydr_cli.cmds.utils import user_lookup
 from _incydr_sdk.core.client import Client
 

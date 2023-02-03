@@ -2,6 +2,7 @@ from os import path
 
 import click
 import pytest
+
 from _incydr_cli import get_user_project_path
 from _incydr_cli.cursor import CursorStore
 

@@ -4,6 +4,11 @@ from datetime import datetime
 from typing import List
 from typing import Optional
 
+from pydantic import BaseModel
+from pydantic import Extra
+from pydantic import Field
+from rich.markdown import Markdown
+
 from _incydr_sdk.core.models import Model
 from _incydr_sdk.core.models import ResponseModel
 from _incydr_sdk.enums import SortDirection
@@ -12,10 +17,6 @@ from _incydr_sdk.enums.cases import FileAvailability
 from _incydr_sdk.enums.cases import SortKeys
 from _incydr_sdk.utils import list_as_panel
 from _incydr_sdk.utils import model_as_card
-from pydantic import BaseModel
-from pydantic import Extra
-from pydantic import Field
-from rich.markdown import Markdown
 
 
 class Case(ResponseModel, validate_assignment=True):

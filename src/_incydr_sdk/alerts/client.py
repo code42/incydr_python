@@ -5,8 +5,6 @@ from typing import List
 from typing import Union
 
 import requests
-from _incydr_sdk.enums.alerts import AlertState
-from _incydr_sdk.queries.alerts import AlertQuery
 from pydantic import parse_obj_as
 
 from .models.alert import AlertSummary
@@ -15,6 +13,8 @@ from .models.request import AlertDetailsRequest
 from .models.request import UpdateAlertStateRequest
 from .models.response import AlertDetails
 from .models.response import AlertQueryPage
+from _incydr_sdk.enums.alerts import AlertState
+from _incydr_sdk.queries.alerts import AlertQuery
 
 
 class AlertsV1:

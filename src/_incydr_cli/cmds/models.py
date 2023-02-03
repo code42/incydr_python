@@ -1,9 +1,10 @@
 from typing import Optional
 
-from _incydr_sdk.core.models import CSVModel
-from _incydr_sdk.core.models import Model
 from pydantic import Field
 from pydantic import root_validator
+
+from _incydr_sdk.core.models import CSVModel
+from _incydr_sdk.core.models import Model
 
 
 class UserCSV(CSVModel):

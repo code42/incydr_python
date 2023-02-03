@@ -3,10 +3,11 @@ from __future__ import annotations
 from typing import List
 from typing import Optional
 
-from _incydr_sdk.core.models import ResponseModel
 from pydantic import BaseModel
 from pydantic import Field
 from rich.markdown import Markdown
+
+from _incydr_sdk.core.models import ResponseModel
 
 
 class Date(ResponseModel):

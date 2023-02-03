@@ -4,13 +4,14 @@ from datetime import datetime
 from typing import List
 from typing import Optional
 
+from pydantic import Extra
+from pydantic import Field
+
 from _incydr_sdk.core.models import Model
 from _incydr_sdk.core.models import ResponseModel
 from _incydr_sdk.enums.trusted_activities import ActivityType
 from _incydr_sdk.enums.trusted_activities import Name
 from _incydr_sdk.enums.trusted_activities import PrincipalType
-from pydantic import Extra
-from pydantic import Field
 
 
 class ProviderObject(Model):

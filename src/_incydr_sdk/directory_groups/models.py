@@ -1,8 +1,9 @@
 from typing import List
 from typing import Optional
 
-from _incydr_sdk.core.models import ResponseModel
 from pydantic import Field
+
+from _incydr_sdk.core.models import ResponseModel
 
 
 class DirectoryGroup(ResponseModel):

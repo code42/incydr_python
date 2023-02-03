@@ -6,12 +6,13 @@ from typing import List
 from typing import Optional
 
 import rich.box
-from _incydr_sdk.core.models import Model
 from pydantic import constr
 from pydantic import Field
 from pydantic import validator
 from rich.markdown import Markdown
 from rich.panel import Panel
+
+from _incydr_sdk.core.models import Model
 
 
 class Observation(Model):

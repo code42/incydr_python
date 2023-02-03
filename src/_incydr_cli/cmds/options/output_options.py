@@ -1,6 +1,7 @@
 from enum import Enum
 
 import click
+
 from _incydr_cli.core import incompatible_with
 
 

@@ -5,7 +5,6 @@ from io import IOBase
 from pathlib import Path
 from typing import Union
 
-from _incydr_sdk.enums import _Enum
 from pydantic import BaseSettings
 from pydantic import Field
 from pydantic import root_validator
@@ -14,6 +13,8 @@ from pydantic import validator
 from rich import pretty
 from rich.console import Console
 from rich.logging import RichHandler
+
+from _incydr_sdk.enums import _Enum
 
 # capture default displayhook so we can "uninstall" rich
 _sys_displayhook = sys.displayhook

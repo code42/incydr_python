@@ -1,12 +1,11 @@
 from itertools import count
 from typing import Iterator
 
-from _incydr_sdk.enums import SortDirection
-from _incydr_sdk.enums.devices import SortKeys
-
 from .models import Device
 from .models import DevicesPage
 from .models import QueryDevicesRequest
+from _incydr_sdk.enums import SortDirection
+from _incydr_sdk.enums.devices import SortKeys
 
 
 class DevicesClient:

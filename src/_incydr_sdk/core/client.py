@@ -6,6 +6,10 @@ import traceback
 from collections import deque
 from textwrap import indent
 
+from requests_toolbelt import user_agent
+from requests_toolbelt.sessions import BaseUrlSession
+from requests_toolbelt.utils.dump import dump_response
+
 from _incydr_sdk.__version__ import __version__
 from _incydr_sdk.alert_rules.client import AlertRulesClient
 from _incydr_sdk.alerts.client import AlertsClient
@@ -22,9 +26,6 @@ from _incydr_sdk.trusted_activities.client import TrustedActivitiesClient
 from _incydr_sdk.user_risk_profiles.client import UserRiskProfiles
 from _incydr_sdk.users.client import UsersClient
 from _incydr_sdk.watchlists.client import WatchlistsClient
-from requests_toolbelt import user_agent
-from requests_toolbelt.sessions import BaseUrlSession
-from requests_toolbelt.utils.dump import dump_response
 
 _base_user_agent = user_agent("incydr", __version__)
 _auth_header_regex = re.compile(r"Authorization: (Bearer|Basic) \S+")

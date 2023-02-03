@@ -3,14 +3,15 @@ from typing import Iterator
 from typing import List
 from typing import Union
 
+from pydantic import parse_obj_as
+from requests import HTTPError
+from requests import Response
+
 from _incydr_sdk.alert_rules.models.request import GetRulesRequest
 from _incydr_sdk.alert_rules.models.response import RuleDetails
 from _incydr_sdk.alert_rules.models.response import RuleUsersList
 from _incydr_sdk.exceptions import IncydrException
 from _incydr_sdk.user_risk_profiles.models import UserRiskProfile
-from pydantic import parse_obj_as
-from requests import HTTPError
-from requests import Response
 
 
 class MissingUsernameCriterionError(IncydrException):

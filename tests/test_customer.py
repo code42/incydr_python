@@ -1,8 +1,9 @@
 import json
 
+from pytest_httpserver import HTTPServer
+
 from _incydr_sdk.customer.models import Customer
 from incydr import Client
-from pytest_httpserver import HTTPServer
 
 TEST_CUSTOMER = {
     "name": "test-customer",

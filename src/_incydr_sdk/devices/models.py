@@ -2,11 +2,12 @@ from datetime import datetime
 from typing import List
 from typing import Optional
 
+from pydantic import BaseModel
+from pydantic import Field
+
 from _incydr_sdk.core.models import ResponseModel
 from _incydr_sdk.enums import SortDirection
 from _incydr_sdk.enums.devices import SortKeys
-from pydantic import BaseModel
-from pydantic import Field
 
 
 class Device(ResponseModel):

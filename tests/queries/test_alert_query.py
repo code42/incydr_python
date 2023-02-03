@@ -1,6 +1,7 @@
 import json
 
 import pytest
+
 from _incydr_sdk.enums.alerts import AlertTerm
 from incydr import AlertQuery
 

@@ -1,10 +1,11 @@
 from typing import List
 from typing import Optional
 
-from _incydr_sdk.enums.watchlists import WatchlistType
 from pydantic import BaseModel
 from pydantic import constr
 from pydantic import Field
+
+from _incydr_sdk.enums.watchlists import WatchlistType
 
 
 class UpdateExcludedUsersRequest(BaseModel):

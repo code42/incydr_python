@@ -4,9 +4,10 @@ from datetime import datetime
 from typing import List
 from typing import Optional
 
+from pydantic import Field
+
 from _incydr_sdk.core.models import ResponseModel
 from _incydr_sdk.enums.watchlists import WatchlistType
-from pydantic import Field
 
 
 class Date(ResponseModel):

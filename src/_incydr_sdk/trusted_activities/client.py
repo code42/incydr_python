@@ -2,6 +2,8 @@ from itertools import count
 from typing import Iterator
 from typing import List
 
+from requests import Response
+
 from _incydr_sdk.enums import SortDirection
 from _incydr_sdk.enums.trusted_activities import ActivityType
 from _incydr_sdk.enums.trusted_activities import CloudShareApps
@@ -18,7 +20,6 @@ from _incydr_sdk.trusted_activities.models import QueryTrustedActivitiesRequest
 from _incydr_sdk.trusted_activities.models import TrustedActivitiesPage
 from _incydr_sdk.trusted_activities.models import TrustedActivity
 from _incydr_sdk.trusted_activities.models import UpdateTrustedActivity
-from requests import Response
 
 
 class TrustedActivitiesV2:

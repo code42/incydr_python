@@ -3,12 +3,13 @@ from __future__ import annotations
 from typing import List
 from typing import Optional
 
+from pydantic import BaseModel
+from pydantic import Field
+
 from _incydr_sdk.alerts.models.alert import AlertDetails  # noqa
 from _incydr_sdk.alerts.models.alert import AlertSummary
 from _incydr_sdk.alerts.models.enums import ProblemType
 from _incydr_sdk.core.models import ResponseModel
-from pydantic import BaseModel
-from pydantic import Field
 
 
 class QueryProblem(BaseModel):

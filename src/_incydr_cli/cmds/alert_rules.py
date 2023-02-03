@@ -1,6 +1,8 @@
 from typing import Optional
 
 import click
+from rich.table import Table
+
 from _incydr_cli import console
 from _incydr_cli import logging_options
 from _incydr_cli import render
@@ -17,7 +19,6 @@ from _incydr_sdk.alert_rules.models.response import RuleDetails
 from _incydr_sdk.core.client import Client
 from _incydr_sdk.utils import list_as_panel
 from _incydr_sdk.utils import model_as_card
-from rich.table import Table
 
 
 MAX_USER_DISPLAY_COUNT = 25

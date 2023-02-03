@@ -1,4 +1,5 @@
 import click
+
 from _incydr_cli.core import incompatible_with
 from _incydr_cli.file_readers import FileOrString
 

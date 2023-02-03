@@ -6,6 +6,8 @@ from typing import List
 from typing import Tuple
 from typing import Union
 
+from requests import Response
+
 from _incydr_sdk.cases.models import Case
 from _incydr_sdk.cases.models import CaseDetail
 from _incydr_sdk.cases.models import CaseFileEvents
@@ -19,7 +21,6 @@ from _incydr_sdk.enums.cases import CaseStatus
 from _incydr_sdk.enums.cases import SortKeys
 from _incydr_sdk.file_events.models.event import FileEventV2
 from _incydr_sdk.queries.utils import MICROSECOND_FORMAT
-from requests import Response
 
 
 class CasesV1:

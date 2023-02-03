@@ -5,6 +5,12 @@ from typing import List
 from typing import Optional
 from typing import Union
 
+from pydantic import BaseModel
+from pydantic import conint
+from pydantic import Field
+from pydantic import root_validator
+from pydantic import StrictBool
+
 from _incydr_sdk.core.models import Model
 from _incydr_sdk.enums.alerts import AlertSeverity
 from _incydr_sdk.enums.alerts import AlertState
@@ -12,11 +18,6 @@ from _incydr_sdk.enums.alerts import AlertTerm
 from _incydr_sdk.enums.alerts import Operator
 from _incydr_sdk.enums.alerts import RiskSeverity
 from _incydr_sdk.queries.utils import parse_ts_to_ms_str
-from pydantic import BaseModel
-from pydantic import conint
-from pydantic import Field
-from pydantic import root_validator
-from pydantic import StrictBool
 
 
 _term_enum_map = {

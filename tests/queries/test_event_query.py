@@ -2,10 +2,11 @@ from datetime import datetime
 from datetime import timedelta
 
 import pytest
+from pydantic import ValidationError
+
 from _incydr_sdk.queries.file_events import Filter
 from _incydr_sdk.queries.file_events import FilterGroup
 from incydr import EventQuery
-from pydantic import ValidationError
 
 TEST_START_DATE = "P1D"
 TEST_TIMESTAMP = "2020-09-10 11:12:13"
