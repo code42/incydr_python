@@ -45,7 +45,7 @@ Source = "https://github.com/code42/incydr_python/incydr"
 incydr = "incydr.__main__:incydr"
 
 [tool.hatch.version]
-path = "src/incydr/__version__.py"
+path = "src/_incydr_sdk/__version__.py"
 
 [tool.hatch.build]
 sources = ["src"]

@@ -6,7 +6,7 @@ import sys
 import click
 from requests.exceptions import HTTPError
 
-from incydr.__version__ import __version__
+from _incydr_sdk.__version__ import __version__
 from _incydr_cli import console
 from _incydr_cli import logging_options
 from _incydr_cli.cmds.alert_rules import alert_rules
