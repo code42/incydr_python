@@ -3,16 +3,18 @@ from datetime import datetime
 from unittest import mock
 
 import pytest
-from _cli.cmds.options.output_options import TableFormat
-from _cli.cursor import CursorStore
-from _client.alerts.models.response import AlertDetails
-from _client.alerts.models.response import AlertQueryPage
-from _client.alerts.models.response import AlertSummary
-from _client.queries.utils import parse_ts_to_posix_ts
+from pytest_httpserver import HTTPServer
+
+from _incydr_cli.cmds.options.output_options import TableFormat
+from _incydr_cli.cursor import CursorStore
+from _incydr_cli.main import incydr
+from _incydr_sdk.alerts.models.response import AlertDetails
+from _incydr_sdk.alerts.models.response import AlertQueryPage
+from _incydr_sdk.alerts.models.response import AlertSummary
+from _incydr_sdk.queries.utils import parse_ts_to_posix_ts
 from incydr import AlertQuery
 from incydr import Client
-from incydr.cli import incydr
-from pytest_httpserver import HTTPServer
+
 
 TEST_ALERT_ID = "000-42-code"
 
@@ -403,7 +405,7 @@ def test_cli_search_with_checkpointing_stores_new_checkpoint(
     mock_cursor = mocker.MagicMock(spec=CursorStore)
     mock_cursor.get.return_value = None
     with mock.patch(
-        "_cli.cmds.alerts._get_cursor_store", return_value=mock_cursor
+        "_incydr_cli.cmds.alerts._get_cursor_store", return_value=mock_cursor
     ) as mock_get_store, mock.patch.object(
         mock_cursor, "replace"
     ) as mock_replace, mock.patch.object(
@@ -467,7 +469,7 @@ def test_cli_search_with_checkpointing_ignores_start_param_and_uses_existing_che
     mock_cursor = mocker.MagicMock(spec=CursorStore)
     mock_cursor.get.return_value = CURSOR_TIMESTAMP
     with mock.patch(
-        "_cli.cmds.alerts._get_cursor_store", return_value=mock_cursor
+        "_incydr_cli.cmds.alerts._get_cursor_store", return_value=mock_cursor
     ) as mock_get_store:
         result = runner.invoke(
             incydr,

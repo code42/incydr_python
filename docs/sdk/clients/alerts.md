@@ -1,5 +1,5 @@
 # Alerts
 
-::: _client.alerts.client.AlertsV1
+::: _incydr_sdk.alerts.client.AlertsV1
     :docstring:
     :members:

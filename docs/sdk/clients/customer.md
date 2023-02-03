@@ -1,5 +1,5 @@
 # Customer
 
-::: _client.customer.client.CustomerV1
+::: _incydr_sdk.customer.client.CustomerV1
     :docstring:
     :members:

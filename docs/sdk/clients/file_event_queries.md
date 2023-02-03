@@ -4,7 +4,7 @@
 
 Use the `EventQuery` class to create a query for searching and filtering file events.  More details on how to use the `EventQuery` class can be found in the [Query Building](#query-building) section below.
 
-::: _client.queries.file_events.EventQuery
+::: _incydr_sdk.queries.file_events.EventQuery
     :docstring:
     :members: equals not_equals exists does_not_exist greater_than less_than matches_any
 

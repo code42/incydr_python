@@ -4,13 +4,14 @@ from typing import List
 from urllib.parse import urlencode
 
 import pytest
-from _client.alert_rules.client import MissingUsernameCriterionError
-from _client.alert_rules.models.response import RuleDetails
-from _client.alert_rules.models.response import RuleUser
-from _client.alert_rules.models.response import RuleUsersList
-from _client.core.client import Client
-from incydr.cli import incydr
 from pytest_httpserver import HTTPServer
+
+from _incydr_cli.main import incydr
+from _incydr_sdk.alert_rules.client import MissingUsernameCriterionError
+from _incydr_sdk.alert_rules.models.response import RuleDetails
+from _incydr_sdk.alert_rules.models.response import RuleUser
+from _incydr_sdk.alert_rules.models.response import RuleUsersList
+from _incydr_sdk.core.client import Client
 
 TEST_RULE_ID = "test-rule-id"
 

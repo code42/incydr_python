@@ -2,7 +2,7 @@
 
 Use the `AlertQuery` class to create a query for searching and filtering Incydr alerts.  More details on how to use the `AlertQuery` class can be found in the [Query Building](#query-building) section below.
 
-::: _client.queries.alerts.AlertQuery
+::: _incydr_sdk.queries.alerts.AlertQuery
     :docstring:
     :members: equals not_equals contains does_not_contain matches_any
 

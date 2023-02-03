@@ -42,18 +42,28 @@ Issues = "https://github.com/code42/incydr_python/issues"
 Source = "https://github.com/code42/incydr_python/incydr"
 
 [project.scripts]
-incydr = "incydr.cli:incydr"
+incydr = "incydr.__main__:incydr"
 
 [tool.hatch.version]
-path = "src/_client/version.py"
+path = "src/_incydr_sdk/__version__.py"
+
+[tool.hatch.build]
+sources = ["src"]
+include = [
+  "incydr",
+  "_incydr_sdk",
+  "_incydr_cli",
+]
 
 [tool.hatch.build.targets.sdist]
 [tool.hatch.build.targets.wheel]
 
 [tool.hatch.envs.style]
+python = "3.10"  # this should always match version of "style" github action
 dependencies = [
     "pre-commit",
 ]
+
 [tool.hatch.envs.style.scripts]
 check = "pre-commit run --all-files --show-diff-on-failure"
 check-no-diff = "pre-commit run --all-files"
@@ -66,6 +76,7 @@ dependencies = [
   "mkautodoc",
   "mkdocs-click",
 ]
+
 [tool.hatch.envs.docs.scripts]
 build = "mkdocs build"
 serve = "mkdocs serve"

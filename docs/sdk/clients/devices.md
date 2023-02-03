@@ -1,5 +1,5 @@
 # Devices
 
-::: _client.devices.client.DevicesV1
+::: _incydr_sdk.devices.client.DevicesV1
     :docstring:
     :members:

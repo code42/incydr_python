@@ -1,15 +1,16 @@
-import pytest
-from _cli.logger import _init_logger
-from _cli.logger import get_logger_for_server
-from _cli.logger.enums import ServerProtocol
-from _cli.logger.handlers import NoPrioritySysLogHandler
-
 import logging
+
+import pytest
+
+from _incydr_cli.logger import _init_logger
+from _incydr_cli.logger import get_logger_for_server
+from _incydr_cli.logger.enums import ServerProtocol
+from _incydr_cli.logger.handlers import NoPrioritySysLogHandler
 
 
 @pytest.fixture(autouse=True)
 def init_socket_mock(mocker):
-    return mocker.patch("_cli.logger.NoPrioritySysLogHandler.connect_socket")
+    return mocker.patch("_incydr_cli.logger.NoPrioritySysLogHandler.connect_socket")
 
 
 @pytest.fixture(autouse=True)
@@ -52,7 +53,7 @@ def test_get_logger_for_server_constructs_handler_with_expected_args(
     mocker, monkeypatch
 ):
     no_priority_syslog_handler = mocker.patch(
-        "_cli.logger.handlers.NoPrioritySysLogHandler.__init__"
+        "_incydr_cli.logger.handlers.NoPrioritySysLogHandler.__init__"
     )
     no_priority_syslog_handler.return_value = None
     get_logger_for_server(ServerProtocol.TCP, "example.com", None, "cert")
@@ -65,7 +66,7 @@ def test_get_logger_for_server_when_hostname_includes_port_constructs_handler_wi
     mocker,
 ):
     no_priority_syslog_handler = mocker.patch(
-        "_cli.logger.handlers.NoPrioritySysLogHandler.__init__"
+        "_incydr_cli.logger.handlers.NoPrioritySysLogHandler.__init__"
     )
     no_priority_syslog_handler.return_value = None
     get_logger_for_server(ServerProtocol.TCP, "example.com", 999, None)
