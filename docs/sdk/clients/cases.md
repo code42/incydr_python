@@ -1,5 +1,5 @@
 # Cases
 
-::: _client.cases.client.CasesV1
+::: _incydr_sdk.cases.client.CasesV1
     :docstring:
     :members:

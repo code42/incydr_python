@@ -1,5 +1,5 @@
 # Trusted Activities
 
-::: _client.trusted_activities.client.TrustedActivitiesV2
+::: _incydr_sdk.trusted_activities.client.TrustedActivitiesV2
     :docstring:
     :members:

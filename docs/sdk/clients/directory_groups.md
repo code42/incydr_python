@@ -1,5 +1,5 @@
 # Directory Groups
 
-::: _client.directory_groups.client.DirectoryGroupsV1
+::: _incydr_sdk.directory_groups.client.DirectoryGroupsV1
     :docstring:
     :members:

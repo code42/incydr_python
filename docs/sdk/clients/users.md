@@ -1,5 +1,5 @@
 # Users
 
-::: _client.users.client.UsersV1
+::: _incydr_sdk.users.client.UsersV1
     :docstring:
     :members:
