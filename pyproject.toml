@@ -74,6 +74,9 @@ dependencies = [
   "mkautodoc",
   "mkdocs-click",
 ]
+pre-install-commands = [
+  "pip install '.[cli]'"
+]
 [tool.hatch.envs.docs.scripts]
 build = "mkdocs build"
 serve = "mkdocs serve"

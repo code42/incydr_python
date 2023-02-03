@@ -1,4 +1,4 @@
 # Configuration
 
-::: _client.core.settings.IncydrSettings
+::: _incydr_sdk.core.settings.IncydrSettings
     :docstring:
