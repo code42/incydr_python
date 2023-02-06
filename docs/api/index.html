@@ -1,5 +1,61 @@
 <!DOCTYPE html>
-<html>
-<iframe src="https://code42.github.io/developer.code42.com/api/" style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;">
-</iframe>
+<html lang="en">
+    <head>
+          <meta charset="utf-8">
+        <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <title>Code42 API Documentation</title>
+        <link href="../css/redocoverrides.css.scss" rel="stylesheet" />
+    <!--    <link rel="stylesheet" href="https://use.typekit.net/sxu2uqu.css">-->
+        <link href="../images/favicon.ico" rel="icon" type="image/ico" />
+        <link rel="stylesheet" href="../css/custom.css">
+    </head>
+  <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="" style="padding:0; margin:0">
+    <header class="md-header md-header--lifted" data-md-component="header" style="background-color: #00284c">
+        <nav class="md-header__inner md-grid" aria-label="Header">
+            <a href=".." title="Code42 Developer Portal" class="md-header__button md-logo" aria-label="Code42 Developer Portal" data-md-component="logo">
+            <img src="../images/logo_developers.svg" alt="logo">
+            </a>
+        </nav>
+    </header>
+    <div id="redoc-container" style="top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; z-index:999999;"></div>
+<!--    <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>-->
+    <script src="../redoc.standalone.js"></script>
+    <script>
+        var opts = {
+            expandResponses: "200",
+            hideHostname: true,
+            scrollYOffset: 68,
+            hideSingleRequestSampleTab: true,
+            theme: {
+                colors: {
+                    primary: {
+                        main: "#333333"
+                    }
+                },
+                sidebar: {
+                    width: "345px",
+                    backgroundColor: "#FFFFFF",
+                    textColor: "#424242"
+                },
+                rightPanel: {
+                    backgroundColor: "#00284c"
+                },
+                typography: {
+                    headings: {
+                        fontFamily: "'proxima-nova', sans-serif",
+                        fontWeight: 700
+                    }
+                },
+                schema: {
+                    arrow: {
+                    size: '1.4em',
+                    color: '#1d8127'
+                    }
+                }
+            }
+        };
+        Redoc.init("https://developer.code42.com/api/code42api.json", opts, document.getElementById("redoc-container"))
+    </script>
+  </body>
 </html>
