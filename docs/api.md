@@ -5,7 +5,7 @@ hide:
 ---
 <script>
     var opts = {
-        scrollYOffset: 100,
+        scrollYOffset: 120,
         hideHostname: true,
         hideDownloadButton: true,
         hideSingleRequestSampleTab: true,
@@ -39,4 +39,3 @@ hide:
     };
     Redoc.init("https://raw.githubusercontent.com/code42/developer.code42.com/gh-pages/api/code42api.json", opts, document.getElementById("redoc-container"))
 </script>
-
