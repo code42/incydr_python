@@ -11,12 +11,3 @@
         {{ super() }}
     {% endif %}
 {% endblock %}
-
-{% block scripts %}
-    {% if page.url == "api/" %}
-        {{ super() }}
-        {% include "partials/redoc_init.html" %}
-    {% else %}
-        {{ super() }}
-    {% endif %}
-{% endblock %}}
