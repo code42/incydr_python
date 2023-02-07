@@ -2,7 +2,7 @@
 
 Welcome to the Code42 Developer Portal! Here you will find resources to assist you in leveraging the Code42 platform for automation and scripting. Code42 offers a powerful set of tools you can use for everything from performing automated actions to integrating with your company's security applications.
 
-We offer several different approaches to integrate into Code42 so you can choose the right level of control mixed with your desired simplicity to integrate into our product. 
+We offer several different approaches to integrate into Code42 so you can choose the right level of control mixed with your desired simplicity to integrate into our product.
 
 | Tool  | Interface | Primary use | Flexibility | Development Time |
 | ----- | --------- | ----------- | ------------| ---------------- |
@@ -27,7 +27,7 @@ Code42 API access is included with any licensed subscription of a Code42 product
 
 The Incydr SDK is a Python wrapper around the public Code42 APIs with some additional utility.
 
-The SDK contains a [Python client](#python-sdk) and a [CLI tool extension](#cli-tool) to accelerate development of internal applications using the Incydr platform, 
+The SDK contains a [Python client](#python-sdk) and a [CLI tool extension](#cli-tool) to accelerate development of internal applications using the Incydr platform,
 while avoiding the overhead of session or authentication management, paging, and JSON parsing.
 
 We welcome submissions of code as well as ideas to our open source [GitHub repository](https://github.com/code42/incydr_python) to be considered for a future update.
@@ -46,7 +46,7 @@ For more information, see the full [Incydr Python SDK Documentation](sdk/index.m
 
 ### CLI Tool
 
-The Incydr SDK CLI tool is an extension of the Python SDK and offers a way to interact with your Code42 environment without using the Code42 console or making API calls directly. 
+The Incydr SDK CLI tool is an extension of the Python SDK and offers a way to interact with your Code42 environment without using the Code42 console or making API calls directly.
 If you have familiarity with command line tools, Code42, and have Python and PyPI (pip) installed, you can get started quickly and easily with the Incydr SDK CLI.
 
 #### Example Use Cases
@@ -55,7 +55,7 @@ If you have familiarity with command line tools, Code42, and have Python and PyP
 * [Automate user management](cli/cmds/users.md)
 * [Extract events from Code42, and optionally send them to a syslog server or SIEM](cli/syslogging.md)
 
-Setting the CLI to run as a scheduled task in Windows or added to the crontab in Linux can quickly get automations up and running. 
+Setting the CLI to run as a scheduled task in Windows or added to the crontab in Linux can quickly get automations up and running.
 
 For more information, see the full [Incydr CLI tool documentation](cli/index.md).
 
@@ -66,12 +66,12 @@ For more information, see the full [Incydr CLI tool documentation](cli/index.md)
 
 ### Py42
 
-Py42 is an [open source](https://github.com/code42/py42) Python SDK wrapper around the Code42 API that also provides several utility methods. 
+Py42 is an [open source](https://github.com/code42/py42) Python SDK wrapper around the Code42 API that also provides several utility methods.
 
 For more information, see the full [py42 documentation](https://py42docs.code42.com).
 
 ### Code42 Command-line Interface
 
-The Code42 command-line interface (CLI) offers a way to interact with your Code42 environment without using the Code42 console or making API calls directly. 
+The Code42 command-line interface (CLI) offers a way to interact with your Code42 environment without using the Code42 console or making API calls directly.
 
 For more information, see the full [Code42 CLI documentation](https://clidocs.code42.com).
