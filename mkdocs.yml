@@ -24,6 +24,8 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+    custom_dir: docs/overrides
+
 
 repo_name: code42/incydr_python
 repo_url: https://github.com/code42/incydr_python
@@ -31,7 +33,7 @@ edit_uri: ""
 
 nav:
   - Introduction: 'index.md'
-  - API Reference: 'api/index.html'
+  - API Reference: 'api.md'
   - SDK:
     - Introduction: 'sdk/index.md'
     - Client: 'sdk/client.md'
@@ -100,6 +102,9 @@ markdown_extensions:
 
 extra_css:
 - css/custom.css
+
+extra_javascript:
+  - javascripts/redoc.standalone.js
 
 plugins:
   - autorefs
