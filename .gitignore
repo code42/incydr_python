@@ -40,3 +40,8 @@ coverage.xml
 # docs build files
 site/
 *.csv
+
+# node
+package-lock.json
+package.json
+node_modules/

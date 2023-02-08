@@ -41,7 +41,7 @@ The commands listed below are unavailable in the Incydr CLI and do not currently
 
 * Backup data is not included in `devices list` and `devices show`.
 * `send-to` commands are not available.  Server logging is now done with the `--output PROTOCOL:HOSTNAME:PORT` option on the `alerts search`, `audit-log search`, and `file-event search` commands.
-* `departing-employee`, `high-risk-employee`, and `detection-lists` commands have been deprecated in the original CLI and not available. Use [Watchlist](watchlists.md) commands instead.
+* `departing-employee`, `high-risk-employee`, and `detection-lists` commands have been deprecated in the original CLI and not available. Use [Watchlist](cmds/watchlists.md) commands instead.
 * The V1 file event data model is no longer supported. The Incydr CLI uses the latest V2 file event data model.  Previously, you had to opt into this by enabling the `use-v2-file-events` profile setting in the Code42 CLI.
 * User token authentication via a username and password is no longer supported. Use API clients for authentication.
 * File event checkpointing now stores the original query it was run with and subsequent runs with the same checkpoint will ignore any additional filters.  All queries require a `--start` value as fallback for the `checkpoint`.
