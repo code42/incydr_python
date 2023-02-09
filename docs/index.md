@@ -62,7 +62,7 @@ For more information, see the full [Incydr CLI tool documentation](cli/index.md)
 ## Preservation Tools
 
 !!! note
-    The following resources provide preservation capabilities unsupported in the Incydr SDK but will no longer being updated with the latest security functionality.  Security customers should use the Incydr SDK for all integration needs.
+    The following resources provide preservation capabilities unavailable in the Incydr SDK. They will no longer be updated with the latest security functionality. Use the Incydr SDK for all security-related use cases.
 
 ### Py42
 
