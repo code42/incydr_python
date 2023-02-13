@@ -21,7 +21,7 @@ The Code42 REST API is available for a wide variety of use cases, from performin
 * Complex workflow applications where Python isn't available
 * Applications where direct control over options is a necessity
 
-Code42 API access is included with any licensed subscription of a Code42 product. See our [reference documentation](/api/) for the complete schema and methods available.
+Code42 API access is included with any licensed subscription of a Code42 product. See our [reference documentation](api/) for the complete schema and methods available.
 
 ## Incydr SDK
 
@@ -34,7 +34,7 @@ We welcome submissions of code as well as ideas to our open source [GitHub repos
 
 ### Python SDK
 
-The Incydr SDK provides a Python client for interacting with the [Code42 Incydr API](https://developer.code42.com/api) library.
+The Incydr SDK provides a Python client for interacting with the [Code42 Incydr API](api/).
 
 #### Example Use Cases
 
