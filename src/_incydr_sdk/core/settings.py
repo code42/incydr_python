@@ -162,7 +162,8 @@ class IncydrSettings(BaseSettings):
 
         if not hasattr(logger, "_incydr"):
             warnings.warn(
-                "A custom logger has been set, all other log-related settings on the `incydr.Client` are ignored for custom loggers."
+                "A custom logger has been set, all other log-related settings on the `incydr.Client` are ignored for custom loggers.",
+                stacklevel=2,
             )
             return values
 
