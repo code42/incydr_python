@@ -12,6 +12,7 @@ theme:
         - navigation.instant
         - navigation.tracking
         - content.code.annotate
+        - navigation.indexes
     palette:
     - scheme: default
 #    # Palette toggle for light mode
@@ -78,9 +79,11 @@ nav:
         - Trusted Activites: 'cli/cmds/trusted_activities.md'
         - Watchlists: 'cli/cmds/watchlists.md'
   - Guides:
-    - Microsoft Sentinel:
-      - Data Collector API: 'guides/azure-sentinel-data-collector.md'
-      - Log Analytics Agent: 'guides/azure-sentinel-log-analytics.md'
+      - Introduction: 'integration-guides/index.md'
+      - Microsoft Sentinel:
+        - 'integration-guides/sentinel/introduction.md'
+        - Data Collector API: 'integration-guides/sentinel/azure-sentinel-data-collector.md'
+        - Log Analytics Agent: 'integration-guides/sentinel/azure-sentinel-log-analytics.md'
 
 markdown_extensions:
   - attr_list
