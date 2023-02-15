@@ -37,7 +37,7 @@ $ pip install 'incydr[cli]'
 $ pip install 'incydr[all]'.
 ```
 
-For more details see the [SDK Documentation](docs/sdk/index.md) and the [CLI Documentation](docs/cli/getting_started.md).
+For more details see the [SDK Documentation](https://developer.code42.com/sdk/) and the [CLI Documentation](https://developer.code42.com/cli/).
 
 ## License
 
