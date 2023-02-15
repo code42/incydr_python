@@ -81,7 +81,7 @@ nav:
   - Guides:
       - Introduction: 'integration-guides/index.md'
       - Microsoft Sentinel:
-        - 'integration-guides/sentinel/introduction.md'
+        - Introduction: 'integration-guides/sentinel/introduction.md'
         - Data Collector API: 'integration-guides/sentinel/azure-sentinel-data-collector.md'
         - Log Analytics Agent: 'integration-guides/sentinel/azure-sentinel-log-analytics.md'
 
