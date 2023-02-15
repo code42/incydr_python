@@ -10,9 +10,7 @@ The Incydr SDK is a Python client for interacting with the [Code42 Incydr API](h
 It provides a thin wrapper around the [Requests](https://requests.readthedocs.io/en/latest/) HTTP library with
 helper clients that model Code42 data and validate requests with the help of [Pydantic](https://pydantic-docs.helpmanual.io).
 
-**This project is currently in BETA and subject to breaking changes prior to the 1.0 release.**
-
-Documentation during the beta can be found at https://code42.github.io/incydr_python
+Documentation during the beta can be found at https://developer.code42.com
 
 **Table of Contents**
 
