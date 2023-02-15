@@ -1,4 +1,4 @@
-### Prepare your environment:
+### Prepare your environment
 
 - [Install py42 into your Python environment](https://py42docs.code42.com/en/stable/userguides/gettingstarted.html#installation)
 - [Create a Code42 API Client](https://support.code42.com/Incydr/Admin/Code42_console_reference/API_clients) to authenticate py42. The `Alerts Read` permission is required to query alerts.
@@ -9,7 +9,7 @@
 <b>NOTE:</b> Workspace ID and Keys can be found in your Log Analytics Workspace Settings under <b>Agents Management</b> > <b>Log Analytics agent instructions</b>.
 </aside>
 
-### Writing the script:
+### Writing the script
 
 First, import the py42 SDK client and required classes for building your Alert query:
 

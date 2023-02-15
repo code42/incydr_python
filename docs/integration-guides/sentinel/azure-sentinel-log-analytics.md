@@ -1,5 +1,5 @@
 
-### Prepare your environment:
+### Prepare your environment
 
 - Install the [Azure Log Analytics Agent](https://learn.microsoft.com/en-us/azure/azure-monitor/agents/log-analytics-agent)
 - Install the [Code42 CLI](https://clidocs.code42.com/en/stable/userguides/gettingstarted.html)
