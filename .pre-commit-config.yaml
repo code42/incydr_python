@@ -26,5 +26,6 @@ repos:
         - id: fix-byte-order-marker
         - id: trailing-whitespace
         - id: end-of-file-fixer
+          exclude: CNAME
         - id: check-yaml
           args: ['--unsafe']
