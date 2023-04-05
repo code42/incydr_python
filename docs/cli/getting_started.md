@@ -23,7 +23,7 @@ The following values should be present in one of the above locations:
 ```bash
 INCYDR_API_CLIENT_ID='api-client-key'
 INCYDR_API_CLIENT_SECRET='api-client-secret'
-INCYDR_URL='code42.api.url'
+INCYDR_URL='https://code42.api.url'
 ```
 
 See [Incydr SDK Settings](../sdk/settings.md) for more available settings.
