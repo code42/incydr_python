@@ -14,3 +14,4 @@
 ### Fixed
 
 - Bug in the `user_risk_profile` client, where `get_page()` was using the incorrect query param for the page number.
+- Bug in `AuditEventsPage` model that prevented some audit log events from being parsed correctly.
