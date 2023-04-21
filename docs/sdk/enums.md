@@ -21,6 +21,29 @@ open_alert_state = alerts.AlertState.OPEN
 !!! note
     Incydr SDK's enums all inherit from Python's `str` class.  The `str` value for each enum can be used wherever that enum class is expected.
 
+## Agents
+
+### Agent Type
+
+::: incydr.enums.agents.AgentType
+    :docstring:
+
+* **CODE42AAT** = `"CODE42AAT"`
+* **CODE42** = `"CODE42"`
+* **COMBINED** = `"COMBINED"`
+
+### Agents Sort Keys
+
+::: incydr.enums.agents.SortKeys
+    :docstring:
+
+* **NAME** = `"NAME"`
+* **USER_ID** = `"USER_ID"`
+* **AGENT_TYPE** = `"AGENT_TYPE"`
+* **OS_HOSTNAME** = `"OS_HOSTNAME"`
+* **LAST_CONNECTED** = `"LAST_CONNECTED"`
+* **OS_NAME** = `"OS_NAME"`
+
 ## Alerts
 
 ### Alert Severity
