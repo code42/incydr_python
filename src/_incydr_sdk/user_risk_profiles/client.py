@@ -97,7 +97,7 @@ class UserRiskProfilesV1:
         """
         page_size = page_size or self._parent.settings.page_size
         data = QueryUserRiskProfilesRequest(
-            page_num=page_num,
+            page=page_num,
             page_size=page_size,
             manager_id=manager_id,
             title=title,
