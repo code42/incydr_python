@@ -1,15 +1,18 @@
 from itertools import count
-from typing import Optional, Union, List, Iterator
+from typing import Iterator
+from typing import List
+from typing import Optional
+from typing import Union
 
 import requests
 
-from .models import Agent
-from .models import SortKeys
-from .models import AgentType
-from .models import AgentsPage
-from .models import QueryAgentsRequest
-from .models import AgentUpdateRequest
 from ..enums import SortDirection
+from .models import Agent
+from .models import AgentsPage
+from .models import AgentType
+from .models import AgentUpdateRequest
+from .models import QueryAgentsRequest
+from .models import SortKeys
 
 
 class AgentsV1:

@@ -11,7 +11,8 @@ from rich.progress import track
 from _incydr_cli import console
 from _incydr_cli import logging_options
 from _incydr_cli import render
-from _incydr_cli.cmds.models import AgentCSV, AgentJSON
+from _incydr_cli.cmds.models import AgentCSV
+from _incydr_cli.cmds.models import AgentJSON
 from _incydr_cli.cmds.options.output_options import columns_option
 from _incydr_cli.cmds.options.output_options import input_format_option
 from _incydr_cli.cmds.options.output_options import single_format_option
@@ -20,8 +21,8 @@ from _incydr_cli.cmds.options.output_options import table_format_option
 from _incydr_cli.cmds.options.output_options import TableFormat
 from _incydr_cli.core import IncydrCommand
 from _incydr_cli.core import IncydrGroup
-from _incydr_sdk.core.client import Client
 from _incydr_sdk.agents.models import Agent
+from _incydr_sdk.core.client import Client
 from _incydr_sdk.utils import model_as_card
 
 
@@ -205,7 +206,7 @@ def process_batch(client: Client, batch: List[str], activate: bool):
                 )
                 batch = list(set(batch) - set(invalid_agent_ids))
                 if len(batch) > 0:
-                    console.print(f"Removing invalid agent_ids and retrying...")
+                    console.print("Removing invalid agent_ids and retrying...")
                     try:
                         api_call(batch)
                     except requests.HTTPError as err:

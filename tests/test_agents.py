@@ -7,11 +7,11 @@ import requests
 from pytest_httpserver import HTTPServer
 
 from _incydr_cli.main import incydr
-from incydr.models import Agent
-from incydr.models import AgentsPage
+from incydr import Client
 from incydr.enums import SortDirection
 from incydr.enums.agents import SortKeys
-from incydr import Client
+from incydr.models import Agent
+from incydr.models import AgentsPage
 
 TEST_AGENT_ID = "agent-1"
 
@@ -289,7 +289,11 @@ def test_cli_show_when_custom_params_makes_expected_call(
 
 
 def test_cli_bulk_activate_CSV_file_input(httpserver_auth: HTTPServer, runner):
-    csv_lines = ("agent_id,some_extra_column\n", "1234,not_relevant\n", "2345,extra_data\n")
+    csv_lines = (
+        "agent_id,some_extra_column\n",
+        "1234,not_relevant\n",
+        "2345,extra_data\n",
+    )
 
     httpserver_auth.expect_request(
         uri="/v1/agents/activate", method="POST", json={"agentIds": ["1234", "2345"]}
@@ -304,7 +308,10 @@ def test_cli_bulk_activate_CSV_file_input(httpserver_auth: HTTPServer, runner):
 
 
 def test_cli_bulk_activate_JSON_file_input(httpserver_auth: HTTPServer, runner):
-    json_lines = ({"agent_id": "1234", "extra": "not_relevant"}, {"agentId": "2345", "extra": "ignore"})
+    json_lines = (
+        {"agent_id": "1234", "extra": "not_relevant"},
+        {"agentId": "2345", "extra": "ignore"},
+    )
 
     httpserver_auth.expect_request(
         uri="/v1/agents/activate", method="POST", json={"agentIds": ["1234", "2345"]}
@@ -315,13 +322,19 @@ def test_cli_bulk_activate_JSON_file_input(httpserver_auth: HTTPServer, runner):
             for line in json_lines:
                 json.dump(line, tmpfile)
                 tmpfile.write("\n")
-        result = runner.invoke(incydr, ["agents", "bulk-activate", "--format", "json-lines", "tmpfile"])
+        result = runner.invoke(
+            incydr, ["agents", "bulk-activate", "--format", "json-lines", "tmpfile"]
+        )
         httpserver_auth.check()
         assert "Activating agents..." in result.output
 
 
 def test_cli_bulk_deactivate_CSV_file_input(httpserver_auth: HTTPServer, runner):
-    csv_lines = ("agent_id,some_extra_column\n", "1234,not_relevant\n", "2345,extra_data\n")
+    csv_lines = (
+        "agent_id,some_extra_column\n",
+        "1234,not_relevant\n",
+        "2345,extra_data\n",
+    )
 
     httpserver_auth.expect_request(
         uri="/v1/agents/deactivate", method="POST", json={"agentIds": ["1234", "2345"]}
@@ -336,7 +349,10 @@ def test_cli_bulk_deactivate_CSV_file_input(httpserver_auth: HTTPServer, runner)
 
 
 def test_cli_bulk_deactivate_JSON_file_input(httpserver_auth: HTTPServer, runner):
-    json_lines = ({"agent_id": "1234", "extra": "not_relevant"}, {"agentId": "2345", "extra": "ignore"})
+    json_lines = (
+        {"agent_id": "1234", "extra": "not_relevant"},
+        {"agentId": "2345", "extra": "ignore"},
+    )
 
     httpserver_auth.expect_request(
         uri="/v1/agents/deactivate", method="POST", json={"agentIds": ["1234", "2345"]}
@@ -347,16 +363,22 @@ def test_cli_bulk_deactivate_JSON_file_input(httpserver_auth: HTTPServer, runner
             for line in json_lines:
                 json.dump(line, tmpfile)
                 tmpfile.write("\n")
-        result = runner.invoke(incydr, ["agents", "bulk-deactivate", "--format", "json-lines", "tmpfile"])
+        result = runner.invoke(
+            incydr, ["agents", "bulk-deactivate", "--format", "json-lines", "tmpfile"]
+        )
         httpserver_auth.check()
         assert "Deactivating agents..." in result.output
 
 
-def test_cli_bulk_activate_retries_with_agent_ids_not_found_removed(httpserver_auth: HTTPServer, runner):
+def test_cli_bulk_activate_retries_with_agent_ids_not_found_removed(
+    httpserver_auth: HTTPServer, runner
+):
     input_lines = "\n".join(("agent_id", "1234", "5678", "2345", "9876"))
 
     httpserver_auth.expect_request(
-        uri="/v1/agents/activate", method="POST", json={"agentIds": ["1234", "5678", "2345", "9876"]}
+        uri="/v1/agents/activate",
+        method="POST",
+        json={"agentIds": ["1234", "5678", "2345", "9876"]},
     ).respond_with_json(response_json={"agentsNotFound": ["5678", "9876"]}, status=404)
     # order of agentIds in CLI requests aren't deterministic for retries because of usage of sets
     httpserver_auth.expect_request(
@@ -366,16 +388,25 @@ def test_cli_bulk_activate_retries_with_agent_ids_not_found_removed(httpserver_a
         uri="/v1/agents/activate", method="POST", json={"agentIds": ["2345", "1234"]}
     ).respond_with_data(status=204)
 
-    result = runner.invoke(incydr, ["agents", "bulk-activate", "--format", "csv", "-"], input=input_lines)
-    assert "404 Error processing batch of 4 agent activations, agent_ids not found: ['5678', '9876']" in result.output
+    result = runner.invoke(
+        incydr, ["agents", "bulk-activate", "--format", "csv", "-"], input=input_lines
+    )
+    assert (
+        "404 Error processing batch of 4 agent activations, agent_ids not found: ['5678', '9876']"
+        in result.output
+    )
     assert "Activating agents..." in result.output
 
 
-def test_cli_bulk_activate_retries_ids_individually_when_unknown_error_occurs(httpserver_auth: HTTPServer, runner):
+def test_cli_bulk_activate_retries_ids_individually_when_unknown_error_occurs(
+    httpserver_auth: HTTPServer, runner
+):
     input_lines = "\n".join(("agent_id", "1234", "5678", "2345", "9876"))
 
     httpserver_auth.expect_request(
-        uri="/v1/agents/activate", method="POST", json={"agentIds": ["1234", "5678", "2345", "9876"]}
+        uri="/v1/agents/activate",
+        method="POST",
+        json={"agentIds": ["1234", "5678", "2345", "9876"]},
     ).respond_with_data(response_data="Unknown Server Error", status=500)
     httpserver_auth.expect_request(
         uri="/v1/agents/activate", method="POST", json={"agentIds": ["1234"]}
@@ -390,18 +421,26 @@ def test_cli_bulk_activate_retries_ids_individually_when_unknown_error_occurs(ht
         uri="/v1/agents/activate", method="POST", json={"agentIds": ["9876"]}
     ).respond_with_data(status=204)
 
-    result = runner.invoke(incydr, ["agents", "bulk-activate", "--format", "csv", "-"], input=input_lines)
+    result = runner.invoke(
+        incydr, ["agents", "bulk-activate", "--format", "csv", "-"], input=input_lines
+    )
     assert "Unknown error processing batch of 4 agent activations" in result.output
     assert "Trying agent activation for this batch individually" in result.output
     assert "Activating agents..." in result.output
-    assert "Failed to process activation for 5678: Unknown Server Error" in result.output
+    assert (
+        "Failed to process activation for 5678: Unknown Server Error" in result.output
+    )
 
 
-def test_cli_bulk_deactivate_retries_with_agent_ids_not_found_removed(httpserver_auth: HTTPServer, runner):
+def test_cli_bulk_deactivate_retries_with_agent_ids_not_found_removed(
+    httpserver_auth: HTTPServer, runner
+):
     input_lines = "\n".join(("agent_id", "1234", "5678", "2345", "9876"))
 
     httpserver_auth.expect_request(
-        uri="/v1/agents/deactivate", method="POST", json={"agentIds": ["1234", "5678", "2345", "9876"]}
+        uri="/v1/agents/deactivate",
+        method="POST",
+        json={"agentIds": ["1234", "5678", "2345", "9876"]},
     ).respond_with_json(response_json={"agentsNotFound": ["5678", "9876"]}, status=404)
     # order of agentIds in CLI requests aren't deterministic for retries because of usage of sets
     httpserver_auth.expect_request(
@@ -411,16 +450,25 @@ def test_cli_bulk_deactivate_retries_with_agent_ids_not_found_removed(httpserver
         uri="/v1/agents/deactivate", method="POST", json={"agentIds": ["2345", "1234"]}
     ).respond_with_data(status=204)
 
-    result = runner.invoke(incydr, ["agents", "bulk-deactivate", "--format", "csv", "-"], input=input_lines)
-    assert "404 Error processing batch of 4 agent deactivations, agent_ids not found: ['5678', '9876']" in result.output
+    result = runner.invoke(
+        incydr, ["agents", "bulk-deactivate", "--format", "csv", "-"], input=input_lines
+    )
+    assert (
+        "404 Error processing batch of 4 agent deactivations, agent_ids not found: ['5678', '9876']"
+        in result.output
+    )
     assert "Deactivating agents..." in result.output
 
 
-def test_cli_bulk_deactivate_retries_ids_individually_when_unknown_error_occurs(httpserver_auth: HTTPServer, runner):
+def test_cli_bulk_deactivate_retries_ids_individually_when_unknown_error_occurs(
+    httpserver_auth: HTTPServer, runner
+):
     input_lines = "\n".join(("agent_id", "1234", "5678", "2345", "9876"))
 
     httpserver_auth.expect_request(
-        uri="/v1/agents/deactivate", method="POST", json={"agentIds": ["1234", "5678", "2345", "9876"]}
+        uri="/v1/agents/deactivate",
+        method="POST",
+        json={"agentIds": ["1234", "5678", "2345", "9876"]},
     ).respond_with_data(response_data="Unknown Server Error", status=500)
     httpserver_auth.expect_request(
         uri="/v1/agents/deactivate", method="POST", json={"agentIds": ["1234"]}
@@ -435,8 +483,12 @@ def test_cli_bulk_deactivate_retries_ids_individually_when_unknown_error_occurs(
         uri="/v1/agents/deactivate", method="POST", json={"agentIds": ["9876"]}
     ).respond_with_data(status=204)
 
-    result = runner.invoke(incydr, ["agents", "bulk-deactivate", "--format", "csv", "-"], input=input_lines)
+    result = runner.invoke(
+        incydr, ["agents", "bulk-deactivate", "--format", "csv", "-"], input=input_lines
+    )
     assert "Unknown error processing batch of 4 agent deactivations" in result.output
     assert "Trying agent deactivation for this batch individually" in result.output
     assert "Deactivating agents..." in result.output
-    assert "Failed to process deactivation for 5678: Unknown Server Error" in result.output
+    assert (
+        "Failed to process deactivation for 5678: Unknown Server Error" in result.output
+    )

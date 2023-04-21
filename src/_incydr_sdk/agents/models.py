@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from _incydr_sdk.enums import _Enum
 from typing import List
 from typing import Optional
 
@@ -10,10 +9,12 @@ from pydantic import Field
 from pydantic import validator
 
 from _incydr_sdk.core.models import ResponseModel
+from _incydr_sdk.enums import _Enum
 
 
 class SortKeys(_Enum):
     """Possible keys to sort agents list results by."""
+
     NAME = "NAME"
     USER_ID = "USER_ID"
     AGENT_TYPE = "AGENT_TYPE"
@@ -24,6 +25,7 @@ class SortKeys(_Enum):
 
 class AgentType(_Enum):
     """Possible types of agents."""
+
     CODE42AAT = "CODE42AAT"
     COMBINED = "COMBINED"
     CODE42 = "CODE42"
@@ -49,6 +51,7 @@ class Agent(ResponseModel):
     * **creation_date**: `datetime` The time the agent was first registered.
     * **modification_date**: `datetime` The time the agent's database entry was last updated.
     """
+
     agent_id: Optional[str] = Field(alias="agentId")
     name: Optional[str]
     user_id: Optional[str] = Field(alias="userId")
@@ -75,6 +78,7 @@ class AgentsPage(ResponseModel):
     * **page_size**: `int` The maximum number of agents returned in query results page.
     * **page_num**: `int` The current page number of the query result set.
     """
+
     agents: List[Agent]
     total_count: int = Field(alias="totalCount")
     page_size: int = Field(alias="pageSize")
@@ -96,7 +100,7 @@ class QueryAgentsRequest(BaseModel):
     page: Optional[int]
 
     @validator("srtDir")
-    def _validate(cls, value):
+    def _validate(cls, value):  # noqa
         value = str(value).upper()
         assert value in ("ASC", "DESC")
         return value
