@@ -2,12 +2,13 @@
 #
 # SPDX-License-Identifier: MIT
 from . import models
+from . import enums
 from _incydr_sdk.__version__ import __version__
 from _incydr_sdk.core.client import Client
 from _incydr_sdk.queries.alerts import AlertQuery
 from _incydr_sdk.queries.file_events import EventQuery
 
-__all__ = ["__version__", "Client", "AlertQuery", "EventQuery", "models"]
+__all__ = ["__version__", "Client", "AlertQuery", "EventQuery", "models", "enums"]
 
 __locals = locals()
 for __name in __all__:
