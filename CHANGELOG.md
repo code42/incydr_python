@@ -13,7 +13,7 @@
 
 ### Added
 
-- Better error messaging when authentication parameters or env vars missing when instantiating the `incydr.Client` or running CLI commands. 
+- Better error messaging when authentication parameters or env vars missing when instantiating the `incydr.Client` or running CLI commands.
 - Missing authentication parameters (`url`, `api_client_id`, or `api_client_secret`) causes client to raise new exception type: `AuthMissingError`.
 - `incydr.exceptions` module has been added to the public API.
 

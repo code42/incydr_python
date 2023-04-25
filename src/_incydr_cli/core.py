@@ -1,6 +1,5 @@
 import difflib
 import re
-from textwrap import dedent
 
 import click
 from requests import HTTPError
@@ -79,15 +78,10 @@ class ExceptionHandlingGroup(IncydrGroup):
             missing_vars = "\n".join(
                 f"  - INCYDR_{key.upper()}" for key in err.error_keys
             )
-            msg = dedent(
-                f"""Missing authentication variables in environment.
-
-                {missing_vars}
-
-                See https://developer.code42.com/cli/getting_started/#authentication
-                """
+            msg = (
+                f"Missing authentication variables in environment.\n\n{missing_vars}"
+                "\n\nSee https://developer.code42.com/cli/getting_started/#authentication"
             )
-
             settings.logger.error(msg)
             raise IncydrCLIException(msg)
 
