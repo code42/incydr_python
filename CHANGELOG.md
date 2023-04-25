@@ -9,7 +9,15 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
-## 1.0.1 2023-04-21
+## 1.0.2 - Unreleased
+
+### Added
+
+- Better error messaging when authentication parameters or env vars missing when instantiating the `incydr.Client` or running CLI commands. 
+- Missing authentication parameters (`url`, `api_client_id`, or `api_client_secret`) causes client to raise new exception type: `AuthMissingError`.
+- `incydr.exceptions` module has been added to the public API.
+
+## 1.0.1 - 2023-04-21
 
 ### Fixed
 

@@ -1,8 +1,12 @@
+from os import environ
 from urllib.parse import urlencode
 
 import pytest
 from click.testing import CliRunner
 from pytest_httpserver import HTTPServer
+
+# ensure environment is clean of incydr env vars that might throw off tests
+environ.clear()
 
 TEST_SERVER_ADDRESS = "127.0.0.1:8042"
 TEST_HOST = f"http://{TEST_SERVER_ADDRESS}"

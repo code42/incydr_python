@@ -1,12 +1,14 @@
 import difflib
 import re
+from textwrap import dedent
 
 import click
 from requests import HTTPError
 
 from _incydr_cli.exceptions import IncydrCLIException
 from _incydr_cli.exceptions import LoggedCLIError
-from _incydr_sdk.core.client import Client
+from _incydr_sdk.core.settings import IncydrSettings
+from _incydr_sdk.exceptions import AuthMissingError
 from _incydr_sdk.exceptions import IncydrException
 
 _DIFFLIB_CUT_OFF = 0.6
@@ -64,6 +66,7 @@ class ExceptionHandlingGroup(IncydrGroup):
         return super().make_context(info_name, args, parent=parent, **extra)
 
     def invoke(self, ctx):
+        settings = IncydrSettings(url="", api_client_id="", api_client_secret="")
         try:
             return super().invoke(ctx)
         except click.UsageError as err:
@@ -72,24 +75,37 @@ class ExceptionHandlingGroup(IncydrGroup):
             raise
         except click.exceptions.Exit:
             raise
+        except AuthMissingError as err:
+            missing_vars = "\n".join(
+                f"  - INCYDR_{key.upper()}" for key in err.error_keys
+            )
+            msg = dedent(
+                f"""Missing authentication variables in environment.
+
+                {missing_vars}
+
+                See https://developer.code42.com/cli/getting_started/#authentication
+                """
+            )
+
+            settings.logger.error(msg)
+            raise IncydrCLIException(msg)
+
         except IncydrException as err:
             # log error and raise custom error to print error message to console
-            client = Client(skip_auth=True)
-            client._log_error(err, self._original_args)
+            settings._log_error(err, self._original_args)
             raise IncydrCLIException(err.args[0])
         except click.ClickException:
             raise
         except HTTPError as err:
             # log error with traceback and print error code with brief error message to console
-            client = Client(skip_auth=True)
-            client._log_verbose_error(self._original_args, err.request)
+            settings._log_verbose_error(self._original_args, err.request)
             raise LoggedCLIError(err.args[0])
         except OSError:
             raise
         except Exception:
             # log error with traceback and print message pointing user to logs
-            client = Client(skip_auth=True)
-            client._log_verbose_error(self._original_args)
+            settings._log_verbose_error(self._original_args)
             raise LoggedCLIError("Unknown problem occurred.")
 
     @staticmethod
