@@ -1,8 +1,10 @@
+import os
 from urllib.parse import urlencode
 
 import pytest
 from click.testing import CliRunner
 from pytest_httpserver import HTTPServer
+
 
 TEST_SERVER_ADDRESS = "127.0.0.1:8042"
 TEST_HOST = f"http://{TEST_SERVER_ADDRESS}"
@@ -28,9 +30,17 @@ TEST_USER = {
 }
 
 
+@pytest.fixture(autouse=True)
+def clean_environment(mocker):
+    mocker.patch.dict(os.environ, clear=True)
+
+
 @pytest.fixture(scope="session")
 def runner():
-    return CliRunner()
+    cli_runner = CliRunner()
+    # prevent local .env files from interfering with tests
+    with cli_runner.isolated_filesystem():
+        yield cli_runner
 
 
 @pytest.fixture(scope="session")
