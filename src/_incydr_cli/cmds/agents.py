@@ -29,7 +29,11 @@ from _incydr_sdk.utils import model_as_card
 @click.group(cls=IncydrGroup)
 @logging_options
 def agents():
-    """View and manage Incydr agents."""
+    """
+    View and manage Incydr agents.
+
+    Incydr agents run on the endpoints in your environment and monitor for insider risk activity.
+    """
 
 
 @agents.command("list", cls=IncydrCommand)
