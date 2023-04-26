@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import List
 from typing import Optional
 
-from pydantic import BaseModel
 from pydantic import Field
 from rich.markdown import Markdown
 
+from _incydr_sdk.core.models import Model
 from _incydr_sdk.core.models import ResponseModel
 
 
@@ -125,8 +125,8 @@ class UserRiskProfilesPage(ResponseModel):
     )
 
 
-class QueryUserRiskProfilesRequest(BaseModel):
-    page_num: Optional[int]
+class QueryUserRiskProfilesRequest(Model):
+    page: Optional[int]
     page_size: Optional[int]
     manager_id: Optional[str]
     title: Optional[str]
@@ -144,7 +144,7 @@ class QueryUserRiskProfilesRequest(BaseModel):
         use_enum_values = True
 
 
-class UpdateUserRiskProfileRequest(BaseModel):
+class UpdateUserRiskProfileRequest(Model):
     endDate: Optional[Date] = None
     notes: Optional[str] = Field(
         None,
@@ -154,14 +154,14 @@ class UpdateUserRiskProfileRequest(BaseModel):
     startDate: Optional[Date] = None
 
 
-class AddCloudAliasesRequest(BaseModel):
+class AddCloudAliasesRequest(Model):
     cloudAliases: Optional[List[str]] = None
     userId: Optional[str] = Field(
         None, description="The ID of the user to add cloud aliases.", example="123"
     )
 
 
-class DeleteCloudAliasesRequest(BaseModel):
+class DeleteCloudAliasesRequest(Model):
     cloudAliases: Optional[List[str]] = None
     userId: Optional[str] = Field(
         None, description="The ID of the user to delete cloud aliases.", example="123"
