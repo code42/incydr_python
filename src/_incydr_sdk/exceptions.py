@@ -1,6 +1,3 @@
-from textwrap import dedent
-
-import pydantic
 from pydantic import ValidationError
 
 
