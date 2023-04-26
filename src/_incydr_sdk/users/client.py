@@ -237,6 +237,8 @@ class UsersV1:
 
         * **user_id**: `str` (required) - The unique ID for the user.
         * **roles**: `str | List[str]` The roles to remove from the user. Accepts either role IDs or role names."
+
+        **Returns**: A `requests.Response` indicating success.
         """
         roles = self._update_role_ids_for_user(roles, user_id, add=False)
         response = self._parent.session.put(
@@ -268,7 +270,6 @@ class UsersV1:
         * **user_id**: `str` (required) - The unique ID for the user.
 
         **Returns**: A `requests.Response` indicating success.
-
         """
         return self._parent.session.post(f"/v1/users/{user_id}/activate")
 
@@ -281,7 +282,6 @@ class UsersV1:
         * **user_id**: `str` (required) - The unique ID for the user.
 
         **Returns**: A `requests.Response` indicating success.
-
         """
         return self._parent.session.post(f"/v1/users/{user_id}/deactivate")
 
@@ -291,7 +291,7 @@ class UsersV1:
 
         **Parameters**:
 
-        **Returns**: A list of [`UserRole`][role-model] objects.
+        **Returns**: A list of [`Role`][role-model] objects.
         """
         response = self._parent.session.get("/v1/users/roles")
         return parse_obj_as(List[Role], response.json())
@@ -303,6 +303,8 @@ class UsersV1:
         **Parameters**:
 
         * **role**: `str` (required) - Role ID or role name (case-sensitive).
+
+        **Returns**: A [`Role`](role-model) object.
         """
         response = self._parent.session.get(
             f"/v1/users/roles/{self._get_id_by_name(role)}"

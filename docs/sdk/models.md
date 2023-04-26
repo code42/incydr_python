@@ -14,6 +14,19 @@
 See [Pydantic documentation](https://pydantic-docs.helpmanual.io/usage/models/#model-properties) for full list of
 available model methods.
 
+## Agents
+---
+
+### `Agent` model
+
+::: incydr.models.Agent
+    :docstring:
+
+### `AgentsPage` model
+
+::: incydr.models.AgentsPage
+    :docstring:
+
 ## Alerts
 ---
 

@@ -36,7 +36,7 @@ class DevicesV1:
     def get_device(self, device_id: str) -> Device:
         """Get a single device.
 
-        **Parameters:**
+        **Parameters**:
 
         * **device_id**: `str` (required) - The unique ID for the device.
 
