@@ -139,14 +139,21 @@ TEST_EVENT_1 = {
         ],
         "trusted": False,
         "trustReason": None,
+        "untrustedValues": {
+            "accountNames": ["testAccount"],
+            "domains": ["dropbox.com"],
+            "gitRepositoryUris": ["github.com/example"],
+            "slackWorkspaces": ["exampleSlack"],
+            "urlPaths": ["example.com/test"],
+        },
     },
     "git": {
-        "event_id": "1234",
-        "last_commit_hash": "abcd-1234",
-        "repository_email": "gituser@example.com",
-        "repository_endpoint_path": "/test/repo",
-        "repository_uri": "git@example.com",
-        "repository_user": "Git User",
+        "eventId": "1234",
+        "lastCommitHash": "abcd-1234",
+        "repositoryEmail": "gituser@example.com",
+        "repositoryEndpointPath": "/test/repo",
+        "repositoryUri": "git@example.com",
+        "repositoryUser": "Git User",
     },
 }
 
@@ -285,7 +292,22 @@ TEST_EVENT_2 = {
         "score": 11,
         "severity": "CRITICAL",
         "trust_reason": None,
+        "untrusted_values": {
+            "account_names": ["testAccount"],
+            "domains": ["dropbox.com"],
+            "git_repository_uris": ["github.com/example"],
+            "slack_workspaces": ["exampleSlack"],
+            "url_paths": ["example.com/test"],
+        },
         "trusted": False,
+    },
+    "git": {
+        "event_id": "1234",
+        "last_commit_hash": "abcd-1234",
+        "repository_email": "gituser@example.com",
+        "repository_endpoint_path": "/test/repo",
+        "repository_uri": "git@example.com",
+        "repository_user": "Git User",
     },
 }
 
