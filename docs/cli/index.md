@@ -25,6 +25,7 @@ correspond to request parameters.
 
 The following subcommand groups are available under the `incydr` command:
 
+* [Agents](cmds/agents.md)
 * [Alert Rules](cmds/alert_rules.md)
 * [Alerts](cmds/alerts.md)
 * [Audit Log](cmds/audit_log.md)

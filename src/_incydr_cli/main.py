@@ -8,6 +8,7 @@ from requests.exceptions import HTTPError
 
 from _incydr_cli import console
 from _incydr_cli import logging_options
+from _incydr_cli.cmds.agents import agents
 from _incydr_cli.cmds.alert_rules import alert_rules
 from _incydr_cli.cmds.alerts import alerts
 from _incydr_cli.cmds.audit_log import audit_log
@@ -66,6 +67,7 @@ def incydr(version, python, script_dir):
                 sys.exit(0)
 
 
+incydr.add_command(agents)
 incydr.add_command(alerts)
 incydr.add_command(alert_rules)
 incydr.add_command(audit_log)
