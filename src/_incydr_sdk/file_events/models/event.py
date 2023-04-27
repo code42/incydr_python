@@ -9,6 +9,59 @@ from _incydr_sdk.core.models import ResponseModel
 from _incydr_sdk.enums.file_events import ReportType
 
 
+class AcquiredFromGit(Model):
+    repository_email: Optional[str] = Field(
+        None,
+        alias="repositoryEmail",
+        title="The email address specified by the user who performed the Git event. This is a user-defined value and may differ from the credentials used to sign in to Git.",
+    )
+    repository_uri: Optional[str] = Field(
+        None,
+        alias="repositoryUri",
+        title="Uniform Resource Identifier (URI) for the Git repository.",
+    )
+    repository_user: Optional[str] = Field(
+        None,
+        alias="repositoryUser",
+        title="The username specified by the user who performed the Git event. This is a user-defined value and may differ from the credentials used to sign in to Git.",
+    )
+
+
+class AcquiredFromSourceUser(Model):
+    email: Optional[List[str]] = Field(
+        None,
+        example=["first.last@example.com", "first_last_example_com"],
+        title="For endpoint events where a file in cloud storage is synced to a device, the email address of the user logged in to the cloud storage provider.",
+    )
+
+
+class UntrustedValues(Model):
+    account_names: List[str] = Field(
+        ...,
+        alias="accountNames",
+        title="Account names that do not match an entry in your list of Trusted activity. Values are obtained from the account name metadata for the event. Only applies to event types that are evaluated for trust.",
+    )
+    domains: List[str] = Field(
+        ...,
+        title="Domains that do not match an entry in your list of Trusted activity. Values are obtained from the domain section of related metadata for the event. Only applies to event types that are evaluated for trust.",
+    )
+    git_repository_uris: List[str] = Field(
+        ...,
+        alias="gitRepositoryUris",
+        title="Git URIs that do not match an entry in your list of Trusted activity. Values are obtained from the Git URI metadata for the event. Only applies to event types that are evaluated for trust.",
+    )
+    slack_workspaces: List[str] = Field(
+        ...,
+        alias="slackWorkspaces",
+        title="Slack workspaces that do not match an entry in your list of Trusted activity. Values are obtained from the Slack metadata for the event. Only applies to event types that are evaluated for trust.",
+    )
+    url_paths: List[str] = Field(
+        ...,
+        alias="urlPaths",
+        title="URL paths that do not match an entry in your list of Trusted activity. Values are obtained from the URL metadata for the event. Only applies to event types that are evaluated for trust.",
+    )
+
+
 class DestinationEmail(Model):
     recipients: Optional[List[str]] = Field(
         description="The email addresses of those who received the email. Includes the To, Cc, and Bcc recipients.",
@@ -144,6 +197,9 @@ class RiskIndicator(Model):
         description="Name of the risk indicator.",
         example="Browser upload",
     )
+    id: Optional[str] = Field(
+        None, title="The unique identifier for the risk indicator."
+    )
     weight: Optional[int] = Field(
         description="Configured weight of the risk indicator at the time this event was seen.",
         example=5,
@@ -208,63 +264,74 @@ class User(Model):
 
 
 class AcquiredFrom(Model):
-    agent_timestamp: Optional[datetime] = Field(
-        None,
-        alias="agentTimestamp",
-        description="Date and time that the Code42 service on the device detected an event; based on the device’s system clock and reported in Coordinated Universal Time (UTC).",
-        example="2020-10-27T15:16:05.369203Z",
-    )
-    event_action: Optional[str] = Field(
-        None,
-        alias="eventAction",
-        description="The type of file event observed. For example: file-modified, application-read, removable-media-created.",
-        example="file-downloaded",
-    )
     event_id: Optional[str] = Field(
         None,
         alias="eventId",
-        description="The unique identifier for the event.",
         example="0_147e9445-2f30-4a91-8b2a-9455332e880a_973435567569502913_986467523038446097_163",
+        title="The unique identifier for the event.",
     )
-    file_name: Optional[str] = Field(
-        None,
-        alias="fileName",
-        description="The name of the file, including the file extension.",
-        example="example.txt",
+    tabs: Optional[List[Tab]] = Field(
+        None, title="Metadata about the browser tab source."
     )
-    md5: Optional[str] = Field(
+    source_account_name: Optional[str] = Field(
         None,
-        description="The MD5 hash of the file contents.",
-        example="6123bbce7f3937667a368bbb9f3d79ce",
+        alias="sourceAccountName",
+        title="For cloud sync apps installed on user devices, the name of the cloud account where the event was observed. This can help identify if the activity occurred in a business or personal account.",
+    )
+    source_account_type: Optional[str] = Field(
+        None,
+        alias="sourceAccountType",
+        title="For cloud sync apps installed on user devices, the type of account where the event was observed. For example, 'BUSINESS' or 'PERSONAL'.",
     )
     source_category: Optional[str] = Field(
         None,
         alias="sourceCategory",
-        description="General category of where the file originated. For example: Cloud Storage, Email, Social Media.",
         example="Social Media",
-    )
-    source_domains: Optional[List[str]] = Field(
-        None,
-        alias="sourceDomains",
-        description="The domain section of the URLs reported in file.acquiredFrom.tabs.url.",
-        example="example.com",
+        title="General category of where the file originated. For example: Cloud Storage, Email, Social Media.",
     )
     source_name: Optional[str] = Field(
         None,
         alias="sourceName",
-        description="The name reported by the device's operating system.  This may be different than the device name in the Code42 console.",
         example="Mari's MacBook",
+        title="The name reported by the device's operating system.  This may be different than the device name in the Code42 console.",
     )
-    tabs: Optional[List[Tab]] = Field(
+    source_user: Optional[AcquiredFromSourceUser] = Field(None, alias="sourceUser")
+    agent_timestamp: Optional[datetime] = Field(
         None,
-        description="Metadata about the browser tab source.",
+        alias="agentTimestamp",
+        example="2020-10-27T15:16:05.369203Z",
+        title="Date and time that the Code42 service on the device detected an event; based on the device’s system clock and reported in Coordinated Universal Time (UTC).",
     )
     user_email: Optional[str] = Field(
         None,
         alias="userEmail",
-        description="The Code42 username used to sign in to the Code42 app on the device (for endpoint events) or the cloud service username of the person who caused the event (for cloud events).",
         example="cody@example.com",
+        title="The Code42 username used to sign in to the Code42 app on the device (for endpoint events) or the cloud service username of the person who caused the event (for cloud events).",
     )
+    event_action: Optional[str] = Field(
+        None,
+        alias="eventAction",
+        example="file-downloaded",
+        title="The type of file event observed. For example: file-modified, application-read, removable-media-created.",
+    )
+    source_domains: Optional[List[str]] = Field(
+        None,
+        alias="sourceDomains",
+        example="example.com",
+        title="The domain section of the URLs reported in file.acquiredFrom.tabs.url.",
+    )
+    file_name: Optional[str] = Field(
+        None,
+        alias="fileName",
+        example="example.txt",
+        title="The name of the file, including the file extension.",
+    )
+    md5: Optional[str] = Field(
+        None,
+        example="6123bbce7f3937667a368bbb9f3d79ce",
+        title="The MD5 hash of the file contents.",
+    )
+    git: Optional[AcquiredFromGit] = None
 
 
 class Destination(Model):
@@ -326,6 +393,11 @@ class Destination(Model):
     user: Optional[DestinationUser] = Field(
         description="Metadata about the destination user."
     )
+    remote_hostname: Optional[str] = Field(
+        None,
+        alias="remoteHostname",
+        title="For events where a file transfer tool was used, the destination hostname.",
+    )
 
 
 class File(Model):
@@ -366,6 +438,12 @@ class File(Model):
         description="The file location on the user's device; a forward or backslash must be included at the end of the filepath. Possibly null if the file event occurred on a cloud provider.",
         example="/Users/alix/Documents/",
     )
+    original_directory: Optional[str] = Field(
+        None,
+        alias="originalDirectory",
+        example="/Users/alix/Documents/",
+        title="The original file location on the user’s device or cloud service location; a forward or backslash must be included at the end of the filepath. Possibly null if the file event occurred on a cloud provider.",
+    )
     directory_id: Optional[List[str]] = Field(
         alias="directoryId",
         description="Unique identifiers of the parent drives that contain the file; searching on directoryId will return events for all of the files contained in the parent drive.",
@@ -393,6 +471,12 @@ class File(Model):
     name: Optional[str] = Field(
         description="The name of the file, including the file extension.",
         example="ReadMe.md",
+    )
+    original_name: Optional[str] = Field(
+        None,
+        alias="originalName",
+        example="ReadMe.md",
+        title="The original name of the file, including the file extension.",
     )
     owner: Optional[str] = Field(
         description="The name of the user who owns the file as reported by the device's file system.",
@@ -428,6 +512,7 @@ class Risk(Model):
         description="Indicates whether or not the file activity is trusted based on your Data Preferences settings.",
         example=True,
     )
+    untrusted_values: UntrustedValues = Field(..., alias="untrustedValues")
 
 
 class Source(Model):
@@ -538,6 +623,11 @@ class Event(Model):
     observer: Optional[str] = Field(
         description="The data source that captured the file event. For example: GoogleDrive, Office365, Salesforce.",
         example="Endpoint",
+    )
+    detector_display_name: Optional[str] = Field(
+        None,
+        alias="detectorDisplayName",
+        title="Indicates the name you provided when the cloud data connection was initially configured in the Code42 console.",
     )
     related_events: Optional[List[RelatedEvent]] = Field(
         alias="relatedEvents",
