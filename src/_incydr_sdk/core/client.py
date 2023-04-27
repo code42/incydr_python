@@ -8,6 +8,7 @@ from requests_toolbelt import user_agent
 from requests_toolbelt.sessions import BaseUrlSession
 
 from _incydr_sdk.__version__ import __version__
+from _incydr_sdk.agents.client import AgentsClient
 from _incydr_sdk.alert_rules.client import AlertRulesClient
 from _incydr_sdk.alerts.client import AlertsClient
 from _incydr_sdk.audit_log.client import AuditLogClient
@@ -92,6 +93,7 @@ class Client:
 
         self._session.hooks["response"] = [response_hook]
 
+        self._agents = AgentsClient(self)
         self._alerts = AlertsClient(self)
         self._alert_rules = AlertRulesClient(self)
         self._audit_log = AuditLogClient(self)
@@ -153,6 +155,16 @@ class Client:
             'https://api.us.code42.com/v1/users'
         """
         return self._session
+
+    @property
+    def agents(self):
+        """
+        Property returning an [`AgentsClient`](../agents) for interacting with
+        `/v*/agents` API endpoints.
+        Usage:
+            >>> client.agents.v1.get_page()
+        """
+        return self._agents
 
     @property
     def alerts(self):

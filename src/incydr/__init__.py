@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2022-present Code42 Software <integrations@code42.com>
 #
 # SPDX-License-Identifier: MIT
+from . import enums
 from . import models
 from _incydr_sdk import exceptions
 from _incydr_sdk.__version__ import __version__

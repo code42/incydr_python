@@ -24,3 +24,26 @@ class UserJSON(Model):
     @property
     def user(self):
         return self.userId or self.username
+
+
+class AgentCSV(CSVModel):
+    agent_id: str = Field(csv_aliases=["agent_id", "agentId", "guid"])
+
+
+class AgentJSON(Model):
+    agent_id: Optional[str]
+
+    @root_validator(pre=True)
+    def _validate(cls, values):  # noqa
+        if "agent_id" in values:
+            return values
+        elif "agentId" in values:
+            values["agent_id"] = values["agentId"]
+            return values
+        elif "guid" in values:
+            values["agent_id"] = values["guid"]
+            return values
+        else:
+            raise ValueError(
+                "A json key of 'agent_id', 'agentId', or 'guid' is required"
+            )
