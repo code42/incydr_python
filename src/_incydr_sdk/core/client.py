@@ -1,14 +1,11 @@
 import base64
 import json
 import logging
-import re
-import traceback
 from collections import deque
-from textwrap import indent
 
+import pydantic
 from requests_toolbelt import user_agent
 from requests_toolbelt.sessions import BaseUrlSession
-from requests_toolbelt.utils.dump import dump_response
 
 from _incydr_sdk.__version__ import __version__
 from _incydr_sdk.agents.client import AgentsClient
@@ -22,6 +19,7 @@ from _incydr_sdk.customer.client import CustomerClient
 from _incydr_sdk.departments.client import DepartmentsClient
 from _incydr_sdk.devices.client import DevicesClient
 from _incydr_sdk.directory_groups.client import DirectoryGroupsClient
+from _incydr_sdk.exceptions import AuthMissingError
 from _incydr_sdk.file_events.client import FileEventsClient
 from _incydr_sdk.trusted_activities.client import TrustedActivitiesClient
 from _incydr_sdk.user_risk_profiles.client import UserRiskProfiles
@@ -29,7 +27,6 @@ from _incydr_sdk.users.client import UsersClient
 from _incydr_sdk.watchlists.client import WatchlistsClient
 
 _base_user_agent = user_agent("incydr", __version__)
-_auth_header_regex = re.compile(r"Authorization: (Bearer|Basic) \S+")
 
 
 class Client:
@@ -58,12 +55,20 @@ class Client:
         skip_auth: bool = False,
         **settings_kwargs,
     ):
-        self._settings = IncydrSettings(
-            url=url,
-            api_client_id=api_client_id,
-            api_client_secret=api_client_secret,
-            **settings_kwargs,
-        )
+        try:
+            self._settings = IncydrSettings(
+                url=url,
+                api_client_id=api_client_id,
+                api_client_secret=api_client_secret,
+                **settings_kwargs,
+            )
+        except pydantic.ValidationError as err:
+            auth_keys = {"api_client_id", "api_client_secret", "url"}
+            error_keys = {e["loc"][0] for e in err.errors()}
+            if auth_keys & error_keys:
+                raise AuthMissingError(err)
+            else:
+                raise
         self._request_history = deque(maxlen=self._settings.max_response_history)
 
         self._session = BaseUrlSession(base_url=self._settings.url)
@@ -79,9 +84,9 @@ class Client:
         def response_hook(response, *args, **kwargs):
             level = self._settings.log_level
             if level == logging.INFO:
-                self._log_response_info(response)
+                self.settings._log_response_info(response)
             if level == logging.DEBUG:
-                self._log_response_debug(response)
+                self.settings._log_response_debug(response)
 
             self._request_history.appendleft(response)
             response.raise_for_status()
@@ -310,46 +315,3 @@ class Client:
             >>> client.watchlists.v1.get_page()
         """
         return self._watchlists
-
-    def _log_response_info(self, response):
-        self._settings.logger.info(
-            f"{response.request.method} {response.request.url} status_code={response.status_code}"
-        )
-
-    def _log_response_debug(self, response):
-        try:
-            dumped = dump_response(
-                response, request_prefix=b"", response_prefix=b""
-            ).decode("utf-8")
-            dumped = re.sub(
-                _auth_header_regex,
-                "Authorization: <token_redacted>",
-                dumped,
-            )
-            if not self._settings.use_rich:
-                dumped = indent(dumped, prefix="\t")
-            self._settings.logger.debug(dumped)
-        except Exception as err:
-            self._settings.logger.debug(f"Error dumping request/response info: {err}")
-            self._settings.logger.debug(response)
-
-    def _log_error(self, err, invocation_str=None):
-        message = str(err) if err else None
-        if invocation_str:
-            message = f"Exception occurred from input: '{invocation_str}'.\n" + message
-        if message:
-            self._settings.logger.error(message)
-
-    def _log_verbose_error(self, invocation_str=None, http_request=None):
-        """For logging traces, invocation strs, and request parameters during exceptions to the
-        error log file."""
-        prefix = (
-            "Exception occurred."
-            if not invocation_str
-            else f"Exception occurred from input: '{invocation_str}'."
-        )
-        message = f"{prefix}. See error below."
-        self._log_error(message)
-        self._log_error(traceback.format_exc())
-        if http_request:
-            self._log_error(f"Request parameters: {http_request.body}")

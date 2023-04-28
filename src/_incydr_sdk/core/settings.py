@@ -1,8 +1,10 @@
 import logging
+import re
 import sys
 import warnings
 from io import IOBase
 from pathlib import Path
+from textwrap import indent
 from typing import Union
 
 from pydantic import BaseSettings
@@ -10,6 +12,7 @@ from pydantic import Field
 from pydantic import root_validator
 from pydantic import SecretStr
 from pydantic import validator
+from requests_toolbelt.utils.dump import dump_response
 from rich import pretty
 from rich.console import Console
 from rich.logging import RichHandler
@@ -36,6 +39,8 @@ _std_log_formatter = logging.Formatter(
     fmt="%(asctime)s - %(name)s:%(levelname)s - %(message)s", datefmt="[%x %X]"
 )
 _rich_log_formatter = logging.Formatter(fmt="%(message)s", datefmt="[%x %X]")
+
+_auth_header_regex = re.compile(r"Authorization: (Bearer|Basic) \S+")
 
 
 class IncydrSettings(BaseSettings):
@@ -153,7 +158,7 @@ class IncydrSettings(BaseSettings):
             raise ValueError(f"{value} is not a `logging.Logger`.")
 
     @root_validator(skip_on_failure=True)
-    def configure_logging(cls, values):  # noqa
+    def _configure_logging(cls, values):  # noqa
         use_rich = values["use_rich"]
         log_file = values["log_file"]
         log_stderr = values["log_stderr"]
@@ -200,3 +205,44 @@ class IncydrSettings(BaseSettings):
         logger.setLevel(log_level)
         values["logger"] = logger
         return values
+
+    def _log_response_info(self, response):
+        self.logger.info(
+            f"{response.request.method} {response.request.url} status_code={response.status_code}"
+        )
+
+    def _log_response_debug(self, response):
+        try:
+            dumped = dump_response(
+                response, request_prefix=b"", response_prefix=b""
+            ).decode("utf-8")
+            dumped = re.sub(
+                _auth_header_regex,
+                "Authorization: <token_redacted>",
+                dumped,
+            )
+            if not self.use_rich:
+                dumped = indent(dumped, prefix="\t")
+            self.logger.debug(dumped)
+        except Exception as err:
+            self.logger.debug(f"Error dumping request/response info: {err}")
+            self.logger.debug(response)
+
+    def _log_error(self, err, invocation_str=None):
+        message = str(err) if err else None
+        if invocation_str:
+            message = f"Exception occurred from input: '{invocation_str}'.\n" + message
+        if message:
+            self.logger.error(message)
+
+    def _log_verbose_error(self, invocation_str=None, http_request=None):
+        """For logging traces, invocation strs, and request parameters during exceptions to the
+        error log file."""
+        prefix = (
+            "Exception occurred."
+            if not invocation_str
+            else f"Exception occurred from input: '{invocation_str}'."
+        )
+        self.logger.exception(f"{prefix}. See error below.")
+        if http_request:
+            self._log_error(f"Request parameters: {http_request.body}")

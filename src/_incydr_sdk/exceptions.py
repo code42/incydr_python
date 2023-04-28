@@ -1,7 +1,27 @@
+from pydantic import ValidationError
+
+
 class IncydrException(Exception):
     """Base class for all Incydr specific exceptions."""
 
     ...
+
+
+class AuthMissingError(ValidationError, IncydrException):
+    def __init__(self, validation_error: ValidationError):
+        self.pydantic_error = str(validation_error)
+        super().__init__(validation_error.raw_errors, validation_error.model)
+
+    @property
+    def error_keys(self):
+        return [e["loc"][0] for e in self.errors()]
+
+    def __str__(self):
+        return (
+            f"{self.pydantic_error}\n\n"
+            "Pass required args to the `incydr.Client` or set required values in your environment.\n\n"
+            "See https://developer.code42.com/sdk/settings for more details."
+        )
 
 
 class WatchlistNotFoundError(IncydrException):

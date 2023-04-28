@@ -9,10 +9,13 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
-## 1.1.0 (Unreleased)
+## 1.1.0 - (Unreleased)
 
 ### Added
 
+- Better error messaging when authentication parameters or env vars missing when instantiating the `incydr.Client` or running CLI commands.
+- Missing authentication parameters (`url`, `api_client_id`, or `api_client_secret`) causes client to raise new exception type: `AuthMissingError`.
+- `incydr.exceptions` module has been added to the public API.
 - Support for [Agents APIs](https://developer.code42.com/api/#tag/Agents), including:
   - An `agents.v1` client to the SDK with the following methods:
     - `client.agents.v1.get_page()` to query a single page of agents.
@@ -26,8 +29,11 @@
     - `incydr agents show` to show the details of a given agent by ID.
     - `incydr agents bulk-activate` to activate a set of agents from CSV or JSON-LINES file input.
     - `incydr agents bulk-deactivate` to deactivate a set of agents from CSV or JSON-LINES file input.
+- New search terms on the [incydr.enums.file_events.EventSearchTerm](https://developer.code42.com/sdk/enums/#event-search-terms) enum, enabling full support for querying the latest file event fields.
+- New file event field models: `AcquiredFromGit`, `AcquiredFromSourceUser`, `UntrustedValues`.
+- Various other additions to existing model fields.
 
-## 1.0.1 2023-04-21
+## 1.0.1 - 2023-04-21
 
 ### Fixed
 
