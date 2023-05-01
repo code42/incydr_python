@@ -28,7 +28,7 @@ client = incydr.Client(
 ```
 
 Any arguments that are not provided to the `incydr.Client` will attempt to be loaded from environment variables or
-   .env files. See [Settings](/settings) for more details
+   .env files. See [Settings](/sdk/settings) for more details
 
 
 The [`incydr.Client`](client.md) provides helper methods that map to each API action described in the
