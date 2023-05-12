@@ -2,6 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 import click
+from boltons.iterutils import chunked
 from rich.progress import track
 from rich.table import Table
 
@@ -312,21 +313,21 @@ def add(
 
     # Add included users
     if users:
-        client.watchlists.v1.add_included_users(
-            watchlist, _get_user_ids(client, users, format_=format_)
-        )
-        console.print(
-            f"Successfully included users on watchlist with ID: '{watchlist}'"
-        )
+        user_ids = _get_user_ids(client, users, format_=format_)
+        for chunk in chunked(user_ids, size=100):
+            client.watchlists.v1.add_included_users(watchlist, chunk)
+            console.print(
+                f"Successfully included {len(chunk)} users on watchlist with ID: '{watchlist}'"
+            )
 
-    # Add excluded users
+        # Add excluded users
     if excluded_users:
-        client.watchlists.v1.add_excluded_users(
-            watchlist, _get_user_ids(client, excluded_users, format_=format_)
-        )
-        console.print(
-            f"Successfully excluded users from watchlist with ID: '{watchlist}'"
-        )
+        user_ids = _get_user_ids(client, excluded_users, format_=format_)
+        for chunk in chunked(user_ids, size=100):
+            client.watchlists.v1.add_excluded_users(watchlist, chunk)
+            console.print(
+                f"Successfully excluded {len(chunk)} users from watchlist with ID: '{watchlist}'"
+            )
 
     # Add departments
     if departments:
@@ -410,21 +411,21 @@ def remove(
 
     # Remove included users
     if users:
-        client.watchlists.v1.remove_included_users(
-            watchlist, _get_user_ids(client, users, format_=format_)
-        )
-        console.print(
-            f"Successfully removed included users on watchlist with ID: '{watchlist}'"
-        )
+        user_ids = _get_user_ids(client, users, format_=format_)
+        for chunk in chunked(user_ids, size=100):
+            client.watchlists.v1.remove_included_users(watchlist, chunk)
+            console.print(
+                f"Successfully removed {len(chunk)} included users on watchlist with ID: '{watchlist}'"
+            )
 
     # Remove excluded users
     if excluded_users:
-        client.watchlists.v1.remove_excluded_users(
-            watchlist, _get_user_ids(client, excluded_users, format_=format_)
-        )
-        console.print(
-            f"Successfully removed excluded users from watchlist with ID: '{watchlist}'"
-        )
+        user_ids = _get_user_ids(client, excluded_users, format_=format_)
+        for chunk in chunked(user_ids, size=100):
+            client.watchlists.v1.remove_excluded_users(watchlist, chunk)
+            console.print(
+                f"Successfully removed {len(chunk)} excluded users from watchlist with ID: '{watchlist}'"
+            )
 
     # Remove departments
     if departments:
