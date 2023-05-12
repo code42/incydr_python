@@ -2,6 +2,7 @@ import datetime
 import json
 from urllib.parse import urlencode
 
+import pydantic
 import pytest
 from pytest_httpserver import HTTPServer
 from pytest_lazyfixture import (
@@ -393,6 +394,16 @@ def test_add_included_users_returns_expected_data(
     )
 
 
+def test_add_included_users_raises_validation_error_when_more_than_100_users_passed(
+    httpserver_auth: HTTPServer,
+):
+    c = Client()
+    with pytest.raises(pydantic.ValidationError):
+        c.watchlists.v1.add_included_users(
+            watchlist_id=TEST_WATCHLIST_ID, user_ids=list(range(101))
+        )
+
+
 @valid_ids_param
 def test_remove_included_users_returns_expected_data(
     httpserver_auth: HTTPServer, input, expected
@@ -406,6 +417,16 @@ def test_remove_included_users_returns_expected_data(
         c.watchlists.v1.remove_included_users(TEST_WATCHLIST_ID, input).status_code
         == 200
     )
+
+
+def test_remove_included_users_raises_validation_error_when_more_than_100_users_passed(
+    httpserver_auth: HTTPServer,
+):
+    c = Client()
+    with pytest.raises(pydantic.ValidationError):
+        c.watchlists.v1.remove_included_users(
+            watchlist_id=TEST_WATCHLIST_ID, user_ids=list(range(101))
+        )
 
 
 def test_get_included_user_returns_expected_data(mock_get_included_user):
@@ -880,6 +901,30 @@ def test_cli_update_departments_and_directory_groups_makes_expected_call(
     result = runner.invoke(
         incydr,
         ["watchlists", command, TEST_WATCHLIST_ID, "--" + option, ",".join(GROUPS)],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+@pytest.mark.parametrize("action", [("add", "add"), ("remove", "delete")])
+def test_cli_update_users_batches_by_100(httpserver_auth: HTTPServer, runner, action):
+    USER_IDS = [f"user-{i}" for i in range(150)]
+
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-users/{action[1]}",
+        method="POST",
+        json={"userIds": USER_IDS[:100], "watchlistId": TEST_WATCHLIST_ID},
+    ).respond_with_data()
+
+    httpserver_auth.expect_request(
+        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-users/{action[1]}",
+        method="POST",
+        json={"userIds": USER_IDS[100:], "watchlistId": TEST_WATCHLIST_ID},
+    ).respond_with_data()
+
+    result = runner.invoke(
+        incydr,
+        ["watchlists", action[0], TEST_WATCHLIST_ID, "--users", ",".join(USER_IDS)],
     )
     httpserver_auth.check()
     assert result.exit_code == 0
