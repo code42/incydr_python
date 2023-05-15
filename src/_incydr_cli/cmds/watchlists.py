@@ -308,6 +308,9 @@ def add(
 
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
+
+    If adding or excluding more than 100 users in a single run, the CLI will automatically batch
+    requests due to a limit of 100 per request on the backend.
     """
     client = Client()
 
@@ -406,6 +409,9 @@ def remove(
 
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
+
+    If removing more than users or exclusions in a single run, the CLI will automatically batch
+    requests due to a limit of 100 per request on the backend.
     """
     client = Client()
 
