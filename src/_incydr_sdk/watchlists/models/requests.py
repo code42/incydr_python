@@ -10,7 +10,9 @@ from _incydr_sdk.enums.watchlists import WatchlistType
 
 class UpdateExcludedUsersRequest(BaseModel):
     userIds: Optional[List[str]] = Field(
-        None, description="A list of user IDs to add or remove."
+        None,
+        description="A list of user IDs to add or remove.",
+        max_items=100,
     )
 
 
@@ -28,7 +30,9 @@ class UpdateIncludedDirectoryGroupsRequest(BaseModel):
 
 class UpdateIncludedUsersRequest(BaseModel):
     userIds: Optional[List[str]] = Field(
-        None, description="A list of user IDs to add or remove."
+        None,
+        description="A list of user IDs to add or remove.",
+        max_items=100,
     )
     watchlistId: Optional[str] = Field(
         None, description="A unique watchlist ID.", example="123"

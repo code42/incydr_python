@@ -2,6 +2,8 @@ from typing import Optional
 from uuid import UUID
 
 import click
+import requests
+from boltons.iterutils import chunked
 from rich.progress import track
 from rich.table import Table
 
@@ -307,26 +309,83 @@ def add(
 
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
+
+    If adding or excluding more than 100 users in a single run, the CLI will automatically batch
+    requests due to a limit of 100 per request on the backend.
     """
     client = Client()
 
     # Add included users
     if users:
-        client.watchlists.v1.add_included_users(
-            watchlist, _get_user_ids(client, users, format_=format_)
-        )
-        console.print(
-            f"Successfully included users on watchlist with ID: '{watchlist}'"
-        )
+        user_ids, errors = _get_user_ids(client, users, format_=format_)
+        succeeded = 0
+        for chunk in chunked(user_ids, size=100):
+            try:
+                client.watchlists.v1.add_included_users(watchlist, chunk)
+                console.print(
+                    f"Successfully included {len(chunk)} users on watchlist with ID: '{watchlist}'"
+                )
+                succeeded += len(chunk)
+            except requests.HTTPError as err:
+                if "User not found" in err.response.text:
+                    console.print(
+                        "Problem processing batch of users, will attempt each individually."
+                    )
+                    chunk_succeeded = 0
+                    for user in chunk:
+                        try:
+                            client.watchlists.v1.add_included_users(watchlist, user)
+                            succeeded += 1
+                            chunk_succeeded += 1
+                        except requests.HTTPError as err:
+                            client.settings.logger.error(
+                                f"Problem adding userId={user} to watchlist={watchlist}: {err.response.text}"
+                            )
+                            errors.append(user)
+                    console.print(
+                        f"Successfully included {chunk_succeeded} users on watchlist with ID: '{watchlist}'"
+                    )
+                else:
+                    raise err
+        if errors:
+            console.print("[red]The following usernames/user IDs were not found:")
+            console.print("\t" + "\n\t".join(errors))
 
     # Add excluded users
     if excluded_users:
-        client.watchlists.v1.add_excluded_users(
-            watchlist, _get_user_ids(client, excluded_users, format_=format_)
-        )
-        console.print(
-            f"Successfully excluded users from watchlist with ID: '{watchlist}'"
-        )
+        succeeded = 0
+        user_ids, errors = _get_user_ids(client, excluded_users, format_=format_)
+        for chunk in chunked(user_ids, size=100):
+            try:
+                client.watchlists.v1.add_excluded_users(watchlist, chunk)
+                console.print(
+                    f"Successfully excluded {len(chunk)} users from watchlist with ID: '{watchlist}'"
+                )
+                succeeded += len(chunk)
+            except requests.HTTPError as err:
+                if "User not found" in err.response.text:
+                    console.print(
+                        "Problem processing batch of users, will attempt each individually."
+                    )
+                    chunk_succeeded = 0
+                    for user in chunk:
+                        try:
+                            client.watchlists.v1.add_excluded_users(watchlist, user)
+                            succeeded += 1
+                            chunk_succeeded += 1
+                        except requests.HTTPError as err:
+                            client.settings.logger.error(
+                                f"Problem excluding userId={user} from watchlist={watchlist}: {err.response.text}"
+                            )
+                            errors.append(user)
+                    console.print(
+                        f"Successfully excluded {chunk_succeeded} users from watchlist with ID: '{watchlist}'"
+                    )
+                else:
+                    raise err
+        if errors:
+            console.print("[red]The following usernames/user IDs were not found:")
+            console.print("\t" + "\n\t".join(errors))
 
     # Add departments
     if departments:
@@ -405,26 +464,83 @@ def remove(
 
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
+
+    If removing more than users or exclusions in a single run, the CLI will automatically batch
+    requests due to a limit of 100 per request on the backend.
     """
     client = Client()
 
     # Remove included users
     if users:
-        client.watchlists.v1.remove_included_users(
-            watchlist, _get_user_ids(client, users, format_=format_)
-        )
-        console.print(
-            f"Successfully removed included users on watchlist with ID: '{watchlist}'"
-        )
+        user_ids, errors = _get_user_ids(client, users, format_=format_)
+        succeeded = 0
+        for chunk in chunked(user_ids, size=100):
+            try:
+                client.watchlists.v1.remove_included_users(watchlist, chunk)
+                console.print(
+                    f"Successfully removed {len(chunk)} included users on watchlist with ID: '{watchlist}'"
+                )
+                succeeded += len(chunk)
+            except requests.HTTPError as err:
+                if "User not found" in err.response.text:
+                    console.print(
+                        "Problem processing batch of users, will attempt each individually."
+                    )
+                    chunk_succeeded = 0
+                    for user in chunk:
+                        try:
+                            client.watchlists.v1.remove_included_users(watchlist, user)
+                            succeeded += 1
+                            chunk_succeeded += 1
+                        except requests.HTTPError as err:
+                            client.settings.logger.error(
+                                f"Problem removing userId={user} from watchlist={watchlist}: {err.response.text}"
+                            )
+                            errors.append(user)
+                    console.print(
+                        f"Successfully removed {chunk_succeeded} users from watchlist with ID: '{watchlist}'"
+                    )
+                else:
+                    raise err
+        if errors:
+            console.print("[red]The following usernames/user IDs were not found:")
+            console.print("\t" + "\n\t".join(errors))
 
     # Remove excluded users
     if excluded_users:
-        client.watchlists.v1.remove_excluded_users(
-            watchlist, _get_user_ids(client, excluded_users, format_=format_)
-        )
-        console.print(
-            f"Successfully removed excluded users from watchlist with ID: '{watchlist}'"
-        )
+        user_ids, errors = _get_user_ids(client, excluded_users, format_=format_)
+        succeeded = 0
+        for chunk in chunked(user_ids, size=100):
+            try:
+                client.watchlists.v1.remove_excluded_users(watchlist, chunk)
+                console.print(
+                    f"Successfully removed {len(chunk)} excluded users from watchlist with ID: '{watchlist}'"
+                )
+                succeeded += len(chunk)
+            except requests.HTTPError as err:
+                if "User not found" in err.response.text:
+                    console.print(
+                        "Problem processing batch of users, will attempt each individually."
+                    )
+                    chunk_succeeded = 0
+                    for user in chunk:
+                        try:
+                            client.watchlists.v1.remove_excluded_users(watchlist, user)
+                            succeeded += 1
+                            chunk_succeeded += 1
+                        except requests.HTTPError as err:
+                            client.settings.logger.error(
+                                f"Problem removing excluded userId={user} from watchlist={watchlist}: {err.response.text}"
+                            )
+                            errors.append(user)
+                    console.print(
+                        f"Successfully removed {chunk_succeeded} excluded users from watchlist with ID: '{watchlist}'"
+                    )
+                else:
+                    raise err
+            if errors:
+                console.print("[red]The following usernames/user IDs were not found:")
+                console.print("\t" + "\n\t".join(errors))
 
     # Remove departments
     if departments:
@@ -555,21 +671,36 @@ def list_departments(
 
 
 def _get_user_ids(client, users, format_=None):
+    ids, errors = [], []
     if isinstance(users, str):
-        ids = [user_lookup(client, i.strip()) for i in users.split(",")]
+        for user in users.split(","):
+            try:
+                user_id = user_lookup(client, user)
+                ids.append(user_id)
+            except ValueError:
+                client.settings.logger.error(
+                    f"Problem looking up userId for username: {user}"
+                )
+                errors.append(user)
     else:
         if format_ == "csv":
             users = UserCSV.parse_csv(users)
         else:
             users = UserJSON.parse_json_lines(users)
-        ids = []
         for row in track(
             users,
             description="Reading users...",
             transient=True,
         ):
-            ids.append(user_lookup(client, row.user))
-    return ids
+            try:
+                user_id = user_lookup(client, row.user)
+                ids.append(user_id)
+            except ValueError:
+                client.settings.logger.error(
+                    f"Problem looking up userId for username: {row.user}"
+                )
+                errors.append(row.user)
+    return ids, errors
 
 
 def _output_results(results, model, format_, columns=None):

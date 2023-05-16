@@ -207,7 +207,8 @@ class WatchlistsV1:
         **Parameters**:
 
         * **watchlist**: `str` (required) - Watchlist ID.
-        * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to include on the watchlist.
+        * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to include on the watchlist. A maximum
+            of 100 users can be processed in a single request.
 
         **Returns**: A `requests.Response` indicating success.
         """
@@ -226,7 +227,8 @@ class WatchlistsV1:
         **Parameters**:
 
         * **watchlist**: `str` (required) - Watchlist ID.
-        * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to remove from the watchlist.
+        * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to remove from the watchlist. A maximum
+            of 100 users can be processed in a single request.
 
         **Returns**: A `requests.Response` indicating success.
         """
@@ -278,7 +280,8 @@ class WatchlistsV1:
         **Parameters**:
 
         * **watchlist**: `str` (required) - Watchlist ID.
-        * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to exclude from the watchlist.
+        * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to exclude from the watchlist. A maximum
+            of 100 users can be processed in a single request.
 
         **Returns**: A `requests.Response` indicating success.
         """
@@ -296,7 +299,8 @@ class WatchlistsV1:
         **Parameters**:
 
         * **watchlist**: `str` (required) - Watchlist ID.
-        * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to remove from the exclusion list.
+        * **user_ids**: `str`, `List[str]` (required) - List of unique user IDs to remove from the exclusion list. A
+            maximum of 100 users can be processed in a single request.
 
         **Returns**: A `requests.Response` indicating success.
         """
