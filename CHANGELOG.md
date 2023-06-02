@@ -9,6 +9,11 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## 1.1.1 - 2023-06-02
+
+### Fixed
+- CLI `watchlists add|remove` commands for included and excluded users now batches requests to work around 100 user limit of backend API.
+
 ## 1.1.0 - 2023-05-01
 
 ### Added
