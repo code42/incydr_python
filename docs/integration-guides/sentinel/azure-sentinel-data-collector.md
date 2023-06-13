@@ -1,7 +1,7 @@
 ### Prepare your environment
 
 - [Install py42 into your Python environment](https://py42docs.code42.com/en/stable/userguides/gettingstarted.html#installation)
-- [Create a Code42 API Client](https://support.code42.com/Incydr/Admin/Code42_console_reference/API_clients) to authenticate py42. The `Alerts Read` permission is required to query alerts.
+- [Create a Code42 API Client](https://support.code42.com/hc/en-us/articles/14827617150231) to authenticate py42. The `Alerts Read` permission is required to query alerts.
 - Gather your Azure Log Analytics `Workspace ID` and either `Primary Key` or `Secondary Key` to authenticate requests pushing data into Sentinel.
 
 <aside style="margin: 30px">
