@@ -37,7 +37,7 @@ class Client:
 
     * **url**: `str` The url of your Incydr API gateway. See the [developer getting started guide](https://developer.code42.com/api/#section/User-Guides/Get-started)
         to find your API domain based on your console login URL.
-    * **api_client_id**: `str` The ID of your [Incydr API Client](https://support.code42.com/Incydr/Admin/Code42_console_reference/API_clients)
+    * **api_client_id**: `str` The ID of your [Incydr API Client](https://support.code42.com/hc/en-us/articles/14827617150231)
     * **api_client_secret**: `str` The Secret for your Incydr API Client.
 
     Usage example:
