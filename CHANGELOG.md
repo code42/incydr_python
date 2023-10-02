@@ -9,6 +9,12 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## 1.1.1 - 2023-10-03
+
+### Fixed
+
+- Pinned Pydantic version to major version `1.*` following the release of Pydantic 2.0.
+
 ## 1.1.0 - 2023-05-01
 
 ### Added

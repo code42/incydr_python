@@ -27,7 +27,7 @@ dependencies = [
   "requests",
   "requests-toolbelt",
   "rich",
-  "pydantic[dotenv]",
+  "pydantic[dotenv]==1.*",
   "isodate",
   "python-dateutil",
 ]
