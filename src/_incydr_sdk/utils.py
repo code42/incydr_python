@@ -174,7 +174,14 @@ def flatten_fields(model: Type[BaseModel]) -> Generator[str, None, None]:
     for name, field in model.__fields__.items():
         # the field.shape tells us if the field contains a single `BaseModel` or something like a `List[BaseModel]`
         # we can only traverse singleton models when flattening
-        if issubclass(field.type_, BaseModel) and field.shape == SHAPE_SINGLETON:
+        try:
+            is_subclass = issubclass(field.type_, BaseModel)
+        # TypeError is thrown if field.type_ is a Union type.
+        # Assumes our endpoints won't return a field that can be one of multiple models
+        # This would be a pretty odd API design anyway
+        except TypeError:
+            is_subclass = False
+        if field.shape == SHAPE_SINGLETON and is_subclass:
             for child_name in flatten_fields(field.type_):
                 yield f"{name}.{child_name}"
         else:

@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 from typing import Optional
+from typing import Union
 
 from pydantic import Field
 
@@ -15,7 +16,7 @@ class SearchFilter(ResponseModel):
         example="IS_NOT",
     )
     term: Optional[str] = Field(description="The field to match.", example="user.email")
-    value: Optional[str] = Field(
+    value: Optional[Union[List[str], str]] = Field(
         None, description="The input for the search.", example="ari@example.com"
     )
 
