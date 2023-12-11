@@ -9,6 +9,12 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## 1.1.2 - 2023-12-11
+
+### Fixed
+
+- Saved search filter values can now accept a list of strings.  Prior to this fix this was incorrectly resulting in a model validation error.
+
 ## 1.1.1 - 2023-10-03
 
 ### Fixed

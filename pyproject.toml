@@ -85,7 +85,7 @@ svg = "python docs/example_logging.py"
 
 
 [[tool.hatch.envs.test.matrix]]
-python = ["37", "38", "39", "310","311"]
+python = ["37", "38", "39", "310","311", "312"]
 [tool.hatch.envs.test]
 dependencies = [
   "pytest",
@@ -98,6 +98,7 @@ dependencies = [
   "python-dateutil",
 ]
 [tool.hatch.envs.test.scripts]
+debug = "pytest ./tests/test_file_events.py -s -k saved_search"
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=incydr"
 cov-report = "pytest --cov-report=xml:coverage.xml --cov-config=pyproject.toml --cov=incydr"
 no-cov = "cov --no-cov"
