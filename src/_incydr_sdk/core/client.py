@@ -43,7 +43,7 @@ class Client:
     Usage example:
 
         >>> import incydr
-        >>> client = incydr.Client(url="https://api.us.code42.com", api_client_id="<client_id>", api_client_secret="<client_secret>")
+        >>> client = incydr.Client(url="https://example.com", api_client_id="<client_id>", api_client_secret="<client_secret>")
 
     """
 
