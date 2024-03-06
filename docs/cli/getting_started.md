@@ -23,10 +23,10 @@ The following values should be present in one of the above locations:
 ```bash
 INCYDR_API_CLIENT_ID='api-client-key'
 INCYDR_API_CLIENT_SECRET='api-client-secret'
-INCYDR_URL='https://example.com'
+INCYDR_URL='api_domain'
 ```
 
-You must update the `INCYDR_URL` value for your specific environment. To find the correct value, identify the URL you use to sign in to the Code42 web console, then note the corresponding **API Domain** value in the table below. Use https for all API requests.
+You must update the `api_domain` value for your specific environment. To find the correct value, identify the URL you use to sign in to the Code42 web console, then note the corresponding **API Domain** value in the table below. Use https for all API requests.
 
 | Console Domain         | API Domain         |
 | ---------------------- | ------------------ |
