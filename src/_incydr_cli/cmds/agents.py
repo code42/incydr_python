@@ -57,7 +57,7 @@ def agents():
     default=None,
     help="Filter by unhealthy agents. Defaults to returning all unhealthy agents."
     " Pass a comma delimited list of health issue types to filter by unhealthy agents that have (at least) any "
-    "of the given health issue type(s). Example: NOT_CONNECTING.",
+    "of the given health issue type(s). Health issue types include the following: NOT_CONNECTING, NOT_SENDING_SECURITY_EVENTS.",
     cls=incompatible_with("healthy"),
 )
 @table_format_option
