@@ -37,6 +37,8 @@ class AgentsV1:
         sort_key: SortKeys = SortKeys.NAME,
         page_num: int = 1,
         page_size: int = 500,
+        agent_healthy: bool = None,
+        agent_health_issue_types: List[str] = None,
     ) -> AgentsPage:
         """
         Get a page of agents.
@@ -51,12 +53,16 @@ class AgentsV1:
         * **page_size**: `int` - Max number of results to return per page.
         * **sort_dir**: `SortDirection` - `asc` or `desc`. The direction in which to sort the response based on the corresponding key. Defaults to `asc`.
         * **sort_key**: `[SortKeys][agents-sort-keys]` - Values on which the response will be sorted. Defaults to agent name.
+        * **agent_healthy**: `bool | None` - Optionally retrieve agents with this health status. Agents that have no health issue types are considered healthy.
+        * **agent_health_issue_types**: `List[str] | str` - Optionally retrieve agents that have (at least) any of the given issue type(s). Example: `NOT_CONNECTING`
 
         **Returns**: An `[AgentsPage][agentspage-model]` object.
         """
         data = QueryAgentsRequest(
             active=active,
             agentType=agent_type,
+            agentHealthy=agent_healthy,
+            anyOfAgentHealthIssueTypes=agent_health_issue_types,
             srtDir=sort_dir,
             srtKey=sort_key,
             pageSize=page_size,
@@ -72,6 +78,8 @@ class AgentsV1:
         sort_dir: SortDirection = SortDirection.ASC,
         sort_key: SortKeys = SortKeys.NAME,
         page_size: int = 500,
+        agent_healthy: bool = None,
+        agent_health_issue_types: List[str] = None,
     ) -> Iterator[Agent]:
         """
         Iterate over all agents.
@@ -84,6 +92,8 @@ class AgentsV1:
             page = self.get_page(
                 active=active,
                 agent_type=agent_type,
+                agent_healthy=agent_healthy,
+                agent_health_issue_types=agent_health_issue_types,
                 sort_dir=sort_dir,
                 sort_key=sort_key,
                 page_num=page_num,

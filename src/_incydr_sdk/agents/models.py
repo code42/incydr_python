@@ -42,8 +42,11 @@ class Agent(ResponseModel):
     * **user_id**: `str` The unique ID of the user the agent is assigned to.
     * **os_hostname**: `str` The hostname reported by the OS the agent is running on.
     * **os_name**: `str` The name of the OS the agent is running on.
+    * **machine_id**: `str` Device machine ID.
+    * **serial_number**: `str` Authenticated agent serial number.
     * **active**: `bool` If the agent status is active.
     * **agent_type**: `[AgentType][agent-type]` The type of agent.
+    * **agent_health_issue_types: `List[str]` List of health issues with the agent.
     * **app_version**: `str` The app version of the agent.
     * **product_version**: `str` The product version of the agent.
     * **last_connected**: `datetime` The time the agent last connected to a Code42 Authority server.
@@ -57,8 +60,11 @@ class Agent(ResponseModel):
     user_id: Optional[str] = Field(alias="userId")
     os_hostname: Optional[str] = Field(alias="osHostname")
     os_name: Optional[str] = Field(alias="osName")
+    machine_id: Optional[str] = Field(alias="machineId")
+    serial_number: Optional[str] = Field(alias="serialNumber")
     active: Optional[bool]
     agent_type: Optional[AgentType] = Field(alias="agentType")
+    agent_health_issue_types: Optional[List[str]] = Field(alias="agentHealthIssueTypes")
     app_version: Optional[str] = Field(alias="appVersion")
     product_version: Optional[str] = Field(alias="productVersion")
     last_connected: Optional[datetime] = Field(alias="lastConnected")
@@ -93,7 +99,8 @@ class AgentUpdateRequest(BaseModel):
 class QueryAgentsRequest(BaseModel):
     active: Optional[bool]
     agentType: Optional[AgentType]
-    userId: Optional[str]
+    agentHealthy: Optional[bool]
+    anyOfAgentHealthIssueTypes: Optional[List[str]]
     srtKey: Optional[SortKeys]
     srtDir: Optional[str]
     pageSize: Optional[int]

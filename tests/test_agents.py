@@ -21,8 +21,11 @@ TEST_AGENT_1 = {
     "userId": "user-1",
     "osHostname": "DESKTOP-H6V9R95",
     "osName": "Win",
+    "machineId": "123",
+    "serialNumber": "A12B34",
     "active": True,
     "agentType": "COMBINED",
+    "agentHealthIssueTypes": ["NOT_CONNECTING"],
     "appVersion": "1.0",
     "productVersion": "2.0",
     "lastConnected": "2022-07-14T17:05:44.524000Z",
@@ -38,8 +41,11 @@ TEST_AGENT_2 = {
     "userId": "user-1",
     "osHostname": "DESKTOP-H6V9R95",
     "osName": "Win",
+    "machineId": "456",
+    "serialNumber": "A45B67",
     "active": True,
     "agentType": "COMBINED",
+    "agentHealthIssueTypes": [],
     "appVersion": "1.0",
     "productVersion": "2.0",
     "lastConnected": "2022-07-14T17:05:44.524000Z",
@@ -54,8 +60,11 @@ TEST_AGENT_3 = {
     "userId": "user-1",
     "osHostname": "DESKTOP-H6V9R95",
     "osName": "Win",
+    "machineId": "1",
+    "serialNumber": "C42",
     "active": True,
     "agentType": "COMBINED",
+    "agentHealthIssueTypes": [],
     "appVersion": "1.0",
     "productVersion": "2.0",
     "lastConnected": "2022-07-14T17:05:44.524000Z",
@@ -259,6 +268,7 @@ def test_cli_list_when_custom_params_makes_expected_call(
 ):
     query = {
         "active": True,
+        "agentHealthy": True,
         "srtKey": "NAME",
         "srtDir": "ASC",
         "pageSize": 500,
@@ -275,7 +285,63 @@ def test_cli_list_when_custom_params_makes_expected_call(
         uri="/v1/agents", method="GET", query_string=urlencode(query)
     ).respond_with_json(agents_data)
 
-    result = runner.invoke(incydr, ["agents", "list", "--active"])
+    result = runner.invoke(incydr, ["agents", "list", "--active", "--healthy"])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_list_when_unhealthy_option_passed_with_default_value_passes_no_issue_types(
+    httpserver_auth: HTTPServer, runner
+):
+    query = {
+        "agentHealthy": False,
+        "srtKey": "NAME",
+        "srtDir": "ASC",
+        "pageSize": 500,
+        "page": 1,
+    }
+
+    agents_data = {
+        "agents": [TEST_AGENT_1, TEST_AGENT_2],
+        "totalCount": 2,
+        "pageSize": 500,
+        "page": 1,
+    }
+    httpserver_auth.expect_request(
+        uri="/v1/agents", method="GET", query_string=urlencode(query)
+    ).respond_with_json(agents_data)
+
+    result = runner.invoke(incydr, ["agents", "list", "--unhealthy"])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_list_when_unhealthy_option_passed_with_string_parses_issue_types_correctly(
+    httpserver_auth: HTTPServer, runner
+):
+    query = [
+        ("agentHealthy", False),
+        ("anyOfAgentHealthIssueTypes", "NOT_CONNECTED"),
+        ("anyOfAgentHealthIssueTypes", "TEST_VALUE"),
+        ("srtKey", "NAME"),
+        ("srtDir", "ASC"),
+        ("pageSize", 500),
+        ("page", 1),
+    ]
+
+    agents_data = {
+        "agents": [TEST_AGENT_1, TEST_AGENT_2],
+        "totalCount": 2,
+        "pageSize": 500,
+        "page": 1,
+    }
+    httpserver_auth.expect_request(
+        uri="/v1/agents", method="GET", query_string=urlencode(query)
+    ).respond_with_json(agents_data)
+
+    result = runner.invoke(
+        incydr, ["agents", "list", "--unhealthy", "NOT_CONNECTED,TEST_VALUE"]
+    )
     httpserver_auth.check()
     assert result.exit_code == 0
 
