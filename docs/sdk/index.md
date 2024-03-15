@@ -21,11 +21,20 @@ Import the `incydr.Client` initialize with your Incydr API Client:
 import incydr
 
 client = incydr.Client(
-    url="https://api.us.code42.com",
+    url="api_domain",
     api_client_id="my_id",
     api_client_secret="my_secret" # (1)
 )
 ```
+
+You must update the `api_domain` value for your specific environment. To find the correct value, identify the URL you use to sign in to the Code42 web console, then note the corresponding **API Domain** value in the table below. Use https for all API requests.
+
+| Console Domain         | API Domain         |
+| ---------------------- | ------------------ |
+| console.us.code42.com  | api.us.code42.com  |
+| console.us2.code42.com | api.us2.code42.com |
+| console.ie.code42.com  | api.ie.code42.com  |
+| console.gov.code42.com | api.gov.code42.com |
 
 Any arguments that are not provided to the `incydr.Client` will attempt to be loaded from environment variables or
    .env files. See [Settings](/sdk/settings) for more details
