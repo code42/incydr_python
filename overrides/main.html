@@ -1,0 +1,13 @@
+{#-
+    Overrides base template to inject Redoc API reference page in the footer of the mkdocs page (but only on /api).
+    Using the footer section prevents the Redoc styling/layout from being affected by the Mkdocs content container
+    styling/layout.
+-#}
+{% extends "base.html" %}
+{% block footer %}
+    {% if page.url == "api/" %}
+        {% include "partials/redoc.html" %}
+    {% else %}
+        {{ super() }}
+    {% endif %}
+{% endblock %}
