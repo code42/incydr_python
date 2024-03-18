@@ -9,6 +9,26 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## 1.2.0 - 2024-3-18
+
+### Added
+
+- The following agent health related fields will be present on the response when retrieving agents:
+  - `serialNumber`
+  - `machineId`
+  - `agentHealthIssueTypes`
+- Additional optional args in the SDK's agent client for filtering by agent health.
+  - `client.agents.v1.get_page()` and `client.agents.v1.get_page()` now accept:
+    - `agent_healthy: bool` - Retrieve only healthy agents with `True` or only unhealthy agents with `False`.  Defaults to returning all agents.
+    - `agent_health_issue_types: List[str] | str`- Retrieve agents with any of the given health issues. Ex: `NOT_CONNECTING`
+- Additional options in the CLI's agent command group for filtering by agent health:
+  - `incydr agents list` now accepts:
+    - `--healthy` - Retrieve only healthy agents.
+    - `--unhealthy` - Retrieve only unhealthy agents.
+    - Pass a comma separated list of health issue types to the unhealthy option to filter for agents with any of the given health issues. Ex: `--unhealthy NOT_CONNECTING,NOT_SENDING_SECURITY_EVENTS`
+    - Use `incydr agents list --help` to see more specifics on the new command options.
+- See the [SDK documentation](https://developer.code42.com/sdk/clients/agents/) and the [CLI documentation](https://developer.code42.com/cli/cmds/agents/#agents-list) for more details.
+
 ## 1.1.2 - 2023-12-11
 
 ### Fixed
