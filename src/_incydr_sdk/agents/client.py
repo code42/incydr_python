@@ -38,7 +38,7 @@ class AgentsV1:
         page_num: int = 1,
         page_size: int = 500,
         agent_healthy: bool = None,
-        agent_health_issue_types: List[str] = None,
+        agent_health_issue_types: Union[List[str], str] = None,
     ) -> AgentsPage:
         """
         Get a page of agents.
@@ -62,7 +62,9 @@ class AgentsV1:
             active=active,
             agentType=agent_type,
             agentHealthy=agent_healthy,
-            anyOfAgentHealthIssueTypes=agent_health_issue_types,
+            anyOfAgentHealthIssueTypes=[agent_health_issue_types]
+            if isinstance(agent_health_issue_types, str)
+            else agent_health_issue_types,
             srtDir=sort_dir,
             srtKey=sort_key,
             pageSize=page_size,

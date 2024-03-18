@@ -1,5 +1,19 @@
 # Contributing
 
+To test changes on a branch that haven't been released yet, you'll have to pull down the branch and
+install the SDK/CLI in `editable` mode using `pip intall -e`. Navigate to the `incydr_python` directory and to install from your local path
+(rather than from a released version on PyPI) use:
+
+```bash
+pip install -e .
+```
+
+To install the CLI extension in a similar manner:
+
+ ```bash
+ pip install -e .'[cli]'
+ ```
+
 ## Install hatch
 
 The Incydr SDK uses [Hatch](https://hatch.pypa.io/latest/) as its Python project manager.
