@@ -65,8 +65,8 @@ dependencies = [
 ]
 
 [tool.hatch.envs.style.scripts]
-check = "pre-commit run --all-files --show-diff-on-failure"
-check-no-diff = "pre-commit run --all-files"
+check = "pre-commit run --all-files"
+check-diff = "pre-commit run --all-files --show-diff-on-failure"
 
 [tool.hatch.envs.docs]
 dependencies = [
@@ -92,7 +92,6 @@ dependencies = [
   "pytest-cov",
   "pytest-mock",
   "pytest-httpserver",
-  "pytest-lazy-fixture",
   "click",
   "chardet",
   "python-dateutil",

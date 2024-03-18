@@ -5,9 +5,6 @@ from urllib.parse import urlencode
 import pydantic
 import pytest
 from pytest_httpserver import HTTPServer
-from pytest_lazyfixture import (
-    lazy_fixture,
-)  # lazy_fixture allows us to pass a fixture as a value in @pytest.mark.parametrize
 
 from _incydr_cli.main import incydr
 from _incydr_sdk.core.client import Client
@@ -749,16 +746,17 @@ def test_cli_update_makes_expected_call(httpserver_auth: HTTPServer, runner):
 @pytest.mark.parametrize(
     "command,mock_server_call",
     [
-        ("list-members", lazy_fixture("mock_get_all_members")),
-        ("list-included-users", lazy_fixture("mock_get_all_included_users")),
-        ("list-excluded-users", lazy_fixture("mock_get_all_excluded_users")),
-        ("list-directory-groups", lazy_fixture("mock_get_all_directory_groups")),
-        ("list-departments", lazy_fixture("mock_get_all_departments")),
+        ("list-members", "mock_get_all_members"),
+        ("list-included-users", "mock_get_all_included_users"),
+        ("list-excluded-users", "mock_get_all_excluded_users"),
+        ("list-directory-groups", "mock_get_all_directory_groups"),
+        ("list-departments", "mock_get_all_departments"),
     ],
 )
 def test_cli_list_members_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, command, mock_server_call
+    httpserver_auth: HTTPServer, runner, command, mock_server_call, request
 ):
+    request.getfixturevalue(mock_server_call)
     result = runner.invoke(incydr, ["watchlists", command, TEST_WATCHLIST_ID])
     httpserver_auth.check()
     assert result.exit_code == 0

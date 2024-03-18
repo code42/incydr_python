@@ -19,6 +19,7 @@ from _incydr_cli.cmds.options.output_options import single_format_option
 from _incydr_cli.cmds.options.output_options import SingleFormat
 from _incydr_cli.cmds.options.output_options import table_format_option
 from _incydr_cli.cmds.options.output_options import TableFormat
+from _incydr_cli.core import incompatible_with
 from _incydr_cli.core import IncydrCommand
 from _incydr_cli.core import IncydrGroup
 from _incydr_sdk.agents.models import Agent
@@ -42,19 +43,54 @@ def agents():
     default=None,
     help="Filter by active or inactive agents. Defaults to returning both when when neither option is passed.",
 )
+@click.option(
+    "--healthy",
+    is_flag=True,
+    default=None,
+    help="Filter by healthy agents. Agents that have no health issue types are considered healthy.",
+    cls=incompatible_with("unhealthy"),
+)
+@click.option(
+    "--unhealthy",
+    is_flag=False,  # is_flag=False with a flag_value indicates an optional value
+    flag_value="FLAG_VALUE",
+    default=None,
+    help="Filter by unhealthy agents. Defaults to returning all unhealthy agents."
+    " Pass a comma delimited list of health issue types to filter by unhealthy agents that have (at least) any "
+    "of the given health issue type(s). Health issue types include the following: NOT_CONNECTING, NOT_SENDING_SECURITY_EVENTS.",
+    cls=incompatible_with("healthy"),
+)
 @table_format_option
 @columns_option
 @logging_options
 def list_(
     active: bool = None,
+    healthy: bool = None,
+    unhealthy: str = None,
     format_: TableFormat = None,
     columns: str = None,
 ):
     """
     List agents.
     """
+    agent_healthy = None
+    health_issues = None
+    if healthy:
+        agent_healthy = True
+    if unhealthy:
+        agent_healthy = False
+        if (
+            not unhealthy == "FLAG_VALUE"
+        ):  # If the unhealthy value is FLAG_VALUE then we know the option was passed with no values
+            health_issues = unhealthy.split(",")
+
     client = Client()
-    agents = client.agents.v1.iter_all(active=active)
+
+    agents = client.agents.v1.iter_all(
+        active=active,
+        agent_healthy=agent_healthy,
+        agent_health_issue_types=health_issues,
+    )
 
     if format_ == TableFormat.table:
         render.table(Agent, agents, columns=columns, flat=False)

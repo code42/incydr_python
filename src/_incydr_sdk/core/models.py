@@ -3,6 +3,7 @@ from __future__ import annotations
 from csv import DictReader
 from datetime import datetime
 from datetime import timedelta
+from datetime import timezone
 from json import JSONDecodeError
 
 import requests
@@ -116,15 +117,19 @@ class ResponseModel(Model):
             raise
 
 
+def datetime_now_utc_callback():
+    return datetime.now(timezone.utc)
+
+
 class AuthResponse(ResponseModel):
     token_type: str
     expires_in: int
     access_token: SecretStr
-    _init_time: datetime = PrivateAttr(default_factory=datetime.utcnow)
+    _init_time: datetime = PrivateAttr(default_factory=datetime_now_utc_callback)
 
     @property
     def expired(self):
-        return (datetime.utcnow() - self._init_time) > timedelta(
+        return (datetime.now(timezone.utc) - self._init_time) > timedelta(
             seconds=self.expires_in
         )
 
