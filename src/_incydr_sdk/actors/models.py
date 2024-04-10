@@ -29,7 +29,7 @@ class Actor(ResponseModel):
     * **division**: `str` The actor's division.
     * **employee_type**: `str` The actor's employment type.
     * **first_name**: `str` The first (given) name of the actor.
-    * **in_scope**: `str` TODO
+    * **in_scope**: `str` The actor's scope state. An actor is considered "in scope" if their activity is monitored in at least one data source.
     * **last_name**: `str` The last (family) name of the actor.
     * **locality**: `str` - The actor's locality (city)
     * **manager_actor_id**: `str` The actor ID of the actor's manager.
