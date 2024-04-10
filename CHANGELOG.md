@@ -13,11 +13,22 @@
 
 ### Added TODO
 
-- Support for [Actors APIs](), including:
+- Support for [Actors APIs](https://developer.code42.com/api/#tag/Actors), including:
   - An `actors.v1` client to the SDK with the following methods:
-    -
+    - `client.actors.v1.get_page()` - to query a single page of actors.
+    - `client.actors.v1.iter_all()` - to lazily iterate through all pages of actors.
+    - `client.actors.v1.get_actor_by_id()` - to retrieve details of a single actor by ID.
+    - `client.actors.v1.get_actor_by_name()` - to retrieve details of a single actor by name.
+    - `client.actors.v1.get_family_by_member_id()` - to retrieve details of an actor family by a member's ID.
+    - `client.actors.v1.get_family_by_member_name()` - to retrieve details of an actor family by a member's name.
+    - `client.actors.v1.create_adoption()` - to create child-parent adoptions between actors.
+    - `client.actors.v1.remove_adoption()` - to remove a child actor from its parent.
   - A set of `actors` CLI commands:
-    -
+    - `incydr actors list` to list all actors matching search criteria (in table, CSV, or JSON formats).
+    - `incydr actors show` to show details of a given actor by ID or name.
+    - `incydr actors show-family` to show details of an actors family.
+    - `incydr actors adoption create` to create child-parent adoptions between actors.
+    - `incydr actors adoption remove` to remove a child actor from its parent.
 
 ## 1.2.0 - 2024-3-18
 
