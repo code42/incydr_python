@@ -9,6 +9,16 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## 1.3.0 (Unreleased)
+
+### Added TODO
+
+- Support for [Actors APIs](), including:
+  - An `actors.v1` client to the SDK with the following methods:
+    -
+  - A set of `actors` CLI commands:
+    -
+
 ## 1.2.0 - 2024-3-18
 
 ### Added

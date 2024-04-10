@@ -14,6 +14,29 @@
 See [Pydantic documentation](https://pydantic-docs.helpmanual.io/usage/models/#model-properties) for full list of
 available model methods.
 
+## Actors
+---
+
+### `Actor` model
+
+::: incydr.models.Actor
+    :docstring:
+
+### `ActorFamily` model
+
+::: incydr.models.ActorFamily
+    :docstring:
+
+### ActorsPage` model
+
+::: incydr.models.ActorsPage
+    :docstring:
+
+### `ActorAdoption` model
+
+::: incydr.models.ActorAdoption
+    :docstring:
+
 ## Agents
 ---
 

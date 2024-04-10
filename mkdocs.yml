@@ -41,6 +41,7 @@ nav:
         - Configuration: 'sdk/settings.md'
         - Logging: 'sdk/logging.md'
     - Reference:
+      - Actors: 'sdk/clients/actors.md'
       - Agents: 'sdk/clients/agents.md'
       - Alerts: 'sdk/clients/alerts.md'
       - Alert Rules: 'sdk/clients/alert_rules.md'
@@ -67,6 +68,7 @@ nav:
       - Migration: 'cli/migration.md'
       - Syslogging: 'cli/syslogging.md'
       - Commands:
+        - Actors: 'cli/cmds/actors.md'
         - Agents: 'cli/cmds/agents.md'
         - Alerts: 'cli/cmds/alerts.md'
         - Alert Rules: 'cli/cmds/alert_rules.md'

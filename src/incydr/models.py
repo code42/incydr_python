@@ -1,3 +1,7 @@
+from _incydr_sdk.actors.models import Actor
+from _incydr_sdk.actors.models import ActorAdoption
+from _incydr_sdk.actors.models import ActorFamily
+from _incydr_sdk.actors.models import ActorsPage
 from _incydr_sdk.agents.models import Agent
 from _incydr_sdk.agents.models import AgentsPage
 from _incydr_sdk.alert_rules.models.response import RuleDetails
@@ -40,6 +44,10 @@ from _incydr_sdk.watchlists.models.responses import WatchlistsPage
 from _incydr_sdk.watchlists.models.responses import WatchlistUser
 
 __all__ = [
+    "Actor",
+    "ActorFamily",
+    "ActorsPage",
+    "ActorAdoption",
     "Agent",
     "AgentsPage",
     "AlertDetails",
