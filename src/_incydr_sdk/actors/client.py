@@ -185,6 +185,8 @@ class ActorsV1:
         Create an adoption between an actor and a parent actor by adding the actor as a child to the parent, both
          are specified by their actor ID.
 
+        Activity originating from actors who have a parent will have said activity attributed to their parent.
+
         **Parameters**:
 
         * **child_actor_id**: `str` (required) - Unique ID for the actor that will be added as a child to the parent actor.

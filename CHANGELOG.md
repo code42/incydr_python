@@ -11,7 +11,7 @@
 
 ## 1.3.0 (Unreleased)
 
-### Added TODO
+### Added
 
 - Support for [Actors APIs](https://developer.code42.com/api/#tag/Actors), including:
   - An `actors.v1` client to the SDK with the following methods:

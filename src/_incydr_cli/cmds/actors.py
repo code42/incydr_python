@@ -150,13 +150,23 @@ def show(
 
 
 @actors.command(cls=IncydrCommand)
-@click.option("--actor-id", default=None, help="")
-@click.option("--name", default=None, help="")
+@click.option(
+    "--actor-id",
+    default=None,
+    help="Get an actor family by the actor ID of one of its members.",
+)
+@click.option(
+    "--name",
+    default=None,
+    help="Get an actor family by the actor name of one of its members, where name is typically a username/email address.",
+)
 @single_format_option
 @logging_options
 def show_family(actor_id: str = None, name: str = None, format_: SingleFormat = None):
     """
     Show an actors family.
+
+    Specify actor by ID or name, either --actor-id or --name is required.
 
     An actor family consists of the the parent actor and any associated children.
     """
@@ -204,6 +214,8 @@ def create(
     """
     Create an adoption between an actor and a parent actor by adding the actor as a child to the parent, both
     are specified by their actor ID.
+
+    Activity originating from actors who have a parent will have said activity attributed to their parent.
 
     CHILDREN is a comma-delimited string of one or more actor IDs, all of which will be adopted by the specified parent actor.
 
