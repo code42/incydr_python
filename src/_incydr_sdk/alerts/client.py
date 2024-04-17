@@ -3,6 +3,7 @@ from itertools import count
 from typing import Iterator
 from typing import List
 from typing import Union
+from warnings import warn
 
 import requests
 from pydantic import parse_obj_as
@@ -42,6 +43,12 @@ class AlertsV1:
 
         **Returns**: An [`AlertQueryPage`][alertquerypage-model] object.
         """
+        warn(
+            "Alerts are deprecated. Replaced by Sessions.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         if not isinstance(query, AlertQuery):
             raise ValueError("query must be an `incydr.AlertQuery` object.")
         query.tenant_id = self._parent.tenant_id
@@ -58,6 +65,12 @@ class AlertsV1:
 
         **Returns**: A generator yielding individual [`AlertSummary`][alertsummary-model] objects.
         """
+        warn(
+            "Alerts are deprecated. Replaced by Sessions.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         if not isinstance(query, AlertQuery):
             raise ValueError("query must be an `incydr.AlertQuery` object.")
         query.tenant_id = self._parent.tenant_id
@@ -84,6 +97,12 @@ class AlertsV1:
 
         **Returns**: A list of [`AlertDetails`][alertdetails-model] objects.
         """
+        warn(
+            "Alerts are deprecated. Replaced by Sessions.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         if isinstance(alert_ids, str):
             alert_ids = [alert_ids]
         results = []
@@ -110,6 +129,12 @@ class AlertsV1:
 
         **Returns**: A `Response` object indicating success.
         """
+        warn(
+            "Alerts are deprecated. Replaced by Sessions.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         data = AddNoteRequest(
             alertId=alert_id,
             note=note,
@@ -133,6 +158,12 @@ class AlertsV1:
 
         **Returns**: A `Response` object indicating success.
         """
+        warn(
+            "Alerts are deprecated. Replaced by Sessions.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         if isinstance(alert_ids, str):
             alert_ids = [alert_ids]
         data = UpdateAlertStateRequest(

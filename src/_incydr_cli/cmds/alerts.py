@@ -26,6 +26,7 @@ from _incydr_cli.cmds.options.output_options import SingleFormat
 from _incydr_cli.cmds.options.output_options import table_format_option
 from _incydr_cli.cmds.options.output_options import TableFormat
 from _incydr_cli.cmds.options.utils import checkpoint_option
+from _incydr_cli.cmds.utils import deprecation_warning
 from _incydr_cli.cmds.utils import warn_interrupt
 from _incydr_cli.core import IncydrCommand
 from _incydr_cli.core import IncydrGroup
@@ -39,11 +40,15 @@ from _incydr_sdk.core.models import Model
 from _incydr_sdk.queries.alerts import AlertQuery
 from _incydr_sdk.utils import model_as_card
 
+# Deprecated April 2024.
+DEPRECATION_TEXT = "DeprecationWarning: Alerts commands are deprecated. Use the 'incydr sessions' command group instead."
+
 
 @click.group(cls=IncydrGroup)
 @logging_options
 def alerts():
     """View and manage alerts."""
+    deprecation_warning(DEPRECATION_TEXT)
 
 
 @alerts.command(cls=IncydrCommand)

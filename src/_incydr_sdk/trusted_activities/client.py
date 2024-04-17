@@ -69,7 +69,7 @@ class TrustedActivitiesV2:
         * **page_size**: `int` - Max number of results to return per page. Defaults to client's `page_size` setting.
         * **activity_type**: `ActivityType` - The type of the trusted activity.
         * **sort_key**: `SortKeys` - The key by which to sort the returned list.
-        * **sort_direction**: `SortDirection` - The order in which to sort the returned list.
+        * **sort_dir**: `SortDirection` - The order in which to sort the returned list.
 
         **Returns**: A [`TrustedActivitiesPage`][trustedactivitiespage-model] object.
         """

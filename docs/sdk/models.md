@@ -50,8 +50,10 @@ available model methods.
 ::: incydr.models.AgentsPage
     :docstring:
 
-## Alerts
+## Alerts (Deprecated)
 ---
+
+Alerts has been replaced by [Sessions](#sessions).
 
 ### `AlertDetails` model
 
@@ -182,6 +184,14 @@ available model methods.
 ### `UpdateRolesResponse` model
 
 ::: incydr.models.UpdateRolesResponse
+    :docstring:
+
+## Sessions
+
+::: incydr.models.Session
+    :docstring:
+
+::: incydr.models.SessionsPage
     :docstring:
 
 ## Trusted Activities

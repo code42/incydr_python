@@ -22,6 +22,7 @@ from _incydr_sdk.devices.client import DevicesClient
 from _incydr_sdk.directory_groups.client import DirectoryGroupsClient
 from _incydr_sdk.exceptions import AuthMissingError
 from _incydr_sdk.file_events.client import FileEventsClient
+from _incydr_sdk.sessions.client import SessionsClient
 from _incydr_sdk.trusted_activities.client import TrustedActivitiesClient
 from _incydr_sdk.user_risk_profiles.client import UserRiskProfiles
 from _incydr_sdk.users.client import UsersClient
@@ -105,6 +106,7 @@ class Client:
         self._devices = DevicesClient(self)
         self._directory_groups = DirectoryGroupsClient(self)
         self._file_events = FileEventsClient(self)
+        self._sessions = SessionsClient(self)
         self._trusted_activities = TrustedActivitiesClient(self)
         self._users = UsersClient(self)
         self._user_risk_profiles = UserRiskProfiles(self)
@@ -181,7 +183,7 @@ class Client:
     @property
     def alerts(self):
         """
-        Property returning an [`AlertsClient`](../alerts) for interacting with
+        (DEPRECATED) Property returning an [`AlertsClient`](../alerts) for interacting with
         `/v*/alerts` API endpoints.
         Usage:
             >>> client.alerts.v1.get_page()
@@ -280,6 +282,17 @@ class Client:
 
         """
         return self._file_events
+
+    @property
+    def sessions(self):
+        """
+        Property returning a [`SessionsClient`](../sessions) for interacting with `/v*/sessions` API endpoints.
+        Usage:
+
+            >>> client.items.v1.get_page(has_alerts=True)
+
+        """
+        return self._sessions
 
     @property
     def trusted_activities(self):
