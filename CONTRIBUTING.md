@@ -14,6 +14,10 @@ To install the CLI extension in a similar manner:
  pip install -e .'[cli]'
  ```
 
+Note! Using pyenv but its not picking up the version? Try running
+
+```eval "$(pyenv init -)"```
+
 ## Install hatch
 
 The Incydr SDK uses [Hatch](https://hatch.pypa.io/latest/) as its Python project manager.

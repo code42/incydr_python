@@ -25,7 +25,7 @@ def parse_ts_to_ms_str(timestamp: Union[str, int, float, datetime, date]):
     """
     # convert str/int/float values to datetime
     if isinstance(timestamp, (int, float)):
-        timestamp = datetime.utcfromtimestamp(timestamp)
+        timestamp = datetime.fromtimestamp(timestamp, tz=timezone.utc)
     elif isinstance(timestamp, str):
         timestamp = parse_str_to_dt(timestamp)
     timestamp.replace(tzinfo=timezone.utc)
