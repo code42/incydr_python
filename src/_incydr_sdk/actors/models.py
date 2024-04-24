@@ -135,7 +135,7 @@ class ActorsPage(ResponseModel):
 
     **Fields**:
 
-    * **actors**: `List[str]` The list of actors returned from the query.
+    * **actors**: `List[Actor]` The list of actors returned from the query.
     """
 
     actors: List[Actor]

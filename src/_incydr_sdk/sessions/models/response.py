@@ -67,13 +67,22 @@ class Session(ResponseModel):
 
 
 class SessionsPage(ResponseModel):
-    """ """
+    """
+    A model representing a page of sessions.
+
+    **Fields**:
+
+    * **items**: `List[Session]` The list of sessions returned by the query.
+    * **total_count**: `int` The total count of sessions returned by the query.
+    """
 
     items: List[Session] = Field(None)
     total_count: int = Field(None, alias="totalCount")
 
 
 class SessionEvents(ResponseModel):
-    """ """
+    """
+    The wrapped file event search response returned when retrieving the events attached to a session.
+    """
 
     query_result: FileEventsPage = Field(alias="queryResult")
