@@ -2,13 +2,11 @@ import json
 from urllib.parse import urlencode
 
 import pytest
-import requests
 from pytest_httpserver import HTTPServer
 
 from _incydr_cli.main import incydr
 from _incydr_sdk.actors.client import ActorNotFoundError
 from _incydr_sdk.actors.models import Actor
-from _incydr_sdk.actors.models import ActorAdoption
 from _incydr_sdk.actors.models import ActorFamily
 from _incydr_sdk.actors.models import ActorsPage
 from incydr import Client
@@ -355,34 +353,6 @@ def test_get_family_by_member_name_returns_expected_data(
     assert response.json() == json.dumps(ACTOR_FAMILY)
 
 
-def test_create_adoption_returns_expected_data(httpserver_auth: HTTPServer):
-    response_json = {
-        "childActorIds": [CHILD_ACTOR_ID],
-        "parentActorId": PARENT_ACTOR_ID,
-    }
-    httpserver_auth.expect_request(
-        uri="/v1/actors/adoption",
-        method="POST",
-        json={"childActorId": CHILD_ACTOR_ID, "parentActorId": PARENT_ACTOR_ID},
-    ).respond_with_json(response_json)
-
-    client = Client()
-    response = client.actors.v1.create_adoption(CHILD_ACTOR_ID, PARENT_ACTOR_ID)
-    assert isinstance(response, ActorAdoption)
-    assert response.json() == json.dumps(response_json)
-
-
-def test_remove_adoption_returns_successful_call(httpserver_auth: HTTPServer):
-    httpserver_auth.expect_request(
-        uri=f"/v1/actors/adoption/{CHILD_ACTOR_ID}", method="DELETE"
-    ).respond_with_data(status=200)
-
-    client = Client()
-    response = client.actors.v1.remove_adoption(CHILD_ACTOR_ID)
-    assert isinstance(response, requests.Response)
-    assert response.status_code == 200
-
-
 # ************************************************ CLI ************************************************
 
 
@@ -498,99 +468,6 @@ def test_cli_show_family_when_get_by_name_makes_expected_call(
 ):
     result = runner.invoke(
         incydr, ["actors", "show-family", "--name", CHILD_ACTOR_NAME]
-    )
-    httpserver_auth.check()
-    assert result.exit_code == 0
-
-
-def test_cli_adoption_create_when_single_actor_makes_expected_call(
-    httpserver_auth: HTTPServer, runner
-):
-    response_json = {
-        "childActorIds": [CHILD_ACTOR_ID],
-        "parentActorId": PARENT_ACTOR_ID,
-    }
-    httpserver_auth.expect_request(
-        uri="/v1/actors/adoption",
-        method="POST",
-        json={"childActorId": CHILD_ACTOR_ID, "parentActorId": PARENT_ACTOR_ID},
-    ).respond_with_json(response_json)
-
-    result = runner.invoke(
-        incydr, ["actors", "adoption", "create", CHILD_ACTOR_ID, PARENT_ACTOR_ID]
-    )
-    httpserver_auth.check()
-    assert result.exit_code == 0
-
-
-def test_cli_adoption_create_when_multiple_actors_makes_expected_call(
-    httpserver_auth: HTTPServer, runner
-):
-    test_actor_id = "test-actor-id"
-
-    httpserver_auth.expect_request(
-        uri="/v1/actors/adoption",
-        method="POST",
-        json={"childActorId": CHILD_ACTOR_ID, "parentActorId": PARENT_ACTOR_ID},
-    ).respond_with_json(
-        {
-            "childActorIds": [CHILD_ACTOR_ID],
-            "parentActorId": PARENT_ACTOR_ID,
-        }
-    )
-
-    httpserver_auth.expect_request(
-        uri="/v1/actors/adoption",
-        method="POST",
-        json={"childActorId": test_actor_id, "parentActorId": PARENT_ACTOR_ID},
-    ).respond_with_json(
-        {
-            "childActorIds": [CHILD_ACTOR_ID, test_actor_id],
-            "parentActorId": PARENT_ACTOR_ID,
-        }
-    )
-
-    result = runner.invoke(
-        incydr,
-        [
-            "actors",
-            "adoption",
-            "create",
-            CHILD_ACTOR_ID + "," + test_actor_id,
-            PARENT_ACTOR_ID,
-        ],
-    )
-    httpserver_auth.check()
-    assert result.exit_code == 0
-
-
-def test_cli_adoption_remove_when_single_actor_makes_expected_call(
-    httpserver_auth: HTTPServer, runner
-):
-    httpserver_auth.expect_request(
-        uri=f"/v1/actors/adoption/{CHILD_ACTOR_ID}", method="DELETE"
-    ).respond_with_data(status=200)
-
-    result = runner.invoke(incydr, ["actors", "adoption", "remove", CHILD_ACTOR_ID])
-    httpserver_auth.check()
-    assert result.exit_code == 0
-
-
-def test_cli_adoption_remove_when_multiple_actor_makes_expected_call(
-    httpserver_auth: HTTPServer, runner
-):
-    test_actor_id = "test-actor-id"
-
-    httpserver_auth.expect_request(
-        uri=f"/v1/actors/adoption/{CHILD_ACTOR_ID}", method="DELETE"
-    ).respond_with_data(status=200)
-
-    httpserver_auth.expect_request(
-        uri=f"/v1/actors/adoption/{test_actor_id}", method="DELETE"
-    ).respond_with_data(status=200)
-
-    result = runner.invoke(
-        incydr, ["actors", "adoption", "remove", CHILD_ACTOR_ID + "," + test_actor_id]
     )
     httpserver_auth.check()
     assert result.exit_code == 0
