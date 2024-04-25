@@ -9,8 +9,18 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
-## 1.3.0 (Unreleased)
+## 2.0.0 (Unreleased)
 
+### Removed
+- **Breaking Change!** Cloud alias risk profile functionality has been removed.
+  - The following Python SDK methods have been removed:
+    - `client.user_risk_profiles.add_cloud_alias()` should be replaced by `client.actors.create_adoption()`
+    - `client.user_risk_profiles.remove_cloud_alias()` should be replaced by `client.actors.remove_adoption()`
+  - The following CLI commands have been removed.
+    - `incydr risk-profiles add-cloud-alias` should be replaced by `incydr actors adoption create`
+    - `incydr risk-profiles remove-cloud-alias` should be replaced by `incydr actors adoption remove`
+    - `incydr risk-profiles bulk-add-cloud-aliases`
+    - `incydr risk-profiles bulk-remove-cloud-aliases`
 ### Added
 
 - Support for [Actors APIs](https://developer.code42.com/api/#tag/Actors), including:

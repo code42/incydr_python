@@ -11,7 +11,6 @@ from _incydr_sdk.alert_rules.models.request import GetRulesRequest
 from _incydr_sdk.alert_rules.models.response import RuleDetails
 from _incydr_sdk.alert_rules.models.response import RuleUsersList
 from _incydr_sdk.exceptions import IncydrException
-from _incydr_sdk.user_risk_profiles.models import UserRiskProfile
 
 
 class MissingUsernameCriterionError(IncydrException):
@@ -172,8 +171,3 @@ class AlertRulesV2:
                 raise MissingUsernameCriterionError(rule_id)
             raise e
         return RuleUsersList.parse_response(response)
-
-    def _get_user_aliases(self, user_id):
-        response = self._parent.session.get(f"/v1/user-risk-profiles/{user_id}")
-        profile = UserRiskProfile.parse_response(response)
-        return profile.cloud_aliases
