@@ -32,11 +32,6 @@ available model methods.
 ::: incydr.models.ActorsPage
     :docstring:
 
-### `ActorAdoption` model
-
-::: incydr.models.ActorAdoption
-    :docstring:
-
 ## Agents
 ---
 

@@ -1,5 +1,4 @@
 from _incydr_sdk.actors.models import Actor
-from _incydr_sdk.actors.models import ActorAdoption
 from _incydr_sdk.actors.models import ActorFamily
 from _incydr_sdk.actors.models import ActorsPage
 from _incydr_sdk.agents.models import Agent
@@ -47,7 +46,6 @@ __all__ = [
     "Actor",
     "ActorFamily",
     "ActorsPage",
-    "ActorAdoption",
     "Agent",
     "AgentsPage",
     "AlertDetails",
