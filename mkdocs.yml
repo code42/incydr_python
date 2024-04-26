@@ -43,7 +43,7 @@ nav:
     - Reference:
       - Actors: 'sdk/clients/actors.md'
       - Agents: 'sdk/clients/agents.md'
-      - Alerts: 'sdk/clients/alerts.md'
+      - Alerts (Deprecated): 'sdk/clients/alerts.md'
       - Alert Rules: 'sdk/clients/alert_rules.md'
       - Alert Querying: 'sdk/clients/alert_queries.md'
       - Audit Log: 'sdk/clients/audit_log.md'
@@ -54,6 +54,7 @@ nav:
       - Directory Groups: 'sdk/clients/directory_groups.md'
       - File Events: 'sdk/clients/file_events.md'
       - File Event Querying: 'sdk/clients/file_event_queries.md'
+      - Sessions: 'sdk/clients/sessions.md'
       - Trusted Activites: 'sdk/clients/trusted_activities.md'
       - Users: 'sdk/clients/users.md'
       - User Risk Profiles: 'sdk/clients/user_risk_profiles.md'
@@ -70,7 +71,7 @@ nav:
       - Commands:
         - Actors: 'cli/cmds/actors.md'
         - Agents: 'cli/cmds/agents.md'
-        - Alerts: 'cli/cmds/alerts.md'
+        - Alerts (Deprecated): 'cli/cmds/alerts.md'
         - Alert Rules: 'cli/cmds/alert_rules.md'
         - Audit Log: 'cli/cmds/audit_log.md'
         - Cases: 'cli/cmds/cases.md'
@@ -79,6 +80,7 @@ nav:
         - Directory Groups: 'cli/cmds/directory_groups.md'
         - File Events: 'cli/cmds/file_events.md'
         - Users & Risk Profiles: 'cli/cmds/users.md'
+        - Sessions: 'cli/cmds/sessions.md'
         - Trusted Activites: 'cli/cmds/trusted_activities.md'
         - Watchlists: 'cli/cmds/watchlists.md'
   - Guides:

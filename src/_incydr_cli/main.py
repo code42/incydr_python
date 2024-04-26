@@ -18,6 +18,7 @@ from _incydr_cli.cmds.departments import departments
 from _incydr_cli.cmds.devices import devices
 from _incydr_cli.cmds.directory_groups import directory_groups
 from _incydr_cli.cmds.file_events import file_events
+from _incydr_cli.cmds.sessions import sessions
 from _incydr_cli.cmds.trusted_activities import trusted_activities
 from _incydr_cli.cmds.user_risk_profiles import risk_profiles
 from _incydr_cli.cmds.users import users
@@ -79,6 +80,7 @@ incydr.add_command(directory_groups)
 incydr.add_command(file_events)
 incydr.add_command(cases)
 incydr.add_command(risk_profiles)
+incydr.add_command(sessions)
 incydr.add_command(trusted_activities)
 incydr.add_command(users)
 incydr.add_command(watchlists)

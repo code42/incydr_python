@@ -13,6 +13,21 @@
 
 ### Added
 
+- Support for the [Sessions APIs](https://developer.code42.com/api/#tag/Alerts-and-Sessions)
+  - A `sessions.v1` client to the SDK with the following methods:
+    - `client.sessions.v1.get_page()` - to query a page of sessions.
+    - `client.sessions.v1.iter_all()` - to lazily iterate through all pages of sessions.
+    - `client.sessions.v1.get_session_details()` - to retrieve the details of a single session specified by ID.
+    - `client.sessions.v1.get_session_events()` - to retrieve the file events associated with a session specified by ID.
+    - `client.sessions.v1.update_state_by_id()` - to update the state of a session specified by ID.
+    - `client.sessions.v1.update_state_by_criteria()` - to update the state of all sessions matching the filter criteria.
+    - `client.sessions.v1.add_note()` - to attach a note to a session specified by ID.
+  - A set of `sessions` CLI commands:
+    - `incydr sessions search` to search sessions by criteria. Includes various filter, output, and checkpointing options.
+    - `incydr sessions show` to show session details.
+    - `incydr sessions show-events` to show file events associated with the session.
+    - `incydr sessions update` to update the state and/or note of a session.
+    - `incydr sessions bulk-update-state` to update the state and attach an optional note to multiple sessions at once
 - Support for [Actors APIs](https://developer.code42.com/api/#tag/Actors), including:
   - An `actors.v1` client to the SDK with the following methods:
     - `client.actors.v1.get_page()` - to query a single page of actors.
@@ -29,6 +44,10 @@
     - `incydr actors show-family` to show details of an actors family.
     - `incydr actors adoption create` to create child-parent adoptions between actors.
     - `incydr actors adoption remove` to remove a child actor from its parent.
+
+### Deprecated
+
+- Alerts Python SDK methods and the Alerts CLI commands group have been deprecated.  Functionality is replaced by the Sessions SDK client and CLI command group.
 
 ## 1.2.0 - 2024-3-18
 

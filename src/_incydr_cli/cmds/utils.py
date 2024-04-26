@@ -5,7 +5,12 @@ from signal import SIGINT
 from signal import signal
 
 import click
+from click import echo
 from click import style
+
+
+def deprecation_warning(text):
+    echo(style(text, fg="red"), err=True)
 
 
 def user_lookup(client, value):

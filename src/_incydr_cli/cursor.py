@@ -77,7 +77,7 @@ class CursorStore:
 
     def get_items(self, cursor_name):
         """
-        Used with alerts and audit_log events to avoid duplicates
+        Used with alerts, audit_log events, and sessions to avoid duplicates
         """
         try:
             location = path.join(self._dir_path, cursor_name) + f"_{self._event_key}"
@@ -88,7 +88,7 @@ class CursorStore:
 
     def replace_items(self, cursor_name, new_events):
         """
-        Used with alerts and audit_log events to avoid duplicates
+        Used with alerts, audit_log events, and sessions to avoid duplicates
         """
         location = path.join(self._dir_path, cursor_name) + f"_{self._event_key}"
         with open(location, "w") as checkpoint:

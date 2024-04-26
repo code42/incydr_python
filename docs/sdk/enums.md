@@ -44,7 +44,9 @@ open_alert_state = alerts.AlertState.OPEN
 * **LAST_CONNECTED** = `"LAST_CONNECTED"`
 * **OS_NAME** = `"OS_NAME"`
 
-## Alerts
+## Alerts (Deprecated)
+
+Alerts has been replaced by [Sessions](#sessions).
 
 ### Alert Severity
 
@@ -539,6 +541,48 @@ open_alert_state = alerts.AlertState.OPEN
 * **MODERATE** = `"MODERATE"`
 * **LOW** = `"LOW"`
 * **NO_RISK_INDICATED** = `"NO_RISK_INDICATED"`
+
+## Sessions
+
+### Session States
+
+::: incydr.enums.sessions.SessionStates
+    :docstring:
+
+* **OPEN** = `"OPEN"`
+* **IN_PROGRESS** = `"IN_PROGRESS"`
+* **CLOSED** = `"CLOSED"`
+* **CLOSED_TP** = `"CLOSED_TP"`
+* **CLOSED_FP** = `"CLOSED_FP"`
+* **OPEN_NEW_DATA** = `"OPEN_NEW_DATA"`
+
+### Session Severities
+
+::: incydr.enums.sessions.SessionSeverities
+    :docstring:
+
+* **NO_RISK** = `"NO_RISK"`
+* **LOW** = `"LOW"`
+* **MODERATE** = `"MODERATE"`
+* **HIGH** = `"HIGH"`
+* **CRITICAL** = `"CRITICAL"`
+
+### Content Inspection Statuses
+
+::: incydr.enums.sessions.ContentInspectionStatuses
+    :docstring:
+
+* **PENDING** = `"PENDING"`
+* **FOUND** = `"FOUND"`
+* **NOT_FOUND** = `"NOT_FOUND"`
+
+### Sort Keys
+
+::: incydr.enums.sessions.SortKeys
+    :docstring:
+
+* **END_TIME** = `"end_time"`
+* **SCORE** = `"score"`
 
 ## Trusted Activities
 

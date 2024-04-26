@@ -45,7 +45,7 @@ class Agent(ResponseModel):
     * **machine_id**: `str` Device machine ID.
     * **serial_number**: `str` Authenticated agent serial number.
     * **active**: `bool` If the agent status is active.
-    * **agent_type**: `[AgentType][agent-type]` The type of agent.
+    * **agent_type**: [`AgentType`][agent-type] The type of agent.
     * **agent_health_issue_types: `List[str]` List of health issues with the agent. Health issue types include the following: `NOT_CONNECTING`, `NOT_SENDING_SECURITY_EVENTS`.
     * **app_version**: `str` The app version of the agent.
     * **product_version**: `str` The product version of the agent.

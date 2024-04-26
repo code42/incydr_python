@@ -24,6 +24,8 @@ from _incydr_sdk.file_events.models.event import FileEventV2
 from _incydr_sdk.file_events.models.event import User
 from _incydr_sdk.file_events.models.response import FileEventsPage
 from _incydr_sdk.file_events.models.response import SavedSearch
+from _incydr_sdk.sessions.models.response import Session
+from _incydr_sdk.sessions.models.response import SessionsPage
 from _incydr_sdk.trusted_activities.models import TrustedActivitiesPage
 from _incydr_sdk.trusted_activities.models import TrustedActivity
 from _incydr_sdk.user_risk_profiles.models import UserRiskProfile
@@ -70,6 +72,8 @@ __all__ = [
     "RuleUsersList",
     "RuleUser",
     "RuleDetails",
+    "Session",
+    "SessionsPage",
     "TrustedActivity",
     "TrustedActivitiesPage",
     "DepartmentsPage",
