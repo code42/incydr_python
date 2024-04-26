@@ -3,8 +3,6 @@ from itertools import count
 from typing import Iterator
 from typing import Union
 
-from requests import Response
-
 from _incydr_sdk.exceptions import DateParseError
 from _incydr_sdk.queries.utils import DATE_STR_FORMAT
 from _incydr_sdk.user_risk_profiles.models import Date
@@ -199,44 +197,6 @@ class UserRiskProfilesV1:
             json=data.dict(),
         )
         return UserRiskProfile.parse_response(response)
-
-    def add_cloud_alias(self, user_id: str, cloud_alias: str) -> Response:
-        """
-        Add cloud aliases to a user risk profile.
-
-        A cloud alias is the username an employee uses to access cloud services such as Google Drive or Box.
-        Adding a cloud alias allows Incydr to link a user's cloud activity with their Code42 username.
-        Each user has a default cloud alias of their Code42 username. You can add one additional alias.
-
-        **Parameters:**
-
-        * **user_id**: `str` - User ID of the profile to update.
-        * **cloud_alias**: `str` - The new cloud alias to add to the user risk profile.
-
-        **Returns**: A `requests.Response` indicating success.
-        """
-
-        return self._parent.session.post(
-            f"/v1/user-risk-profiles/{user_id}/add-cloud-aliases",
-            json={"userId": user_id, "cloudAliases": [cloud_alias]},
-        )
-
-    def delete_cloud_alias(self, user_id: str, cloud_alias: str) -> Response:
-        """
-        Delete a cloud alias from a user risk profile.
-
-        **Parameters:**
-
-        * **user_id**: `str` - User ID of the profile to update.
-        * **cloud_alias**: `str` - The cloud alias to remove from the user risk profile.
-
-        **Returns**: A `requests.Response` indicating success.
-        """
-
-        return self._parent.session.post(
-            f"/v1/user-risk-profiles/{user_id}/delete-cloud-aliases",
-            json={"userId": user_id, "cloudAliases": [cloud_alias]},
-        )
 
 
 def _create_date(date: Union[datetime, str]):

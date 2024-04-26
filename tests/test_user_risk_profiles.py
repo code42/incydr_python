@@ -4,7 +4,6 @@ from urllib.parse import urlencode
 
 import pytest
 from pytest_httpserver import HTTPServer
-from requests import Response
 
 from _incydr_cli.main import incydr
 from _incydr_sdk.user_risk_profiles.models import UserRiskProfile
@@ -204,40 +203,6 @@ def test_update_when_default_params_returns_expected_data(mock_update_profile):
     assert user_risk_profile.json() == json.dumps(TEST_USER_RISK_PROFILE_2)
 
 
-def test_add_cloud_alias_when_default_params_returns_expected_data(
-    httpserver_auth: HTTPServer,
-):
-    httpserver_auth.expect_request(
-        f"/v1/user-risk-profiles/{TEST_USER_ID}/add-cloud-aliases",
-        method="POST",
-        json={"userId": TEST_USER_ID, "cloudAliases": ["alias_one"]},
-    ).respond_with_json(TEST_USER_RISK_PROFILE_2)
-
-    client = Client()
-    response = client.user_risk_profiles.v1.add_cloud_alias(TEST_USER_ID, "alias_one")
-
-    assert isinstance(response, Response)
-    assert response.status_code == 200
-
-
-def test_delete_cloud_alias_when_default_params_returns_expected_data(
-    httpserver_auth: HTTPServer,
-):
-    httpserver_auth.expect_request(
-        f"/v1/user-risk-profiles/{TEST_USER_ID}/delete-cloud-aliases",
-        method="POST",
-        json={"userId": TEST_USER_ID, "cloudAliases": ["alias_one"]},
-    ).respond_with_json(TEST_USER_RISK_PROFILE_2)
-
-    client = Client()
-    response = client.user_risk_profiles.v1.delete_cloud_alias(
-        TEST_USER_ID, "alias_one"
-    )
-
-    assert isinstance(response, Response)
-    assert response.status_code == 200
-
-
 # ************************************************ CLI ************************************************
 
 
@@ -314,94 +279,3 @@ def test_cli_update_when_no_options_raises_usage_error(
         "At least one of --start-date, --end-date, or --notes, or one of their corresponding clear flags, is required to update a user risk profile."
         in str(result.output)
     )
-
-
-@user_input
-def test_cli_add_cloud_alias_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, user, mock_user_lookup
-):
-    httpserver_auth.expect_request(
-        f"/v1/user-risk-profiles/{TEST_USER_ID}/add-cloud-aliases",
-        method="POST",
-        json={"userId": TEST_USER_ID, "cloudAliases": ["test-alias"]},
-    ).respond_with_json(TEST_USER_RISK_PROFILE_1)
-
-    result = runner.invoke(
-        incydr, ["users", "risk-profiles", "add-cloud-alias", user, "test-alias"]
-    )
-    assert result.exit_code == 0
-
-
-@user_input
-def test_cli_remove_cloud_alias_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, user, mock_user_lookup
-):
-    httpserver_auth.expect_request(
-        f"/v1/user-risk-profiles/{TEST_USER_ID}/delete-cloud-aliases",
-        method="POST",
-        json={"userId": TEST_USER_ID, "cloudAliases": ["test-alias"]},
-    ).respond_with_json(TEST_USER_RISK_PROFILE_1)
-
-    result = runner.invoke(
-        incydr, ["users", "risk-profiles", "remove-cloud-alias", user, "test-alias"]
-    )
-    assert result.exit_code == 0
-
-
-cloud_alias_params = pytest.mark.parametrize(
-    "url_path,command",
-    [
-        ("add-cloud-aliases", "bulk-add-cloud-aliases"),
-        ("delete-cloud-aliases", "bulk-remove-cloud-aliases"),
-    ],
-)
-
-
-@cloud_alias_params
-def test_cli_bulk_update_cloud_aliases_when_csv_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, tmp_path, mock_user_lookup, url_path, command
-):
-    httpserver_auth.expect_request(
-        f"/v1/user-risk-profiles/test-user-id/{url_path}",
-        method="POST",
-        json={"userId": "test-user-id", "cloudAliases": ["test-alias-1"]},
-    ).respond_with_json(TEST_USER_RISK_PROFILE_1)
-    httpserver_auth.expect_request(
-        f"/v1/user-risk-profiles/{TEST_USER_ID}/{url_path}",
-        method="POST",
-        json={"userId": TEST_USER_ID, "cloudAliases": ["test-alias-2"]},
-    ).respond_with_json(TEST_USER_RISK_PROFILE_2)
-
-    p = tmp_path / "user_aliases.csv"
-    p.write_text(
-        "user,cloud_alias\ntest-user-id,test-alias-1\nfoo@bar.com,test-alias-2\n"
-    )
-    result = runner.invoke(incydr, ["users", "risk-profiles", command, str(p)])
-    httpserver_auth.check()
-    assert result.exit_code == 0
-
-
-@cloud_alias_params
-def test_cli_bulk_update_cloud_aliases_when_json_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, tmp_path, mock_user_lookup, url_path, command
-):
-    httpserver_auth.expect_request(
-        f"/v1/user-risk-profiles/test-user-id/{url_path}",
-        method="POST",
-        json={"userId": "test-user-id", "cloudAliases": ["test-alias-1"]},
-    ).respond_with_json(TEST_USER_RISK_PROFILE_1)
-    httpserver_auth.expect_request(
-        f"/v1/user-risk-profiles/{TEST_USER_ID}/{url_path}",
-        method="POST",
-        json={"userId": TEST_USER_ID, "cloudAliases": ["test-alias-2"]},
-    ).respond_with_json(TEST_USER_RISK_PROFILE_2)
-
-    p = tmp_path / "user_aliases.csv"
-    p.write_text(
-        '{ "user": "test-user-id", "cloud_alias": "test-alias-1" }\n{ "user": "foo@bar.com", "cloud_alias": "test-alias-2"}'
-    )
-    result = runner.invoke(
-        incydr, ["users", "risk-profiles", command, str(p), "--format", "json-lines"]
-    )
-    httpserver_auth.check()
-    assert result.exit_code == 0
