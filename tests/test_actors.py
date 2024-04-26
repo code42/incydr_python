@@ -594,3 +594,78 @@ def test_cli_adoption_remove_when_multiple_actor_makes_expected_call(
     )
     httpserver_auth.check()
     assert result.exit_code == 0
+
+
+@pytest.mark.parametrize(
+    "file_text,options",
+    [
+        ("child,parent\n1234,5678\nabcd,efgh", None),
+        (
+            '{ "child": "1234", "parent": "5678" }\n{ "child": "abcd", "parent": "efgh" }',
+            ["--format", "json-lines"],
+        ),
+    ],
+)
+def test_cli_adoption_bulk_create_makes_expected_calls(
+    httpserver_auth: HTTPServer, runner, tmp_path, file_text, options
+):
+    httpserver_auth.expect_request(
+        uri="/v1/actors/adoption",
+        method="POST",
+        json={"childActorId": "1234", "parentActorId": "5678"},
+    ).respond_with_json(
+        {
+            "childActorIds": ["1234"],
+            "parentActorId": "5678",
+        }
+    )
+
+    httpserver_auth.expect_request(
+        uri="/v1/actors/adoption",
+        method="POST",
+        json={"childActorId": "abcd", "parentActorId": "efgh"},
+    ).respond_with_json(
+        {
+            "childActorIds": ["abcd"],
+            "parentActorId": "efgh",
+        }
+    )
+
+    p = tmp_path / "actors.csv"
+    p.write_text(file_text)
+
+    cmd = ["actors", "adoption", "bulk-create", str(p)]
+    if options:
+        cmd.extend(options)
+    result = runner.invoke(incydr, cmd)
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+@pytest.mark.parametrize(
+    "file_text,options",
+    [
+        ("child\nabcd\n1234", None),
+        ('{ "child": "abcd" }\n{ "child": "1234" }', ["--format", "json-lines"]),
+    ],
+)
+def test_cli_adoption_bulk_remove_makes_expected_calls(
+    httpserver_auth: HTTPServer, runner, tmp_path, file_text, options
+):
+    httpserver_auth.expect_request(
+        uri="/v1/actors/adoption/abcd", method="DELETE"
+    ).respond_with_data(status=200)
+
+    httpserver_auth.expect_request(
+        uri="/v1/actors/adoption/1234", method="DELETE"
+    ).respond_with_data(status=200)
+
+    p = tmp_path / "actors.csv"
+    p.write_text(file_text)
+
+    cmd = ["actors", "adoption", "bulk-remove", str(p)]
+    if options:
+        cmd.extend(options)
+    result = runner.invoke(incydr, cmd)
+    httpserver_auth.check()
+    assert result.exit_code == 0

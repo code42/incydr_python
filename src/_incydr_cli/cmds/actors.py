@@ -1,11 +1,17 @@
+from pathlib import Path
+
 import click
 import requests
+from pydantic import Field
+from requests import HTTPError
 from rich.panel import Panel
+from rich.progress import track
 
 from _incydr_cli import console
 from _incydr_cli import logging_options
 from _incydr_cli import render
 from _incydr_cli.cmds.options.output_options import columns_option
+from _incydr_cli.cmds.options.output_options import input_format_option
 from _incydr_cli.cmds.options.output_options import single_format_option
 from _incydr_cli.cmds.options.output_options import SingleFormat
 from _incydr_cli.cmds.options.output_options import table_format_option
@@ -15,6 +21,8 @@ from _incydr_cli.core import IncydrGroup
 from _incydr_sdk.actors.client import ActorNotFoundError
 from _incydr_sdk.actors.models import Actor
 from _incydr_sdk.core.client import Client
+from _incydr_sdk.core.models import CSVModel
+from _incydr_sdk.core.models import Model
 from _incydr_sdk.exceptions import IncydrException
 from _incydr_sdk.utils import model_as_card
 
@@ -267,3 +275,96 @@ def remove(
         )
     else:
         console.print("No adoptions removed successfully.")
+
+
+@adoption.command(cls=IncydrCommand)
+@click.argument("file", type=click.File())
+@input_format_option
+@logging_options
+def bulk_create(
+    file: Path,
+    format_: str,
+):
+    """
+    Bulk create adoptions between parent and child actors. The child actor will be assigned to the parent.
+
+    Takes a single arg `FILE` which specifies the path to the file (use "-" to read from stdin).
+
+    File format can either be CSV or [JSON Lines format](https://jsonlines.org) (Default is CSV).
+
+    Accepts the following CSV columns:
+
+    * `child` (REQUIRED) - The actor ID of the to-be child actor. This actor will be adopted by the parent.
+    * `parent` (REQUIRED) - The actor ID of the to-be parent actor.  This actor will be the parent in the adoption relationship.
+
+    Actor adoptions cannot be nested. An actor is either a parent, a child, or neither. They cannot be both.
+    """
+
+    class CreateAdoptionCsv(CSVModel):
+        child: str = Field(
+            csv_aliases=["child", "child_actor_id", "child_id", "childId"]
+        )
+        parent: str = Field(
+            csv_aliases=["parent", "parent_actor_id", "parent_id", "parentId"]
+        )
+
+    class CreateAdoptionJson(Model):
+        child: str = Field(alias="child_id")
+        parent: str = Field(alias="parent_id")
+
+    if format_ == "csv":
+        actor_adoptions = CreateAdoptionCsv.parse_csv(file)
+    else:
+        actor_adoptions = CreateAdoptionJson.parse_json_lines(file)
+
+    client = Client()
+    try:
+        for row in track(
+            actor_adoptions, description="Creating actor adoptions...", transient=True
+        ):
+            client.actors.v1.create_adoption(row.child, row.parent)
+    except HTTPError as err:
+        console.print(f"[red]Error:[/red] {err.response.text}")
+
+
+@adoption.command(cls=IncydrCommand)
+@click.argument("file", type=click.File())
+@input_format_option
+@logging_options
+def bulk_remove(
+    file: Path,
+    format_: str,
+):
+    """
+    Bulk remove adoptions between parent and child actors. Removes the parent from a list of child actor IDs.
+
+    Takes a single arg `FILE` which specifies the path to the file (use "-" to read from stdin).
+
+    File format can either be CSV or [JSON Lines format](https://jsonlines.org) (Default is CSV).
+
+    Accepts a single CSV column:
+
+    * `child` (REQUIRED) - The actor ID of the child actor. This actor will have their parent actor removed.
+    """
+
+    class RemoveAdoptionCsv(CSVModel):
+        child: str = Field(
+            csv_aliases=["child", "child_actor_id", "child_id", "childId"]
+        )
+
+    class RemoveAdoptionJson(Model):
+        child: str = Field(csv_aliases=["child_id"])
+
+    if format_ == "csv":
+        actor_adoptions = RemoveAdoptionCsv.parse_csv(file)
+    else:
+        actor_adoptions = RemoveAdoptionJson.parse_json_lines(file)
+
+    client = Client()
+    try:
+        for row in track(
+            actor_adoptions, description="Removing actor adoptions...", transient=True
+        ):
+            client.actors.v1.remove_adoption(row.child)
+    except HTTPError as err:
+        console.print(f"[red]Error:[/red] {err.response.text}")
