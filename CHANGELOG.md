@@ -11,16 +11,6 @@
 
 ## 2.0.0 (Unreleased)
 
-### Removed
-- **Breaking Change!** Cloud alias risk profile functionality has been removed.
-  - The following Python SDK methods have been removed:
-    - `client.user_risk_profiles.add_cloud_alias()` should be replaced by `client.actors.create_adoption()`
-    - `client.user_risk_profiles.remove_cloud_alias()` should be replaced by `client.actors.remove_adoption()`
-  - The following CLI commands have been removed.
-    - `incydr risk-profiles add-cloud-alias` should be replaced by `incydr actors adoption create`
-    - `incydr risk-profiles remove-cloud-alias` should be replaced by `incydr actors adoption remove`
-    - `incydr risk-profiles bulk-add-cloud-aliases`
-    - `incydr risk-profiles bulk-remove-cloud-aliases`
 ### Added
 
 - Support for the [Sessions APIs](https://developer.code42.com/api/#tag/Alerts-and-Sessions)
@@ -54,6 +44,30 @@
     - `incydr actors show-family` to show details of an actors family.
     - `incydr actors adoption create` to create child-parent adoptions between actors.
     - `incydr actors adoption remove` to remove a child actor from its parent.
+
+### Removed
+
+- **Breaking Change!** Cloud alias risk profile functionality has been removed.
+  - The following Python SDK methods have been removed:
+    - `client.user_risk_profiles.add_cloud_alias()` should be replaced by `client.actors.create_adoption()`
+    - `client.user_risk_profiles.remove_cloud_alias()` should be replaced by `client.actors.remove_adoption()`
+  - The following CLI commands have been removed.
+    - `incydr risk-profiles add-cloud-alias` should be replaced by `incydr actors adoption create`
+    - `incydr risk-profiles remove-cloud-alias` should be replaced by `incydr actors adoption remove`
+    - `incydr risk-profiles bulk-add-cloud-aliases`
+    - `incydr risk-profiles bulk-remove-cloud-aliases`
+
+### Changed
+
+- **Breaking Change!** `User risk profiles` have been renamed as `Risk profiles` to better fit their additional application to actors.
+  - The SDK has been updated to reflect this via the following changes:
+    - `UserRiskProfile` model has been renamed to `RiskProfile`.
+    - `UserRiskProfilesPage` model has been renamed to `RiskProfilesPage`.
+    - The `UserRiskProfiles` class has been renamed to `RiskProfiles`
+    - The Incydr client `user_risk_profiles` property has been renamed to `risk_profiles`, methods in that client have been renamed similarly.
+      - `client.user_risk_profiles.v1.get_user_risk_profile()` would now be `client.risk_profiles.v1.get_risk_profile()`.
+    - The CLI has been updated to reflect this via the following changes:
+      - The `risk-profiles` command group is no longer available under the `users` command group. It is still accessible as its own `incydr` command group. ex: `incydr risk-profiles list`.
 
 ### Deprecated
 

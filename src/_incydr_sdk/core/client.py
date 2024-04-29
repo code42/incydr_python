@@ -22,9 +22,9 @@ from _incydr_sdk.devices.client import DevicesClient
 from _incydr_sdk.directory_groups.client import DirectoryGroupsClient
 from _incydr_sdk.exceptions import AuthMissingError
 from _incydr_sdk.file_events.client import FileEventsClient
+from _incydr_sdk.risk_profiles.client import RiskProfiles
 from _incydr_sdk.sessions.client import SessionsClient
 from _incydr_sdk.trusted_activities.client import TrustedActivitiesClient
-from _incydr_sdk.user_risk_profiles.client import UserRiskProfiles
 from _incydr_sdk.users.client import UsersClient
 from _incydr_sdk.watchlists.client import WatchlistsClient
 
@@ -109,7 +109,7 @@ class Client:
         self._sessions = SessionsClient(self)
         self._trusted_activities = TrustedActivitiesClient(self)
         self._users = UsersClient(self)
-        self._user_risk_profiles = UserRiskProfiles(self)
+        self._risk_profiles = RiskProfiles(self)
         self._watchlists = WatchlistsClient(self)
 
         if not skip_auth:
@@ -319,17 +319,17 @@ class Client:
         return self._users
 
     @property
-    def user_risk_profiles(self):
+    def risk_profiles(self):
         """
-        Property returning a [`UserRiskProfilesClient`](../user_risk_profiles) for interacting with
+        Property returning a [`RiskProfilesClient`](../risk_profiles) for interacting with
         `/v*/user_risk_profiles` API endpoints.
 
         Usage:
 
-            >>> client.user_risk_profiles.v1.get_user_risk_profile("23")
+            >>> client.risk_profiles.v1.get_risk_profile("23")
 
         """
-        return self._user_risk_profiles
+        return self._risk_profiles
 
     @property
     def watchlists(self):

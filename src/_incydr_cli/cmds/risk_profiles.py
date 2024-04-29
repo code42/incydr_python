@@ -13,20 +13,19 @@ from _incydr_cli.cmds.options.output_options import table_format_option
 from _incydr_cli.cmds.options.output_options import TableFormat
 from _incydr_cli.cmds.options.profile_filter_options import profile_filter_options
 from _incydr_cli.cmds.options.utils import user_lookup_callback
-from _incydr_cli.cmds.users import users
 from _incydr_cli.core import incompatible_with
 from _incydr_cli.core import IncydrCommand
 from _incydr_cli.core import IncydrGroup
 from _incydr_sdk.core.client import Client
 from _incydr_sdk.exceptions import DateParseError
-from _incydr_sdk.user_risk_profiles.models import UserRiskProfile
+from _incydr_sdk.risk_profiles.models import RiskProfile
 from _incydr_sdk.utils import model_as_card
 
 
-@users.group(cls=IncydrGroup)
+@click.group(cls=IncydrGroup)
 @logging_options
 def risk_profiles():
-    """View and manage user risk profiles."""
+    """View and manage risk profiles."""
 
 
 @risk_profiles.command("list", cls=IncydrCommand)
@@ -50,10 +49,10 @@ def list_(
     support_user: Optional[bool],
 ):
     """
-    List user risk profiles.
+    List risk profiles.
     """
     client = Client()
-    profiles = client.user_risk_profiles.v1.iter_all(
+    profiles = client.risk_profiles.v1.iter_all(
         manager_id=manager,
         title=title,
         division=division,
@@ -68,7 +67,7 @@ def list_(
     )
 
     if format_ == TableFormat.csv:
-        render.csv(UserRiskProfile, profiles, columns=columns, flat=True)
+        render.csv(RiskProfile, profiles, columns=columns, flat=True)
     elif format_ == TableFormat.table:
         columns = columns or [
             "username",
@@ -79,7 +78,7 @@ def list_(
             "start_date",
             "end_date",
         ]
-        render.table(UserRiskProfile, profiles, columns=columns, flat=False)
+        render.table(RiskProfile, profiles, columns=columns, flat=False)
     else:
         printed = False
         if format_ == TableFormat.json_pretty:
@@ -103,12 +102,12 @@ def show(
     format_: SingleFormat,
 ):
     """
-    Show details for a user risk profile.
+    Show details for a risk profile.
 
     Accepts a user ID or a username.  Performs an additional lookup if a username is passed.
     """
     client = Client()
-    profile = client.user_risk_profiles.v1.get_user_risk_profile(user)
+    profile = client.risk_profiles.v1.get_risk_profile(user)
     if format_ == SingleFormat.rich and client.settings.use_rich:
         console.print(
             Panel.fit(model_as_card(profile), title=f"Risk Profile {profile.username}")
@@ -166,7 +165,7 @@ def update(
     clear_notes=None,
 ):
     """
-    Update a user risk profile.
+    Update a risk profile.
 
     Accepts a user ID or a username.  Performs an additional lookup if a username is passed.
     """
@@ -175,7 +174,7 @@ def update(
     ):
         raise click.UsageError(
             "At least one of --start-date, --end-date, or --notes, or one of their corresponding clear flags, "
-            "is required to update a user risk profile."
+            "is required to update a risk profile."
         )
 
     client = Client()
@@ -188,14 +187,12 @@ def update(
         notes = ""
 
     try:
-        updated_profile = client.user_risk_profiles.v1.update(
+        updated_profile = client.risk_profiles.v1.update(
             user, notes, start_date, end_date
         )
         if client.settings.use_rich:
             console.print(
-                Panel.fit(
-                    model_as_card(updated_profile), title="Updated User Risk Profile"
-                )
+                Panel.fit(model_as_card(updated_profile), title="Updated Risk Profile")
             )
         else:
             console.print(updated_profile.json(), highlight=False)

@@ -18,9 +18,9 @@ from _incydr_cli.cmds.departments import departments
 from _incydr_cli.cmds.devices import devices
 from _incydr_cli.cmds.directory_groups import directory_groups
 from _incydr_cli.cmds.file_events import file_events
+from _incydr_cli.cmds.risk_profiles import risk_profiles
 from _incydr_cli.cmds.sessions import sessions
 from _incydr_cli.cmds.trusted_activities import trusted_activities
-from _incydr_cli.cmds.user_risk_profiles import risk_profiles
 from _incydr_cli.cmds.users import users
 from _incydr_cli.cmds.watchlists import watchlists
 from _incydr_cli.core import ExceptionHandlingGroup

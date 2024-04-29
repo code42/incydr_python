@@ -5,14 +5,14 @@ from typing import Union
 
 from _incydr_sdk.exceptions import DateParseError
 from _incydr_sdk.queries.utils import DATE_STR_FORMAT
-from _incydr_sdk.user_risk_profiles.models import Date
-from _incydr_sdk.user_risk_profiles.models import QueryUserRiskProfilesRequest
-from _incydr_sdk.user_risk_profiles.models import UpdateUserRiskProfileRequest
-from _incydr_sdk.user_risk_profiles.models import UserRiskProfile
-from _incydr_sdk.user_risk_profiles.models import UserRiskProfilesPage
+from _incydr_sdk.risk_profiles.models import Date
+from _incydr_sdk.risk_profiles.models import QueryRiskProfilesRequest
+from _incydr_sdk.risk_profiles.models import RiskProfile
+from _incydr_sdk.risk_profiles.models import RiskProfilesPage
+from _incydr_sdk.risk_profiles.models import UpdateRiskProfileRequest
 
 
-class UserRiskProfiles:
+class RiskProfiles:
     def __init__(self, parent):
         self._parent = parent
         self._v1 = None
@@ -20,11 +20,11 @@ class UserRiskProfiles:
     @property
     def v1(self):
         if self._v1 is None:
-            self._v1 = UserRiskProfilesV1(self._parent)
+            self._v1 = RiskProfilesV1(self._parent)
         return self._v1
 
 
-class UserRiskProfilesV1:
+class RiskProfilesV1:
     """
     Client for `/v1/user-risk-profiles` endpoints.
 
@@ -32,24 +32,24 @@ class UserRiskProfilesV1:
 
         >>> import incydr
         >>> client = incydr.Client(**kwargs)
-        >>> client.user_risk_profiles.v1.get_page()
+        >>> client.risk_profiles.v1.get_page()
     """
 
     def __init__(self, parent):
         self._parent = parent
 
-    def get_user_risk_profile(self, user_id: str) -> UserRiskProfile:
+    def get_risk_profile(self, user_id: str) -> RiskProfile:
         """
-        Get a single user risk profile.
+        Get a single risk profile.
 
         **Parameters:**
 
         * **user_id**: `str` (required) - The unique ID for the user.
 
-        **Returns**: A [`UserRiskProfile`][userriskprofile-model] object representing the user risk profile.
+        **Returns**: A [`RiskProfile`][riskprofile-model] object representing the risk profile.
         """
         response = self._parent.session.get(f"/v1/user-risk-profiles/{user_id}")
-        return UserRiskProfile.parse_response(response)
+        return RiskProfile.parse_response(response)
 
     def get_page(
         self,
@@ -66,9 +66,9 @@ class UserRiskProfilesV1:
         active: bool = None,
         deleted: bool = None,
         support_user: bool = None,
-    ) -> UserRiskProfilesPage:
+    ) -> RiskProfilesPage:
         """
-        Get a page of user risk profiles.
+        Get a page of risk profiles.
 
         Filter results by passing the appropriate parameters:
 
@@ -91,10 +91,10 @@ class UserRiskProfilesV1:
         * **support_user**: `bool | None` - When true, return only support users. When false, return only non-support users.
                                             Defaults to returning both
 
-        **Returns**: A ['UserRiskProfilesPage'][userriskprofilespage-model] object.
+        **Returns**: A ['RiskProfilesPage'][riskprofilespage-model] object.
         """
         page_size = page_size or self._parent.settings.page_size
-        data = QueryUserRiskProfilesRequest(
+        data = QueryRiskProfilesRequest(
             page=page_num,
             page_size=page_size,
             manager_id=manager_id,
@@ -112,7 +112,7 @@ class UserRiskProfilesV1:
         response = self._parent.session.get(
             "/v1/user-risk-profiles", params=data.dict()
         )
-        return UserRiskProfilesPage.parse_response(response)
+        return RiskProfilesPage.parse_response(response)
 
     def iter_all(
         self,
@@ -128,13 +128,13 @@ class UserRiskProfilesV1:
         active: bool = None,
         deleted: bool = None,
         support_user: bool = None,
-    ) -> Iterator[UserRiskProfile]:
+    ) -> Iterator[RiskProfile]:
         """
-        Iterate over all user risk profiles.
+        Iterate over all risk profiles.
 
         Accepts the same parameters as `.get_page()` except `page_num`.
 
-        **Returns**: A generator yielding individual [`UserRiskProfile`][userriskprofile-model] objects.
+        **Returns**: A generator yielding individual [`RiskProfile`][riskprofile-model] objects.
         """
         page_size = page_size or self._parent.settings.page_size
         for page_num in count(1):
@@ -163,17 +163,17 @@ class UserRiskProfilesV1:
         notes: str = None,
         start_date: Union[datetime, str] = None,
         end_date: Union[datetime, str] = None,
-    ) -> UserRiskProfile:
+    ) -> RiskProfile:
         """
-        Updates a user risk profile.
+        Updates a risk profile.
 
         **Parameters**
 
-        * **notes**: `str` - Additional notes for the user risk profile.
+        * **notes**: `str` - Additional notes for the risk profile.
         * **start_date**: `datetime` - The starting date for the user. Accepts a datetime object or a string in the format yyyy-MM-dd (UTC) format. Pass an empty string to clear the field.
         * **end_date**: `datetime` - The departure date for the user.  Accepts a datetime object or a string in the format yyyy-MM-dd (UTC) format.  Pass an empty string to clear the field.
 
-        **Returns**: A [`UserRiskProfile`][userriskprofile-model] object.
+        **Returns**: A [`RiskProfile`][riskprofile-model] object.
         """
         paths = []
         if start_date is not None:
@@ -187,7 +187,7 @@ class UserRiskProfilesV1:
             if notes == "":
                 notes = None
 
-        data = UpdateUserRiskProfileRequest(
+        data = UpdateRiskProfileRequest(
             endDate=end_date, notes=notes, startDate=start_date
         )
 
@@ -196,7 +196,7 @@ class UserRiskProfilesV1:
             params={"paths": paths},
             json=data.dict(),
         )
-        return UserRiskProfile.parse_response(response)
+        return RiskProfile.parse_response(response)
 
 
 def _create_date(date: Union[datetime, str]):

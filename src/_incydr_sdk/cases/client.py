@@ -52,7 +52,7 @@ class CasesV1:
 
         * **name**: `str` (required) The unique name given to the case.
         * **subject**: `str` The user UID of the subject being investigated in this case.
-        * **assignee**: `str` The user UID of the administrator assigned to investigate the case.
+        * **assignee**: `str` The actor ID of the administrator assigned to investigate the case.
         * **findings**: `str` Markdown formatted text summarizing the findings for a case.
         * **description**: `str` Brief description providing context for a case.
 
@@ -124,7 +124,7 @@ class CasesV1:
 
         **Parameters**:
 
-        * **assignee**: `str` - User UID of an assignee of a case on which to filter.
+        * **assignee**: `str` - Actor ID of an assignee of a case on which to filter.
         * **created_at**: `Tuple[datetime, datetime]` - Filter cases created between the supplied start and end times.
         * **is_assigned**: `bool` - Filter cases with an assignee (`True`) or without (`False`).
         * **last_modified_by**: `str` - User UID of the user who most recently modified the case.
