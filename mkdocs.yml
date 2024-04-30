@@ -54,7 +54,7 @@ nav:
       - Directory Groups: 'sdk/clients/directory_groups.md'
       - File Events: 'sdk/clients/file_events.md'
       - File Event Querying: 'sdk/clients/file_event_queries.md'
-      - Risk Profiles: 'sdk/clients/user_risk_profiles.md'
+      - Risk Profiles: 'sdk/clients/risk_profiles.md'
       - Sessions: 'sdk/clients/sessions.md'
       - Trusted Activites: 'sdk/clients/trusted_activities.md'
       - Users: 'sdk/clients/users.md'
