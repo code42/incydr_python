@@ -6,8 +6,8 @@ import pytest
 from pytest_httpserver import HTTPServer
 
 from _incydr_cli.main import incydr
-from _incydr_sdk.user_risk_profiles.models import UserRiskProfile
-from _incydr_sdk.user_risk_profiles.models import UserRiskProfilesPage
+from _incydr_sdk.risk_profiles.models import RiskProfile
+from _incydr_sdk.risk_profiles.models import RiskProfilesPage
 from incydr import Client
 from tests.test_users import TEST_USER_1
 
@@ -125,8 +125,8 @@ def test_get_single_user_risk_profile_when_default_params_returns_expected_data(
     mock_get_profile,
 ):
     client = Client()
-    user_risk_profile = client.user_risk_profiles.v1.get_user_risk_profile(TEST_USER_ID)
-    assert isinstance(user_risk_profile, UserRiskProfile)
+    user_risk_profile = client.risk_profiles.v1.get_risk_profile(TEST_USER_ID)
+    assert isinstance(user_risk_profile, RiskProfile)
     assert user_risk_profile.user_id == TEST_USER_ID
     assert user_risk_profile.json() == json.dumps(TEST_USER_RISK_PROFILE_1)
 
@@ -146,8 +146,8 @@ def test_get_page_when_default_params_returns_expected_data(
     )
 
     client = Client()
-    page = client.user_risk_profiles.v1.get_page()
-    assert isinstance(page, UserRiskProfilesPage)
+    page = client.risk_profiles.v1.get_page()
+    assert isinstance(page, RiskProfilesPage)
     assert page.user_risk_profiles[0].json() == json.dumps(TEST_USER_RISK_PROFILE_1)
     assert page.user_risk_profiles[1].json() == json.dumps(TEST_USER_RISK_PROFILE_2)
     assert page.total_count == len(page.user_risk_profiles) == 2
@@ -179,27 +179,27 @@ def test_iter_all_when_default_params_returns_expected_data(
         "/v1/user-risk-profiles", method="GET", query_string=urlencode(query_2)
     ).respond_with_json(user_risk_profile_data_2)
     client = Client()
-    iterator = client.user_risk_profiles.v1.iter_all(page_size=2)
+    iterator = client.risk_profiles.v1.iter_all(page_size=2)
     total_user_risk_profiles = 0
     expected_user_risk_profiles = [TEST_USER_RISK_PROFILE_1, TEST_USER_RISK_PROFILE_2]
 
     for item in iterator:
         total_user_risk_profiles += 1
-        assert isinstance(item, UserRiskProfile)
+        assert isinstance(item, RiskProfile)
         assert item.json() == json.dumps(expected_user_risk_profiles.pop(0))
     assert total_user_risk_profiles == 2
 
 
 def test_update_when_default_params_returns_expected_data(mock_update_profile):
     client = Client()
-    user_risk_profile = client.user_risk_profiles.v1.update(
+    user_risk_profile = client.risk_profiles.v1.update(
         TEST_USER_ID,
         notes="These are new notes",
         start_date=datetime.datetime(2020, 9, 1, tzinfo=datetime.timezone.utc),
         end_date=datetime.datetime(2022, 8, 2, tzinfo=datetime.timezone.utc),
     )
 
-    assert isinstance(user_risk_profile, UserRiskProfile)
+    assert isinstance(user_risk_profile, RiskProfile)
     assert user_risk_profile.json() == json.dumps(TEST_USER_RISK_PROFILE_2)
 
 
@@ -219,7 +219,7 @@ def test_cli_list_makes_expected_call(httpserver_auth: HTTPServer, runner):
         "/v1/user-risk-profiles", method="GET", query_string=urlencode(query_1)
     ).respond_with_json(user_risk_profile_data_1)
 
-    result = runner.invoke(incydr, ["users", "risk-profiles", "list"])
+    result = runner.invoke(incydr, ["risk-profiles", "list"])
     httpserver_auth.check()
     assert result.exit_code == 0
 
@@ -228,7 +228,7 @@ def test_cli_list_makes_expected_call(httpserver_auth: HTTPServer, runner):
 def test_cli_show_makes_expected_call(
     httpserver_auth: HTTPServer, runner, user, mock_get_profile, mock_user_lookup
 ):
-    result = runner.invoke(incydr, ["users", "risk-profiles", "show", user])
+    result = runner.invoke(incydr, ["risk-profiles", "show", user])
     httpserver_auth.check()
     assert result.exit_code == 0
 
@@ -240,7 +240,6 @@ def test_cli_update_when_all_params_makes_expected_call(
     result = runner.invoke(
         incydr,
         [
-            "users",
             "risk-profiles",
             "update",
             user,
@@ -264,7 +263,7 @@ def test_cli_update_when_incorrect_date_format_raises_date_parse_exception(
 ):
     result = runner.invoke(
         incydr,
-        ["users", "risk-profiles", "update", TEST_USER_ID, date_option, date_input],
+        ["risk-profiles", "update", TEST_USER_ID, date_option, date_input],
     )
     assert result.exit_code == 1
     assert "DateParseError: Error parsing time data." in result.output
@@ -273,9 +272,9 @@ def test_cli_update_when_incorrect_date_format_raises_date_parse_exception(
 def test_cli_update_when_no_options_raises_usage_error(
     httpserver_auth: HTTPServer, runner
 ):
-    result = runner.invoke(incydr, ["users", "risk-profiles", "update", TEST_USER_ID])
+    result = runner.invoke(incydr, ["risk-profiles", "update", TEST_USER_ID])
     assert result.exit_code == 2
     assert (
-        "At least one of --start-date, --end-date, or --notes, or one of their corresponding clear flags, is required to update a user risk profile."
+        "At least one of --start-date, --end-date, or --notes, or one of their corresponding clear flags, is required to update a risk profile."
         in str(result.output)
     )

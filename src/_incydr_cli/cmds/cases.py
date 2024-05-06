@@ -84,7 +84,7 @@ def cases():
 )
 @click.option(
     "--assignee",
-    help="User of the assignee of the case. Takes a user ID or a username.  Performs an additional lookup if a username is passed.",
+    help="User of the assignee of the case. Takes an actor ID or a username.  Performs an additional lookup if a username is passed.",
     default=None,
     callback=user_lookup_callback,
 )
@@ -259,7 +259,7 @@ def bulk_update(
     Valid CSV columns that correspond to update-able case fields include:
 
     * `number` (REQUIRED) - Case number.
-    * `assignee` - User ID or username of the administrator assigned to the case. Performs an additional lookup if a username is passed.
+    * `assignee` - actor ID or username of the administrator assigned to the case. Performs an additional lookup if a username is passed.
     * `description` - Brief optional description.
     * `findings` - Markdown formatted text summarizing the findings for a case.
     * `name` - Case name.

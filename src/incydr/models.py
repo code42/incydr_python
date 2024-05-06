@@ -23,12 +23,12 @@ from _incydr_sdk.file_events.models.event import FileEventV2
 from _incydr_sdk.file_events.models.event import User
 from _incydr_sdk.file_events.models.response import FileEventsPage
 from _incydr_sdk.file_events.models.response import SavedSearch
+from _incydr_sdk.risk_profiles.models import RiskProfile
+from _incydr_sdk.risk_profiles.models import RiskProfilesPage
 from _incydr_sdk.sessions.models.response import Session
 from _incydr_sdk.sessions.models.response import SessionsPage
 from _incydr_sdk.trusted_activities.models import TrustedActivitiesPage
 from _incydr_sdk.trusted_activities.models import TrustedActivity
-from _incydr_sdk.user_risk_profiles.models import UserRiskProfile
-from _incydr_sdk.user_risk_profiles.models import UserRiskProfilesPage
 from _incydr_sdk.users.models import Role
 from _incydr_sdk.users.models import UpdateRolesResponse
 from _incydr_sdk.users.models import UserRole
@@ -88,8 +88,8 @@ __all__ = [
     "IncludedDirectoryGroupsList",
     "IncludedDirectoryGroup",
     "AuditEventsPage",
-    "UserRiskProfilesPage",
-    "UserRiskProfile",
+    "RiskProfilesPage",
+    "RiskProfile",
 ]
 
 

@@ -220,17 +220,17 @@ Alerts has been replaced by [Sessions](#sessions).
 :::incydr.models.Role
     :docstring:
 
-## User Risk Profiles
+## Risk Profiles
 ---
 
-### `UserRiskProfile` model
+### `RiskProfile` model
 
-::: incydr.models.UserRiskProfile
+::: incydr.models.RiskProfile
     :docstring:
 
-### `UserRiskProfilesPage` model
+### `RiskProfilesPage` model
 
-::: incydr.models.UserRiskProfilesPage
+::: incydr.models.RiskProfilesPage
     :docstring:
 
 ## Watchlists

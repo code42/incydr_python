@@ -40,7 +40,7 @@ The Incydr SDK provides a Python client for interacting with the [Code42 Incydr 
 
 * [Search file events](sdk/clients/file_event_queries.md)
 * Manage [watchlist](sdk/clients/watchlists.md) membership
-* Manage [users](sdk/clients/users.md) and [user risk profiles](sdk/clients/user_risk_profiles.md)
+* Manage [users](sdk/clients/users.md) and [risk profiles](sdk/clients/risk_profiles.md)
 
 For more information, see the full [Incydr Python SDK Documentation](sdk/index.md).
 
