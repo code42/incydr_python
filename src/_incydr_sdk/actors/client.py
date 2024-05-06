@@ -4,7 +4,6 @@ import requests
 
 from ..exceptions import IncydrException
 from .models import Actor
-from .models import ActorAdoption
 from .models import ActorFamily
 from .models import ActorsPage
 from .models import QueryActorsRequest
@@ -177,49 +176,6 @@ class ActorsV1:
         except requests.HTTPError as err:
             if err.response.status_code == 404:
                 raise ActorNotFoundError(name)
-
-    def create_adoption(
-        self, child_actor_id: str, parent_actor_id: str
-    ) -> ActorAdoption:
-        """
-        Create an adoption between an actor and a parent actor by adding the actor as a child to the parent, both
-         are specified by their actor ID.
-
-        Activity originating from actors who have a parent will have said activity attributed to their parent.
-
-        **Parameters**:
-
-        * **child_actor_id**: `str` (required) - Unique ID for the actor that will be added as a child to the parent actor.
-        * **parent_actor_id**: `str` (required) - Unique ID for the parent actor.
-
-        **Returns**: A [`ActorAdoption`][actor-adoption-model] object representing the new parent-child actor adoption.
-        """
-        try:
-            response = self._parent.session.post(
-                "/v1/actors/adoption",
-                json={"childActorId": child_actor_id, "parentActorId": parent_actor_id},
-            )
-            return ActorAdoption.parse_response(response)
-        except requests.HTTPError as err:
-            if err.response.status_code == 404:
-                raise ActorNotFoundError
-
-    def remove_adoption(self, child_actor_id: str):
-        """
-        Removes the adoption between a child and parent actor by removing the parent from a child actor, specified by
-        actor ID.
-
-        **Parameters**:
-
-        * **child_actor_id**: `str` (required) - Unique ID for the child actor.
-
-        **Returns**: A `requests.Response` indicating success.
-        """
-        try:
-            return self._parent.session.delete(f"/v1/actors/adoption/{child_actor_id}")
-        except requests.HTTPError as err:
-            if err.response.status_code == 404:
-                raise ActorNotFoundError(child_actor_id)
 
 
 class ActorsClient:

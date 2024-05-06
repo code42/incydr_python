@@ -139,22 +139,3 @@ class ActorsPage(ResponseModel):
     """
 
     actors: List[Actor]
-
-
-class ActorAdoption(ResponseModel):
-    """
-    A model representing the result of an actor adoption.
-
-    **Fields**:
-
-    * **child_actor_ids**: `List[str]`
-    * **parent_actor_id**: `str`
-    """
-
-    child_actor_ids: List[str] = Field(
-        alias="childActorIds",
-        description="The actor IDs of the children associated with this parent.",
-    )
-    parent_actor_id: str = Field(
-        alias="parentActorId", description="The actor ID of the parent."
-    )

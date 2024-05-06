@@ -1,5 +1,4 @@
 import click
-import requests
 from rich.panel import Panel
 
 from _incydr_cli import console
@@ -15,7 +14,6 @@ from _incydr_cli.core import IncydrGroup
 from _incydr_sdk.actors.client import ActorNotFoundError
 from _incydr_sdk.actors.models import Actor
 from _incydr_sdk.core.client import Client
-from _incydr_sdk.exceptions import IncydrException
 from _incydr_sdk.utils import model_as_card
 
 
@@ -29,8 +27,7 @@ def actors():
     User cloud accounts are consolidated into a single actor through adoption,
     which tie related actors to one parent actor.
 
-    The actor commands can be used to retrieve information about actors and their relationships,
-    and also manage adoption.
+    The actor commands can be used to retrieve information about actors and their relationships.
     """
 
 
@@ -196,74 +193,3 @@ def show_family(actor_id: str = None, name: str = None, format_: SingleFormat = 
         console.print_json(family.json())
     else:
         click.echo(family.json())
-
-
-@actors.group("adoption", cls=IncydrGroup)
-def adoption():
-    """Manage actor adoption."""
-
-
-@adoption.command(cls=IncydrCommand)
-@click.argument("children")
-@click.argument("parent")
-@logging_options
-def create(
-    children: str,
-    parent: str,
-):
-    """
-    Create an adoption between an actor and a parent actor by adding the actor as a child to the parent, both
-    are specified by their actor ID.
-
-    Activity originating from actors who have a parent will have said activity attributed to their parent.
-
-    CHILDREN is a comma-delimited string of one or more actor IDs, all of which will be adopted by the specified parent actor.
-
-    PARENT is a single actor ID.
-    """
-    client = Client()
-    children_list = children.split(",")
-    response = None
-    for child in children_list:
-        try:
-            response = client.actors.v1.create_adoption(child, parent)
-        except (IncydrException, requests.HTTPError):
-            console.print(f"Error creating adoption for child {child}, skipping...")
-
-    if response:
-        console.print(
-            f"Adoption(s) created between parent actor with ID: {response.parent_actor_id} and children with ID(s): {response.child_actor_ids}"
-        )
-    else:
-        console.print("No adoptions created successfully.")
-
-
-@adoption.command(cls=IncydrCommand)
-@click.argument("children")
-@logging_options
-def remove(
-    children: str,
-):
-    """
-    Removes the adoption between a child and parent actor by removing the parent from a child actor, specified by
-    actor ID.
-
-    CHILDREN is a comma-delimited string of one or more actor IDs, all of which will be removed from their parent actor.
-    """
-    client = Client()
-    children_list = children.split(",")
-    response = None
-    success = []
-    for child in children_list:
-        try:
-            response = client.actors.v1.remove_adoption(child)
-            success.append(child)
-        except (IncydrException, requests.HTTPError):
-            console.print(f"Error removing adoption for child {child}, skipping...")
-
-    if response:
-        console.print(
-            f"Adoption removed. Following actors removed from parent: {success}"
-        )
-    else:
-        console.print("No adoptions removed successfully.")
