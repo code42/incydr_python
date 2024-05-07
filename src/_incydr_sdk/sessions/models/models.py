@@ -12,9 +12,9 @@ from _incydr_sdk.enums.sessions import SortKeys
 
 
 class ContentInspectionEvent(Model):
-    event_id: str = Field(alias="eventId")
-    pii_type: str = Field(alias="piiType")
-    status: str
+    event_id: Optional[str] = Field(alias="eventId")
+    pii_type: Optional[List[str]] = Field(alias="piiType")
+    status: Optional[str]
 
 
 class ContentInspectionResult(Model):
@@ -22,41 +22,43 @@ class ContentInspectionResult(Model):
         alias="eventResults",
         description="List of all content inspection events that have occurred.",
     )
-    status: str
+    status: Optional[str]
 
 
 class Note(Model):
-    content: str
-    id: str
-    source_timestamp: int = Field(alias="sourceTimestamp")
-    user_id: str = Field(alias="userId")
+    content: Optional[str]
+    id: Optional[str]
+    source_timestamp: Optional[int] = Field(alias="sourceTimestamp")
+    user_id: Optional[str] = Field(alias="userId")
 
 
 class RiskIndicator(Model):
-    event_count: int = Field(alias="eventCount")
-    id: str
-    name: str
-    weight: int
+    event_count: Optional[int] = Field(alias="eventCount")
+    id: Optional[str]
+    name: Optional[str]
+    weight: Optional[int]
 
 
 class Score(Model):
-    score: int
-    severity: int
-    source_timestamp: int = Field(alias="sourceTimestamp")
+    score: Optional[int]
+    severity: Optional[int]
+    source_timestamp: Optional[int] = Field(alias="sourceTimestamp")
 
 
 class State(Model):
-    source_timestamp: int = Field(alias="sourceTimestamp")
+    source_timestamp: Optional[int] = Field(alias="sourceTimestamp")
     state: SessionStates
-    user_id: str = Field(alias="userId", description="A User ID. (Deprecated)")
+    user_id: Optional[str] = Field(
+        alias="userId", description="A User ID. (Deprecated)"
+    )
 
 
 class Alert(Model):
     """ """
 
-    alert_id: str = Field(alias="alertId")
-    lesson_id: str = Field(alias="lessonId")
-    rule_id: str = Field(alias="ruleId")
+    alert_id: Optional[str] = Field(alias="alertId")
+    lesson_id: Optional[str] = Field(alias="lessonId")
+    rule_id: Optional[str] = Field(alias="ruleId")
 
 
 class SessionsCriteriaRequest(BaseModel):
@@ -83,5 +85,5 @@ class SessionsQueryRequest(SessionsCriteriaRequest):
 
 
 class SessionsChangeStateRequest(BaseModel):
-    ids: List[str]
-    newState: str
+    ids: Optional[List[str]]
+    newState: Optional[str]
