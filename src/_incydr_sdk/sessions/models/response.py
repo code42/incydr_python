@@ -41,28 +41,28 @@ class Session(ResponseModel):
     * **triggered_alerts**: `str` The list of all alerts that were triggered by activity in this session.
     """
 
-    actor_id: str = Field(alias="actorId")
-    begin_time: int = Field(alias="beginTime")
-    content_inspection_results: ContentInspectionResult = Field(
+    actor_id: Optional[str] = Field(alias="actorId")
+    begin_time: Optional[int] = Field(alias="beginTime")
+    content_inspection_results: Optional[ContentInspectionResult] = Field(
         alias="contentInspectionResults"
     )
-    context_summary: str = Field(alias="contextSummary")
-    critical_events: int = Field(alias="criticalEvents")
-    end_time: int = Field(alias="endTime")
-    exfiltration_summary: str = Field(alias="exfiltrationSummary")
-    first_observed: int = Field(alias="firstObserved")
-    high_events: int = Field(alias="highEvents")
-    last_updated: int = Field(alias="lastUpdated")
-    low_events: int = Field(alias="lowEvents")
-    moderate_events: int = Field(alias="moderateEvents")
-    no_risk_events: int = Field(alias="noRiskEvents")
-    notes: List[Note]
-    risk_indicators: List[RiskIndicator] = Field(alias="riskIndicators")
-    scores: List[Score]
-    session_id: str = Field(alias="sessionId")
-    states: List[State]
-    tenant_id: str = Field(alias="tenantId")
-    triggered_alerts: List[Alert] = Field(alias="triggeredAlerts")
+    context_summary: Optional[str] = Field(alias="contextSummary")
+    critical_events: Optional[int] = Field(alias="criticalEvents")
+    end_time: Optional[int] = Field(alias="endTime")
+    exfiltration_summary: Optional[str] = Field(alias="exfiltrationSummary")
+    first_observed: Optional[int] = Field(alias="firstObserved")
+    high_events: Optional[int] = Field(alias="highEvents")
+    last_updated: Optional[int] = Field(alias="lastUpdated")
+    low_events: Optional[int] = Field(alias="lowEvents")
+    moderate_events: Optional[int] = Field(alias="moderateEvents")
+    no_risk_events: Optional[int] = Field(alias="noRiskEvents")
+    notes: Optional[List[Note]]
+    risk_indicators: Optional[List[RiskIndicator]] = Field(alias="riskIndicators")
+    scores: Optional[List[Score]]
+    session_id: Optional[str] = Field(alias="sessionId")
+    states: Optional[List[State]]
+    tenant_id: Optional[str] = Field(alias="tenantId")
+    triggered_alerts: Optional[List[Alert]] = Field(alias="triggeredAlerts")
     user_id: Optional[str] = Field(None, alias="userId")
 
 

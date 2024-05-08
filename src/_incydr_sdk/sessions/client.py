@@ -131,7 +131,6 @@ class SessionsV1:
 
         **Returns**: A generator yielding individual [`Session`][session-model] objects.
         """
-        print(watchlist_ids)
         for page_num in itertools.count(0):
             page = self.get_page(
                 actor_id=actor_id,
