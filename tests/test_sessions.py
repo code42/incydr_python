@@ -29,7 +29,7 @@ TEST_SESSION = {
     "beginTime": POSIX_TS,
     "contentInspectionResults": {
         "eventResults": [
-            {"eventId": "event-id", "piiType": "string", "status": "PENDING"}
+            {"eventId": "event-id", "piiType": ["string"], "status": "PENDING"}
         ],
         "status": "PENDING",
     },
