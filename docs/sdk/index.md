@@ -31,10 +31,10 @@ You must update the `api_domain` value for your specific environment. To find th
 
 | Console Domain         | API Domain         |
 | ---------------------- | ------------------ |
-| console.us.code42.com  | api.us.code42.com  |
-| console.us2.code42.com | api.us2.code42.com |
-| console.ie.code42.com  | api.ie.code42.com  |
-| console.gov.code42.com | api.gov.code42.com |
+| console.us.code42.com  | https://api.us.code42.com  |
+| console.us2.code42.com | https://api.us2.code42.com |
+| console.ie.code42.com  | https://api.ie.code42.com  |
+| console.gov.code42.com | https://api.gov.code42.com |
 
 Any arguments that are not provided to the `incydr.Client` will attempt to be loaded from environment variables or
    .env files. See [Settings](/sdk/settings) for more details
