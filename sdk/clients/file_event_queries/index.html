@@ -1,0 +1,2242 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://developer.code42.com/sdk/clients/file_event_queries/">
+      
+      
+        <link rel="prev" href="../file_events/">
+      
+      
+        <link rel="next" href="../risk_profiles/">
+      
+      
+      <link rel="icon" href="../../../images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+    
+    
+      
+        <title>File Event Querying - Code42 Developer Portal</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.66ac8b77.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../css/custom.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#file-event-querying" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Code42 Developer Portal" class="md-header__button md-logo" aria-label="Code42 Developer Portal" data-md-component="logo">
+      
+  <img src="../../../images/logo_developers.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Code42 Developer Portal
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              File Event Querying
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/code42/incydr_python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    code42/incydr_python
+  </div>
+</a>
+
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../api/" class="md-tabs__link">
+        
+  
+    
+  
+  API Reference
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+    
+  
+  SDK
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../cli/" class="md-tabs__link">
+          
+  
+    
+  
+  CLI
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../integration-guides/" class="md-tabs__link">
+          
+  
+    
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Code42 Developer Portal" class="md-nav__button md-logo" aria-label="Code42 Developer Portal" data-md-component="logo">
+      
+  <img src="../../../images/logo_developers.svg" alt="logo">
+
+    </a>
+    Code42 Developer Portal
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/code42/incydr_python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    code42/incydr_python
+  </div>
+</a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../api/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    SDK
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            SDK
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Client
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Settings
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Settings
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../logging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Logging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actors/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Actors
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Agents
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alerts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Alerts (Deprecated)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alert_rules/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Alert Rules
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alert_queries/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Alert Querying
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audit_log/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Audit Log
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cases
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../customer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Customer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../departments/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Departments
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devices/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Devices
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../directory_groups/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Directory Groups
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../file_events/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    File Events
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    File Event Querying
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    File Event Querying
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#eventquery-class" class="md-nav__link">
+    <span class="md-ellipsis">
+      EventQuery Class
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#query-building" class="md-nav__link">
+    <span class="md-ellipsis">
+      Query Building
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#saved-searches" class="md-nav__link">
+    <span class="md-ellipsis">
+      Saved Searches
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pagination" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pagination
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../risk_profiles/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Risk Profiles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sessions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sessions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trusted_activities/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Trusted Activites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../users/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Users
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../watchlists/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Watchlists
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../enums/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Enums
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Models
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../cli/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    CLI
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            CLI
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/getting_started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/bulk/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bulk Commands
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/logging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Logging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/migration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/syslogging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Syslogging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Commands
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            Commands
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/cmds/actors/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Actors
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/cmds/agents/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Agents
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/cmds/alerts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Alerts (Deprecated)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/cmds/alert_rules/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Alert Rules
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/cmds/audit_log/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Audit Log
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/cmds/cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cases
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/cmds/departments/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Departments
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/cmds/devices/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Devices
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/cmds/directory_groups/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Directory Groups
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/cmds/file_events/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    File Events
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/cmds/riks_profiles.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Risk Profiles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/cmds/sessions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sessions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/cmds/trusted_activities/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Trusted Activites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/cmds/users/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Users
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/cmds/watchlists/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Watchlists
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../integration-guides/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Guides
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Microsoft Sentinel
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            Microsoft Sentinel
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../integration-guides/sentinel/introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../integration-guides/sentinel/azure-sentinel-data-collector/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data Collector API
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../integration-guides/sentinel/azure-sentinel-log-analytics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Log Analytics Agent
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#eventquery-class" class="md-nav__link">
+    <span class="md-ellipsis">
+      EventQuery Class
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#query-building" class="md-nav__link">
+    <span class="md-ellipsis">
+      Query Building
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#saved-searches" class="md-nav__link">
+    <span class="md-ellipsis">
+      Saved Searches
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pagination" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pagination
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="file-event-querying">File Event Querying<a class="headerlink" href="#file-event-querying" title="Permanent link">&para;</a></h1>
+<h2 id="eventquery-class">EventQuery Class<a class="headerlink" href="#eventquery-class" title="Permanent link">&para;</a></h2>
+<p>Use the <code>EventQuery</code> class to create a query for searching and filtering file events.  More details on how to use the <code>EventQuery</code> class can be found in the <a href="#query-building">Query Building</a> section below.</p>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>_incydr_sdk.queries.file_events.<strong>EventQuery</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">start_date=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">end_date=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">groupClause='AND'</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">groups=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">pgNum=1</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">pgSize=100</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">pgToken=''</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">srtDir='asc'</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">srtKey='event.id'</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**kwargs</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Class to build a file event query. Use the class methods to attach additional filter operators.</p>
+<p><strong>Parameters</strong>:</p>
+<div class="highlight"><pre><span></span><code><span class="w"> </span><span class="o"><em></span><span class="w"> </span><span class="o"></em><em></span><span class="n">start_date</span><span class="o"></em><em>:</span><span class="w"> </span><span class="n n-Quoted"><code>int</code></span><span class="p">,</span><span class="w"> </span><span class="n n-Quoted"><code>float</code></span><span class="p">,</span><span class="w"> </span><span class="n n-Quoted"><code>str</code></span><span class="p">,</span><span class="w"> </span><span class="n n-Quoted"><code>datetime</code></span><span class="p">,</span><span class="w"> </span><span class="n n-Quoted"><code>timedelta</code></span><span class="w"> </span><span class="o">-</span><span class="w">  </span><span class="k">Start</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="kt">date</span><span class="w"> </span><span class="k">range</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="k">query</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="k">events</span><span class="p">.</span><span class="w"> </span><span class="n">Defaults</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="k">None</span><span class="p">.</span>
+<span class="w"> </span><span class="o"></em></span><span class="w"> </span><span class="o"><strong></span><span class="n">end_date</span><span class="o"></strong>:</span><span class="w"> </span><span class="n n-Quoted"><code>int</code></span><span class="p">,</span><span class="w"> </span><span class="n n-Quoted"><code>float</code></span><span class="p">,</span><span class="w"> </span><span class="n n-Quoted"><code>str</code></span><span class="p">,</span><span class="w"> </span><span class="n n-Quoted"><code>datetime</code></span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="k">End</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="kt">date</span><span class="w"> </span><span class="k">range</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="k">query</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="k">events</span><span class="p">.</span><span class="w">  </span><span class="n">Defaults</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="k">None</span><span class="p">.</span>
+</code></pre></div></div>
+<div class="autodoc-members">
+<div class="autodoc-signature"><code><strong>equals</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">term</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Adds an <code>equals</code> filter to the query.</p>
+<p>When passed as part of a query, returns events when the field corresponding to the filter term equals the
+indicated value(s).</p>
+<p>Example:
+    <code>EventQuery(**kwargs).equals('file.category', 'Document')</code> creates a query which will return file events
+    where the <code>file.category</code> field is equal to <code>Document</code>.</p>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><strong>term</strong>: <code>str</code> - The term which corresponds to a file event field.</li>
+<li><strong>values</strong>: <code>str | List[str]</code> - The value(s) for the term to match.</li>
+</ul></div>
+<div class="autodoc-signature"><code><strong>not_equals</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">term</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Adds an <code>not_equals</code> filter to the query. The opposite of the <code>equals</code> filter.</p>
+<p>When passed as part of a query, returns events when the field corresponding to the filter term does not equal the indicated value(s).</p>
+<p>Example:
+    <code>EventQuery(**kwargs).not_equals('file.category', 'Document')</code> creates a query which will return file events where the <code>file.category</code> field is NOT equal to <code>Document</code>.</p>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><strong>term</strong>: <code>str</code> - The term which corresponds to a file event field.</li>
+<li><strong>values</strong>: <code>str | List[str]</code> - The value(s) for the term to not match.</li>
+</ul></div>
+<div class="autodoc-signature"><code><strong>exists</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">term</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Adds an <code>exists</code> filter to the query. The opposite of the <code>does_not_exist</code> filter.</p>
+<p>When passed as part of a query, returns events when the field corresponding to the filter term is not <code>null</code>.</p>
+<p>Example:
+    <code>EventQuery(**kwargs).exists('risk.trustReason')</code> creates a query which will return file events where the <code>risk.trustReason</code> field is populated with any not null value.</p>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><strong>term</strong>: <code>str</code> - The term which corresponds to a file event field.</li>
+</ul></div>
+<div class="autodoc-signature"><code><strong>does_not_exist</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">term</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Adds a <code>does_not_exist</code> filter to the query.</p>
+<p>When passed as part of a query, returns events when the field corresponding to the filter term is <code>null</code>.</p>
+<p>Example:
+    <code>EventQuery(**kwargs).does_not_exist('risk.TrustReason')</code> creates a query which will return file events where the <code>risk.trustReason</code> field is null.</p>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><strong>term</strong>: <code>str</code> - The term which corresponds to a file event field.</li>
+</ul></div>
+<div class="autodoc-signature"><code><strong>greater_than</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">term</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">value</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Adds a <code>greater_than</code> filter to the query. The opposite of the <code>less_than</code> filter.</p>
+<p>When passed as part of a query, returns events when the field corresponding to the filter term is greater than the indicated value.</p>
+<p>Example:
+    <code>EventQuery(**kwargs).greater_than('risk.score', 10)</code> creates a query which will return file events where the <code>risk.score</code> field is greater than <code>10</code>.</p>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><strong>term</strong>: <code>str</code> - The term which corresponds to a file event field.</li>
+<li><strong>values</strong>: <code>int</code> - The value for the term to be greater than.</li>
+</ul></div>
+<div class="autodoc-signature"><code><strong>less_than</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">term</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">value</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Adds a <code>less_thn</code> filter to the query. The opposite of the <code>greater_than</code> filter.</p>
+<p>When passed as part of a query, returns events when the field corresponding to the filter term is less than the indicated value.</p>
+<p>Example:
+    <code>EventQuery(**kwargs).less_than('risk.score', 10)</code> creates a query which will return file events where the <code>risk.score</code> field is less than <code>10</code>.</p>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><strong>term</strong>: <code>str</code> - The term which corresponds to a file event field.</li>
+<li><strong>values</strong>: <code>int</code> - The value for the term to be less than.</li>
+</ul></div>
+<div class="autodoc-signature"><code><strong>matches_any</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Sets operator to combine multiple filters to <code>OR</code>.
+Returns events that match at least one of the filters in the query.</p>
+<p>Default operator is <code>AND</code>, which returns events that match all filters in the query.</p></div>
+</div>
+</div>
+<h2 id="query-building">Query Building<a class="headerlink" href="#query-building" title="Permanent link">&para;</a></h2>
+<p>The <code>EventQuery</code> class can be imported directly from the <code>incydr</code> module.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># import the EventQuery class</span>
+<span class="kn">from</span> <span class="nn">incydr</span> <span class="kn">import</span> <span class="n">EventQuery</span>
+</code></pre></div>
+<p>The <code>EventQuery(start_date=None, end_date=None)</code> class takes a start date and/or an end date in various forms, including a timestamp string, a datetime object, or a number (float, int).</p>
+<p>The <code>start_date</code> param can also take a duration (ex. filter for events which occurred in the last week) in the form of an ISO-duration string or a <code>datetime.timedelta</code> object.</p>
+<p>All of the following examples are valid <code>start_date</code> values.
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="c1"># Filter for events after September 10th, 2020</span>
+<span class="n">start_str</span> <span class="o">=</span> <span class="s2">&quot;2020-09-10 11:12:13&quot;</span>  <span class="c1"># string formatted as &quot;%Y-%m-%d %H:%M:%S&quot;</span>
+
+<span class="n">start_datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span> <span class="c1"># datetime object</span>
+
+<span class="n">start_utc</span> <span class="o">=</span> <span class="mf">1599736333.0</span>  <span class="c1"># UTC timestamp</span>
+
+<span class="c1"># Filter for events that occurred in the last 7 days</span>
+<span class="n">start_timedelta</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+
+<span class="n">start_iso_duration</span> <span class="o">=</span> <span class="s2">&quot;P7D&quot;</span>
+</code></pre></div></p>
+<p>Additional filters can be attached to the query by using the <a href="#eventquery-class"><code>EventQuery</code></a> class methods.  Each of these methods takes a <code>str</code> term to filter on as their first argument,
+specifically an <a href="../../enums/#event-search-terms"><code>EventSearchTerm</code></a> which matches a file event field (ex: <code>'risk.severity'</code>).  If applicable the second argument is the value(s) to compare.</p>
+<p>The following operators are available for filtering:</p>
+<ul>
+<li><code>equals</code></li>
+<li><code>not_equals</code></li>
+<li><code>exists</code></li>
+<li><code>does_not_exist</code></li>
+<li><code>greater_than</code></li>
+<li><code>less_than</code></li>
+</ul>
+<p>More detailed documentation on these methods is available above in the <a href="#eventquery-class"><code>EventQuery</code></a> documentation.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># to create a query which filters events which have the file category of &#39;Document&#39; or &#39;Audio&#39; from the past 1 day</span>
+
+<span class="n">query</span> <span class="o">=</span> <span class="n">EventQuery</span><span class="p">(</span><span class="s1">&#39;P1D&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="s1">&#39;file.category&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Document&#39;</span><span class="p">,</span> <span class="s1">&#39;Audio&#39;</span><span class="p">])</span>
+
+<span class="c1"># to create a query which filters events based on the following criteria:</span>
+<span class="c1">#       - occurred from 10-10-2020 to 11-10-2020.</span>
+<span class="c1">#       - &#39;event.action&#39; is not equal to &#39;file-created&#39;</span>
+<span class="c1">#       - &#39;risk.score&#39; is greater than 10</span>
+
+<span class="n">start_date</span> <span class="o">=</span> <span class="s2">&quot;2020-10-10 11:12:13&quot;</span>
+<span class="n">end_date</span> <span class="o">=</span> <span class="s2">&quot;2020-11-10 11:12:13&quot;</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">EventQuery</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">)</span><span class="o">.</span><span class="n">not_equals</span><span class="p">(</span><span class="s1">&#39;event.action&#39;</span><span class="p">,</span> <span class="s1">&#39;file-created&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="s1">&#39;risk.score&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</code></pre></div>
+<p>To assist with the <code>equals()</code> and <code>not_equals()</code> methods, the following search terms have corresponding enum classes to specify valid filter values:</p>
+<ul>
+<li><code>file.category</code>: <a href="../../enums/#file-categories"><code>FileCategory</code></a></li>
+<li><code>event.action</code>: <a href="../../enums/#event-actions"><code>EventAction</code></a></li>
+<li><code>source.category</code>: <a href="../../enums/#source-destination-categories"><code>SourceCategory</code></a></li>
+<li><code>destination.category</code>: <a href="../../enums/#source-destination-categories"><code>DestinationCategory</code></a></li>
+<li><code>event.shareType</code>: <a href="../../enums/#share-types"><code>ShareType</code></a></li>
+<li><code>report.type</code>: <a href="../../enums/#report-types"><code>ReportType</code></a></li>
+<li><code>risk.indicators.name</code>: <a href="../../enums/#risk-indicators"><code>RiskIndicators</code></a></li>
+<li><code>risk.severity</code>: <a href="../../enums/#risk-severity"><code>RiskSeverity</code></a></li>
+<li><code>risk.trustReason</code>: <a href="../../enums/#trust-reasons"><code>TrustReason</code></a></li>
+</ul>
+<p>For example, the <a href="../../enums/#event-actions"><code>EventAction</code></a> enum class provides all valid values for the <code>event.action</code> file event field.</p>
+<p>Pass the event query object to the <code>file_events.v2.search()</code> method to get the results.</p>
+<h2 id="saved-searches">Saved Searches<a class="headerlink" href="#saved-searches" title="Permanent link">&para;</a></h2>
+<p>You can convert a saved search response object into an <code>EventQuery</code> to be used for searching using the
+<code>EventQuery.from_saved_search()</code> class method:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">incydr</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">incydr</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="n">saved_search</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">file_events</span><span class="o">.</span><span class="n">v2</span><span class="o">.</span><span class="n">get_saved_search</span><span class="p">(</span><span class="s2">&quot;&lt;saved_search_id&gt;&quot;</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">incydr</span><span class="o">.</span><span class="n">EventQuery</span><span class="o">.</span><span class="n">from_saved_search</span><span class="p">(</span><span class="n">saved_search</span><span class="p">)</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">file_events</span><span class="o">.</span><span class="n">v2</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="pagination">Pagination<a class="headerlink" href="#pagination" title="Permanent link">&para;</a></h2>
+<p>To facilitate paging when a search query results in more total file events found than the <code>.page_size</code> value of the query
+(the maximum page size is <code>10,000</code> events), the <a href="https://developer.code42.com/api/#tag/File-Events/operation/searchEventsUsingPOST_1">file events search endpoint</a>
+accepts a "page token" parameter, which indicates which event ID the currently requested page should start at.</p>
+<p>By default, an <code>EventQuery</code> sets the <code>.page_token</code> value to an empty string (<code>""</code>), which tells the file events
+service that this is the initial query and that it should return the next page token value in the response.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If <code>.page_token</code> is set to <code>None</code>, then the response will <em>not</em> contain a next page token value, and pagination will need to be done
+manually by incrementing the <code>.page_num</code> property of the query.</p>
+<p>Using page numbers will only result in a maximum of 10,000 events returned, so it is recommended to always use page tokens.</p>
+</div>
+<p>The <code>client.file_events.v2.search()</code> method will automatically update the query object it receives with the next page
+token, so fetching multiple pages of results is as simple as re-running the <code>.search()</code> method with the same query
+object until the server sends a <code>null</code> page token value (meaning there are no more results):</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">incydr</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">incydr</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">incydr</span><span class="o">.</span><span class="n">EventQuery</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="k">while</span> <span class="n">query</span><span class="o">.</span><span class="n">page_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">file_events</span><span class="o">.</span><span class="n">v2</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">file_events</span><span class="p">:</span>
+        <span class="o">...</span> <span class="c1"># process events here</span>
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+    
+        
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.tracking", "content.code.annotate", "navigation.indexes"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      
+        <script src="../../../javascripts/redoc.standalone.js"></script>
+      
+    
+  </body>
+</html>

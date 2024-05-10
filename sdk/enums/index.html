@@ -1,0 +1,3504 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://developer.code42.com/sdk/enums/">
+      
+      
+        <link rel="prev" href="../clients/watchlists/">
+      
+      
+        <link rel="next" href="../models/">
+      
+      
+      <link rel="icon" href="../../images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+    
+    
+      
+        <title>Enums - Code42 Developer Portal</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.66ac8b77.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../css/custom.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#enums" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Code42 Developer Portal" class="md-header__button md-logo" aria-label="Code42 Developer Portal" data-md-component="logo">
+      
+  <img src="../../images/logo_developers.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Code42 Developer Portal
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Enums
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/code42/incydr_python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    code42/incydr_python
+  </div>
+</a>
+
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../api/" class="md-tabs__link">
+        
+  
+    
+  
+  API Reference
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+    
+  
+  SDK
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../cli/" class="md-tabs__link">
+          
+  
+    
+  
+  CLI
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../integration-guides/" class="md-tabs__link">
+          
+  
+    
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Code42 Developer Portal" class="md-nav__button md-logo" aria-label="Code42 Developer Portal" data-md-component="logo">
+      
+  <img src="../../images/logo_developers.svg" alt="logo">
+
+    </a>
+    Code42 Developer Portal
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/code42/incydr_python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    code42/incydr_python
+  </div>
+</a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    SDK
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            SDK
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../client/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Client
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Settings
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Settings
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../settings/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Logging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/actors/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Actors
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/agents/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Agents
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/alerts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Alerts (Deprecated)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/alert_rules/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Alert Rules
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/alert_queries/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Alert Querying
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/audit_log/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Audit Log
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cases
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/customer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Customer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/departments/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Departments
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/devices/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Devices
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/directory_groups/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Directory Groups
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/file_events/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    File Events
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/file_event_queries/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    File Event Querying
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/risk_profiles/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Risk Profiles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/sessions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sessions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/trusted_activities/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Trusted Activites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/users/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Users
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/watchlists/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Watchlists
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Enums
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Enums
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agents
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Agents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agent Type
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agents-sort-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agents Sort Keys
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alerts-deprecated" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alerts (Deprecated)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Alerts (Deprecated)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#alert-severity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alert Severity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alert-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alert State
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alert-terms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alert Terms
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk-severity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk Severity
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cases
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cases-sort-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cases Sort Keys
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#case-statuses" class="md-nav__link">
+    <span class="md-ellipsis">
+      Case Statuses
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#devices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Devices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Devices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#devices-sort-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      Devices Sort Keys
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Events
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Events">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#event-search-terms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Event Search Terms
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Categories
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#event-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Event Actions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-destination-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source &amp; Destination Categories
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#share-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Share Types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#report-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Report Types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk-indicators" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk Indicators
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Risk Indicators">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#risk-indicators-destinations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk Indicators - Destinations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk-indicators-user-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk Indicators - User Behavior
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk-indicators-file-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk Indicators - File Categories
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trust-reasons" class="md-nav__link">
+    <span class="md-ellipsis">
+      Trust Reasons
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk-severity_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk Severity
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sessions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sessions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#session-states" class="md-nav__link">
+    <span class="md-ellipsis">
+      Session States
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session-severities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Session Severities
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#content-inspection-statuses" class="md-nav__link">
+    <span class="md-ellipsis">
+      Content Inspection Statuses
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sort-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sort Keys
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trusted-activities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Trusted Activities
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trusted Activities">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#activity-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Activity Types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cloud-sync-apps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cloud Sync Apps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cloud-share-apps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cloud Share Apps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#email-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      Email Services
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#principal-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Principal Types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trusted-activities-sort-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      Trusted Activities Sort Keys
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#watchlists" class="md-nav__link">
+    <span class="md-ellipsis">
+      Watchlists
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Watchlists">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#watchlist-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Watchlist Types
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Models
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../cli/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    CLI
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            CLI
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/getting_started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/bulk/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bulk Commands
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/logging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Logging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/migration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/syslogging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Syslogging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Commands
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            Commands
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/actors/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Actors
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/agents/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Agents
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/alerts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Alerts (Deprecated)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/alert_rules/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Alert Rules
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/audit_log/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Audit Log
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cases
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/departments/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Departments
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/devices/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Devices
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/directory_groups/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Directory Groups
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/file_events/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    File Events
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/riks_profiles.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Risk Profiles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/sessions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sessions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/trusted_activities/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Trusted Activites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/users/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Users
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/watchlists/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Watchlists
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../integration-guides/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Guides
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Microsoft Sentinel
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            Microsoft Sentinel
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration-guides/sentinel/introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration-guides/sentinel/azure-sentinel-data-collector/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data Collector API
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration-guides/sentinel/azure-sentinel-log-analytics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Log Analytics Agent
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agents
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Agents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agent Type
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agents-sort-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agents Sort Keys
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alerts-deprecated" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alerts (Deprecated)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Alerts (Deprecated)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#alert-severity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alert Severity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alert-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alert State
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alert-terms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alert Terms
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk-severity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk Severity
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cases
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cases-sort-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cases Sort Keys
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#case-statuses" class="md-nav__link">
+    <span class="md-ellipsis">
+      Case Statuses
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#devices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Devices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Devices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#devices-sort-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      Devices Sort Keys
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Events
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Events">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#event-search-terms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Event Search Terms
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Categories
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#event-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Event Actions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-destination-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source &amp; Destination Categories
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#share-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Share Types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#report-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Report Types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk-indicators" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk Indicators
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Risk Indicators">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#risk-indicators-destinations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk Indicators - Destinations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk-indicators-user-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk Indicators - User Behavior
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk-indicators-file-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk Indicators - File Categories
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trust-reasons" class="md-nav__link">
+    <span class="md-ellipsis">
+      Trust Reasons
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk-severity_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk Severity
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sessions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sessions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#session-states" class="md-nav__link">
+    <span class="md-ellipsis">
+      Session States
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session-severities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Session Severities
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#content-inspection-statuses" class="md-nav__link">
+    <span class="md-ellipsis">
+      Content Inspection Statuses
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sort-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sort Keys
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trusted-activities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Trusted Activities
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trusted Activities">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#activity-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Activity Types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cloud-sync-apps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cloud Sync Apps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cloud-share-apps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cloud Share Apps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#email-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      Email Services
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#principal-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Principal Types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trusted-activities-sort-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      Trusted Activities Sort Keys
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#watchlists" class="md-nav__link">
+    <span class="md-ellipsis">
+      Watchlists
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Watchlists">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#watchlist-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Watchlist Types
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="enums">Enums<a class="headerlink" href="#enums" title="Permanent link">&para;</a></h1>
+<p>Documentation on all available enums for the Incydr SDK.</p>
+<p>The following example command will import all enums:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">incydr</span> <span class="kn">import</span> <span class="n">enums</span>
+
+<span class="n">open_alert_state</span> <span class="o">=</span> <span class="n">enums</span><span class="o">.</span><span class="n">alerts</span><span class="o">.</span><span class="n">AlertState</span><span class="o">.</span><span class="n">OPEN</span>
+</code></pre></div>
+<p>Individual enum modules can also be imported:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">incydr.enums</span> <span class="kn">import</span> <span class="n">alerts</span>
+
+<span class="n">open_alert_state</span> <span class="o">=</span> <span class="n">alerts</span><span class="o">.</span><span class="n">AlertState</span><span class="o">.</span><span class="n">OPEN</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Incydr SDK's enums all inherit from Python's <code>str</code> class.  The <code>str</code> value for each enum can be used wherever that enum class is expected.</p>
+</div>
+<h2 id="agents">Agents<a class="headerlink" href="#agents" title="Permanent link">&para;</a></h2>
+<h3 id="agent-type">Agent Type<a class="headerlink" href="#agent-type" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.agents.<strong>AgentType</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Possible types of agents.</p></div>
+</div>
+<ul>
+<li><strong>CODE42AAT</strong> = <code>"CODE42AAT"</code></li>
+<li><strong>CODE42</strong> = <code>"CODE42"</code></li>
+<li><strong>COMBINED</strong> = <code>"COMBINED"</code></li>
+</ul>
+<h3 id="agents-sort-keys">Agents Sort Keys<a class="headerlink" href="#agents-sort-keys" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.agents.<strong>SortKeys</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Possible keys to sort agents list results by.</p></div>
+</div>
+<ul>
+<li><strong>NAME</strong> = <code>"NAME"</code></li>
+<li><strong>USER_ID</strong> = <code>"USER_ID"</code></li>
+<li><strong>AGENT_TYPE</strong> = <code>"AGENT_TYPE"</code></li>
+<li><strong>OS_HOSTNAME</strong> = <code>"OS_HOSTNAME"</code></li>
+<li><strong>LAST_CONNECTED</strong> = <code>"LAST_CONNECTED"</code></li>
+<li><strong>OS_NAME</strong> = <code>"OS_NAME"</code></li>
+</ul>
+<h2 id="alerts-deprecated">Alerts (Deprecated)<a class="headerlink" href="#alerts-deprecated" title="Permanent link">&para;</a></h2>
+<p>Alerts has been replaced by <a href="#sessions">Sessions</a>.</p>
+<h3 id="alert-severity">Alert Severity<a class="headerlink" href="#alert-severity" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.alerts.<strong>AlertSeverity</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Possible severity values for an alert.</p></div>
+</div>
+<ul>
+<li><strong>LOW</strong> = <code>"LOW"</code></li>
+<li><strong>MEDIUM</strong> = <code>"MEDIUM"</code></li>
+<li><strong>HIGH</strong> = <code>"HIGH"</code></li>
+</ul>
+<h3 id="alert-state">Alert State<a class="headerlink" href="#alert-state" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.alerts.<strong>AlertState</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Enum indicating possible alert states.</p></div>
+</div>
+<ul>
+<li><strong>OPEN</strong> = <code>"OPEN"</code></li>
+<li><strong>RESOLVED</strong> = <code>"RESOLVED"</code></li>
+<li><strong>IN_PROGRESS</strong> = <code>"IN_PROGRESS"</code></li>
+<li><strong>PENDING</strong> = <code>"PENDING"</code></li>
+</ul>
+<h3 id="alert-terms">Alert Terms<a class="headerlink" href="#alert-terms" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.alerts.<strong>AlertTerm</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+</div>
+<ul>
+<li><strong>ALERT_ID</strong> = <code>"AlertId"</code></li>
+<li><strong>TYPE</strong> = <code>"Type"</code></li>
+<li><strong>NAME</strong> = <code>"Name"</code></li>
+<li><strong>DESCRIPTION</strong> = <code>"Description"</code></li>
+<li><strong>ACTOR</strong> = <code>"Actor"</code></li>
+<li><strong>ACTOR_ID</strong> = <code>"ActorId"</code></li>
+<li><strong>TARGET</strong> = <code>"Target"</code></li>
+<li><strong>RISK_SEVERITY</strong> = <code>"RiskSeverity"</code></li>
+<li><strong>CREATED_AT</strong> = <code>"CreatedAt"</code></li>
+<li><strong>HAS_AUTH_SIGNIFICANT_WATCHLIST</strong> = <code>"HasAuthSignificantWatchlist"</code></li>
+<li><strong>STATE</strong> = <code>"State"</code></li>
+<li><strong>STATE_LAST_MODIFIED_AT</strong> = <code>"StateLastModifiedAt"</code></li>
+<li><strong>STATE_LAST_MODIFIED_BY</strong> = <code>"StateLastModifiedBy"</code></li>
+<li><strong>LAST_MODIFIED_TIME</strong> = <code>"LastModifiedTime"</code></li>
+<li><strong>LAST_MODIFIED_BY</strong> = <code>"LastModifiedBy"</code></li>
+<li><strong>RULE_ID</strong> = <code>"RuleId"</code></li>
+<li><strong>SEVERITY</strong> = <code>"Severity"</code></li>
+</ul>
+<h3 id="risk-severity">Risk Severity<a class="headerlink" href="#risk-severity" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.alerts.<strong>RiskSeverity</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Possible Risk severity values.</p></div>
+</div>
+<ul>
+<li><strong>CRITICAL</strong> = <code>"CRITICAL"</code></li>
+<li><strong>HIGH</strong> = <code>"HIGH"</code></li>
+<li><strong>MODERATE</strong> = <code>"MODERATE"</code></li>
+<li><strong>LOW</strong> = <code>"LOW"</code></li>
+<li><strong>NO_RISK_INDICATED</strong> = <code>"NO_RISK_INDICATED"</code></li>
+</ul>
+<h2 id="cases">Cases<a class="headerlink" href="#cases" title="Permanent link">&para;</a></h2>
+<h3 id="cases-sort-keys">Cases Sort Keys<a class="headerlink" href="#cases-sort-keys" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.cases.<strong>SortKeys</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Possible keys to sort cases list results by.</p></div>
+</div>
+<ul>
+<li><strong>NAME</strong> = <code>"name"</code></li>
+<li><strong>NUMBER</strong> = <code>"number"</code></li>
+<li><strong>CREATED_AT</strong> = <code>"createdAt"</code></li>
+<li><strong>UPDATED_AT</strong> = <code>"updatedAt"</code></li>
+<li><strong>STATUS</strong> = <code>"status"</code></li>
+<li><strong>ASSIGNEE_USERNAME</strong> = <code>"assigneeUsername"</code></li>
+<li><strong>SUBJECT_USERNAME</strong> = <code>"subjectUsername"</code></li>
+</ul>
+<h3 id="case-statuses">Case Statuses<a class="headerlink" href="#case-statuses" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.cases.<strong>CaseStatus</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Possible statuses for a case.</p></div>
+</div>
+<ul>
+<li><strong>CLOSED</strong>: <code>"CLOSED"</code></li>
+<li><strong>OPEN</strong>: <code>"OPEN"</code></li>
+</ul>
+<h2 id="devices">Devices<a class="headerlink" href="#devices" title="Permanent link">&para;</a></h2>
+<h3 id="devices-sort-keys">Devices Sort Keys<a class="headerlink" href="#devices-sort-keys" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.cases.<strong>SortKeys</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Possible keys to sort cases list results by.</p></div>
+</div>
+<ul>
+<li><strong>NAME</strong> = <code>"name"</code></li>
+<li><strong>OS_HOSTNAME</strong> = <code>"osHostname"</code></li>
+<li><strong>OS</strong> = <code>"os"</code></li>
+<li><strong>LAST_CONNECTED</strong> = <code>"lastConnected"</code></li>
+</ul>
+<h2 id="file-events">File Events<a class="headerlink" href="#file-events" title="Permanent link">&para;</a></h2>
+<h3 id="event-search-terms">Event Search Terms<a class="headerlink" href="#event-search-terms" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.file_events.<strong>EventSearchTerm</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Search terms available to filtering file events.</p></div>
+</div>
+<ul>
+<li><strong>TIMESTAMP</strong> = <code>"@timestamp"</code></li>
+<li><strong>DESTINATION_ACCOUNT_NAME</strong> = <code>"destination.accountName"</code></li>
+<li><strong>DESTINATION_ACCOUNT_TYPE</strong> = <code>"destination.accountType"</code></li>
+<li><strong>DESTINATION_CATEGORY</strong> = <code>"destination.category"</code></li>
+<li><strong>DESTINATION_DOMAINS</strong> = <code>"destination.domains"</code></li>
+<li><strong>DESTINATION_EMAIL_RECIPIENTS</strong> = <code>"destination.email.recipients"</code></li>
+<li><strong>DESTINATION_EMAIL_SUBJECT</strong> = <code>"destination.email.subject"</code></li>
+<li><strong>DESTINATION_IP</strong> = <code>"destination.ip"</code></li>
+<li><strong>DESTINATION_NAME</strong> = <code>"destination.name"</code></li>
+<li><strong>DESTINATION_OPERATING_SYSTEM</strong> = <code>"destination.operatingSystem"</code></li>
+<li><strong>DESTINATION_PRINT_JOB_NAME</strong> = <code>"destination.printJobName"</code></li>
+<li><strong>DESTINATION_PRINTED_FILES_BACKUP_PATH</strong> = <code>"destination.printedFilesBackupPath"</code></li>
+<li><strong>DESTINATION_PRINTER_NAME</strong> = <code>"destination.printerName"</code></li>
+<li><strong>DESTINATION_PRIVATE_IP</strong> = <code>"destination.privateIp"</code></li>
+<li><strong>DESTINATION_REMOVABLE_MEDIA_BUS_TYPE</strong> = <code>"destination.removableMedia.busType"</code></li>
+<li><strong>DESTINATION_REMOVABLE_MEDIA_CAPACITY</strong> = <code>"destination.removableMedia.capacity"</code></li>
+<li><strong>DESTINATION_REMOVABLE_MEDIA_MEDIA_NAME</strong> = <code>"destination.removableMedia.mediaName"</code></li>
+<li><strong>DESTINATION_REMOVABLE_MEDIA_NAME</strong> = <code>"destination.removableMedia.name"</code></li>
+<li><strong>DESTINATION_REMOVABLE_MEDIA_PARTITION_ID</strong> = <code>"destination.removableMedia.partitionId"</code></li>
+<li><strong>DESTINATION_REMOVABLE_MEDIA_SERIAL_NUMBER</strong> = <code>"destination.removableMedia.serialNumber"</code></li>
+<li><strong>DESTINATION_REMOVABLE_MEDIA_VENDOR</strong> = <code>"destination.removableMedia.vendor"</code></li>
+<li><strong>DESTINATION_REMOVABLE_MEDIA_VOLUME_NAME</strong> = <code>"destination.removableMedia.volumeName"</code></li>
+<li><strong>DESTINATION_TABS_TITLE</strong> = <code>"destination.tabs.title"</code></li>
+<li><strong>DESTINATION_TABS_TITLE_ERROR</strong> = <code>"destination.tabs.titleError"</code></li>
+<li><strong>DESTINATION_TABS_URL</strong> = <code>"destination.tabs.url"</code></li>
+<li><strong>DESTINATION_TABS_URL_ERROR</strong> = <code>"destination.tabs.urlError"</code></li>
+<li><strong>DESTINATION_USER_EMAIL</strong> = <code>"destination.user.email"</code></li>
+<li><strong>EVENT_ACTION</strong> = <code>"event.action"</code></li>
+<li><strong>EVENT_ID</strong> = <code>"event.id"</code></li>
+<li><strong>EVENT_INGESTED</strong> = <code>"event.ingested"</code></li>
+<li><strong>EVENT_INSERTED</strong> = <code>"event.inserted"</code></li>
+<li><strong>EVENT_OBSERVER</strong> = <code>"event.observer"</code></li>
+<li><strong>EVENT_RELATED_EVENTS_AGENT_TIMESTAMP</strong> = <code>"event.relatedEvents.agentTimestamp"</code></li>
+<li><strong>EVENT_RELATED_EVENTS_EVENT_ACTION</strong> = <code>"event.relatedEvents.eventAction"</code></li>
+<li><strong>EVENT_RELATED_EVENTS_ID</strong> = <code>"event.relatedEvents.id"</code></li>
+<li><strong>EVENT_RELATED_EVENTS_SOURCE_CATEGORY</strong> = <code>"event.relatedEvents.sourceCategory"</code></li>
+<li><strong>EVENT_RELATED_EVENTS_SOURCE_NAME</strong> = <code>"event.relatedEvents.sourceName"</code></li>
+<li><strong>EVENT_RELATED_EVENTS_TABS_TITLE</strong> = <code>"event.relatedEvents.tabs.title"</code></li>
+<li><strong>EVENT_RELATED_EVENTS_TABS_TITLE_ERROR</strong> = <code>"event.relatedEvents.tabs.titleError"</code></li>
+<li><strong>EVENT_RELATED_EVENTS_TABS_URL</strong> = <code>"event.relatedEvents.tabs.url"</code></li>
+<li><strong>EVENT_RELATED_EVENTS_TABS_URL_ERROR</strong> = <code>"event.relatedEvents.tabs.urlError"</code></li>
+<li><strong>EVENT_RELATED_EVENTS_USER_EMAIL</strong> = <code>"event.relatedEvents.userEmail"</code></li>
+<li><strong>EVENT_SHARE_TYPE</strong> = <code>"event.shareType"</code></li>
+<li><strong>FILE_CATEGORY</strong> = <code>"file.category"</code></li>
+<li><strong>FILE_CATEGORY_BY_BYTES</strong> = <code>"file.categoryByBytes"</code></li>
+<li><strong>FILE_CATEGORY_BY_EXTENSION</strong> = <code>"file.categoryByExtension"</code></li>
+<li><strong>FILE_CLASSIFICATIONS_VALUE</strong> = <code>"file.classifications.value"</code></li>
+<li><strong>FILE_CLASSIFICATIONS_VENDOR</strong> = <code>"file.classifications.vendor"</code></li>
+<li><strong>FILE_CLOUD_DRIVE_ID</strong> = <code>"file.cloudDriveId"</code></li>
+<li><strong>FILE_CREATED</strong> = <code>"file.created"</code></li>
+<li><strong>FILE_DIRECTORY</strong> = <code>"file.directory"</code></li>
+<li><strong>FILE_DIRECTORY_ID</strong> = <code>"file.directoryId"</code></li>
+<li><strong>FILE_HASH_MD5</strong> = <code>"file.hash.md5"</code></li>
+<li><strong>FILE_HASH_MD5_ERROR</strong> = <code>"file.hash.md5Error"</code></li>
+<li><strong>FILE_HASH_SHA256</strong> = <code>"file.hash.sha256"</code></li>
+<li><strong>FILE_HASH_SHA256_ERROR</strong> = <code>"file.hash.sha256Error"</code></li>
+<li><strong>FILE_ID</strong> = <code>"file.id"</code></li>
+<li><strong>FILE_MIME_TYPE_BY_BYTES</strong> = <code>"file.mimeTypeByBytes"</code></li>
+<li><strong>FILE_MIME_TYPE_BY_EXTENSION</strong> = <code>"file.mimeTypeByExtension"</code></li>
+<li><strong>FILE_MODIFIED</strong> = <code>"file.modified"</code></li>
+<li><strong>FILE_NAME</strong> = <code>"file.name"</code></li>
+<li><strong>FILE_OWNER</strong> = <code>"file.owner"</code></li>
+<li><strong>FILE_SIZE_IN_BYTES</strong> = <code>"file.sizeInBytes"</code></li>
+<li><strong>FILE_URL</strong> = <code>"file.url"</code></li>
+<li><strong>PROCESS_EXECUTABLE</strong> = <code>"process.executable"</code></li>
+<li><strong>PROCESS_OWNER</strong> = <code>"process.owner"</code></li>
+<li><strong>REPORT_COUNT</strong> = <code>"report.count"</code></li>
+<li><strong>REPORT_DESCRIPTION</strong> = <code>"report.description"</code></li>
+<li><strong>REPORT_HEADERS</strong> = <code>"report.headers"</code></li>
+<li><strong>REPORT_ID</strong> = <code>"report.id"</code></li>
+<li><strong>REPORT_NAME</strong> = <code>"report.name"</code></li>
+<li><strong>REPORT_TYPE</strong> = <code>"report.type"</code></li>
+<li><strong>RISK_INDICATORS_NAME</strong> = <code>"risk.indicators.name"</code></li>
+<li><strong>RISK_INDICATORS_WEIGHT</strong> = <code>"risk.indicators.weight"</code></li>
+<li><strong>RISK_SCORE</strong> = <code>"risk.score"</code></li>
+<li><strong>RISK_SEVERITY</strong> = <code>"risk.severity"</code></li>
+<li><strong>RISK_TRUST_REASON</strong> = <code>"risk.trustReason"</code></li>
+<li><strong>RISK_TRUSTED</strong> = <code>"risk.trusted"</code></li>
+<li><strong>SOURCE_CATEGORY</strong> = <code>"source.category"</code></li>
+<li><strong>SOURCE_DOMAIN</strong> = <code>"source.domain"</code></li>
+<li><strong>SOURCE_DOMAINS</strong> = <code>"source.domains"</code></li>
+<li><strong>SOURCE_EMAIL_FROM</strong> = <code>"source.email.from"</code></li>
+<li><strong>SOURCE_EMAIL_SENDER</strong> = <code>"source.email.sender"</code></li>
+<li><strong>SOURCE_IP</strong> = <code>"source.ip"</code></li>
+<li><strong>SOURCE_NAME</strong> = <code>"source.name"</code></li>
+<li><strong>SOURCE_OPERATING_SYSTEM</strong> = <code>"source.operatingSystem"</code></li>
+<li><strong>SOURCE_PRIVATE_IP</strong> = <code>"source.privateIp"</code></li>
+<li><strong>SOURCE_REMOVABLE_MEDIA_BUS_TYPE</strong> = <code>"source.removableMedia.busType"</code></li>
+<li><strong>SOURCE_REMOVABLE_MEDIA_CAPACITY</strong> = <code>"source.removableMedia.capacity"</code></li>
+<li><strong>SOURCE_REMOVABLE_MEDIA_MEDIA_NAME</strong> = <code>"source.removableMedia.mediaName"</code></li>
+<li><strong>SOURCE_REMOVABLE_MEDIA_NAME</strong> = <code>"source.removableMedia.name"</code></li>
+<li><strong>SOURCE_REMOVABLE_MEDIA_PARTITION_ID</strong> = <code>"source.removableMedia.partitionId"</code></li>
+<li><strong>SOURCE_REMOVABLE_MEDIA_SERIAL_NUMBER</strong> = <code>"source.removableMedia.serialNumber"</code></li>
+<li><strong>SOURCE_REMOVABLE_MEDIA_VENDOR</strong> = <code>"source.removableMedia.vendor"</code></li>
+<li><strong>SOURCE_REMOVABLE_MEDIA_VOLUME_NAME</strong> = <code>"source.removableMedia.volumeName"</code></li>
+<li><strong>SOURCE_TABS_TITLE</strong> = <code>"source.tabs.title"</code></li>
+<li><strong>SOURCE_TABS_TITLE_ERROR</strong> = <code>"source.tabs.titleError"</code></li>
+<li><strong>SOURCE_TABS_URL</strong> = <code>"source.tabs.url"</code></li>
+<li><strong>SOURCE_TABS_URL_ERROR</strong> = <code>"source.tabs.urlError"</code></li>
+<li><strong>USER_DEVICE_UID</strong> = <code>"user.deviceUid"</code></li>
+<li><strong>USER_EMAIL</strong> = <code>"user.email"</code></li>
+<li><strong>USER_ID</strong> = <code>"user.id"</code></li>
+</ul>
+<h3 id="file-categories">File Categories<a class="headerlink" href="#file-categories" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.file_events.<strong>FileCategory</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Available file categories for filtering file events.</p></div>
+</div>
+<ul>
+<li><strong>AUDIO</strong> = <code>"Audio"</code></li>
+<li><strong>DOCUMENT</strong> = <code>"Document"</code></li>
+<li><strong>EXECUTABLE</strong> = <code>"Executable"</code></li>
+<li><strong>IMAGE</strong> = <code>"Image"</code></li>
+<li><strong>PDF</strong> = <code>"Pdf"</code></li>
+<li><strong>PRESENTATION</strong> = <code>"Presentation"</code></li>
+<li><strong>SCRIPT</strong> = <code>"Script"</code></li>
+<li><strong>SOURCE_CODE</strong> = <code>"SourceCode"</code></li>
+<li><strong>SPREADSHEET</strong> = <code>"Spreadsheet"</code></li>
+<li><strong>VIDEO</strong> = <code>"Video"</code></li>
+<li><strong>VIRTUAL_DISK_IMAGE</strong> = <code>"VirtualDiskImage"</code></li>
+<li><strong>ZIP</strong> = <code>"Archive"</code></li>
+</ul>
+<h3 id="event-actions">Event Actions<a class="headerlink" href="#event-actions" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.file_events.<strong>EventAction</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Available event actions for filtering file events.</p></div>
+</div>
+<ul>
+<li><strong>REMOVABLE_MEDIA_CREATED</strong> = <code>"removable-media-created"</code></li>
+<li><strong>REMOVABLE_MEDIA_MODIFIED</strong> = <code>"removable-media-modified"</code></li>
+<li><strong>REMOVABLE_MEDIA_DELETED</strong> = <code>"removable-media-deleted"</code></li>
+<li><strong>SYNC_APP_CREATED</strong> = <code>"sync-app-created"</code></li>
+<li><strong>SYNC_APP_MODIFIED</strong> = <code>"sync-app-modified"</code></li>
+<li><strong>SYNC_APP_DELETED</strong> = <code>"sync-app-deleted"</code></li>
+<li><strong>FILE_SHARED</strong> = <code>"file-shared"</code></li>
+<li><strong>FILE_CREATED</strong> = <code>"file-created"</code></li>
+<li><strong>FILE_DELETED</strong> = <code>"file-deleted"</code></li>
+<li><strong>FILE_DOWNLOADED</strong> = <code>"file-downloaded"</code></li>
+<li><strong>FILE_EMAILED</strong> = <code>"file-emailed"</code></li>
+<li><strong>FILE_MODIFIED</strong> = <code>"file-modified"</code></li>
+<li><strong>FILE_PRINTED</strong> = <code>"file-printed"</code></li>
+<li><strong>APPLICATION_READ</strong> = <code>"application-read"</code></li>
+</ul>
+<h3 id="source-destination-categories">Source &amp; Destination Categories<a class="headerlink" href="#source-destination-categories" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.file_events.<strong>Category</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Source and destination categories available for filtering file events.</p></div>
+</div>
+<ul>
+<li><strong>BUSINESS_TOOLS</strong> = <code>"Business Tools"</code></li>
+<li><strong>CLOUD_STORAGE</strong> = <code>"Cloud Storage"</code></li>
+<li><strong>DEVICE</strong> = <code>"Device"</code></li>
+<li><strong>EMAIL</strong> = <code>"Email"</code></li>
+<li><strong>MESSAGING</strong> = <code>"Messaging"</code></li>
+<li><strong>MULTIPLE_POSSIBILITIES</strong> = <code>"Multiple Possibilities"</code></li>
+<li><strong>SOCIAL_MEDIA</strong> = <code>"Social Media"</code></li>
+<li><strong>SOURCE_CODE_REPOSITORY</strong> = <code>"Source Code Repository"</code></li>
+<li><strong>UNCATEGORIZED</strong> = <code>"Uncategorized"</code></li>
+<li><strong>UNKNOWN</strong> = <code>"Unknown"</code></li>
+<li><strong>BUSINESS_INTELLIGENCE_TOOLS</strong> = <code>"Business Intelligence Tools"</code></li>
+<li><strong>CIVIL_SERVICES</strong> = <code>"Civil Services"</code></li>
+<li><strong>CLOUD_COMPUTING</strong> = <code>"Cloud Computing"</code></li>
+<li><strong>CODING_TOOLS</strong> = <code>"Coding Tools"</code></li>
+<li><strong>CONTRACT_MANAGEMENT</strong> = <code>"Contract Management"</code></li>
+<li><strong>CRM_TOOLS</strong> = <code>"CRM Tools"</code></li>
+<li><strong>DESIGN_TOOLS</strong> = <code>"Design Tools"</code></li>
+<li><strong>E_COMMERCE</strong> = <code>"E-commerce"</code></li>
+<li><strong>FILE_CONVERSION_TOOLS</strong> = <code>"File Conversion Tools"</code></li>
+<li><strong>FINANCIAL_SERVICES</strong> = <code>"Financial Services"</code></li>
+<li><strong>HEALTHCARE_AND_INSURANCE</strong> = <code>"Healthcare &amp; Insurance"</code></li>
+<li><strong>HR_TOOLS</strong> = <code>"HR Tools"</code></li>
+<li><strong>IMAGE_HOSTING</strong> = <code>"Image Hosting"</code></li>
+<li><strong>IT_SERVICES</strong> = <code>"IT Services"</code></li>
+<li><strong>JOB_LISTINGS</strong> = <code>"Job Listings"</code></li>
+<li><strong>LEARNING_PLATFORMS</strong> = <code>"Learning Platforms"</code></li>
+<li><strong>MARKETING_TOOLS</strong> = <code>"Marketing Tools"</code></li>
+<li><strong>PDF_MANAGER</strong> = <code>"PDF Manager"</code></li>
+<li><strong>PHOTO_PRINTING</strong> = <code>"Photo Printing"</code></li>
+<li><strong>PRODUCTIVITY_TOOLS</strong> = <code>"Productivity Tools"</code></li>
+<li><strong>PROFESSIONAL_SERVICES</strong> = <code>"Professional Services"</code></li>
+<li><strong>REAL_ESTATE</strong> = <code>"Real Estate"</code></li>
+<li><strong>SALES_TOOLS</strong> = <code>"Sales Tools"</code></li>
+<li><strong>SEARCH_ENGINE</strong> = <code>"Search Engine"</code></li>
+<li><strong>SHIPPING</strong> = <code>"Shipping"</code></li>
+<li><strong>SOFTWARE</strong> = <code>"Software"</code></li>
+<li><strong>TRAVEL</strong> = <code>"Travel"</code></li>
+<li><strong>WEB_HOSTING</strong> = <code>"Web Hosting"</code></li>
+</ul>
+<h3 id="share-types">Share Types<a class="headerlink" href="#share-types" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.file_events.<strong>ShareType</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Share types available for filtering file events.</p></div>
+</div>
+<ul>
+<li><strong>PUBLIC_LINK_SHARE</strong> = <code>"Anyone with the link"</code></li>
+<li><strong>DOMAIN_SHARE</strong> = <code>"Anyone in your organization"</code></li>
+<li><strong>DIRECT_USER_SHARE</strong> = <code>"Shared with specific people"</code></li>
+</ul>
+<h3 id="report-types">Report Types<a class="headerlink" href="#report-types" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.file_events.<strong>ReportType</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Report types available for filtering file events.</p></div>
+</div>
+<ul>
+<li><strong>AD_HOC</strong> = <code>"REPORT_TYPE_AD_HOC"</code></li>
+<li><strong>SAVED</strong> = <code>"REPORT_TYPE_SAVED"</code></li>
+</ul>
+<h3 id="risk-indicators">Risk Indicators<a class="headerlink" href="#risk-indicators" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.file_events.<strong>RiskIndicators</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Risk indicator names available for filtering file events.</p></div>
+</div>
+<h4 id="risk-indicators-destinations">Risk Indicators - Destinations<a class="headerlink" href="#risk-indicators-destinations" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>ADOBE_UPLOAD</strong> = <code>"Adobe upload"</code></li>
+<li><strong>ADOBE_ACROBAT_UPLOAD</strong> = <code>"Adobe Acrobat upload"</code></li>
+<li><strong>AIR_DROP</strong> = <code>"AirDrop"</code></li>
+<li><strong>AMAZON_DRIVE_UPLOAD</strong> = <code>"Amazon Drive upload"</code></li>
+<li><strong>AOL_UPLOAD</strong> = <code>"AOL upload"</code></li>
+<li><strong>BAIDU_NET_DISK_UPLOAD</strong> = <code>"Baidu NetDisk upload"</code></li>
+<li><strong>BITBUCKET_UPLOAD</strong> = <code>"Bitbucket upload"</code></li>
+<li><strong>BOX_UPLOAD</strong> = <code>"Box upload"</code></li>
+<li><strong>CANVA_UPLOAD</strong> = <code>"Canva upload"</code></li>
+<li><strong>CLOUD_CONVERT_UPLOAD</strong> = <code>"CloudConvert upload"</code></li>
+<li><strong>COLABORATORY_UPLOAD</strong> = <code>"Colaboratory upload"</code></li>
+<li><strong>COMBINE_PDF_UPLOAD</strong> = <code>"CombinePDF upload"</code></li>
+<li><strong>COMCAST_UPLOAD</strong> = <code>"Comcast upload"</code></li>
+<li><strong>COMPRESS_JPEG_UPLOAD</strong> = <code>"Compress JPEG upload"</code></li>
+<li><strong>CRASHPLAN_UPLOAD</strong> = <code>"Crashplan upload"</code></li>
+<li><strong>DISCORD_UPLOAD</strong> = <code>"Discord upload"</code></li>
+<li><strong>DRAKE_PORTALS_UPLOAD</strong> = <code>"Drake Portals upload"</code></li>
+<li><strong>DROPBOX_UPLOAD</strong> = <code>"Dropbox upload"</code></li>
+<li><strong>EVERNOTE_UPLOAD</strong> = <code>"Evernote upload"</code></li>
+<li><strong>FACEBOOK_MESSENGER_UPLOAD</strong> = <code>"Facebook Messenger upload"</code></li>
+<li><strong>FACEBOOK_UPLOAD</strong> = <code>"Facebook upload"</code></li>
+<li><strong>FASTMAIL_UPLOAD</strong> = <code>"Fastmail upload"</code></li>
+<li><strong>FIGMA_UPLOAD</strong> = <code>"Figma upload"</code></li>
+<li><strong>FILE_DOT_IO_UPLOAD</strong> = <code>"File.io upload"</code></li>
+<li><strong>FILESTACK_UPLOAD</strong> = <code>"Filestack upload"</code></li>
+<li><strong>FOUR_CHAN_UPLOAD</strong> = <code>"4chan upload"</code></li>
+<li><strong>FREE_CONVERT_UPLOAD</strong> = <code>"Free Convert upload"</code></li>
+<li><strong>FREE_PDF_CONVERT_UPLOAD</strong> = <code>"Free PDF Convert upload"</code></li>
+<li><strong>GIT_HUB_UPLOAD</strong> = <code>"GitHub upload"</code></li>
+<li><strong>GIT_HUB_PAGES_UPLOAD</strong> = <code>"GitHub Pages upload"</code></li>
+<li><strong>GIT_LAB_UPLOAD</strong> = <code>"GitLab upload"</code></li>
+<li><strong>GMAIL_UPLOAD</strong> = <code>"Gmail upload"</code></li>
+<li><strong>GMX_UPLOAD</strong> = <code>"GMX upload"</code></li>
+<li><strong>GOOGLE_APPS_SCRIPT_UPLOAD</strong> = <code>"Google Apps Script upload"</code></li>
+<li><strong>GOOGLE_CHAT_UPLOAD</strong> = <code>"Google Chat upload"</code></li>
+<li><strong>GOOGLE_CLOUD_SHELL_UPLOAD</strong> = <code>"Google Cloud Shell upload"</code></li>
+<li><strong>GOOGLE_DRIVE_UPLOAD</strong> = <code>"Google Drive upload"</code></li>
+<li><strong>GOOGLE_HANGOUTS_UPLOAD</strong> = <code>"Google Hangouts upload"</code></li>
+<li><strong>GOOGLE_JAMBOARD_UPLOAD</strong> = <code>"Google Jamboard upload"</code></li>
+<li><strong>GOOGLE_KEEP_UPLOAD</strong> = <code>"Google Keep upload"</code></li>
+<li><strong>GOOGLE_MESSAGES_UPLOAD</strong> = <code>"Google Messages upload"</code></li>
+<li><strong>GOOGLE_SITES_UPLOAD</strong> = <code>"Google Sites upload"</code></li>
+<li><strong>HEIC_TO_JPEG_UPLOAD</strong> = <code>"HEICtoJPEG upload"</code></li>
+<li><strong>ICLOUD_MAIL_UPLOAD</strong> = <code>"iCloud Mail upload"</code></li>
+<li><strong>ICLOUD_UPLOAD</strong> = <code>"iCloud upload"</code></li>
+<li><strong>I_LOVE_PDF_UPLOAD</strong> = <code>"iLovePDF upload"</code></li>
+<li><strong>IMAGE_COLOR_PICKER_UPLOAD</strong> = <code>"Image Color Picker upload"</code></li>
+<li><strong>IMGUR_UPLOAD</strong> = <code>"Imgur upload"</code></li>
+<li><strong>JPG2_PDF_UPLOAD</strong> = <code>"JPG2PDF upload"</code></li>
+<li><strong>KAPWING_UPLOAD</strong> = <code>"Kapwing upload"</code></li>
+<li><strong>LINKED_IN_UPLOAD</strong> = <code>"LinkedIn upload"</code></li>
+<li><strong>LYCOS_UPLOAD</strong> = <code>"Lycos upload"</code></li>
+<li><strong>MAIL_COM_UPLOAD</strong> = <code>"Mail.com upload"</code></li>
+<li><strong>MEGA_UPLOAD</strong> = <code>"Mega upload"</code></li>
+<li><strong>MICROSOFT_TEAMS_UPLOAD</strong> = <code>"Microsoft Teams upload"</code></li>
+<li><strong>MIRO_UPLOAD</strong> = <code>"Miro upload"</code></li>
+<li><strong>MONDAY_UPLOAD</strong> = <code>"Monday upload"</code></li>
+<li><strong>MURAL_UPLOAD</strong> = <code>"Mural upload"</code></li>
+<li><strong>NOTION_UPLOAD</strong> = <code>"Notion upload"</code></li>
+<li><strong>ODNOKLASSNIKI_UPLOAD</strong> = <code>"Odnoklassniki upload"</code></li>
+<li><strong>OK_UPLOAD</strong> = <code>"OK upload"</code></li>
+<li><strong>ONE_DRIVE_UPLOAD</strong> = <code>"OneDrive upload"</code></li>
+<li><strong>ONE_SIX_THREE_DOT_COM_UPLOAD</strong> = <code>"163.com upload"</code></li>
+<li><strong>ONE_TWO_SIX_DOT_COM_UPLOAD</strong> = <code>"126.com upload"</code></li>
+<li><strong>OPEN_TEXT_HIGHTAIL_UPLOAD</strong> = <code>"OpenText Hightail upload"</code></li>
+<li><strong>OTHER_DESTINATION</strong> = <code>"Other destination"</code></li>
+<li><strong>OUTLOOK_UPLOAD</strong> = <code>"Outlook upload"</code></li>
+<li><strong>OVERLEAF_UPLOAD</strong> = <code>"Overleaf upload"</code></li>
+<li><strong>PDF24_TOOLS_UPLOAD</strong> = <code>"PDF24 Tools upload"</code></li>
+<li><strong>PDF_ESCAPE_UPLOAD</strong> = <code>"PDFescape upload"</code></li>
+<li><strong>PDF_FILLER_UPLOAD</strong> = <code>"pdfFiller upload"</code></li>
+<li><strong>PDF_SIMPLI_UPLOAD</strong> = <code>"PDFSimpli upload"</code></li>
+<li><strong>PHOTOPEA_UPLOAD</strong> = <code>"Photopea upload"</code></li>
+<li><strong>PIXLR_UPLOAD</strong> = <code>"Pixlr upload"</code></li>
+<li><strong>PROTON_MAIL_UPLOAD</strong> = <code>"ProtonMail upload"</code></li>
+<li><strong>PUBLIC_LINK_FROM_CORPORATE_BOX</strong> = <code>"Public link from corporate Box"</code></li>
+<li><strong>PUBLIC_LINK_FROM_CORPORATE_GOOGLE_DRIVE</strong> = <code>"Public link from corporate Google Drive"</code></li>
+<li><strong>PUBLIC_LINK_FROM_CORPORATE_ONE_DRIVE</strong> = <code>"Public link from corporate OneDrive"</code></li>
+<li><strong>QQMAIL_UPLOAD</strong> = <code>"QQMail upload"</code></li>
+<li><strong>QZONE_UPLOAD</strong> = <code>"Qzone upload"</code></li>
+<li><strong>REDDIT_UPLOAD</strong> = <code>"Reddit upload"</code></li>
+<li><strong>REMOVABLE_MEDIA</strong> = <code>"Removable media"</code></li>
+<li><strong>REMOVE_DOT_BG_UPLOAD</strong> = <code>"remove.bg upload"</code></li>
+<li><strong>SALESFORCE_DOWNLOAD</strong> = <code>"Download to unmonitored device from corporate Salesforce"</code></li>
+<li><strong>SECURE_FIRM_PORTAL_UPLOAD</strong> = <code>"Secure Firm Portal upload"</code></li>
+<li><strong>SEJDA_UPLOAD</strong> = <code>"Sejda upload"</code></li>
+<li><strong>SENT_FROM_CORPORATE_GMAIL</strong> = <code>"Sent from corporate Gmail"</code></li>
+<li><strong>SENT_FROM_CORPORATE_OFFICE365</strong> = <code>"Sent from corporate Microsoft Office 365"</code></li>
+<li><strong>SHARED_FROM_CORPORATE_BOX</strong> = <code>"Shared from corporate Box"</code></li>
+<li><strong>SHARED_FROM_CORPORATE_GOOGLE_DRIVE</strong> = <code>"Shared from corporate Google Drive"</code></li>
+<li><strong>SHARED_FROM_CORPORATE_ONE_DRIVE</strong> = <code>"Shared from corporate OneDrive"</code></li>
+<li><strong>SHAREFILE_UPLOAD</strong> = <code>"Sharefile upload"</code></li>
+<li><strong>SINA_MAIL_UPLOAD</strong> = <code>"Sina Mail upload"</code></li>
+<li><strong>SLACK_UPLOAD</strong> = <code>"Slack upload"</code></li>
+<li><strong>SMALL_PDF_UPLOAD</strong> = <code>"SmallPDF upload"</code></li>
+<li><strong>SMART_VAULT_UPLOAD</strong> = <code>"SmartVault upload"</code></li>
+<li><strong>SODA_PDF_UPLOAD</strong> = <code>"Soda PDF upload"</code></li>
+<li><strong>SOHU_MAIL_UPLOAD</strong> = <code>"Sohu Mail upload"</code></li>
+<li><strong>SOURCE_FORGE_UPLOAD</strong> = <code>"SourceForge upload"</code></li>
+<li><strong>STACK_OVERFLOW_UPLOAD</strong> = <code>"Stack Overflow upload"</code></li>
+<li><strong>STASH_UPLOAD</strong> = <code>"Stash upload"</code></li>
+<li><strong>SUGAR_SYNC_UPLOAD</strong> = <code>"SugarSync upload"</code></li>
+<li><strong>TELEGRAM_UPLOAD</strong> = <code>"Telegram upload"</code></li>
+<li><strong>TINY_PNG_UPLOAD</strong> = <code>"TinyPNG upload"</code></li>
+<li><strong>TRELLO_UPLOAD</strong> = <code>"Trello upload"</code></li>
+<li><strong>TUMBLR_UPLOAD</strong> = <code>"Tumblr upload"</code></li>
+<li><strong>TUTANOTA_UPLOAD</strong> = <code>"Tutanota upload"</code></li>
+<li><strong>TWITCH_UPLOAD</strong> = <code>"Twitch upload"</code></li>
+<li><strong>TWITTER_UPLOAD</strong> = <code>"Twitter upload"</code></li>
+<li><strong>UNKNOWN_DESTINATION</strong> = <code>"Unknown destination"</code></li>
+<li><strong>UNMONITORED_DEVICE_DOWNLOAD_BOX</strong> = <code>"Download to unmonitored device from corporate Box"</code></li>
+<li><strong>UNMONITORED_DEVICE_DOWNLOAD_GOOGLE_DRIVE</strong> = <code>"Download to unmonitored device from corporate Google Drive"</code></li>
+<li><strong>UNMONITORED_DEVICE_DOWNLOAD_ONE_DRIVE</strong> = <code>"Download to unmonitored device from corporate OneDrive"</code></li>
+<li><strong>VEED_UPLOAD</strong> = <code>"VEED upload"</code></li>
+<li><strong>VIMEO_UPLOAD</strong> = <code>"Vimeo upload"</code></li>
+<li><strong>VK_UPLOAD</strong> = <code>"Vk upload"</code></li>
+<li><strong>WEBEX_UPLOAD</strong> = <code>"Webex upload"</code></li>
+<li><strong>WE_CHAT_UPLOAD</strong> = <code>"WeChat upload"</code></li>
+<li><strong>WEIBO_UPLOAD</strong> = <code>"Weibo upload"</code></li>
+<li><strong>WE_TRANSFER_UPLOAD</strong> = <code>"WeTransfer upload"</code></li>
+<li><strong>WHATS_APP_UPLOAD</strong> = <code>"WhatsApp upload"</code></li>
+<li><strong>WIX_UPLOAD</strong> = <code>"Wix upload"</code></li>
+<li><strong>WORD_PRESS_UPLOAD</strong> = <code>"WordPress upload"</code></li>
+<li><strong>YAHOO_UPLOAD</strong> = <code>"Yahoo upload"</code></li>
+<li><strong>YOU_TUBE_UPLOAD</strong> = <code>"YouTube upload"</code></li>
+<li><strong>ZIX_UPLOAD</strong> = <code>"Zix upload"</code></li>
+<li><strong>ZOHO_MAIL_UPLOAD</strong> = <code>"Zoho Mail upload"</code></li>
+<li><strong>ZOHO_WORK_DRIVE_UPLOAD</strong> = <code>"Zoho WorkDrive upload"</code></li>
+<li><strong>ZOOM_UPLOAD</strong> = <code>"Zoom upload"</code></li>
+</ul>
+<h4 id="risk-indicators-user-behavior">Risk Indicators - User Behavior<a class="headerlink" href="#risk-indicators-user-behavior" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>FILE_MISMATCH</strong> = <code>"File mismatch"</code></li>
+<li><strong>OFF_HOURS</strong> = <code>"Off hours"</code></li>
+<li><strong>REMOTE</strong> = <code>"Remote"</code></li>
+<li><strong>FIRST_DESTINATION_USE</strong> = <code>"First use of destination"</code></li>
+<li><strong>RARE_DESTINATION_USE</strong> = <code>"Rare use of destination"</code></li>
+<li><strong>CONTRACT</strong> = <code>"Contract"</code></li>
+<li><strong>DEPARTING</strong> = <code>"Departing"</code></li>
+<li><strong>ELEVATED_ACCESS</strong> = <code>"Elevated access"</code></li>
+<li><strong>FLIGHT_RISK</strong> = <code>"Flight risk"</code></li>
+<li><strong>HIGH_IMPACT</strong> = <code>"High impact"</code></li>
+<li><strong>HIGH_RISK</strong> = <code>"High risk"</code></li>
+<li><strong>PERFORMANCE_CONCERNS</strong> = <code>"Performance concerns"</code></li>
+<li><strong>POOR_SECURITY_PRACTICES</strong> = <code>"Poor security practices"</code></li>
+<li><strong>SUSPICIOUS_SYSTEM_ACTIVITY</strong> = <code>"Suspicious system activity"</code></li>
+</ul>
+<h4 id="risk-indicators-file-categories">Risk Indicators - File Categories<a class="headerlink" href="#risk-indicators-file-categories" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>AUDIO</strong> = <code>"Audio"</code></li>
+<li><strong>DOCUMENT</strong> = <code>"Document"</code></li>
+<li><strong>EXECUTABLE</strong> = <code>"Executable"</code></li>
+<li><strong>IMAGE</strong> = <code>"Image"</code></li>
+<li><strong>PDF</strong> = <code>"PDF"</code></li>
+<li><strong>PRESENTATION</strong> = <code>"Presentation"</code></li>
+<li><strong>SCRIPT</strong> = <code>"Script"</code></li>
+<li><strong>SOURCE_CODE</strong> = <code>"Source code"</code></li>
+<li><strong>SPREADSHEET</strong> = <code>"Spreadsheet"</code></li>
+<li><strong>VIDEO</strong> = <code>"Video"</code></li>
+<li><strong>VIRTUAL_DISK_IMAGE</strong> = <code>"Virtual Disk Image"</code></li>
+<li><strong>ZIP</strong> = <code>"Zip"</code></li>
+</ul>
+<h3 id="trust-reasons">Trust Reasons<a class="headerlink" href="#trust-reasons" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.file_events.<strong>TrustReason</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Trust reasons available for filtering file events.</p></div>
+</div>
+<ul>
+<li><strong>TRUSTED_DOMAIN_BROWSER_URL</strong> = <code>"Trusted browser URL"</code></li>
+<li><strong>TRUSTED_BROWSER_URL_PATH</strong> = <code>"Trusted specific URL path"</code></li>
+<li><strong>TRUSTED_DOMAIN_BROWSER_TAB_TITLE</strong> = <code>"Trusted browser tab title"</code></li>
+<li><strong>TRUSTED_BROWSER_TAB_INFOS</strong> = <code>"Trusted browser URL and/or tab title"</code></li>
+<li><strong>TRUSTED_DOMAIN_EMAIL_RECIPIENT</strong> = <code>"Trusted email recipient"</code></li>
+<li><strong>TRUSTED_DOMAIN_CLOUD_SYNC_USERNAME</strong> = <code>"Trusted sync username"</code></li>
+<li><strong>TRUSTED_SLACK_WORKSPACE</strong> = <code>"Trusted Slack workspace"</code></li>
+<li><strong>EVENT_PAIRING_SERVICE_MATCH</strong> = <code>"Event matched with cloud activity"</code></li>
+<li><strong>EVENT_PAIRING_SERVICE_ENDPOINT_MATCH</strong> = <code>"Event matched with endpoint activity"</code></li>
+<li><strong>DOWNLOAD_TO_A_MANAGED_DEVICE</strong> = <code>"Download to a managed device"</code></li>
+<li><strong>SHARED_WITH_TRUSTED_USERS</strong> = <code>"Shared with trusted users"</code></li>
+</ul>
+<h3 id="risk-severity_1">Risk Severity<a class="headerlink" href="#risk-severity_1" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.file_events.<strong>RiskSeverity</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Possible Risk severity values.</p></div>
+</div>
+<ul>
+<li><strong>CRITICAL</strong> = <code>"CRITICAL"</code></li>
+<li><strong>HIGH</strong> = <code>"HIGH"</code></li>
+<li><strong>MODERATE</strong> = <code>"MODERATE"</code></li>
+<li><strong>LOW</strong> = <code>"LOW"</code></li>
+<li><strong>NO_RISK_INDICATED</strong> = <code>"NO_RISK_INDICATED"</code></li>
+</ul>
+<h2 id="sessions">Sessions<a class="headerlink" href="#sessions" title="Permanent link">&para;</a></h2>
+<h3 id="session-states">Session States<a class="headerlink" href="#session-states" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.sessions.<strong>SessionStates</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Enum indicating possible session states (includes alerts).</p></div>
+</div>
+<ul>
+<li><strong>OPEN</strong> = <code>"OPEN"</code></li>
+<li><strong>IN_PROGRESS</strong> = <code>"IN_PROGRESS"</code></li>
+<li><strong>CLOSED</strong> = <code>"CLOSED"</code></li>
+<li><strong>CLOSED_TP</strong> = <code>"CLOSED_TP"</code></li>
+<li><strong>CLOSED_FP</strong> = <code>"CLOSED_FP"</code></li>
+<li><strong>OPEN_NEW_DATA</strong> = <code>"OPEN_NEW_DATA"</code></li>
+</ul>
+<h3 id="session-severities">Session Severities<a class="headerlink" href="#session-severities" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.sessions.<strong>SessionSeverities</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Enum indicating possible session severities.</p></div>
+</div>
+<ul>
+<li><strong>NO_RISK</strong> = <code>"NO_RISK"</code></li>
+<li><strong>LOW</strong> = <code>"LOW"</code></li>
+<li><strong>MODERATE</strong> = <code>"MODERATE"</code></li>
+<li><strong>HIGH</strong> = <code>"HIGH"</code></li>
+<li><strong>CRITICAL</strong> = <code>"CRITICAL"</code></li>
+</ul>
+<h3 id="content-inspection-statuses">Content Inspection Statuses<a class="headerlink" href="#content-inspection-statuses" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.sessions.<strong>ContentInspectionStatuses</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Enum indicating possible content inspection statuses.</p></div>
+</div>
+<ul>
+<li><strong>PENDING</strong> = <code>"PENDING"</code></li>
+<li><strong>FOUND</strong> = <code>"FOUND"</code></li>
+<li><strong>NOT_FOUND</strong> = <code>"NOT_FOUND"</code></li>
+</ul>
+<h3 id="sort-keys">Sort Keys<a class="headerlink" href="#sort-keys" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.sessions.<strong>SortKeys</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Enum indicating possible fields by which to sort items results.</p></div>
+</div>
+<ul>
+<li><strong>END_TIME</strong> = <code>"end_time"</code></li>
+<li><strong>SCORE</strong> = <code>"score"</code></li>
+</ul>
+<h2 id="trusted-activities">Trusted Activities<a class="headerlink" href="#trusted-activities" title="Permanent link">&para;</a></h2>
+<h3 id="activity-types">Activity Types<a class="headerlink" href="#activity-types" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.trusted_activities.<strong>ActivityType</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+</div>
+<ul>
+<li><strong>DOMAIN</strong> = <code>"DOMAIN"</code></li>
+<li><strong>ACCOUNT_NAME</strong> = <code>"ACCOUNT_NAME"</code></li>
+<li><strong>URL_PATH</strong> = <code>"URL_PATH"</code></li>
+<li><strong>SLACK</strong> = <code>"SLACK"</code></li>
+<li><strong>CLOUD_SHARE</strong> = <code>"CLOUD_SHARE"</code></li>
+<li><strong>CLOUD_SYNC</strong> = <code>"CLOUD_SYNC"</code></li>
+<li><strong>EMAIL</strong> = <code>"EMAIL"</code></li>
+<li><strong>FILE_UPLOAD</strong> = <code>"FILE_UPLOAD"</code></li>
+<li><strong>GIT_PUSH</strong> = <code>"GIT_PUSH"</code></li>
+<li><strong>GIT_REPOSITORY_URI</strong> = <code>"GIT_REPOSITORY_URI"</code></li>
+</ul>
+<h3 id="cloud-sync-apps">Cloud Sync Apps<a class="headerlink" href="#cloud-sync-apps" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.trusted_activities.<strong>CloudSyncApps</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+</div>
+<ul>
+<li><strong>BOX</strong> = <code>"BOX"</code></li>
+<li><strong>GOOGLE_DRIVE</strong> = <code>"GOOGLE_DRIVE"</code></li>
+<li><strong>ICLOUD</strong> = <code>"ICLOUD"</code></li>
+<li><strong>ONE_DRIVE</strong> = <code>"ONE_DRIVE"</code></li>
+</ul>
+<h3 id="cloud-share-apps">Cloud Share Apps<a class="headerlink" href="#cloud-share-apps" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.trusted_activities.<strong>CloudShareApps</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+</div>
+<ul>
+<li><strong>BOX</strong> = <code>"BOX"</code></li>
+<li><strong>GOOGLE_DRIVE</strong> = <code>"GOOGLE_DRIVE"</code></li>
+<li><strong>ONE_DRIVE</strong> = <code>"ONE_DRIVE"</code></li>
+</ul>
+<h3 id="email-services">Email Services<a class="headerlink" href="#email-services" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.trusted_activities.<strong>EmailServices</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+</div>
+<ul>
+<li><strong>GMAIL</strong> = <code>"GMAIL"</code></li>
+<li><strong>OFFICE_365</strong> = <code>"OFFICE_365"</code></li>
+</ul>
+<h3 id="principal-types">Principal Types<a class="headerlink" href="#principal-types" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.trusted_activities.<strong>PrincipalType</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+</div>
+<ul>
+<li><strong>USER</strong> = <code>"USER"</code></li>
+<li><strong>API_KEY</strong> = <code>"API_KEY"</code></li>
+<li><strong>DEVICE</strong> = <code>"DEVICE"</code></li>
+<li><strong>SERVICE</strong> = <code>"SERVICE"</code></li>
+</ul>
+<h3 id="trusted-activities-sort-keys">Trusted Activities Sort Keys<a class="headerlink" href="#trusted-activities-sort-keys" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.trusted_activities.<strong>SortKeys</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+</div>
+<ul>
+<li><strong>ACTIVITY_ID</strong> = <code>"ACTIVITY_ID"</code></li>
+<li><strong>DESCRIPTION</strong> = <code>"DESCRIPTION"</code></li>
+<li><strong>TYPE</strong> = <code>"TYPE"</code></li>
+<li><strong>UPDATED_BY_PRINCIPAL_NAME</strong> = <code>"UPDATED_BY_PRINCIPAL_NAME"</code></li>
+<li><strong>UPDATE_TIME</strong> = <code>"UPDATE_TIME"</code></li>
+<li><strong>VALUE</strong> = <code>"VALUE"</code></li>
+</ul>
+<h2 id="watchlists">Watchlists<a class="headerlink" href="#watchlists" title="Permanent link">&para;</a></h2>
+<h3 id="watchlist-types">Watchlist Types<a class="headerlink" href="#watchlist-types" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.enums.watchlists.<strong>WatchlistType</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*values</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Available watchlist types.</p></div>
+</div>
+<ul>
+<li><strong>WATCHLIST_TYPE_UNSPECIFIED</strong> = <code>"WATCHLIST_TYPE_UNSPECIFIED"</code></li>
+<li><strong>CONTRACT_EMPLOYEE</strong> = <code>"CONTRACT_EMPLOYEE"</code></li>
+<li><strong>DEPARTING_EMPLOYEE</strong> = <code>"DEPARTING_EMPLOYEE"</code></li>
+<li><strong>ELEVATED_ACCESS_PRIVILEGES</strong> = <code>"ELEVATED_ACCESS_PRIVILEGES"</code></li>
+<li><strong>FLIGHT_RISK</strong> = <code>"FLIGHT_RISK"</code></li>
+<li><strong>HIGH_IMPACT_EMPLOYEE</strong> = <code>"HIGH_IMPACT_EMPLOYEE"</code></li>
+<li><strong>NEW_EMPLOYEE</strong> = <code>"NEW_EMPLOYEE"</code></li>
+<li><strong>PERFORMANCE_CONCERNS</strong> = <code>"PERFORMANCE_CONCERNS"</code></li>
+<li><strong>POOR_SECURITY_PRACTICES</strong> = <code>"POOR_SECURITY_PRACTICES"</code></li>
+<li><strong>SUSPICIOUS_SYSTEM_ACTIVITY</strong> = <code>"SUSPICIOUS_SYSTEM_ACTIVITY"</code></li>
+<li><strong>CUSTOM</strong> = <code>"CUSTOM"</code></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+    
+        
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.tracking", "content.code.annotate", "navigation.indexes"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      
+        <script src="../../javascripts/redoc.standalone.js"></script>
+      
+    
+  </body>
+</html>

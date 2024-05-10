@@ -1,0 +1,3916 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://developer.code42.com/sdk/models/">
+      
+      
+        <link rel="prev" href="../enums/">
+      
+      
+        <link rel="next" href="../../cli/">
+      
+      
+      <link rel="icon" href="../../images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+    
+    
+      
+        <title>Models - Code42 Developer Portal</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.66ac8b77.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../css/custom.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#models" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Code42 Developer Portal" class="md-header__button md-logo" aria-label="Code42 Developer Portal" data-md-component="logo">
+      
+  <img src="../../images/logo_developers.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Code42 Developer Portal
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Models
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/code42/incydr_python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    code42/incydr_python
+  </div>
+</a>
+
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../api/" class="md-tabs__link">
+        
+  
+    
+  
+  API Reference
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+    
+  
+  SDK
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../cli/" class="md-tabs__link">
+          
+  
+    
+  
+  CLI
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../integration-guides/" class="md-tabs__link">
+          
+  
+    
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Code42 Developer Portal" class="md-nav__button md-logo" aria-label="Code42 Developer Portal" data-md-component="logo">
+      
+  <img src="../../images/logo_developers.svg" alt="logo">
+
+    </a>
+    Code42 Developer Portal
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/code42/incydr_python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    code42/incydr_python
+  </div>
+</a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    SDK
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            SDK
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../client/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Client
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Settings
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Settings
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../settings/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Logging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/actors/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Actors
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/agents/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Agents
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/alerts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Alerts (Deprecated)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/alert_rules/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Alert Rules
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/alert_queries/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Alert Querying
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/audit_log/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Audit Log
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cases
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/customer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Customer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/departments/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Departments
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/devices/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Devices
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/directory_groups/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Directory Groups
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/file_events/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    File Events
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/file_event_queries/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    File Event Querying
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/risk_profiles/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Risk Profiles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/sessions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sessions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/trusted_activities/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Trusted Activites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/users/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Users
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clients/watchlists/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Watchlists
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../enums/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Enums
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Models
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Models
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#actors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actors
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Actors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#actor-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actor model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actorfamily-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      ActorFamily model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actorspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      ActorsPage` model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agents
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Agents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agent model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agentspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      AgentsPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alerts-deprecated" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alerts (Deprecated)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Alerts (Deprecated)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#alertdetails-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      AlertDetails model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alertsummary-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      AlertSummary model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alertquerypage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      AlertQueryPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alert-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alert Rules
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Alert Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ruleuser-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      RuleUser model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ruleuserslist-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      RuleUsersList model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ruledetails-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      RuleDetails model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audit-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      Audit Log
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Audit Log">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auditeventspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      AuditEventsPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cases
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#case-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Case model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#casespage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      CasesPage model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#casefileevents-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      CaseFileEvents model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Customer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#customer-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customer model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#departments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Departments
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Departments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#departmentspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      DepartmentsPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#devices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Devices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Devices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#device-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Device model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#devicespage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      DevicesPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#directory-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directory Groups
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Directory Groups">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#directorygroup-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      DirectoryGroup model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#directorygroupspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      DirectoryGroupsPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Events
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Events">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fileevent-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      FileEvent model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fileeventspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      FileEventsPage model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#savedsearch-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      SavedSearch model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Roles
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Roles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#role-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Role model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updaterolesresponse-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      UpdateRolesResponse model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sessions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trusted-activities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Trusted Activities
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trusted Activities">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#trustedactivity-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      TrustedActivity model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trustedactivitiespage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      TrustedActivitiesPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#users" class="md-nav__link">
+    <span class="md-ellipsis">
+      Users
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Users">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#user-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      User model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#userspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      UsersPage model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#role-model_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Role model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risk-profiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk Profiles
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Risk Profiles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#riskprofile-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      RiskProfile model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#riskprofilespage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      RiskProfilesPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#watchlists" class="md-nav__link">
+    <span class="md-ellipsis">
+      Watchlists
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Watchlists">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#watchlist-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Watchlist model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#watchlistspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      WatchlistsPage model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#watchlistuser-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      WatchlistUser model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#watchlistmemberslist-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      WatchlistMembersList model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#includeduserslist-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      IncludedUsersList model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#excludeduserslist-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      ExcludedUsersList model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#includeddepartmentslist-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      IncludedDepartmentsList model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#includeddepartment-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      IncludedDepartment model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#includeddirectorygroupslist-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      IncludedDirectoryGroupsList model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#includeddirectorygroup-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      IncludedDirectoryGroup model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../cli/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    CLI
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            CLI
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/getting_started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/bulk/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bulk Commands
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/logging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Logging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/migration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/syslogging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Syslogging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Commands
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            Commands
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/actors/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Actors
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/agents/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Agents
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/alerts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Alerts (Deprecated)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/alert_rules/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Alert Rules
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/audit_log/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Audit Log
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cases
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/departments/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Departments
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/devices/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Devices
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/directory_groups/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Directory Groups
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/file_events/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    File Events
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/riks_profiles.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Risk Profiles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/sessions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sessions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/trusted_activities/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Trusted Activites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/users/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Users
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cmds/watchlists/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Watchlists
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../integration-guides/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Guides
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Microsoft Sentinel
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            Microsoft Sentinel
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration-guides/sentinel/introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration-guides/sentinel/azure-sentinel-data-collector/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data Collector API
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration-guides/sentinel/azure-sentinel-log-analytics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Log Analytics Agent
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#actors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actors
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Actors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#actor-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actor model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actorfamily-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      ActorFamily model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actorspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      ActorsPage` model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agents
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Agents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agent model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agentspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      AgentsPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alerts-deprecated" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alerts (Deprecated)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Alerts (Deprecated)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#alertdetails-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      AlertDetails model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alertsummary-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      AlertSummary model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alertquerypage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      AlertQueryPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alert-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alert Rules
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Alert Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ruleuser-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      RuleUser model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ruleuserslist-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      RuleUsersList model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ruledetails-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      RuleDetails model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audit-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      Audit Log
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Audit Log">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auditeventspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      AuditEventsPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cases
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#case-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Case model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#casespage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      CasesPage model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#casefileevents-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      CaseFileEvents model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Customer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#customer-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customer model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#departments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Departments
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Departments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#departmentspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      DepartmentsPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#devices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Devices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Devices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#device-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Device model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#devicespage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      DevicesPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#directory-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directory Groups
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Directory Groups">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#directorygroup-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      DirectoryGroup model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#directorygroupspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      DirectoryGroupsPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Events
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Events">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fileevent-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      FileEvent model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fileeventspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      FileEventsPage model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#savedsearch-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      SavedSearch model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Roles
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Roles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#role-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Role model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updaterolesresponse-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      UpdateRolesResponse model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sessions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trusted-activities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Trusted Activities
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trusted Activities">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#trustedactivity-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      TrustedActivity model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trustedactivitiespage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      TrustedActivitiesPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#users" class="md-nav__link">
+    <span class="md-ellipsis">
+      Users
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Users">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#user-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      User model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#userspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      UsersPage model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#role-model_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Role model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risk-profiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk Profiles
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Risk Profiles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#riskprofile-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      RiskProfile model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#riskprofilespage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      RiskProfilesPage model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#watchlists" class="md-nav__link">
+    <span class="md-ellipsis">
+      Watchlists
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Watchlists">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#watchlist-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Watchlist model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#watchlistspage-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      WatchlistsPage model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#watchlistuser-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      WatchlistUser model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#watchlistmemberslist-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      WatchlistMembersList model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#includeduserslist-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      IncludedUsersList model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#excludeduserslist-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      ExcludedUsersList model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#includeddepartmentslist-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      IncludedDepartmentsList model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#includeddepartment-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      IncludedDepartment model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#includeddirectorygroupslist-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      IncludedDirectoryGroupsList model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#includeddirectorygroup-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      IncludedDirectoryGroup model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="models">Models<a class="headerlink" href="#models" title="Permanent link">&para;</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Incydr SDK's Pydantic models default to snake_case for all field attribute names for consistency, and by default will
+convert names to the casing expected by the API endpoint when serializing the data using the model's <code>.json()</code> and
+<code>.dict()</code> methods.</p>
+<p>For example, if the server returns a response with a JSON key of <code>createdAt</code>, the value will be accessible on the
+model via <code>Model.created_at</code>, but calling <code>Model.json()</code> will output with a key of <code>createdAt</code> so the data can be
+used in further requests.</p>
+<p>Fields where a transormation has been applied are marked with <code>json_alias=&lt;aliasName&gt;</code> below.</p>
+</div>
+<p>See <a href="https://pydantic-docs.helpmanual.io/usage/models/#model-properties">Pydantic documentation</a> for full list of
+available model methods.</p>
+<h2 id="actors">Actors<a class="headerlink" href="#actors" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="actor-model"><code>Actor</code> model<a class="headerlink" href="#actor-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>Actor</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">active=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">actorId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">alternateNames=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">country=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">department=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">division=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">employeeType=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">firstName=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">inScope=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">lastName=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">locality=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">managerActorId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">name=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">parentActorId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">region=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">title=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing an Actor.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>active</strong>: <code>bool</code> Whether or not the actor is active.</li>
+<li><strong>actor_id</strong>: <code>str</code> The unique ID of the actor.</li>
+<li><strong>alternate_names</strong>: <code>List[str]</code> A list of other names the actor may have.</li>
+<li><strong>country</strong>: <code>str</code> The actor's country.</li>
+<li><strong>department</strong>: <code>str</code> The actor's department.</li>
+<li><strong>division</strong>: <code>str</code> The actor's division.</li>
+<li><strong>employee_type</strong>: <code>str</code> The actor's employment type, such as if they're a contractor.</li>
+<li><strong>first_name</strong>: <code>str</code> The first (given) name of the actor.</li>
+<li><strong>in_scope</strong>: <code>str</code> The actor's scope state. An actor is considered "in scope" if their activity is monitored in at least one data source.</li>
+<li><strong>last_name</strong>: <code>str</code> The last (family) name of the actor.</li>
+<li><strong>locality</strong>: <code>str</code> - The actor's locality (city).</li>
+<li><strong>manager_actor_id</strong>: <code>str</code> The actor ID of the actor's manager.</li>
+<li><strong>name</strong>: <code>str</code> The actor's (eg. full username/email) name.</li>
+<li><strong>parentActorId</strong>: <code>str</code> The actor ID of this actor's parent actor. (if the actor has a parent).</li>
+<li><strong>region</strong>: <code>str</code> The actor's region (state).</li>
+<li><strong>title</strong>: <code>str</code> The actor's job title.</li>
+</ul></div>
+</div>
+<h3 id="actorfamily-model"><code>ActorFamily</code> model<a class="headerlink" href="#actorfamily-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>ActorFamily</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">children</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">parent</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing an actor family.</p>
+<p>An actor family consists of one or more child actors adopted by a single parent. If an actor is not associated with
+any other actors, the family consists of only the single actor.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>children</strong>: <code>List[<a class="autorefs autorefs-internal" href="#actor-model">Actor</a>]</code> The list of child actors associated with the parent.</li>
+<li><strong>parent</strong>: <code><a class="autorefs autorefs-internal" href="#actor-model">Actor</a></code> The parent actor of the family.</li>
+</ul></div>
+</div>
+<h3 id="actorspage-model">ActorsPage` model<a class="headerlink" href="#actorspage-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>ActorsPage</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">actors</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a page of Actors</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>actors</strong>: <code>List[Actor]</code> The list of actors returned from the query.</li>
+</ul></div>
+</div>
+<h2 id="agents">Agents<a class="headerlink" href="#agents" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="agent-model"><code>Agent</code> model<a class="headerlink" href="#agent-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>Agent</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">agentId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">name=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">userId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">osHostname=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">osName=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">machineId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">serialNumber=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">active=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">agentType=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">agentHealthIssueTypes=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">appVersion=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">productVersion=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">lastConnected=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">externalReference=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">creationDate=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">modificationDate=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing an Incydr agent.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>agent_id</strong>: <code>str</code> The globally unique ID (guid) for this agent.</li>
+<li><strong>name</strong>: <code>str</code> The editable name of the agent.</li>
+<li><strong>user_id</strong>: <code>str</code> The unique ID of the user the agent is assigned to.</li>
+<li><strong>os_hostname</strong>: <code>str</code> The hostname reported by the OS the agent is running on.</li>
+<li><strong>os_name</strong>: <code>str</code> The name of the OS the agent is running on.</li>
+<li><strong>machine_id</strong>: <code>str</code> Device machine ID.</li>
+<li><strong>serial_number</strong>: <code>str</code> Authenticated agent serial number.</li>
+<li><strong>active</strong>: <code>bool</code> If the agent status is active.</li>
+<li><strong>agent_type</strong>: <a class="autorefs autorefs-internal" href="../enums/#agent-type"><code>AgentType</code></a> The type of agent.</li>
+<li>**agent_health_issue_types: <code>List[str]</code> List of health issues with the agent. Health issue types include the following: <code>NOT_CONNECTING</code>, <code>NOT_SENDING_SECURITY_EVENTS</code>.</li>
+<li><strong>app_version</strong>: <code>str</code> The app version of the agent.</li>
+<li><strong>product_version</strong>: <code>str</code> The product version of the agent.</li>
+<li><strong>last_connected</strong>: <code>datetime</code> The time the agent last connected to a Code42 Authority server.</li>
+<li><strong>external_reference</strong>: <code>str</code> Editable reference information (useful for identifying an agent in external systems).</li>
+<li><strong>creation_date</strong>: <code>datetime</code> The time the agent was first registered.</li>
+<li><strong>modification_date</strong>: <code>datetime</code> The time the agent's database entry was last updated.</li>
+</ul></div>
+</div>
+<h3 id="agentspage-model"><code>AgentsPage</code> model<a class="headerlink" href="#agentspage-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>AgentsPage</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">agents</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">pageSize</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">page</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a page of Agents.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>agents</strong>: <code>List[<a class="autorefs autorefs-internal" href="#agent-model">Agent</a>]</code> The list of agents returned from the query.</li>
+<li><strong>total_count</strong>: <code>int</code> Total number of agents found in query results.</li>
+<li><strong>page_size</strong>: <code>int</code> The maximum number of agents returned in query results page.</li>
+<li><strong>page_num</strong>: <code>int</code> The current page number of the query result set.</li>
+</ul></div>
+</div>
+<h2 id="alerts-deprecated">Alerts (Deprecated)<a class="headerlink" href="#alerts-deprecated" title="Permanent link">&para;</a></h2>
+<hr />
+<p>Alerts has been replaced by <a href="#sessions">Sessions</a>.</p>
+<h3 id="alertdetails-model"><code>AlertDetails</code> model<a class="headerlink" href="#alertdetails-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>AlertDetails</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">tenantId</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">type</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">id=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">createdAt</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">state</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">stateLastModifiedBy=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">stateLastModifiedAt=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">name=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">description=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">actor=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">actorId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">target=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">severity=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">riskSeverity=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">ruleId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">watchlists=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">observations=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">note=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing the full details of an alert. Includes all the fields from <code>AlertSummary</code> plus file event
+observations (the events that triggered the alert), and any notes that have been added to the alert.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>observations</strong>: <code>List[Observation]</code> List of observed file events that triggered the alert.</li>
+<li><strong>note</strong>: <code>str</code> Most recent note added to the alert.</li>
+</ul></div>
+</div>
+<h3 id="alertsummary-model"><code>AlertSummary</code> model<a class="headerlink" href="#alertsummary-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>AlertSummary</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">tenantId</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">type</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">id=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">createdAt</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">state</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">stateLastModifiedBy=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">stateLastModifiedAt=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">name=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">description=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">actor=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">actorId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">target=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">severity=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">riskSeverity=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">ruleId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">watchlists=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing an alert summary.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>tenant_id</strong>: <code>str</code> The unique identifier representing the tenant.</li>
+<li><strong>type</strong>: <code>RuleType</code> Rule type that generated the alert.</li>
+<li><strong>id</strong>: <code>str</code> The unique id of the alert.</li>
+<li><strong>created_at</strong>: <code>datetime</code> The timestamp when the alert was created.</li>
+<li><strong>state</strong>: <a class="autorefs autorefs-internal" href="../enums/#alert-state"><code>AlertState</code></a> The current state of the alert.</li>
+<li><strong>state_last_modified_by</strong>: <code>str</code> The actor who last modified the alert state.</li>
+<li><strong>state_last_modified_at</strong>: <code>datetime</code> The timestamp when the alert state was last modified.</li>
+<li><strong>name</strong>: <code>str</code> The name of the alert.  Same as the name of the rule that triggered it.</li>
+<li><strong>description</strong>: <code>str</code> The description of the alert.  Same as the description of the rule that triggered it.</li>
+<li><strong>actor</strong>: <code>str</code> The user who triggered the alert.</li>
+<li><strong>actor_id</strong>: <code>str</code> The user id who triggered the alert, if it is available.</li>
+<li><strong>target</strong>: <code>str</code> Unused legacy property.</li>
+<li><strong>severity</strong>: <a class="autorefs autorefs-internal" href="../enums/#alert-severity"><code>AlertSeverity</code></a> Indicates static rule severity of the alert. (Deprecated)</li>
+<li><strong>risk_severity</strong>: <a class="autorefs autorefs-internal" href="../enums/#risk-severity"><code>RiskSeverity</code></a> Indicates event risk severity of the alert.</li>
+<li><strong>rule_id</strong>: <code>str</code> The unique id corresponding to the rule which triggered the alert.</li>
+<li><strong>watchlists</strong>: <code>str</code> Watchlists the actor is on at the time of the alert (if any).</li>
+</ul></div>
+</div>
+<h3 id="alertquerypage-model"><code>AlertQueryPage</code> model<a class="headerlink" href="#alertquerypage-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>AlertQueryPage</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">type</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">alerts=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">problems=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a page of <code>AlertSummary</code> objects resulting from an alert search query.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>alerts</strong>: <code>List[AlertSummary]</code> List of alerts that found by query.</li>
+<li><strong>total_count</strong>: <code>int</code> The count of alerts found.</li>
+<li><strong>problems</strong>: <code>List[QueryProblem]</code> Potential issues that were hit while trying to run the query.</li>
+</ul></div>
+</div>
+<h2 id="alert-rules">Alert Rules<a class="headerlink" href="#alert-rules" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="ruleuser-model"><code>RuleUser</code> model<a class="headerlink" href="#ruleuser-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>RuleUser</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">userIdFromAuthority=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">aliases=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a user assigned to a rule.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>user_id_from_authority</strong>: <code>str</code> - A unique Code42 user ID.</li>
+<li><strong>user_alias_list</strong>: <code>List[str]</code> - List of user aliases associated with the user.</li>
+</ul></div>
+</div>
+<h3 id="ruleuserslist-model"><code>RuleUsersList</code> model<a class="headerlink" href="#ruleuserslist-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>RuleUsersList</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">id=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">users=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">mode=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a list of users associated with a rule, as well as the rule's configuration mode to <code>INCLUDE</code> or <code>EXCLUDE</code> those users.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>id</strong>: <code>str</code> - Unique ID of the rule.</li>
+<li><strong>users</strong>: <code>List[RuleUser]</code> - A list of users in the rule's username filter.</li>
+<li><strong>mode</strong>: <code>str</code> - Indicates how to filter on the user list. Specifies whether to <code>INCLUDE</code> or <code>EXCLUDE</code> the listed users from the rule.</li>
+</ul></div>
+</div>
+<h3 id="ruledetails-model"><code>RuleDetails</code> model<a class="headerlink" href="#ruledetails-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>RuleDetails</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">name=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">description=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">severity=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">isEnabled=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">source=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">notifications=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">education=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">vectors=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">filters=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">id=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">createdAt=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">createdBy=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">modifiedAt=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">modifiedBy=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">isSystemRule=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+</div>
+<h2 id="audit-log">Audit Log<a class="headerlink" href="#audit-log" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="auditeventspage-model"><code>AuditEventsPage</code> model<a class="headerlink" href="#auditeventspage-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>AuditEventsPage</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">events=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">paginationRangeEndIndex=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">paginationRangeStartIndex=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a page of audit events.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>events</strong>: <code>List[Dict[Optional[str], Any]]</code> A list of zero or more events matching the given criteria.
+    Each event is represented as a dictionary of property names associated with that event.  These fields may differ
+    from event to event.</li>
+<li><strong>pagination_range_end_index</strong>: <code>int</code> The index of the last result returned, in relation to total results found.</li>
+<li><strong>pagination_range_start_index</strong>: <code>int</code> The index of the first result returned, in relation to total results found.</li>
+</ul></div>
+</div>
+<h2 id="cases">Cases<a class="headerlink" href="#cases" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="case-model"><code>Case</code> model<a class="headerlink" href="#case-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>Case</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">number=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">name=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">createdAt=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">updatedAt=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">subject=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">subjectUsername=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">status</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">assignee=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">assigneeUsername=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">createdByUserUid=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">createdByUsername=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">lastModifiedByUserUid=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">lastModifiedByUsername=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">archivalTime=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing an Incydr Case.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>number</strong>: <code>int</code> Unique numeric identifier for the case.</li>
+<li><strong>name</strong>: <code>str</code> Unique name given to the case.</li>
+<li><strong>created_at</strong>: <code>datetime</code> Time at which the case was created. json_alias=<code>createdAt</code></li>
+<li><strong>updated_at</strong>: <code>datetime | None</code> Time at which the case was last updated. json_alias=<code>updatedAt</code></li>
+<li><strong>subject</strong>: <code>str | None</code> The user UID of the subject being investigated in this case.</li>
+<li><strong>subject_username</strong>: <code>str | None</code> The username of the subject being investigated in this case. json_alias=<code>subjectUsername</code></li>
+<li><strong>status</strong>: <code>CaseStatus</code> Indicates the status of the case. OPEN: The case is active and all aspects of the case are editable. CLOSED: The case is resolved. Closed cases cannot be re-opened or modified. Case data for closed cases is retained indefinitely.</li>
+<li><strong>assignee</strong>: <code>str | None</code> The user ID of the administrator assigned to investigate the case.</li>
+<li><strong>assignee_username</strong>: <code>str | None</code> The username of the administrator assigned to investigate the case. json_alias=<code>assigneeUsername</code></li>
+<li><strong>created_by_user_id</strong>: <code>str | None</code> User UID of the user who created the case. json_alias=<code>createdByUserUid</code></li>
+<li><strong>created_by_username</strong>: <code>str | None</code> Username of the user who created the case. json_alias=<code>createdByUsername</code></li>
+<li><strong>last_modified_by_user_id</strong>: <code>str | None</code> User UID of the user who last modified the case. json_alias=<code>lastModifiedByUserUid</code></li>
+<li><strong>last_modified_by_username</strong>: <code>str | None</code> Username of the user who last modified the case. json_alias=<code>lastModifiedByUsername</code></li>
+<li><strong>archival_time</strong>: <code>datetime</code> Time at which the case will be archived.</li>
+</ul></div>
+</div>
+<h3 id="casespage-model"><code>CasesPage</code> model<a class="headerlink" href="#casespage-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>CasesPage</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cases</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a page of <code>Case</code> objects.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>cases</strong>: <code>List[Case]</code> The list of <code>n</code> number of cases retrieved from the query, where <code>n=page_size</code>.</li>
+<li><strong>total_count</strong>: <code>int</code> Total count of cases found by the query.</li>
+</ul></div>
+</div>
+<h3 id="casefileevents-model"><code>CaseFileEvents</code> model<a class="headerlink" href="#casefileevents-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>CaseFileEvents</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">events=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing file events associated with a case.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>events</strong>: <code>List[FileEvent]</code> - List of events in the response..</li>
+<li><strong>total_count</strong>: <code>int</code> - Total number of events associated with the case.</li>
+</ul></div>
+</div>
+<h2 id="customer">Customer<a class="headerlink" href="#customer" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="customer-model"><code>Customer</code> model<a class="headerlink" href="#customer-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>Customer</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">name=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">registrationKey=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">tenantId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model providing details of an Incydr customer account.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>name</strong>: <code>str</code> The Code42 account name.</li>
+<li><strong>registration_key</strong>: <code>str</code> The Code42 registration key (primarily for licensing purposes).</li>
+<li><strong>tenant_id</strong>: <code>str</code> The unique identifier for the account within Code42.</li>
+</ul></div>
+</div>
+<h2 id="departments">Departments<a class="headerlink" href="#departments" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="departmentspage-model"><code>DepartmentsPage</code> model<a class="headerlink" href="#departmentspage-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>DepartmentsPage</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">departments=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a list of departments.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>departments</strong>: <code>List[str]</code> - The list of <code>n</code> department names retrieved by the query, where <code>n=page_size</code>.</li>
+<li><strong>total_count</strong>: <code>int</code> - Total count of departments retrieved by the query.</li>
+</ul></div>
+</div>
+<h2 id="devices">Devices<a class="headerlink" href="#devices" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="device-model"><code>Device</code> model<a class="headerlink" href="#device-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>Device</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">deviceId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">legacyDeviceId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">name=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">osHostname=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">status=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">active=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">blocked=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">alertState=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">userId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">legacyUserId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">orgId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">legacyOrgId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">orgGuid=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">externalReferenceInfo=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">notes=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">lastConnected=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">osVersion=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">osArch=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">address=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">remoteAddress=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeZone=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">version=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">build=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">creationDate=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">modificationDate=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">loginDate=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a device.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>device_id</strong>: <code>str</code> - The globally unique ID (guid) for this device.</li>
+<li><strong>legacy_device_id</strong>: <code>str</code> - The device ID to use for older console-based APIs that require a device ID.</li>
+<li><strong>name</strong>: <code>str</code> - The device name.</li>
+<li><strong>os_hostname</strong>: <code>str</code> - The device hostname according to the device's OS.</li>
+<li><strong>status</strong>: <code>str</code> - The device status. One of [Active, Deactivated, Blocked, Deauthorized (Active/Deactivated followed by optional Blocked and/or Deauthorized).</li>
+<li><strong>active</strong>: <code>bool</code> - Whether or not the device is active. If true, the device will show up on reports, etc.</li>
+<li><strong>blocked</strong>: <code>bool</code> - Whether or not the device is blocked.  If true, restores and logins are disabled.</li>
+<li><strong>alert_state</strong>: <code>int</code> - The device's alert state. One of [0=ok, 1=connection warning, 2=connection critical].</li>
+<li><strong>user_id</strong>: <code>str</code> - The globally unique ID for this user.</li>
+<li><strong>legacy_user_id</strong>: <code>str</code> - The user ID to use for older console-based APIs that require a user ID.</li>
+<li><strong>org_id</strong>: <code>str</code> - An ID for the Code42 organization of the user owning this device.</li>
+<li><strong>legacy_org_id</strong>: <code>str</code> - The org ID to use for older console-based APIs that require an org ID.</li>
+<li><strong>org_guid</strong>: <code>str</code> - The globally unique org ID.  This is the org identifier that should be used for all org-related API actions.</li>
+<li><strong>external_reference</strong>: <code>str</code> - Optional external reference information, such as a serial number, asset tag, employee ID, or help desk issue ID.</li>
+<li><strong>notes</strong>: <code>str</code> - Optional descriptive information for the device.</li>
+<li><strong>last_connected</strong>: <code>datetime</code> - The last day and time this device was connected to the server.</li>
+<li><strong>os_name</strong>: <code>str</code> - The device's operating system name. Ex: Windows<em>, Mac OS X, Linux, Android, iOS, SunOS, etc.</li>
+<li><strong>os_version</strong>: <code>str</code> - The device's operating system version. Ex: 10.5.1, 6.2, etc.</li>
+<li></em>*address: <code>str</code> - The device's internal IP address and port. Ex: 192.168.42.1:4282</li>
+<li><strong>remote_address</strong>: <code>str</code> - The device's external IP address and port. Example: 171.22.110.41:13958</li>
+<li><strong>time_zone</strong>: <code>str</code> - The device's time zone. Ex: Asia/Calcutta</li>
+<li><strong>version</strong>: <code>str</code> - The device product display version.</li>
+<li><strong>build</strong>: <code>int</code> - The device build version long number, will only be applicable to CP4/SP devices.</li>
+<li><strong>creation_date</strong>: <code>datetime</code> - The date and time this device was created.</li>
+<li><strong>modification_date</strong>: <code>datetime</code> - The date and time this device was last modified.</li>
+<li><strong>login_date</strong>: <code>datetime</code> - The date and time this device was last logged in.</li>
+</ul></div>
+</div>
+<h3 id="devicespage-model"><code>DevicesPage</code> model<a class="headerlink" href="#devicespage-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>DevicesPage</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">devices=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a page of <code>Device</code> objects.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>devices</strong>: <code>List[Device]</code> - The list of <code>n</code> number of devices retrieved from the query, where <code>n=page_size</code>.</li>
+<li><strong>total_count</strong>: <code>int</code> - Total count of devices found by query.</li>
+</ul></div>
+</div>
+<h2 id="directory-groups">Directory Groups<a class="headerlink" href="#directory-groups" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="directorygroup-model"><code>DirectoryGroup</code> model<a class="headerlink" href="#directorygroup-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>DirectoryGroup</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">groupId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">name=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+</div>
+<h3 id="directorygroupspage-model"><code>DirectoryGroupsPage</code> model<a class="headerlink" href="#directorygroupspage-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>DirectoryGroupsPage</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">directoryGroups=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a list of directory groups.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>directory_groups</strong>: <code>List[DirectoryGroup</code>] - The list of <code>n</code> directory groups retrieved by the query, where <code>n=page_size</code>.</li>
+<li><strong>total_count</strong>: <code>int</code> - Total count of directory groups retrieved by the query.</li>
+</ul></div>
+</div>
+<h2 id="file-events">File Events<a class="headerlink" href="#file-events" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="fileevent-model"><code>FileEvent</code> model<a class="headerlink" href="#fileevent-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>FileEventV2</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timestamp=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">destination=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">event=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">file=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">process=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">report=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">risk=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">source=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">user=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">git=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>timestamp</strong>: - The date and time that the Code42 service on the device detected the event.  This timestamp is based on the device’s system clock and reported in Coordinated Universal Time (UTC).</li>
+<li><strong>destination</strong>: <code>Destination</code> - A [<code>Destination</code>] object containing metadata about the destination of the file event.</li>
+<li><strong>event</strong>: <code>Event</code> - An [<code>Event</code>] object containing summary information about the event.</li>
+<li><strong>file</strong>: <code>File</code> - A [<code>File</code>] object containing metadata about the file for this event.</li>
+<li><strong>process</strong>: <code>Process</code> - A [<code>Process</code>] object containing metadata about the process associated with the event.</li>
+<li><strong>report</strong>: <code>Report</code> - A [<code>Report</code>] object containing metadata for reports from 3rd party sources, such Salesforce downloads.</li>
+<li><strong>risk</strong>: <code>Risk</code> - A [<code>Risk</code>] object containing metadata on risk factors associated with the event.</li>
+<li><strong>source</strong>: <code>Source</code> - A [<code>Source</code>] object containing metadata about the source of the file event.</li>
+<li><strong>user</strong>: <code>User</code> - A [<code>User</code>] object containing metadata Attributes of the Code42 username signed in to the Code42 app on the device.</li>
+<li><strong>git</strong>: <code>Git</code> - A [<code>Git</code>] object containing git details for the event (if applicable).</li>
+</ul></div>
+</div>
+<h3 id="fileeventspage-model"><code>FileEventsPage</code> model<a class="headerlink" href="#fileeventspage-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>FileEventsPage</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">fileEvents=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">nextPgToken=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">problems=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a page of <code>FileEventV2</code> objects.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>file_events</strong>: <code>List[FileEventsV2]</code> - The list of <code>n</code> number of file events retrieved from the query, where <code>n=pg_size</code>.</li>
+<li><strong>next_pg_token</strong>: <code>str</code> - The pgToken value from another request to indicate the starting point the next page of results. <code>nextPgToken</code> is null if there are no more results or if pgToken was not supplied.</li>
+<li><strong>problems</strong>: <code>List[QueryProblem]</code> - "List of problems in the request.  A problem with a search request could be an invalid filter value, an operator that can't be used on a term, etc.</li>
+<li><strong>total_count</strong>: <code>int</code> - Total count of file events found by the query.</li>
+</ul></div>
+</div>
+<h3 id="savedsearch-model"><code>SavedSearch</code> model<a class="headerlink" href="#savedsearch-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>SavedSearch</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">apiVersion=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">columns=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">createdByUID=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">createdByUsername=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">creationTimestamp=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">groupClause=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">groups=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">id=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">modifiedByUID=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">modifiedByUsername=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">modifiedTimestamp=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">name=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">notes=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">srtDir=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">srtKey=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a saved search.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>api_version</strong>: <code>int</code> - The version of the API used to create the search.</li>
+<li><strong>columns</strong>: <code>List[str]</code> - The list of columns to be displayed in the web app for the search.</li>
+<li><strong>created_by_uid</strong>: <code>str</code> - The ID of the user who created the saved search.</li>
+<li><strong>created_by_username</strong>: <code>str</code> - The username of the user who created the saved search.</li>
+<li><strong>creation_timestamp</strong>: <code>datetime</code> - The time at which the saved search was created.</li>
+<li><strong>group_clause</strong>: <code>GroupClause</code> - <code>AND</code> or <code>OR</code>. Grouping clause for any specified groups. Defaults to <code>AND</code>.</li>
+<li><strong>groups</strong>: <code>List[SearchFilterGroup]</code> - One or more FilterGroups to be combined in a query.</li>
+<li><strong>id</strong>: <code>str</code> - The ID for the saved search.</li>
+<li><strong>modified_by_uid</strong>: <code>str</code> - The ID of the user who last modified the saved search.</li>
+<li><strong>modified_by_username</strong>: <code>str</code> - The username of the user who last modified the saved search.</li>
+<li><strong>modified_timestamp</strong>: <code>datetime</code> - The time at which the saved search was last modified.</li>
+<li><strong>name</strong>: <code>str</code> - The name given to the saved search.</li>
+<li><strong>notes</strong>: <code>str</code> - Optional notes about the search.</li>
+<li><strong>srt_dir</strong>: <code>SortDirection</code> - <code>asc</code> or <code>desc</code>. The direction in which to sort the response based on the corresponding key. Defaults to 'asc'.</li>
+<li><strong>srt_key</strong>: <code>str</code> - One or more values on which the response will be sorted. Defaults to event ID.</li>
+</ul></div>
+</div>
+<h2 id="roles">Roles<a class="headerlink" href="#roles" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="role-model"><code>Role</code> model<a class="headerlink" href="#role-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>Role</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">roleId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">roleName=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">creationDate=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">modificationDate=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">permissions=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a role.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>role_id</strong>: <code>str</code> - A role ID.</li>
+<li><strong>role_name</strong>: <code>str</code> - A role name.</li>
+<li><strong>modification_date</strong>: <code>str</code> - The date and time this role for the user was last modified.</li>
+<li><strong>creation_date</strong>: <code>str</code> - The date and time this role for the user was created.</li>
+<li><strong>permission_ids</strong>: <code>str</code> - The permission IDs associated with this role.</li>
+</ul></div>
+</div>
+<h3 id="updaterolesresponse-model"><code>UpdateRolesResponse</code> model<a class="headerlink" href="#updaterolesresponse-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>UpdateRolesResponse</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">processedReplacementRoleIds=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">newlyAssignedRolesIds=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">unassignedRolesIds=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">ignoredRolesIds=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing the response to updating a user's role.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>processed_replacement_role_ids</strong>: <code>List[str]</code> - The role IDs processed.</li>
+<li><strong>newly_assigned_roles_ids</strong>: <code>List[str]</code> - The role IDs newly assigned to the user.</li>
+<li><strong>unassigned_roles_ids</strong>: <code>List[str]</code> - The role IDs unassigned from the user.</li>
+<li><strong>ignored_roles_ids</strong>: <code>List[str]</code> - The role IDs ignored.</li>
+</ul></div>
+</div>
+<h2 id="sessions">Sessions<a class="headerlink" href="#sessions" title="Permanent link">&para;</a></h2>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>Session</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">actorId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">beginTime=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">contentInspectionResults=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">contextSummary=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">criticalEvents=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">endTime=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">exfiltrationSummary=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">firstObserved=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">highEvents=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">lastUpdated=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">lowEvents=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">moderateEvents=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">noRiskEvents=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">notes=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">riskIndicators=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">scores=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">sessionId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">states=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">tenantId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">triggeredAlerts=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">userId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a session summary.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>actor_id</strong>: <code>str</code> The ID of the actor that generated the session.</li>
+<li><strong>begin_time</strong>: <code>datetime</code> The date and time when this session began.</li>
+<li><strong>content_inspection_results</strong>: <code>List[ContentInspectionResult]</code> The results of content inspection.</li>
+<li><strong>context_summary</strong>: <code>str</code> An English summary of the contextual aspects of this session is any were identified.</li>
+<li><strong>critical_events</strong>: <code>int</code> The number of events in the session with a critical risk severity.</li>
+<li><strong>end_time</strong>: <code>datetime</code> The date and time when this session ended.</li>
+<li><strong>exfiltration_summary</strong>: <code>str</code> An English summary of the exfiltration (if any) in this session.</li>
+<li><strong>first_observed</strong>: <code>datetime</code> The date and time at which this session was first observed.</li>
+<li><strong>high_events</strong>: <code>int</code> The number of events in the session with a high risk severity.</li>
+<li><strong>last_updated</strong>: <code>datetime</code> The date and time at which this session was last updated.</li>
+<li><strong>low_events</strong>: <code>int</code> The number of events in the session with a low risk severity</li>
+<li><strong>moderate_events</strong>: <code>int</code> The number of events in the session with a moderate risk severity.</li>
+<li><strong>no_risk_events</strong>: <code>int</code> The number of events in the session with a no risk severity.</li>
+<li><strong>notes</strong>: <code>str</code> The set of notes associated with this session.</li>
+<li><strong>risk_indicators</strong>: <code>List[str]</code> The list of risk indicator/weight combinations observed in this session.</li>
+<li><strong>scores</strong>: <code>str</code> The history of all score assignments for this session.</li>
+<li><strong>session_id</strong>: <code>str</code> The session ID.</li>
+<li><strong>states</strong>: <code>str</code> The history of states this session has been in.</li>
+<li><strong>tenant_id</strong>: <code>str</code> The tenant ID.</li>
+<li><strong>triggered_alerts</strong>: <code>str</code> The list of all alerts that were triggered by activity in this session.</li>
+</ul></div>
+</div>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>SessionsPage</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">items=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a page of sessions.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>items</strong>: <code>List[Session]</code> The list of sessions returned by the query.</li>
+<li><strong>total_count</strong>: <code>int</code> The total count of sessions returned by the query.</li>
+</ul></div>
+</div>
+<h2 id="trusted-activities">Trusted Activities<a class="headerlink" href="#trusted-activities" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="trustedactivity-model"><code>TrustedActivity</code> model<a class="headerlink" href="#trustedactivity-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>TrustedActivity</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">activityActionGroups=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">activityId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">isHighValueSource=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">description=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">principalType=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">type=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">updateTime=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">updatedByPrincipalId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">updatedByPrincipalName=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">value=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing an TrustedActivity.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>activity_action_groups</strong>: <code>List[ActivityActionGroup]</code> The list of activity actions associated with the activity.</li>
+<li><strong>activity_id</strong>: <code>str</code> The unique identifier of the trusted activity.</li>
+<li><strong>description</strong>: <code>str</code> A description of the trusted activity.</li>
+<li><strong>principal_type</strong>: <code>PrincipalType | None</code></li>
+<li><strong>activity_type</strong>: <code>ActivityType | None</code> The type of the trusted activity.</li>
+<li><strong>update_time</strong>: <code>datetime | None</code> The time at which the trust activity was last created or modified.</li>
+<li><strong>updated_by_principal_id</strong>: <code>str | None</code> The unique identifier of the user who last updated the trust activity.</li>
+<li><strong>updated_by_principal_name</strong>: <code>str | None</code> The username of the user who last updated the trusted activity.</li>
+<li><strong>value</strong>: <code>str</code> The value of the trusted activity.</li>
+</ul></div>
+</div>
+<h3 id="trustedactivitiespage-model"><code>TrustedActivitiesPage</code> model<a class="headerlink" href="#trustedactivitiespage-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>TrustedActivitiesPage</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">trustedActivities=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a page of <code>TrustedActivity</code> objects.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>total_count</strong>: <code>int</code> Total count of trusted activities found by the query.</li>
+<li><strong>trusted_activities</strong>: <code>List[TrustedActivity]</code> The list of trusted activities retrieved from the query.</li>
+</ul></div>
+</div>
+<h2 id="users">Users<a class="headerlink" href="#users" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="user-model"><code>User</code> model<a class="headerlink" href="#user-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>User</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">deviceUid=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">email=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">id=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+</div>
+<h3 id="userspage-model"><code>UsersPage</code> model<a class="headerlink" href="#userspage-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>UsersPage</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">users=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a page of <code>User</code> objects.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>users</strong>: <code>List[User]</code> - The list of <code>n</code> number of users retrieved from the query, where <code>n=page_size</code>.</li>
+<li><strong>total_count</strong>: <code>int</code> - Total count of users found by query.</li>
+</ul></div>
+</div>
+<h3 id="role-model_1"><code>Role</code> model<a class="headerlink" href="#role-model_1" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>Role</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">roleId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">roleName=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">creationDate=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">modificationDate=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">permissions=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a role.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>role_id</strong>: <code>str</code> - A role ID.</li>
+<li><strong>role_name</strong>: <code>str</code> - A role name.</li>
+<li><strong>modification_date</strong>: <code>str</code> - The date and time this role for the user was last modified.</li>
+<li><strong>creation_date</strong>: <code>str</code> - The date and time this role for the user was created.</li>
+<li><strong>permission_ids</strong>: <code>str</code> - The permission IDs associated with this role.</li>
+</ul></div>
+</div>
+<h2 id="risk-profiles">Risk Profiles<a class="headerlink" href="#risk-profiles" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="riskprofile-model"><code>RiskProfile</code> model<a class="headerlink" href="#riskprofile-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>RiskProfile</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">active=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cloudAliases=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">country=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">deleted=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">department=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">displayName=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">division=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">employmentType=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">endDate=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">locality=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">managerDisplayName=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">managerId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">managerUsername=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">notes=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">region=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">startDate=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">supportUser=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">tenantId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">title=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">userId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">username=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a risk profile.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>active</strong>: <code>bool</code> - Whether the actor is active.</li>
+<li><strong>cloud_alias</strong>: <code>List[str]</code> - List of cloud aliases for the actor.</li>
+<li><strong>country</strong>: <code>str</code> - The actor's country.</li>
+<li><strong>deleted</strong>: <code>bool</code> - Whether the actor has been deleted.</li>
+<li><strong>department</strong>: <code>str</code> - The actor's department.</li>
+<li><strong>display_name</strong>: <code>str</code> - The actor's display name.</li>
+<li><strong>division</strong>: <code>str</code> - The actor's division.</li>
+<li><strong>employment_type</strong>: <code>str</code> - The actor's employment type.</li>
+<li><strong>end_date</strong>: <code>Date</code> - Departure date for the actor</li>
+<li><strong>locality</strong>: <code>str</code> - The actor's locality (city).</li>
+<li><strong>manager_display_name</strong>: <code>str</code> - The actor's manager's display name.</li>
+<li><strong>manager_id</strong>: <code>str</code> - Unique actor ID of the actor's manager.</li>
+<li><strong>manager_username</strong>: <code>str</code> - The Code42 actorname of the actor's manager.</li>
+<li><strong>notes</strong>: <code>str</code> - Additional notes about the actor.</li>
+<li><strong>region</strong>: <code>str</code> - The actor's region (state).</li>
+<li><strong>start_date</strong>: <code>Date</code> - Starting date for the actor.</li>
+<li><strong>support_user</strong>: <code>bool</code> - Whether the actor is a support actor.</li>
+<li><strong>tenant_id</strong>: <code>str</code> - Unique tenant ID.</li>
+<li><strong>title</strong>: <code>str</code> - The actor's job title.</li>
+<li><strong>user_id</strong>: <code>str</code> - Unique actor ID.</li>
+<li><strong>username</strong>: <code>str</code> - actor's Code42 actorname.</li>
+</ul></div>
+</div>
+<h3 id="riskprofilespage-model"><code>RiskProfilesPage</code> model<a class="headerlink" href="#riskprofilespage-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>RiskProfilesPage</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">userRiskProfiles=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a page of <code>RiskProfile</code> objects.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>total_count</strong>: <code>int</code> The total count of all risk profiles.</li>
+<li><strong>user_risk_profiles</strong>: <code>List[RiskProfile]</code> The list of <code>n</code> number of risk profiles
+                        retrieved from the query, where <code>n=page_size</code>.</li>
+</ul></div>
+</div>
+<h2 id="watchlists">Watchlists<a class="headerlink" href="#watchlists" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="watchlist-model"><code>Watchlist</code> model<a class="headerlink" href="#watchlist-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>Watchlist</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">description=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">listType</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">stats=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">tenantId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">title=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">watchlistId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing an Incydr Watchlist.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>description</strong>: <code>str</code> - Optional description for a custom watchlist.</li>
+<li><strong>list_type</strong>: <a class="autorefs autorefs-internal" href="../enums/#watchlist-types"><code>WatchlistType</code></a> - The watchlist type.</li>
+<li><strong>stats</strong>: <code>WatchlistStats</code> - Watchlist membership information.  Includes <code>included_user_count</code>, <code>included_department_count</code>, <code>included_directory_groups_count</code>, and <code>excluded_users_count</code>.</li>
+<li><strong>tenant_id</strong>: <code>str</code> - A unique tenant ID.</li>
+<li><strong>title</strong>: <code>str</code> - Title for a custom watchlist.</li>
+<li><strong>watchlist_id</strong>: <code>str</code> - A unique watchlist ID.</li>
+</ul></div>
+</div>
+<h3 id="watchlistspage-model"><code>WatchlistsPage</code> model<a class="headerlink" href="#watchlistspage-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>WatchlistsPage</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">watchlists=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a page of <code>Watchlist</code> objects.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>total_count</strong>: <code>int</code> - Total count of watchlists found by the query.</li>
+<li><strong>watchlists</strong>: <code>List[Watchlist]</code> - The list <code>n</code> number of watchlists retrieved from the query, where <code>n=page_size</code>.</li>
+</ul></div>
+</div>
+<h3 id="watchlistuser-model"><code>WatchlistUser</code> model<a class="headerlink" href="#watchlistuser-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>WatchlistUser</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">addedTime=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">userId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">username=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a user whose associated with a watchlist.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>added_time</strong>: <code>datetime</code> - The time the user was associated with the watchlist.</li>
+<li><strong>user_id</strong>: <code>str</code> - Unique user ID.</li>
+<li><strong>username</strong>: `str - Username.</li>
+</ul></div>
+</div>
+<h3 id="watchlistmemberslist-model"><code>WatchlistMembersList</code> model<a class="headerlink" href="#watchlistmemberslist-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>WatchlistMembersList</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">watchlistMembers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a list of watchlist members.
+Watchlist members are users who are on a list, whether it is because they are individually included,
+or because they are part of a department or directory group that is included.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>watchlist_members</strong>: <code>List[WatchlistUser]</code> - The list of watchlist members.</li>
+<li><strong>total_count</strong>: <code>int</code> - Total count of members on the watchlist.</li>
+</ul></div>
+</div>
+<h3 id="includeduserslist-model"><code>IncludedUsersList</code> model<a class="headerlink" href="#includeduserslist-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>IncludedUsersList</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">includedUsers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a list of users included on a watchlist.
+Included users are those that have been individually included on that list.</p>
+<ul>
+<li><strong>included_users</strong>: <code>List[WatchlistUser]</code> - The list of included users.</li>
+<li><strong>total_count</strong>: <code>int</code> - The total count of all included users.</li>
+</ul></div>
+</div>
+<h3 id="excludeduserslist-model"><code>ExcludedUsersList</code> model<a class="headerlink" href="#excludeduserslist-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>ExcludedUsersList</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">excludedUsers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a list of users excluded from a watchlist.
+Excluded users are those that have been individually excluded from that list.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>excluded_users</strong>: <code>List[WatchlistUser]</code> - The list of excluded users.</li>
+<li><strong>total_count</strong>: <code>int</code></li>
+</ul></div>
+</div>
+<h3 id="includeddepartmentslist-model"><code>IncludedDepartmentsList</code> model<a class="headerlink" href="#includeddepartmentslist-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>IncludedDepartmentsList</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">includedDepartments=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a list of departments included on a watchlist.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>included_departments</strong>: <code>List[IncludedDepartment]</code> - The list of included departments.</li>
+<li><strong>total_count</strong>: <code>int</code> - The total count of all included departments.</li>
+</ul></div>
+</div>
+<h3 id="includeddepartment-model"><code>IncludedDepartment</code> model<a class="headerlink" href="#includeddepartment-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>IncludedDepartment</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">addedTime=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">name=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a department included on a watchlist.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>added_time</strong>: <code>datetime</code> - The time the department was included on the watchlist.</li>
+<li><strong>name</strong>: <code>str</code> - Department name. Example: "Engineering".</li>
+</ul></div>
+</div>
+<h3 id="includeddirectorygroupslist-model"><code>IncludedDirectoryGroupsList</code> model<a class="headerlink" href="#includeddirectorygroupslist-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>IncludedDirectoryGroupsList</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">includedDirectoryGroups=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">totalCount=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a list of directory groups included on a watchlist.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>included_directory_groups</strong>: <code>List[IncludedDirectoryGroup]</code> - The list of included directory groups.</li>
+<li><strong>total_count</strong>: <code>int</code> - The total count of all included directory groups.</li>
+</ul></div>
+</div>
+<h3 id="includeddirectorygroup-model"><code>IncludedDirectoryGroup</code> model<a class="headerlink" href="#includeddirectorygroup-model" title="Permanent link">&para;</a></h3>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>incydr.models.<strong>IncludedDirectoryGroup</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">addedTime=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">groupId=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">isDeleted=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">name=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">**extra_data</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>A model representing a directory group included on a watchlist.</p>
+<p><strong>Fields</strong>:</p>
+<ul>
+<li><strong>added_time</strong>: <code>datetime</code> - The time the directory group was included on the watchlist.</li>
+<li><strong>group_id</strong>: <code>str</code> - A unique group ID for the directory group.</li>
+<li><strong>is_deleted</strong>: <code>bool</code> - Whether the included group was deleted by the directory provider but still referenced by the watchlist</li>
+<li><strong>name</strong>: <code>str</code> - The name of directory group. Example: "Research and Development".</li>
+</ul></div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+    
+        
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.tracking", "content.code.annotate", "navigation.indexes"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      
+        <script src="../../javascripts/redoc.standalone.js"></script>
+      
+    
+  </body>
+</html>
