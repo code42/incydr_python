@@ -82,7 +82,6 @@ dependencies = [
 [tool.hatch.envs.docs.scripts]
 build = "mkdocs build"
 serve = "mkdocs serve"
-publish = "mkdocs gh-deploy --force"
 svg = "python docs/example_logging.py"
 
 
