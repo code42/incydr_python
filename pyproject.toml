@@ -74,7 +74,7 @@ check-diff = "pre-commit run --all-files --show-diff-on-failure"
 dependencies = [
   "chardet",
   "mkdocs-autorefs",
-  "mkdocs-material",
+  "mkdocs-material==9.5.21",
   "mkautodoc",
   "mkdocs-click",
 ]
