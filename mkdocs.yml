@@ -79,7 +79,7 @@ nav:
         - Devices: 'cli/cmds/devices.md'
         - Directory Groups: 'cli/cmds/directory_groups.md'
         - File Events: 'cli/cmds/file_events.md'
-        - Risk Profiles: 'cli/cmds/riks_profiles.md'
+        - Risk Profiles: 'cli/cmds/risk_profiles.md'
         - Sessions: 'cli/cmds/sessions.md'
         - Trusted Activites: 'cli/cmds/trusted_activities.md'
         - Users: 'cli/cmds/users.md'
