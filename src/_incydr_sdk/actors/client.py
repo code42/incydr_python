@@ -204,9 +204,13 @@ class ActorsV1:
         if notes is not None:
             request_body["notes"] = None if notes == "" else notes
         if start_date is not None:
-            request_body["startDate"] = None if start_date == "" else _create_date(start_date)
+            request_body["startDate"] = (
+                None if start_date == "" else _create_date(start_date)
+            )
         if end_date is not None:
-            request_body["startDate"] = None if end_date == "" else _create_date(end_date)
+            request_body["startDate"] = (
+                None if end_date == "" else _create_date(end_date)
+            )
         try:
             response = self._parent.session.patch(
                 f"/v1/actors/actor/id/{actor_id}", json=request_body

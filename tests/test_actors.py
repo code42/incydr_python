@@ -134,14 +134,13 @@ def mock_get_family_by_member_name(httpserver_auth: HTTPServer):
         uri=f"/v1/actors/actor/name/{CHILD_ACTOR_NAME}/family", method="GET"
     ).respond_with_json(ACTOR_FAMILY)
 
+
 @pytest.fixture
 def mock_update_actor(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request(
-        uri=f"/v1/actors/actor/id/{PARENT_ACTOR_ID}", method="PATCH",
-        json = {
-            "notes": "example note",
-            "startDate": None
-        }
+        uri=f"/v1/actors/actor/id/{PARENT_ACTOR_ID}",
+        method="PATCH",
+        json={"notes": "example note", "startDate": None},
     ).respond_with_json(UPDATED_ACTOR)
 
 
@@ -393,37 +392,47 @@ def test_get_family_by_member_name_returns_expected_data(
 
 def test_update_updates_actor(mock_update_actor):
     client = Client()
-    response = client.actors.v1.update_actor(PARENT_ACTOR_ID, notes = "example note", start_date = "", end_date = None)
+    response = client.actors.v1.update_actor(
+        PARENT_ACTOR_ID, notes="example note", start_date="", end_date=None
+    )
     assert isinstance(response, Actor)
     assert response.json() == json.dumps(UPDATED_ACTOR)
 
-def test_update_when_parameter_not_provided_does_not_update_parameter(mock_update_actor):
+
+def test_update_when_parameter_not_provided_does_not_update_parameter(
+    mock_update_actor,
+):
     client = Client()
-    response = client.actors.v1.update_actor(PARENT_ACTOR_ID, notes = "example note", start_date = "", end_date = None)
+    response = client.actors.v1.update_actor(
+        PARENT_ACTOR_ID, notes="example note", start_date="", end_date=None
+    )
     assert isinstance(response, Actor)
     assert response.end_date == "2024-09-18"
 
+
 def test_update_when_empty_string_is_passed_clears_parameter(mock_update_actor):
     client = Client()
-    response = client.actors.v1.update_actor(PARENT_ACTOR_ID, notes = "example note", start_date = "", end_date = None)
+    response = client.actors.v1.update_actor(
+        PARENT_ACTOR_ID, notes="example note", start_date="", end_date=None
+    )
     assert isinstance(response, Actor)
     assert response.start_date == None
+
 
 def test_update_raises_error_when_actor_not_found(
     httpserver_auth: HTTPServer,
 ):
     httpserver_auth.expect_request(
-        uri=f"/v1/actors/actor/id/{PARENT_ACTOR_ID}", method="PATCH",
-        json = {
-            "notes": "example note",
-            "startDate": None
-        }
+        uri=f"/v1/actors/actor/id/{PARENT_ACTOR_ID}",
+        method="PATCH",
+        json={"notes": "example note", "startDate": None},
     ).respond_with_data(status=404)
     client = Client()
     with pytest.raises(ActorNotFoundError) as e:
-        client.actors.v1.update_actor(PARENT_ACTOR_ID, notes = "example note", start_date = "", end_date = None)
+        client.actors.v1.update_actor(
+            PARENT_ACTOR_ID, notes="example note", start_date="", end_date=None
+        )
     assert "Actor Not Found Error" in str(e.value)
-
 
 
 # ************************************************ CLI ************************************************
