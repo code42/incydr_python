@@ -553,3 +553,21 @@ def test_cli_show_family_when_get_by_name_makes_expected_call(
     )
     httpserver_auth.check()
     assert result.exit_code == 0
+
+
+def test_cli_actor_update_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_update_actor
+):
+    result = runner.invoke(
+        incydr,
+        [
+            "actors",
+            "update",
+            PARENT_ACTOR_ID,
+            "--clear-start-date",
+            "--notes",
+            "example note",
+        ],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
