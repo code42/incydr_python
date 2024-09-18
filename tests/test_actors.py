@@ -416,7 +416,7 @@ def test_update_when_empty_string_is_passed_clears_parameter(mock_update_actor):
         PARENT_ACTOR_ID, notes="example note", start_date="", end_date=None
     )
     assert isinstance(response, Actor)
-    assert response.start_date == None
+    assert response.start_date is None
 
 
 def test_update_raises_error_when_actor_not_found(
