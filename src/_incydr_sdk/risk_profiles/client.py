@@ -2,6 +2,7 @@ from datetime import datetime
 from itertools import count
 from typing import Iterator
 from typing import Union
+from warnings import warn
 
 from _incydr_sdk.exceptions import DateParseError
 from _incydr_sdk.queries.utils import DATE_STR_FORMAT
@@ -48,6 +49,11 @@ class RiskProfilesV1:
 
         **Returns**: A [`RiskProfile`][riskprofile-model] object representing the risk profile.
         """
+        warn(
+            "Risk Profiles are deprecated. Replaced by Actors.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         response = self._parent.session.get(f"/v1/user-risk-profiles/{user_id}")
         return RiskProfile.parse_response(response)
 
@@ -93,6 +99,11 @@ class RiskProfilesV1:
 
         **Returns**: A ['RiskProfilesPage'][riskprofilespage-model] object.
         """
+        warn(
+            "Risk Profiles are deprecated. Replaced by Actors.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         page_size = page_size or self._parent.settings.page_size
         data = QueryRiskProfilesRequest(
             page=page_num,
@@ -136,6 +147,11 @@ class RiskProfilesV1:
 
         **Returns**: A generator yielding individual [`RiskProfile`][riskprofile-model] objects.
         """
+        warn(
+            "Risk Profiles are deprecated. Replaced by Actors.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         page_size = page_size or self._parent.settings.page_size
         for page_num in count(1):
             page = self.get_page(
@@ -175,6 +191,11 @@ class RiskProfilesV1:
 
         **Returns**: A [`RiskProfile`][riskprofile-model] object.
         """
+        warn(
+            "Risk Profiles are deprecated. Replaced by Actors.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         paths = []
         if start_date is not None:
             paths += ["startDate"]

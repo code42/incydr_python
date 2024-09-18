@@ -24,14 +24,17 @@ CHILD_ACTOR = {
     "department": "product",
     "division": "engineering",
     "employeeType": "full-time",
+    "endDate": None,
     "firstName": "first",
     "inScope": True,
     "lastName": "last",
     "locality": "minneapolis",
     "managerActorId": "test-manager-id",
     "name": CHILD_ACTOR_NAME,
+    "notes": None,
     "parentActorId": "parent-actor-id",
     "region": "midwest",
+    "startDate": None,
     "title": "software engineer",
 }
 
@@ -43,14 +46,39 @@ PARENT_ACTOR = {
     "department": "product",
     "division": "engineering",
     "employeeType": "full-time",
+    "endDate": "2024-09-18",
     "firstName": "first",
     "inScope": True,
     "lastName": "last",
     "locality": "minneapolis",
     "managerActorId": "test-manager-id",
     "name": PARENT_ACTOR_NAME,
+    "notes": None,
     "parentActorId": None,
     "region": "midwest",
+    "startDate": "2024-09-18",
+    "title": "software engineer",
+}
+
+UPDATED_ACTOR = {
+    "active": True,
+    "actorId": PARENT_ACTOR_ID,
+    "alternateNames": [],
+    "country": "usa",
+    "department": "product",
+    "division": "engineering",
+    "employeeType": "full-time",
+    "endDate": "2024-09-18",
+    "firstName": "first",
+    "inScope": True,
+    "lastName": "last",
+    "locality": "minneapolis",
+    "managerActorId": "test-manager-id",
+    "name": PARENT_ACTOR_NAME,
+    "notes": None,
+    "parentActorId": None,
+    "region": "midwest",
+    "startDate": None,
     "title": "software engineer",
 }
 
@@ -105,6 +133,16 @@ def mock_get_family_by_member_name(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request(
         uri=f"/v1/actors/actor/name/{CHILD_ACTOR_NAME}/family", method="GET"
     ).respond_with_json(ACTOR_FAMILY)
+
+@pytest.fixture
+def mock_update_actor(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request(
+        uri=f"/v1/actors/actor/id/{PARENT_ACTOR_ID}", method="PATCH",
+        json = {
+            "notes": "example note",
+            "startDate": None
+        }
+    ).respond_with_json(UPDATED_ACTOR)
 
 
 def test_get_page_with_default_params_returns_expected_data(
@@ -351,6 +389,41 @@ def test_get_family_by_member_name_returns_expected_data(
     assert isinstance(response.children[0], Actor)
     assert isinstance(response.parent, Actor)
     assert response.json() == json.dumps(ACTOR_FAMILY)
+
+
+def test_update_updates_actor(mock_update_actor):
+    client = Client()
+    response = client.actors.v1.update_actor(PARENT_ACTOR_ID, notes = "example note", start_date = "", end_date = None)
+    assert isinstance(response, Actor)
+    assert response.json() == json.dumps(UPDATED_ACTOR)
+
+def test_update_when_parameter_not_provided_does_not_update_parameter(mock_update_actor):
+    client = Client()
+    response = client.actors.v1.update_actor(PARENT_ACTOR_ID, notes = "example note", start_date = "", end_date = None)
+    assert isinstance(response, Actor)
+    assert response.end_date == "2024-09-18"
+
+def test_update_when_empty_string_is_passed_clears_parameter(mock_update_actor):
+    client = Client()
+    response = client.actors.v1.update_actor(PARENT_ACTOR_ID, notes = "example note", start_date = "", end_date = None)
+    assert isinstance(response, Actor)
+    assert response.start_date == None
+
+def test_update_raises_error_when_actor_not_found(
+    httpserver_auth: HTTPServer,
+):
+    httpserver_auth.expect_request(
+        uri=f"/v1/actors/actor/id/{PARENT_ACTOR_ID}", method="PATCH",
+        json = {
+            "notes": "example note",
+            "startDate": None
+        }
+    ).respond_with_data(status=404)
+    client = Client()
+    with pytest.raises(ActorNotFoundError) as e:
+        client.actors.v1.update_actor(PARENT_ACTOR_ID, notes = "example note", start_date = "", end_date = None)
+    assert "Actor Not Found Error" in str(e.value)
+
 
 
 # ************************************************ CLI ************************************************

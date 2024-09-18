@@ -1,4 +1,6 @@
+from datetime import datetime
 from itertools import count
+from typing import Union
 
 import requests
 
@@ -7,6 +9,8 @@ from .models import Actor
 from .models import ActorFamily
 from .models import ActorsPage
 from .models import QueryActorsRequest
+from _incydr_sdk.exceptions import DateParseError
+from _incydr_sdk.queries.utils import DATE_STR_FORMAT
 
 
 class ActorsV1:
@@ -177,6 +181,41 @@ class ActorsV1:
             if err.response.status_code == 404:
                 raise ActorNotFoundError(name)
 
+    def update_actor(
+        self,
+        actor_id: str,
+        notes: str,
+        start_date: Union[datetime, str],
+        end_date: Union[datetime, str],
+    ) -> Actor:
+        """
+        Update an actor.
+
+        **Parameters**:
+
+        * **actor_id**: `str` (required) - Unique ID for an actor.
+        * **notes**: `str` - Additional notes for the risk profile. Pass an empty string to clear the field.
+        * **start_date**: `datetime` - The starting date for the user. Accepts a datetime object or a string in the format yyyy-MM-dd (UTC) format. Pass an empty string to clear the field.
+        * **end_date**: `datetime` - The departure date for the user.  Accepts a datetime object or a string in the format yyyy-MM-dd (UTC) format.  Pass an empty string to clear the field.
+
+        **Returns**: An [`Actor`][actor-model] object representing the actor.
+        """
+        request_body = {}
+        if notes is not None:
+            request_body["notes"] = None if notes == "" else notes
+        if start_date is not None:
+            request_body["startDate"] = None if start_date == "" else _create_date(start_date)
+        if end_date is not None:
+            request_body["startDate"] = None if end_date == "" else _create_date(end_date)
+        try:
+            response = self._parent.session.patch(
+                f"/v1/actors/actor/id/{actor_id}", json=request_body
+            )
+            return Actor.parse_response(response)
+        except requests.HTTPError as err:
+            if err.response.status_code == 404:
+                raise ActorNotFoundError(actor_id)
+
 
 class ActorsClient:
     def __init__(self, parent):
@@ -201,3 +240,15 @@ class ActorNotFoundError(IncydrException):
             else "Actor Not Found Error: No results for specified actor(s)."
         )
         super().__init__(self.message)
+
+
+def _create_date(date: Union[datetime, str]):
+    if not isinstance(date, datetime):
+        try:
+            date = datetime.strptime(date, DATE_STR_FORMAT)
+        except ValueError:
+            raise DateParseError(
+                date,
+                msg=f"DateParseError: Error parsing time data. Date '{date}' does not match format {DATE_STR_FORMAT}.",
+            )
+    return date.strftime(DATE_STR_FORMAT)
