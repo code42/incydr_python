@@ -208,7 +208,7 @@ class ActorsV1:
                 None if start_date == "" else _create_date(start_date)
             )
         if end_date is not None:
-            request_body["startDate"] = (
+            request_body["endDate"] = (
                 None if end_date == "" else _create_date(end_date)
             )
         try:
