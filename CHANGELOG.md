@@ -9,6 +9,19 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## Unreleased
+
+### Added
+
+- Support for the API to update actors.
+  - `client.actors.v1.update` - to update an actor's start date, end date, or notes.
+- A CLI command to update an actor.
+  - `incydr actors update` - to update an actor's start date, end date, or notes.
+
+### Deprecated
+
+- Risk Profiles methods and commands are now deprecated, replaced by the `actors` command group.
+
 ## 2.0.0 - 2024-05-10
 
 ### Added
