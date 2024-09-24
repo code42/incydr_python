@@ -474,7 +474,7 @@ def test_update_updates_actor(mock_update_actor):
 def test_update_when_keyword_arg_provided_updates_actor(mock_update_actor):
     client = Client()
     response = client.actors.v1.update_actor(
-        actor_id=PARENT_ACTOR_ID, notes="example note", start_date="", end_date=None
+        actor=PARENT_ACTOR_ID, notes="example note", start_date="", end_date=None
     )
     assert isinstance(response, Actor)
     assert response.json() == json.dumps(UPDATED_ACTOR)

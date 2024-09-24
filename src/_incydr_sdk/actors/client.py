@@ -1,6 +1,5 @@
 from datetime import datetime
 from itertools import count
-from typing import overload
 from typing import Union
 
 import requests
@@ -182,23 +181,9 @@ class ActorsV1:
             if err.response.status_code == 404:
                 raise ActorNotFoundError(name)
 
-    @overload
-    def update_actor(self, actor: Actor) -> Actor:
-        """
-        Update an actor.
-
-        **Parameters**:
-
-        * **actor**: An [`Actor`][actor-model] object representing the actor.
-
-        **Returns**: An [`Actor`][actor-model] object representing the actor.
-        """
-        ...
-
-    @overload
     def update_actor(
         self,
-        actor_id: str,
+        actor: Union[Actor, str],
         notes: str = None,
         start_date: Union[datetime, str] = None,
         end_date: Union[datetime, str] = None,
@@ -208,73 +193,69 @@ class ActorsV1:
 
         **Parameters**:
 
-        * **actor_id**: `str` (required) - Unique ID for an actor.
+        Either:
+
+        * **actor**: `str` (required) - Unique ID for an actor.
         * **notes**: `str` - Additional notes for the risk profile. Pass an empty string to clear the field.
         * **start_date**: `datetime` - The starting date for the user. Accepts a datetime object or a string in the format yyyy-MM-dd (UTC) format. Pass an empty string to clear the field.
         * **end_date**: `datetime` - The departure date for the user.  Accepts a datetime object or a string in the format yyyy-MM-dd (UTC) format.  Pass an empty string to clear the field.
 
-        **Returns**: An [`Actor`][actor-modhel] object representing the actor.
-        """
-        ...
+        Or:
 
-    def update_actor(self, *args, **kwargs):
-        if len(args) == 1 and isinstance(args[0], Actor):
-            return _update_actor_from_actor(self, args[0])
-        elif set(kwargs.keys()).issubset(
-            {"actor_id", "notes", "start_date", "end_date"}
-        ):
-            return _update_actor_from_args(self, *args, **kwargs)
+        * **actor**: An [`Actor`][actor-model] object representing the actor.
+
+        **Returns**: An [`Actor`][actor-model] object representing the actor.
+        """
+        if isinstance(actor, Actor):
+            return self._update_actor_from_actor(actor)
+        elif notes is None and start_date is None and end_date is None:
+            raise IncydrException(
+                "Must provide at least one of notes or start_date or end_date arguments."
+            )
         else:
-            raise TypeError(
-                f"update requires either 1 actor argument or 1 actor_id argument and up to 3 keyword arguments. Instead {args}, {kwargs} was provided."
+            return self._update_actor_from_args(
+                actor_id=actor, start_date=start_date, end_date=end_date, notes=notes
             )
 
+    def _update_actor_from_actor(self, actor: Actor) -> Actor:
+        try:
+            response = self._parent.session.patch(
+                f"/v1/actors/actor/id/{actor.actor_id}",
+                json={
+                    "notes": actor.notes,
+                    "startDate": actor.start_date,
+                    "endDate": actor.end_date,
+                },
+            )
+            return Actor.parse_response(response)
+        except requests.HTTPError as err:
+            if err.response.status_code == 404:
+                raise ActorNotFoundError(actor.actor_id)
 
-def _update_actor_from_actor(self, actor: Actor) -> Actor:
-    try:
-        response = self._parent.session.patch(
-            f"/v1/actors/actor/id/{actor.actor_id}",
-            json={
-                "notes": actor.notes,
-                "startDate": actor.start_date,
-                "endDate": actor.end_date,
-            },
-        )
-        return Actor.parse_response(response)
-    except requests.HTTPError as err:
-        if err.response.status_code == 404:
-            raise ActorNotFoundError(actor.actor_id)
-
-
-def _update_actor_from_args(
-    self,
-    actor_id: str,
-    notes: str = None,
-    start_date: Union[datetime, str] = None,
-    end_date: Union[datetime, str] = None,
-) -> Actor:
-    if notes is None and start_date is None and end_date is None:
-        raise IncydrException(
-            "Must provide at least one of notes or start_date or end_date arguments."
-        )
-
-    request_body = {}
-    if notes is not None:
-        request_body["notes"] = None if notes == "" else notes
-    if start_date is not None:
-        request_body["startDate"] = (
-            None if start_date == "" else _create_date(start_date)
-        )
-    if end_date is not None:
-        request_body["endDate"] = None if end_date == "" else _create_date(end_date)
-    try:
-        response = self._parent.session.patch(
-            f"/v1/actors/actor/id/{actor_id}", json=request_body
-        )
-        return Actor.parse_response(response)
-    except requests.HTTPError as err:
-        if err.response.status_code == 404:
-            raise ActorNotFoundError(actor_id)
+    def _update_actor_from_args(
+        self,
+        actor_id: str,
+        notes: str = None,
+        start_date: Union[datetime, str] = None,
+        end_date: Union[datetime, str] = None,
+    ) -> Actor:
+        request_body = {}
+        if notes is not None:
+            request_body["notes"] = None if notes == "" else notes
+        if start_date is not None:
+            request_body["startDate"] = (
+                None if start_date == "" else _create_date(start_date)
+            )
+        if end_date is not None:
+            request_body["endDate"] = None if end_date == "" else _create_date(end_date)
+        try:
+            response = self._parent.session.patch(
+                f"/v1/actors/actor/id/{actor_id}", json=request_body
+            )
+            return Actor.parse_response(response)
+        except requests.HTTPError as err:
+            if err.response.status_code == 404:
+                raise ActorNotFoundError(actor_id)
 
 
 class ActorsClient:

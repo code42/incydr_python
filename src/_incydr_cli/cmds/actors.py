@@ -267,7 +267,7 @@ def update(
 
     try:
         updated_profile = client.actors.v1.update_actor(
-            actor_id=actor_id, notes=notes, start_date=start_date, end_date=end_date
+            actor=actor_id, notes=notes, start_date=start_date, end_date=end_date
         )
         if client.settings.use_rich:
             console.print(
