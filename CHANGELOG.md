@@ -14,7 +14,7 @@
 ### Added
 
 - Support for the API to update actors.
-  - `client.actors.v1.update` - to update an actor's start date, end date, or notes.
+  - `client.actors.v1.update_actor` - to update an actor's start date, end date, or notes.
 - A CLI command to update an actor.
   - `incydr actors update` - to update an actor's start date, end date, or notes.
 
