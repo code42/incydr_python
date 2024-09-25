@@ -9,6 +9,7 @@ from _incydr_sdk.actors.client import ActorNotFoundError
 from _incydr_sdk.actors.models import Actor
 from _incydr_sdk.actors.models import ActorFamily
 from _incydr_sdk.actors.models import ActorsPage
+from _incydr_sdk.exceptions import IncydrException
 from incydr import Client
 
 CHILD_ACTOR_ID = "child-actor-id"
@@ -24,14 +25,17 @@ CHILD_ACTOR = {
     "department": "product",
     "division": "engineering",
     "employeeType": "full-time",
+    "endDate": None,
     "firstName": "first",
     "inScope": True,
     "lastName": "last",
     "locality": "minneapolis",
     "managerActorId": "test-manager-id",
     "name": CHILD_ACTOR_NAME,
+    "notes": None,
     "parentActorId": "parent-actor-id",
     "region": "midwest",
+    "startDate": None,
     "title": "software engineer",
 }
 
@@ -43,14 +47,83 @@ PARENT_ACTOR = {
     "department": "product",
     "division": "engineering",
     "employeeType": "full-time",
+    "endDate": "2024-09-18",
     "firstName": "first",
     "inScope": True,
     "lastName": "last",
     "locality": "minneapolis",
     "managerActorId": "test-manager-id",
     "name": PARENT_ACTOR_NAME,
+    "notes": None,
     "parentActorId": None,
     "region": "midwest",
+    "startDate": "2024-09-18",
+    "title": "software engineer",
+}
+
+UPDATED_ACTOR = {
+    "active": True,
+    "actorId": PARENT_ACTOR_ID,
+    "alternateNames": [],
+    "country": "usa",
+    "department": "product",
+    "division": "engineering",
+    "employeeType": "full-time",
+    "endDate": "2024-09-18",
+    "firstName": "first",
+    "inScope": True,
+    "lastName": "last",
+    "locality": "minneapolis",
+    "managerActorId": "test-manager-id",
+    "name": PARENT_ACTOR_NAME,
+    "notes": None,
+    "parentActorId": None,
+    "region": "midwest",
+    "startDate": None,
+    "title": "software engineer",
+}
+
+FILLED_ACTOR = {
+    "active": True,
+    "actorId": PARENT_ACTOR_ID,
+    "alternateNames": [],
+    "country": "usa",
+    "department": "product",
+    "division": "engineering",
+    "employeeType": "full-time",
+    "endDate": "2024-09-18",
+    "firstName": "first",
+    "inScope": True,
+    "lastName": "last",
+    "locality": "minneapolis",
+    "managerActorId": "test-manager-id",
+    "name": PARENT_ACTOR_NAME,
+    "notes": "example note",
+    "parentActorId": None,
+    "region": "midwest",
+    "startDate": "2020-09-24",
+    "title": "software engineer",
+}
+
+EMPTIED_ACTOR = {
+    "active": True,
+    "actorId": PARENT_ACTOR_ID,
+    "alternateNames": [],
+    "country": "usa",
+    "department": "product",
+    "division": "engineering",
+    "employeeType": "full-time",
+    "endDate": None,
+    "firstName": "first",
+    "inScope": True,
+    "lastName": "last",
+    "locality": "minneapolis",
+    "managerActorId": "test-manager-id",
+    "name": PARENT_ACTOR_NAME,
+    "notes": None,
+    "parentActorId": None,
+    "region": "midwest",
+    "startDate": None,
     "title": "software engineer",
 }
 
@@ -105,6 +178,42 @@ def mock_get_family_by_member_name(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request(
         uri=f"/v1/actors/actor/name/{CHILD_ACTOR_NAME}/family", method="GET"
     ).respond_with_json(ACTOR_FAMILY)
+
+
+@pytest.fixture
+def mock_update_actor(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request(
+        uri=f"/v1/actors/actor/id/{PARENT_ACTOR_ID}",
+        method="PATCH",
+        json={"notes": "example note", "startDate": None},
+    ).respond_with_json(UPDATED_ACTOR)
+    httpserver_auth.expect_request(
+        uri=f"/v1/actors/actor/id/{PARENT_ACTOR_ID}",
+        method="PATCH",
+        json={"notes": "example note", "startDate": None, "endDate": None},
+    ).respond_with_json(UPDATED_ACTOR)
+
+
+@pytest.fixture
+def mock_fill_actor(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request(
+        uri=f"/v1/actors/actor/id/{PARENT_ACTOR_ID}",
+        method="PATCH",
+        json={
+            "notes": "example note",
+            "startDate": "2020-09-24",
+            "endDate": "2024-09-18",
+        },
+    ).respond_with_json(FILLED_ACTOR)
+
+
+@pytest.fixture
+def mock_empty_actor(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request(
+        uri=f"/v1/actors/actor/id/{PARENT_ACTOR_ID}",
+        method="PATCH",
+        json={"notes": None, "startDate": None, "endDate": None},
+    ).respond_with_json(EMPTIED_ACTOR)
 
 
 def test_get_page_with_default_params_returns_expected_data(
@@ -353,6 +462,80 @@ def test_get_family_by_member_name_returns_expected_data(
     assert response.json() == json.dumps(ACTOR_FAMILY)
 
 
+def test_update_updates_actor(mock_update_actor):
+    client = Client()
+    response = client.actors.v1.update_actor(
+        PARENT_ACTOR_ID, notes="example note", start_date="", end_date=None
+    )
+    assert isinstance(response, Actor)
+    assert response.json() == json.dumps(UPDATED_ACTOR)
+
+
+def test_update_when_keyword_arg_provided_updates_actor(mock_update_actor):
+    client = Client()
+    response = client.actors.v1.update_actor(
+        actor=PARENT_ACTOR_ID, notes="example note", start_date="", end_date=None
+    )
+    assert isinstance(response, Actor)
+    assert response.json() == json.dumps(UPDATED_ACTOR)
+
+
+def test_update_actor_accepts_actor_arg(mock_update_actor):
+    client = Client()
+    test_actor = Actor(
+        actor_id=PARENT_ACTOR_ID, notes="example note", start_date=None, end_date=None
+    )
+    response = client.actors.v1.update_actor(test_actor)
+    assert isinstance(response, Actor)
+    assert response.json() == json.dumps(UPDATED_ACTOR)
+
+
+def test_update_when_parameter_not_provided_does_not_update_parameter(
+    mock_update_actor,
+):
+    client = Client()
+    response = client.actors.v1.update_actor(
+        PARENT_ACTOR_ID, notes="example note", start_date=""
+    )
+    assert isinstance(response, Actor)
+    assert response.end_date == "2024-09-18"
+
+
+def test_update_when_empty_string_is_passed_clears_parameter(mock_update_actor):
+    client = Client()
+    response = client.actors.v1.update_actor(
+        PARENT_ACTOR_ID, notes="example note", start_date="", end_date=None
+    )
+    assert isinstance(response, Actor)
+    assert response.start_date is None
+
+
+def test_update_raises_error_when_no_args_passed(mock_update_actor):
+    client = Client()
+    with pytest.raises(IncydrException) as e:
+        client.actors.v1.update_actor(PARENT_ACTOR_ID)
+    assert (
+        "Must provide at least one of notes or start_date or end_date arguments"
+        in str(e.value)
+    )
+
+
+def test_update_raises_error_when_actor_not_found(
+    httpserver_auth: HTTPServer,
+):
+    httpserver_auth.expect_request(
+        uri=f"/v1/actors/actor/id/{PARENT_ACTOR_ID}",
+        method="PATCH",
+        json={"notes": "example note", "startDate": None},
+    ).respond_with_data(status=404)
+    client = Client()
+    with pytest.raises(ActorNotFoundError) as e:
+        client.actors.v1.update_actor(
+            PARENT_ACTOR_ID, notes="example note", start_date="", end_date=None
+        )
+    assert "Actor Not Found Error" in str(e.value)
+
+
 # ************************************************ CLI ************************************************
 
 
@@ -471,3 +654,51 @@ def test_cli_show_family_when_get_by_name_makes_expected_call(
     )
     httpserver_auth.check()
     assert result.exit_code == 0
+
+
+def test_cli_actor_update_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_fill_actor
+):
+    result = runner.invoke(
+        incydr,
+        [
+            "actors",
+            "update",
+            PARENT_ACTOR_ID,
+            "--notes",
+            "example note",
+            "--start-date",
+            "2020-09-24",
+            "--end-date",
+            "2024-09-18",
+        ],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_actor_update_when_clearing_params_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_empty_actor
+):
+    result = runner.invoke(
+        incydr,
+        [
+            "actors",
+            "update",
+            PARENT_ACTOR_ID,
+            "--clear-start-date",
+            "--clear-end-date",
+            "--clear-notes",
+        ],
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_actor_update_when_no_args_provided_raises_exception(runner):
+    result = runner.invoke(incydr, ["actors", "update", PARENT_ACTOR_ID])
+    assert result.exit_code == 2
+    assert (
+        "At least one of --start-date, --end-date, or --notes, or one of their corresponding clear flags"
+        in str(result.output)
+    )

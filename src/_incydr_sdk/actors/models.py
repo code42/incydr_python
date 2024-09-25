@@ -28,14 +28,17 @@ class Actor(ResponseModel):
     * **department**: `str` The actor's department.
     * **division**: `str` The actor's division.
     * **employee_type**: `str` The actor's employment type, such as if they're a contractor.
+    * **end_date**: `str` The actor's end date.
     * **first_name**: `str` The first (given) name of the actor.
     * **in_scope**: `str` The actor's scope state. An actor is considered "in scope" if their activity is monitored in at least one data source.
     * **last_name**: `str` The last (family) name of the actor.
     * **locality**: `str` - The actor's locality (city).
     * **manager_actor_id**: `str` The actor ID of the actor's manager.
     * **name**: `str` The actor's (eg. full username/email) name.
+    * **notes**: `str` Notes about the actor.
     * **parentActorId**: `str` The actor ID of this actor's parent actor. (if the actor has a parent).
     * **region**: `str` The actor's region (state).
+    * **start_date**: `str` The actor's start date.
     * **title**: `str` The actor's job title.
     """
 
@@ -65,6 +68,9 @@ class Actor(ResponseModel):
         alias="employeeType",
         description="The actor's employment, such as if they're a contractor.",
         example="full-time",
+    )
+    end_date: Optional[str] = Field(
+        None, alias="endDate", description="The actor's end date.", example="2024-09-18"
     )
     first_name: Optional[str] = Field(
         None,
@@ -98,6 +104,12 @@ class Actor(ResponseModel):
         description="The actor's (eg. full username/email) name.",
         example="john.smith@gmail.com",
     )
+    notes: Optional[str] = Field(
+        None,
+        alias="notes",
+        description="Notes about the actor.",
+        example="A super cool person.",
+    )
     parent_actor_id: Optional[str] = Field(
         None,
         alias="parentActorId",
@@ -106,6 +118,12 @@ class Actor(ResponseModel):
     )
     region: Optional[str] = Field(
         None, description="The actor's region.", example="Minnesota"
+    )
+    start_date: Optional[str] = Field(
+        None,
+        alias="startDate",
+        description="The actor's start date.",
+        example="2024-09-18",
     )
     title: Optional[str] = Field(
         None, description="The actor's job title", example="Software Engineer"

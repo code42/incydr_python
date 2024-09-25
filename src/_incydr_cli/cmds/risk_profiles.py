@@ -13,6 +13,7 @@ from _incydr_cli.cmds.options.output_options import table_format_option
 from _incydr_cli.cmds.options.output_options import TableFormat
 from _incydr_cli.cmds.options.profile_filter_options import profile_filter_options
 from _incydr_cli.cmds.options.utils import user_lookup_callback
+from _incydr_cli.cmds.utils import deprecation_warning
 from _incydr_cli.core import incompatible_with
 from _incydr_cli.core import IncydrCommand
 from _incydr_cli.core import IncydrGroup
@@ -21,11 +22,15 @@ from _incydr_sdk.exceptions import DateParseError
 from _incydr_sdk.risk_profiles.models import RiskProfile
 from _incydr_sdk.utils import model_as_card
 
+# Deprecated September 2024.
+DEPRECATION_TEXT = "DeprecationWarning: Risk Profile commands are deprecated. Use the 'incydr actors' command group instead."
+
 
 @click.group(cls=IncydrGroup)
 @logging_options
 def risk_profiles():
     """View and manage risk profiles."""
+    deprecation_warning(DEPRECATION_TEXT)
 
 
 @risk_profiles.command("list", cls=IncydrCommand)

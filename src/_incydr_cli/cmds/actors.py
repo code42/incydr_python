@@ -9,11 +9,13 @@ from _incydr_cli.cmds.options.output_options import single_format_option
 from _incydr_cli.cmds.options.output_options import SingleFormat
 from _incydr_cli.cmds.options.output_options import table_format_option
 from _incydr_cli.cmds.options.output_options import TableFormat
+from _incydr_cli.core import incompatible_with
 from _incydr_cli.core import IncydrCommand
 from _incydr_cli.core import IncydrGroup
 from _incydr_sdk.actors.client import ActorNotFoundError
 from _incydr_sdk.actors.models import Actor
 from _incydr_sdk.core.client import Client
+from _incydr_sdk.exceptions import DateParseError
 from _incydr_sdk.utils import model_as_card
 
 
@@ -193,3 +195,85 @@ def show_family(actor_id: str = None, name: str = None, format_: SingleFormat = 
         console.print_json(family.json())
     else:
         click.echo(family.json())
+
+
+@actors.command(cls=IncydrCommand)
+@click.argument("actor-id")
+@click.option(
+    "--start-date",
+    default=None,
+    help="Update a user's starting date. Accepts a date in yyyy-MM-dd (UTC) format.",
+)
+@click.option(
+    "--end-date",
+    default=None,
+    help="Update a user's departure date. Accepts a date in yyyy-MM-dd (UTC) format.",
+)
+@click.option(
+    "--notes", default=None, help="Update the optional notes on a user's profile."
+)
+@click.option(
+    "--clear-start-date",
+    is_flag=True,
+    default=False,
+    help="Clear the start date on a user's profile. Incompatible with --start-date.",
+    cls=incompatible_with("start_date"),
+)
+@click.option(
+    "--clear-end-date",
+    is_flag=True,
+    default=False,
+    help="Clear the end date on a user's profile. Incompatible with --end-date.",
+    cls=incompatible_with("end_date"),
+)
+@click.option(
+    "--clear-notes",
+    is_flag=True,
+    default=False,
+    help="Clear the notes on a user's profile. Incompatible with --notes.",
+    cls=incompatible_with("notes"),
+)
+@logging_options
+def update(
+    actor_id,
+    start_date=None,
+    end_date=None,
+    notes=None,
+    clear_start_date=None,
+    clear_end_date=None,
+    clear_notes=None,
+):
+    """
+    Update an actor.
+
+    Accepts actor ID.
+    """
+    if not any(
+        [start_date, end_date, notes, clear_start_date, clear_end_date, clear_notes]
+    ):
+        raise click.UsageError(
+            "At least one of --start-date, --end-date, or --notes, or one of their corresponding clear flags, "
+            "is required to update an actor."
+        )
+
+    client = Client()
+
+    if clear_start_date:
+        start_date = ""
+    if clear_end_date:
+        end_date = ""
+    if clear_notes:
+        notes = ""
+
+    try:
+        updated_profile = client.actors.v1.update_actor(
+            actor=actor_id, notes=notes, start_date=start_date, end_date=end_date
+        )
+        if client.settings.use_rich:
+            console.print(
+                Panel.fit(model_as_card(updated_profile), title="Updated Actor")
+            )
+        else:
+            console.print(updated_profile.json(), highlight=False)
+    except DateParseError as err:
+        raise err
