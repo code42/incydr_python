@@ -9,7 +9,7 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
-## 2.1.0 - 2024-09-25
+## 2.1.0 - 2024-09-30
 
 ### Added
 
