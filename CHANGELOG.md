@@ -9,6 +9,12 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## Unreleased
+
+### Updated
+
+- `client.actors.v1.get_actor_by_name` now defaults to `prefer_parent=True`.
+
 ## 2.1.0 - 2024-09-30
 
 ### Added
