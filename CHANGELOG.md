@@ -13,7 +13,7 @@
 
 ### Updated
 
-- `client.actors.v1.get_actor_by_name` now defaults to `prefer_parent=True`.
+- `client.actors.v1.get_actor_by_name` now defaults to `prefer_parent=True`. Previously, it defaulted to `False`.
 
 ## 2.1.0 - 2024-09-30
 
