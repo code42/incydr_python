@@ -40,7 +40,7 @@ _term_enum_map = {
 
 
 class Filter(BaseModel):
-    term: EventSearchTerm
+    term: str
     operator: Operator
     value: Optional[Union[int, str]]
 
@@ -53,8 +53,9 @@ class Filter(BaseModel):
         operator = values.get("operator")
         value = values.get("value")
 
+        # 11-13-2024 - Removing strict filter term requirements to avoid breaking on new fields
         # make sure `term` is valid enum value
-        EventSearchTerm(term)
+        # EventSearchTerm(term)
 
         if operator in (Operator.EXISTS, Operator.DOES_NOT_EXIST):
             values["value"] = None
@@ -66,15 +67,16 @@ class Filter(BaseModel):
                     f"`IS` and `IS_NOT` filters require a `str | int` value, got term={term}, operator={operator}, value={value}."
                 )
 
+        # 11-13-2024 - Removing strict filter term requirements to avoid breaking on new fields
         # check that value is a valid enum for that search term
-        enum = _term_enum_map.get(term)
-        if enum:
-            try:
-                values.update(
-                    {"value": enum[value.upper()]}
-                )  # check if enum name is passed as a value
-            except KeyError:
-                enum(value)
+        # enum = _term_enum_map.get(term)
+        # if enum:
+        #     try:
+        #         values.update(
+        #             {"value": enum[value.upper()]}
+        #         )  # check if enum name is passed as a value
+        #     except KeyError:
+        #         enum(value)
 
         return values
 
