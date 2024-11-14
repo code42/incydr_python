@@ -118,14 +118,14 @@ class ActorsV1:
             if err.response.status_code == 404:
                 raise ActorNotFoundError
 
-    def get_actor_by_name(self, name: str, prefer_parent: bool = False) -> Actor:
+    def get_actor_by_name(self, name: str, prefer_parent: bool = True) -> Actor:
         """
         Get an actor by their name.
 
         **Parameters**:
 
         * **name**: `str` (required) - The actor name.
-        * **prefer_parent**: `str` - Returns an actor's parent when applicable. Returns an actor themselves if they have no parent.
+        * **prefer_parent**: `str` - Returns an actor's parent when applicable. Returns an actor themselves if they have no parent. Defaults to True.
 
         **Returns**: An [`Actor`][actor-model] object representing the actor.
         """
@@ -142,7 +142,10 @@ class ActorsV1:
             matches = self.get_page(name_starts_with=name)
             for actor in matches.actors:
                 if actor.name == name:
-                    return actor
+                    actor_profile = self._parent.session.get(
+                        f"/v1/actors/actor/id/{actor.actor_id}"
+                    )
+                    return Actor.parse_response(actor_profile)
             raise ActorNotFoundError(name)
 
     def get_family_by_member_id(self, actor_id: str) -> ActorFamily:

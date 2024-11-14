@@ -143,6 +143,9 @@ def mock_get_actor_by_name(httpserver_auth: HTTPServer):
             }
         ),
     ).respond_with_json({"actors": [CHILD_ACTOR]})
+    httpserver_auth.expect_request(
+        "/v1/actors/actor/id/child-actor-id", method="GET"
+    ).respond_with_json(CHILD_ACTOR)
 
 
 @pytest.fixture
@@ -407,7 +410,7 @@ def test_get_actor_by_id_with_prefer_parent_returns_expected_data(
 
 def test_get_actor_by_name_returns_expected_data(mock_get_actor_by_name):
     client = Client()
-    response = client.actors.v1.get_actor_by_name(CHILD_ACTOR_NAME)
+    response = client.actors.v1.get_actor_by_name(CHILD_ACTOR_NAME, prefer_parent=False)
     assert isinstance(response, Actor)
     assert response.actor_id == CHILD_ACTOR_ID
     assert response.name == CHILD_ACTOR_NAME
@@ -438,7 +441,7 @@ def test_get_actor_by_name_when_actor_not_found_raises_error(
 
     client = Client()
     with pytest.raises(ActorNotFoundError) as e:
-        client.actors.v1.get_actor_by_name(CHILD_ACTOR_NAME)
+        client.actors.v1.get_actor_by_name(CHILD_ACTOR_NAME, prefer_parent=False)
     assert "Actor Not Found Error" in str(e.value)
 
 
