@@ -132,6 +132,10 @@ def test_event_query_is_when_no_values_raises_error():
     assert e.value.args[0] == "equals() requires at least one value."
 
 
+# TODO
+@pytest.mark.skip(
+    reason="11-13-2024 - Removing strict filter term requirements to avoid breaking on new fields"
+)
 def test_event_query_is_when_invalid_value_for_term_raises_type_error():
     with pytest.raises(ValueError) as e:
 
@@ -142,6 +146,31 @@ def test_event_query_is_when_invalid_value_for_term_raises_type_error():
         "'Invalid-term' is not a valid FileCategory. Expected one of ['Audio', 'Document', 'Executable', 'Image', 'Pdf', 'Presentation', 'Script', 'SourceCode', 'Spreadsheet', 'Video', 'VirtualDiskImage', 'Archive']"
         in str(e.value)
     )
+
+
+def test_event_query_allows_any_search_term_and_creates_expected_filter_group():
+    q = EventQuery(TEST_START_DATE).equals("file-event-field", "value")
+    expected = FilterGroup(
+        filterClause="AND",
+        filters=[
+            Filter(term="file-event-field", operator="IS", value="value"),
+        ],
+    )
+    assert q.groups.pop() == expected
+
+
+def test_event_query_allows_any_string_values_and_creates_expected_filter_group():
+    q = EventQuery(TEST_START_DATE).equals(
+        "file.category", ["Document", "string-value"]
+    )
+    expected = FilterGroup(
+        filterClause="OR",
+        filters=[
+            Filter(term="file.category", operator="IS", value="Document"),
+            Filter(term="file.category", operator="IS", value="string-value"),
+        ],
+    )
+    assert q.groups.pop() == expected
 
 
 def test_event_query_exists_creates_expected_filter_group():

@@ -1,12 +1,27 @@
 from typing import List
 
 from pydantic import parse_obj_as
+from requests import HTTPError
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
+from ..exceptions import IncydrException
 from .models.response import FileEventsPage
 from .models.response import SavedSearch
 from _incydr_sdk.queries.file_events import EventQuery
+
+
+class InvalidQueryException(IncydrException):
+    """Raised when the file events search endpoint returns a 400."""
+
+    def __init__(self, query=None):
+        self.query = query
+        self.message = (
+            "400 Response Error: Invalid query. Please double check your query filters are valid. "
+            "\nTip: Make sure you're specifying your filter fields in dot notation. "
+            "\nFor example, filter by 'file.archiveId' to filter by the archiveId field within the file object.)"
+        )
+        super().__init__(self.message)
 
 
 class FileEventsV2:
@@ -46,7 +61,12 @@ class FileEventsV2:
         """
         self._mount_retry_adapter()
 
-        response = self._parent.session.post("/v2/file-events", json=query.dict())
+        try:
+            response = self._parent.session.post("/v2/file-events", json=query.dict())
+        except HTTPError as err:
+            if err.response.status_code == 400:
+                raise InvalidQueryException(query)
+            raise err
         page = FileEventsPage.parse_response(response)
         query.page_token = page.next_pg_token
         return page

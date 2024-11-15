@@ -9,6 +9,28 @@ from _incydr_sdk.core.models import ResponseModel
 from _incydr_sdk.enums.file_events import ReportType
 
 
+class UserJustification(Model):
+    reason: Optional[str] = Field(
+        None, title="User-select justification for temporarily allowing this action."
+    )
+    text: Optional[str] = Field(
+        None,
+        title="User-select justification for temporarily allowing this action. Only applies when reason is 'Other'.",
+    )
+
+
+class ResponseControls(Model):
+    preventative_control: Optional[str] = Field(
+        None,
+        alias="preventativeControl",
+        example="BLOCKED",
+        title="The preventative action applied to this event",
+    )
+    user_justification: Optional[UserJustification] = Field(
+        None, alias="userJustification"
+    )
+
+
 class AcquiredFromGit(Model):
     repository_email: Optional[str] = Field(
         None,
@@ -108,15 +130,33 @@ class Hash(Model):
     )
 
 
+class Extension(Model):
+    browser: Optional[str] = Field(
+        None, title="The web browser in which the event occurred."
+    )
+    version: Optional[str] = Field(
+        None,
+        title="The version of the Code42 Incydr extension installed when the event occurred.",
+    )
+    logged_in_user: Optional[str] = Field(
+        None,
+        alias="loggedInUser",
+        title="The user signed in to the active tab where the event occurred. For example, the user signed in to Gmail. This may differ from the user account signed in to the browser itself.",
+    )
+
+
 class Process(Model):
     executable: Optional[str] = Field(
+        None,
         description="The name of the process that accessed the file, as reported by the device’s operating system. Depending on your Code42 product plan, this value may be null for some event types.",
         example="bash",
     )
     owner: Optional[str] = Field(
+        None,
         description="The username of the process owner, as reported by the device’s operating system. Depending on your Code42 product plan, this value may be null for some event types.",
         example="root",
     )
+    extension: Optional[Extension]
 
 
 class RemovableMedia(Model):
@@ -454,6 +494,11 @@ class File(Model):
         description="Unique identifier reported by the cloud provider for the file associated with the event.",
         example="PUL5zWLRrdudiJZ1OCWw",
     )
+    mime_type: Optional[str] = Field(
+        None,
+        alias="mimeType",
+        title="The MIME type of the file. For endpoint events, if the mimeTypeByBytes differs from mimeTypeByExtension, this indicates the most likely MIME type for the file. For activity observed by a web browser, this is the only MIME type reported.",
+    )
     mime_type_by_bytes: Optional[str] = Field(
         alias="mimeTypeByBytes",
         description="The MIME type of the file based on its contents.",
@@ -488,6 +533,21 @@ class File(Model):
     url: Optional[str] = Field(
         description="URL reported by the cloud provider at the time the event occurred.",
         example="https://example.com",
+    )
+    archive_id: Optional[str] = Field(
+        None,
+        alias="archiveId",
+        title="Unique identifier for files identified as an archive, such as .zip files.",
+    )
+    parent_archive_id: Optional[str] = Field(
+        None,
+        alias="parentArchiveId",
+        title="For files contained within an archive (such as a .zip file), the unique identifier for that archive; searching on parentArchiveID returns events for all files contained within that archive",
+    )
+    password_protected: Optional[bool] = Field(
+        None,
+        alias="passwordProtected",
+        title="Indicates if this file is password protected.",
     )
 
 
@@ -555,6 +615,11 @@ class Source(Model):
         alias="privateIp",
         description="The IP address of the user's device on your internal network, including Network interfaces, Virtual Network Interface controllers (NICs), and Loopback/non-routable addresses.",
         example=["127.0.0.1", "127.0.0.2"],
+    )
+    remote_hostname: Optional[str] = Field(
+        None,
+        alias="remoteHostname",
+        title="For events where a file transfer tool was used, the source hostname.",
     )
     removable_media: Optional[RemovableMedia] = Field(
         alias="removableMedia",
@@ -638,18 +703,44 @@ class Event(Model):
         description="Sharing types added by this event.",
         example=["SharedViaLink"],
     )
-    vector: Optional[str]
+    vector: Optional[str] = Field(
+        None,
+        example="GIT_PUSH",
+        title="The method of file movement. For example: UPLOADED, DOWNLOADED, EMAILED.",
+    )
 
 
 class Git(Model):
-    event_id: Optional[str] = Field(None, alias="eventId")
-    last_commit_hash: Optional[str] = Field(None, alias="lastCommitHash")
-    repository_email: Optional[str] = Field(None, alias="repositoryEmail")
-    repository_endpoint_path: Optional[str] = Field(
-        None, alias="repositoryEndpointPath"
+    event_id: Optional[str] = Field(
+        None,
+        alias="eventId",
+        title="A global unique identifier (GUID) generated by Incydr for this Git event. All files associated with this event have the same Git event ID. A single Git event can be associated with multiple file events.",
     )
-    repository_uri: Optional[str] = Field(None, alias="repositoryUri")
-    repository_user: Optional[str] = Field(None, alias="repositoryUser")
+    last_commit_hash: Optional[str] = Field(
+        None,
+        alias="lastCommitHash",
+        title="Hash value from the most recent commit in this Git event.",
+    )
+    repository_email: Optional[str] = Field(
+        None,
+        alias="repositoryEmail",
+        title="The email address specified by the user who performed the Git event. This is a user-defined value and may differ from the credentials used to sign in to Git.",
+    )
+    repository_endpoint_path: Optional[str] = Field(
+        None,
+        alias="repositoryEndpointPath",
+        title="File path of the local Git repository on the user's endpoint.",
+    )
+    repository_uri: Optional[str] = Field(
+        None,
+        alias="repositoryUri",
+        title="Uniform Resource Identifier (URI) for the Git repository.",
+    )
+    repository_user: Optional[str] = Field(
+        None,
+        alias="repositoryUser",
+        title="The username specified by the user who performed the Git event. This is a user-defined value and may differ from the credentials used to sign in to Git.",
+    )
 
 
 class FileEventV2(ResponseModel):
@@ -687,6 +778,10 @@ class FileEventV2(ResponseModel):
     )
     report: Optional[Report] = Field(
         description="Metadata for reports from 3rd party sources, such Salesforce downloads.",
+    )
+    response_controls: Optional[ResponseControls] = Field(
+        alias="responseControls",
+        description="Metadata about preventative actions applied to file activity. Only applies to events for users on a preventative watchlist.",
     )
     risk: Optional[Risk] = Field(
         description="Risk factor metadata.",

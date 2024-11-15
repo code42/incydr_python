@@ -101,7 +101,7 @@ dependencies = [
 debug = "pytest ./tests/test_file_events.py -s -k saved_search"
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=incydr"
 cov-report = "pytest --cov-report=xml:coverage.xml --cov-config=pyproject.toml --cov=incydr"
-no-cov = "cov --no-cov"
+no-cov = "pytest --disable-warnings"
 
 [tool.coverage.run]
 branch = true
