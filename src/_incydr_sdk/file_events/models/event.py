@@ -745,6 +745,9 @@ class Git(Model):
 
 class FileEventV2(ResponseModel):
     """
+    New fields are often being made available on the event response and this model definition may not contain the most recent additions.
+    See the response definition for the [File Event Search API](https://developer.code42.com/api/#tag/File-Events/operation/searchEvents) for the most up to date information on what data is available.
+
     **Fields**:
 
     * **timestamp**: - The date and time that the Code42 service on the device detected the event.  This timestamp is based on the device’s system clock and reported in Coordinated Universal Time (UTC).

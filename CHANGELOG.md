@@ -9,10 +9,12 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
-## Unreleased
+## 2.2.0 - 2024-11-18
 
 ### Updated
 
+- Updated the `FileEventV2` model to all existing fields at this time. For example, the recently added `responseControls` response object is now available on the model.
+- Updated `EventQuery` objects to allow filtering by any string by removing the requirement that filter terms and values must match explicitly defined fields.  This allows end users to filter by fields recently added to the file event response without requiring an SDK update. 
 - `client.actors.v1.get_actor_by_name` now defaults to `prefer_parent=True`. Previously, it defaulted to `False`.
 
 ## 2.1.0 - 2024-09-30
