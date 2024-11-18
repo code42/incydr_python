@@ -132,7 +132,6 @@ def test_event_query_is_when_no_values_raises_error():
     assert e.value.args[0] == "equals() requires at least one value."
 
 
-# TODO
 @pytest.mark.skip(
     reason="11-13-2024 - Removing strict filter term requirements to avoid breaking on new fields"
 )
