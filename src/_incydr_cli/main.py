@@ -52,6 +52,9 @@ else:
 )
 @logging_options
 def incydr(version, python, script_dir):
+    # Configure SDK settings
+    os.environ["INCYDR_USER_AGENT_PREFIX"] = "incydrCLI (Code42; code42.com) "
+
     if version:
         console.print(__version__, highlight=False)
     if python:

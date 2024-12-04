@@ -9,6 +9,13 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## Unreleased
+
+### Updated
+
+- The CLI and SDK now have user-agent headers consistent with Code42 current standards.
+
+
 ## 2.2.0 - 2024-11-18
 
 ### Updated
