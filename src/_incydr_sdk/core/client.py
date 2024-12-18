@@ -28,7 +28,7 @@ from _incydr_sdk.trusted_activities.client import TrustedActivitiesClient
 from _incydr_sdk.users.client import UsersClient
 from _incydr_sdk.watchlists.client import WatchlistsClient
 
-_base_user_agent = user_agent("incydr", __version__)
+_base_user_agent = user_agent("incydrSDK", __version__)
 
 
 class Client:
@@ -75,8 +75,8 @@ class Client:
 
         self._session = BaseUrlSession(base_url=self._settings.url)
         self._session.headers["User-Agent"] = (
-            self._settings.user_agent_prefix or "" + _base_user_agent
-        )
+            self._settings.user_agent_prefix or ""
+        ) + _base_user_agent
         self._session.auth = APIClientAuth(
             session=self._session,
             api_client_id=self._settings.api_client_id,

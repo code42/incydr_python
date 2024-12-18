@@ -117,3 +117,8 @@ def test_json_lines_model_parsing():
         err.value
     )
     assert "value is not a valid integer" in str(err.value)
+
+
+def test_user_agent(httpserver_auth: HTTPServer):
+    c = Client()
+    assert c._session.headers["User-Agent"].startswith("incydrSDK")
