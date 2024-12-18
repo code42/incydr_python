@@ -9,11 +9,19 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
-## Unreleased
+## 2.2.1 - 2024-12-18
+
+### Added
+
+- Added support for pyton 3.13.
 
 ### Updated
 
 - The CLI and SDK now have user-agent headers consistent with Code42 current standards.
+
+### Removed
+
+- Removed support for python 3.7 and 3.8, which are end-of-life.
 
 
 ## 2.2.0 - 2024-11-18
