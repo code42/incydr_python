@@ -22,7 +22,11 @@ from tests.test_file_events import TEST_EVENT_2
 
 TEST_SESSION_ID = "123-session-1"
 DATETIME_INSTANT = datetime(2024, 1, 1, tzinfo=timezone.utc)
-POSIX_TS = int(DATETIME_INSTANT.timestamp())
+POSIX_TS = int(DATETIME_INSTANT.timestamp()) * 1000
+START_DATE = "2024-12-19"
+START_TIMESTAMP = 1734566400000  # in ms
+END_DATE = "2024-12-20"
+END_TIMESTAMP = 1734652800000  # in ms
 
 TEST_SESSION = {
     "actorId": TEST_SESSION_ID,
@@ -141,6 +145,50 @@ def test_get_page_when_custom_params_returns_expected_data(httpserver_auth: HTTP
         actor_id="actor-id",
         start_time=POSIX_TS,
         end_time=POSIX_TS,
+        has_alerts=False,
+        sort_key=SortKeys.SCORE,
+        risk_indicators=["risk-indicator"],
+        sort_dir=SortDirection.DESC,
+        states=SessionStates.OPEN,
+        severities=3,
+        rule_ids="rule-id",
+        watchlist_ids="watchlist-id",
+        page_num=2,
+        page_size=10,
+        content_inspection_status=ContentInspectionStatuses.PENDING,
+    )
+    assert isinstance(page, SessionsPage)
+    assert page.items[0].json() == json.dumps(TEST_SESSION)
+    assert len(page.items) == 1 == page.total_count
+
+
+def test_get_page_when_given_date_uses_correct_timestamp(httpserver_auth: HTTPServer):
+    query = {
+        "actor_id": "actor-id",
+        "on_or_after": START_TIMESTAMP,
+        "before": END_TIMESTAMP,
+        "has_alerts": "false",
+        "risk_indicators": ["risk-indicator"],
+        "state": ["OPEN"],
+        "severity": [3],
+        "rule_id": ["rule-id"],
+        "watchlist_id": ["watchlist-id"],
+        "content_inspection_status": "PENDING",
+        "order_by": "score",
+        "sort_direction": "desc",
+        "page_number": 2,
+        "page_size": 10,
+    }
+    sessions_page = {"items": [TEST_SESSION], "totalCount": 1}
+    httpserver_auth.expect_request(
+        "/v1/sessions", method="GET", query_string=urlencode(query, doseq=True)
+    ).respond_with_json(sessions_page)
+
+    client = Client()
+    page = client.sessions.v1.get_page(
+        actor_id="actor-id",
+        start_time=START_DATE,
+        end_time=END_DATE,
         has_alerts=False,
         sort_key=SortKeys.SCORE,
         risk_indicators=["risk-indicator"],
@@ -343,6 +391,56 @@ def test_update_state_by_criteria_makes_expected_calls(httpserver_auth: HTTPServ
         actor_id="actor-id",
         start_time=DATETIME_INSTANT,
         end_time=DATETIME_INSTANT,
+        has_alerts=False,
+        risk_indicators=["risk-indicator"],
+        states=SessionStates.OPEN,
+        severities=3,
+        rule_ids="rule-id",
+        watchlist_ids="watchlist-id",
+        content_inspection_status=ContentInspectionStatuses.PENDING,
+    )
+    assert responses[0].json()["continuationToken"] == token
+    assert responses[1].json()["continuationToken"] is None
+    for response in responses:
+        assert response.status_code == 200
+
+
+def test_update_state_by_criteria_when_given_date_uses_correct_timestamp(
+    httpserver_auth: HTTPServer,
+):
+    query = {
+        "actor_id": "actor-id",
+        "on_or_after": START_TIMESTAMP,
+        "before": END_TIMESTAMP,
+        "has_alerts": "false",
+        "risk_indicators": ["risk-indicator"],
+        "state": ["OPEN"],
+        "severity": [3],
+        "rule_id": ["rule-id"],
+        "watchlist_id": ["watchlist-id"],
+        "content_inspection_status": "PENDING",
+    }
+
+    token = "123-token"
+    httpserver_auth.expect_request(
+        "/v1/sessions/change-states",
+        query_string=urlencode(query, doseq=True),
+        method="POST",
+        json={"continuationToken": None, "newState": "CLOSED"},
+    ).respond_with_json({"continuationToken": token})
+    httpserver_auth.expect_request(
+        "/v1/sessions/change-states",
+        query_string=urlencode(query, doseq=True),
+        method="POST",
+        json={"continuationToken": token, "newState": "CLOSED"},
+    ).respond_with_json({"continuationToken": None})
+
+    client = Client()
+    responses = client.sessions.v1.update_state_by_criteria(
+        new_state=SessionStates.CLOSED,
+        actor_id="actor-id",
+        start_time=START_DATE,
+        end_time=END_DATE,
         has_alerts=False,
         risk_indicators=["risk-indicator"],
         states=SessionStates.OPEN,
