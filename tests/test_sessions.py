@@ -24,9 +24,9 @@ TEST_SESSION_ID = "123-session-1"
 DATETIME_INSTANT = datetime(2024, 1, 1, tzinfo=timezone.utc)
 POSIX_TS = int(DATETIME_INSTANT.timestamp()) * 1000
 START_DATE = "2024-12-19"
-START_TIMESTAMP = 1734566400000 # in ms
+START_TIMESTAMP = 1734566400000  # in ms
 END_DATE = "2024-12-20"
-END_TIMESTAMP = 1734652800000 # in ms
+END_TIMESTAMP = 1734652800000  # in ms
 
 TEST_SESSION = {
     "actorId": TEST_SESSION_ID,
@@ -160,6 +160,7 @@ def test_get_page_when_custom_params_returns_expected_data(httpserver_auth: HTTP
     assert isinstance(page, SessionsPage)
     assert page.items[0].json() == json.dumps(TEST_SESSION)
     assert len(page.items) == 1 == page.total_count
+
 
 def test_get_page_when_given_date_uses_correct_timestamp(httpserver_auth: HTTPServer):
     query = {
@@ -403,7 +404,10 @@ def test_update_state_by_criteria_makes_expected_calls(httpserver_auth: HTTPServ
     for response in responses:
         assert response.status_code == 200
 
-def test_update_state_by_criteria_when_given_date_uses_correct_timestamp(httpserver_auth: HTTPServer):
+
+def test_update_state_by_criteria_when_given_date_uses_correct_timestamp(
+    httpserver_auth: HTTPServer,
+):
     query = {
         "actor_id": "actor-id",
         "on_or_after": START_TIMESTAMP,
