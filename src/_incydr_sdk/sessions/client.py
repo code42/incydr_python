@@ -76,9 +76,9 @@ class SessionsV1:
 
         # Parse timestamps
         if start_time and not isinstance(start_time, (int, float)):
-            start_time = parse_ts_to_posix_ts(start_time)
+            start_time = parse_ts_to_posix_ts(start_time) * 1000
         if end_time and not isinstance(end_time, (int, float)):
-            end_time = parse_ts_to_posix_ts(end_time)
+            end_time = parse_ts_to_posix_ts(end_time) * 1000
 
         if states and not isinstance(states, List):
             states = [states]
@@ -253,9 +253,9 @@ class SessionsV1:
 
         # Parse timestamps
         if start_time and not isinstance(start_time, (int, float)):
-            start_time = parse_ts_to_posix_ts(start_time)
+            start_time = parse_ts_to_posix_ts(start_time) * 1000
         if end_time and not isinstance(end_time, (int, float)):
-            end_time = parse_ts_to_posix_ts(end_time)
+            end_time = parse_ts_to_posix_ts(end_time) * 1000
 
         if states and not isinstance(states, List):
             states = [states]
