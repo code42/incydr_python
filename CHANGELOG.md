@@ -19,7 +19,7 @@
 
 ### Added
 
-- Added support for pyton 3.13.
+- Added support for python 3.13.
 
 ### Updated
 
