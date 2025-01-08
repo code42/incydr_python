@@ -8,7 +8,7 @@ from _incydr_sdk.enums import SortDirection
 from _incydr_sdk.enums.sessions import ContentInspectionStatuses
 from _incydr_sdk.enums.sessions import SessionStates
 from _incydr_sdk.enums.sessions import SortKeys
-from _incydr_sdk.queries.utils import parse_ts_to_posix_ts
+from _incydr_sdk.queries.utils import parse_ts_to_ms_ts
 from _incydr_sdk.sessions.models.models import SessionsChangeStateRequest
 from _incydr_sdk.sessions.models.models import SessionsCriteriaRequest
 from _incydr_sdk.sessions.models.models import SessionsQueryRequest
@@ -76,9 +76,9 @@ class SessionsV1:
 
         # Parse timestamps
         if start_time and not isinstance(start_time, (int, float)):
-            start_time = parse_ts_to_posix_ts(start_time)
+            start_time = parse_ts_to_ms_ts(start_time)
         if end_time and not isinstance(end_time, (int, float)):
-            end_time = parse_ts_to_posix_ts(end_time)
+            end_time = parse_ts_to_ms_ts(end_time)
 
         if states and not isinstance(states, List):
             states = [states]
@@ -253,9 +253,9 @@ class SessionsV1:
 
         # Parse timestamps
         if start_time and not isinstance(start_time, (int, float)):
-            start_time = parse_ts_to_posix_ts(start_time)
+            start_time = parse_ts_to_ms_ts(start_time)
         if end_time and not isinstance(end_time, (int, float)):
-            end_time = parse_ts_to_posix_ts(end_time)
+            end_time = parse_ts_to_ms_ts(end_time)
 
         if states and not isinstance(states, List):
             states = [states]

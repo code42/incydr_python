@@ -41,6 +41,13 @@ def parse_ts_to_posix_ts(timestamp: Union[str, datetime]):
     return dt.timestamp()
 
 
+def parse_ts_to_ms_ts(timestamp: Union[str, datetime]):
+    """
+    Parse epoch ms timestamp from DATE/DATETIME str or datetime obj.
+    """
+    return parse_ts_to_posix_ts(timestamp) * 1000
+
+
 def parse_str_to_dt(timestamp: str):
     try:
         dt = parser.parse(timestamp)
