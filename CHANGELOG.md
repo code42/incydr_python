@@ -9,6 +9,12 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## 2.2.2 - 2025-01-08
+
+### Fixed
+
+- A bug where dates (e.g. 2025-01-08) were incorrectly converted to timestamps when querying sessions.
+
 ## 2.2.1 - 2024-12-18
 
 ### Added
