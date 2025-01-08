@@ -8,7 +8,6 @@ from _incydr_sdk.enums import SortDirection
 from _incydr_sdk.enums.sessions import ContentInspectionStatuses
 from _incydr_sdk.enums.sessions import SessionStates
 from _incydr_sdk.enums.sessions import SortKeys
-from _incydr_sdk.queries.utils import parse_ts_to_posix_ts
 from _incydr_sdk.queries.utils import parse_ts_to_ms_ts
 from _incydr_sdk.sessions.models.models import SessionsChangeStateRequest
 from _incydr_sdk.sessions.models.models import SessionsCriteriaRequest
