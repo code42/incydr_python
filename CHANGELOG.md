@@ -9,6 +9,12 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## Unreleased
+
+### Fixed
+
+- A bug where in some rare cases searching file events could cause the SDK to throw a validation error on the server's correct response.
+
 ## 2.2.2 - 2025-01-08
 
 ### Fixed

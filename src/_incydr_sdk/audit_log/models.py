@@ -5,6 +5,7 @@ from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Union
 
 from pydantic import BaseModel
 from pydantic import Field
@@ -63,7 +64,7 @@ class QueryExportRequest(Model):
     dateRange: Optional[DateRange]
     eventTypes: Optional[List[str]]
     resourceIds: Optional[List[str]]
-    userTypes: Optional[List[UserTypes]]
+    userTypes: Optional[List[Union[UserTypes, str]]]
 
 
 class QueryAuditLogRequest(Model):
@@ -75,4 +76,4 @@ class QueryAuditLogRequest(Model):
     page: int
     pageSize: int
     resourceIds: Optional[List[str]]
-    userTypes: Optional[List[UserTypes]]
+    userTypes: Optional[List[Union[UserTypes, str]]]

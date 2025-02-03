@@ -41,7 +41,7 @@ _term_enum_map = {
 
 class Filter(BaseModel):
     term: str
-    operator: Operator
+    operator: Union[Operator, str]
     value: Optional[Union[int, str]]
 
     class Config:
