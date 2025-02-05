@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import List
 from typing import Optional
+from typing import Union
 
 from pydantic import Field
 
@@ -242,7 +243,7 @@ class Watchlist(ResponseModel):
     description: Optional[str] = Field(
         None, description="Description for a custom watchlist."
     )
-    list_type: WatchlistType = Field(alias="listType")
+    list_type: Union[WatchlistType, str] = Field(alias="listType")
     stats: Optional[WatchlistStats] = None
     tenant_id: Optional[str] = Field(
         None, description="A unique tenant ID.", alias="tenantId"

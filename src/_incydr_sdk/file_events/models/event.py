@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 from typing import Optional
+from typing import Union
 
 from pydantic import Field
 
@@ -226,7 +227,7 @@ class Report(Model):
         description="The display name of the report.",
         example="Top Accounts Report",
     )
-    type: Optional[ReportType] = Field(
+    type: Optional[Union[ReportType, str]] = Field(
         description='Indicates if the report is "REPORT_TYPE_AD_HOC" or "REPORT_TYPE_SAVED".',
         example="REPORT_TYPE_SAVED",
     )

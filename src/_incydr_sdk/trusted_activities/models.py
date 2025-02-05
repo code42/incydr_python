@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import List
 from typing import Optional
+from typing import Union
 
 from pydantic import Extra
 from pydantic import Field
@@ -15,7 +16,7 @@ from _incydr_sdk.enums.trusted_activities import PrincipalType
 
 
 class ProviderObject(Model):
-    name: Optional[Name] = Field(
+    name: Optional[Union[Name, str]] = Field(
         None,
         description="The name of a provider for a specified activity action.\n  ### Supported providers for trusted "
         "activity type and actions\n\n  - `DOMAIN`\n    - `CLOUD_SHARE`\n      - `BOX`\n      - "
@@ -26,7 +27,7 @@ class ProviderObject(Model):
 
 
 class ActivityAction(Model):
-    type: Optional[ActivityType] = Field(
+    type: Optional[Union[ActivityType, str]] = Field(
         None,
         description="The type of an activity action.\n### Supported trusted activity types for each activity action "
         "type\n\n- `CLOUD_SHARE` \n  - `DOMAIN`\n- `CLOUD_SYNC` \n  - `DOMAIN`\n  - `ACCOUNT_NAME`\n- "
@@ -40,7 +41,7 @@ class ActivityAction(Model):
 
 
 class ActivityActionGroup(Model):
-    name: Optional[Name] = Field(
+    name: Optional[Union[Name, str]] = Field(
         Name.DEFAULT,
         description="The name of the activity action group. Currently, only `DEFAULT` activity action group is "
         "supported.",
@@ -85,10 +86,10 @@ class TrustedActivity(ResponseModel, validate_assignment=True):
     description: Optional[str] = Field(
         None, description="A description of the trusted activity."
     )
-    principal_type: Optional[PrincipalType] = Field(
+    principal_type: Optional[Union[PrincipalType, str]] = Field(
         None, alias="principalType", allow_mutation=False
     )
-    type: Optional[ActivityType] = Field(
+    type: Optional[Union[ActivityType, str]] = Field(
         None, description="The type of the trusted activity.", alias="type"
     )
     update_time: Optional[datetime] = Field(
@@ -129,7 +130,7 @@ class UpdateTrustedActivity(Model, extra=Extra.ignore):
         description="Whether the trusted activity represents a high value source",
         alias="isHighValueSource",
     )
-    type: Optional[ActivityType] = Field(
+    type: Optional[Union[ActivityType, str]] = Field(
         None,
         description="The type of the trusted activity.\n\nNote: The `ACCOUNT_NAME` trusted activity type requires "
         "agent version 1.5.0 or later for Incydr \nProfessional, Enterprise, Gov F2, and Horizon product "

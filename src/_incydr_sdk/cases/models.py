@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import List
 from typing import Optional
+from typing import Union
 
 from pydantic import BaseModel
 from pydantic import Extra
@@ -48,7 +49,7 @@ class Case(ResponseModel, validate_assignment=True):
     updated_at: Optional[datetime] = Field(allow_mutation=False, alias="updatedAt")
     subject: Optional[str]
     subject_username: Optional[str] = Field(alias="subjectUsername")
-    status: CaseStatus
+    status: Union[CaseStatus, str]
     assignee: Optional[str]
     assignee_username: Optional[str] = Field(
         allow_mutation=False, alias="assigneeUsername"
@@ -152,7 +153,7 @@ class FileEvent(Model):
         description="Lists indicators that the data may be exposed.",
         example=["OutsideTrustedDomains", "IsPublic"],
     )
-    file_availability: Optional[FileAvailability] = Field(
+    file_availability: Optional[Union[FileAvailability, str]] = Field(
         None,
         alias="fileAvailability",
         description="The download availability status of the file associated with the event.",
@@ -170,7 +171,7 @@ class FileEvent(Model):
         description="The file location on the user's device; a path forward or backslash should be included at the end of the filepath. Possibly null if the file event occurred on a cloud provider.",
         example="/Users/casey/Documents/",
     )
-    risk_indicators: Optional[List[RiskIndicator]] = Field(
+    risk_indicators: Optional[List[Union[RiskIndicator, str]]] = Field(
         None,
         alias="riskIndicators",
         description="List of risk indicators identified for this event. If more than one risk indicator applies to this event, the sum of all indicators determines the total risk score.",

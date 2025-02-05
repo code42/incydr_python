@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import List
 from typing import Optional
+from typing import Union
 
 from pydantic import BaseModel
 from pydantic import Field
@@ -63,7 +64,7 @@ class Agent(ResponseModel):
     machine_id: Optional[str] = Field(alias="machineId")
     serial_number: Optional[str] = Field(alias="serialNumber")
     active: Optional[bool]
-    agent_type: Optional[AgentType] = Field(alias="agentType")
+    agent_type: Optional[Union[AgentType, str]] = Field(alias="agentType")
     agent_health_issue_types: Optional[List[str]] = Field(alias="agentHealthIssueTypes")
     app_version: Optional[str] = Field(alias="appVersion")
     product_version: Optional[str] = Field(alias="productVersion")
@@ -98,10 +99,10 @@ class AgentUpdateRequest(BaseModel):
 
 class QueryAgentsRequest(BaseModel):
     active: Optional[bool]
-    agentType: Optional[AgentType]
+    agentType: Optional[Union[AgentType, str]]
     agentHealthy: Optional[bool]
     anyOfAgentHealthIssueTypes: Optional[List[str]]
-    srtKey: Optional[SortKeys]
+    srtKey: Optional[Union[SortKeys, str]]
     srtDir: Optional[str]
     pageSize: Optional[int]
     page: Optional[int]

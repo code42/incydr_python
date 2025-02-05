@@ -1,5 +1,6 @@
 from typing import List
 from typing import Optional
+from typing import Union
 
 from pydantic import BaseModel
 from pydantic import constr
@@ -50,7 +51,7 @@ class CreateWatchlistRequest(BaseModel):
         description="The required title for a custom watchlist.",
         example="My Custom List",
     )
-    watchlistType: WatchlistType
+    watchlistType: Union[WatchlistType, str]
 
     class Config:
         use_enum_values = True
