@@ -9,6 +9,12 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## Unreleased
+
+### Added
+
+- Improved documentation to clarify that all agent health issues can be queried and filtered using the CLI and SDK.
+
 ## 2.2.3 - 2025-02-05
 
 ### Fixed

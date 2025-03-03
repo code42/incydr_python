@@ -54,7 +54,7 @@ class AgentsV1:
         * **sort_dir**: `SortDirection` - `asc` or `desc`. The direction in which to sort the response based on the corresponding key. Defaults to `asc`.
         * **sort_key**: [`SortKeys`][agents-sort-keys] - Values on which the response will be sorted. Defaults to agent name.
         * **agent_healthy**: `bool | None` - Optionally retrieve agents with this health status. Agents that have no health issue types are considered healthy.
-        * **agent_health_issue_types**: `List[str] | str` - Optionally retrieve agents that have (at least) any of the given issue type(s). Health issue types include the following: `NOT_CONNECTING`, `NOT_SENDING_SECURITY_EVENTS`.
+        * **agent_health_issue_types**: `List[str] | str` - Optionally retrieve agents that have (at least) any of the given issue type(s). Health issue types include the following: `NOT_CONNECTING`, `NOT_SENDING_SECURITY_EVENTS`, `SECURITY_INGEST_REJECTED`, `MISSING_MACOS_PERMISSION_FULL_DISK_ACCESS`, `MISSING_MACOS_PERMISSION_ACCESSIBILITY`.
 
         **Returns**: An [`AgentsPage`][agentspage-model] object.
         """
