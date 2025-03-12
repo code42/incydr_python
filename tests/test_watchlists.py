@@ -630,9 +630,9 @@ def test_list_excluded_users_returns_expected_data_v2(mock_get_all_excluded_acto
     c = Client()
     users = c.watchlists.v2.list_excluded_actors(TEST_WATCHLIST_ID)
     assert isinstance(users, ExcludedActorsList)
-    assert users.excluded_users[0].json() == json.dumps(TEST_ACTOR_1)
-    assert users.excluded_users[1].json() == json.dumps(TEST_ACTOR_2)
-    assert users.total_count == len(users.excluded_users) == 2
+    assert users.excluded_actors[0].json() == json.dumps(TEST_ACTOR_1)
+    assert users.excluded_actors[1].json() == json.dumps(TEST_ACTOR_2)
+    assert users.total_count == len(users.excluded_actors) == 2
 
 
 @valid_ids_param
@@ -1193,7 +1193,7 @@ def test_get_id_by_name_when_no_id_raises_error(httpserver_auth: HTTPServer):
 
 
 def test_cli_list_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, mock_get_all
+    httpserver_auth: HTTPServer, runner, mock_get_all_v2
 ):
     result = runner.invoke(incydr, ["watchlists", "list"])
     httpserver_auth.check()
@@ -1210,13 +1210,13 @@ def test_cli_list_makes_expected_call(
 def test_cli_show_makes_expected_call(
     httpserver_auth: HTTPServer,
     runner,
-    mock_get_all,
+    mock_get_all_v2,
     watchlist_input,
     watchlist_expected,
-    mock_get_all_included_users,
-    mock_get_all_excluded_users,
-    mock_get_all_departments,
-    mock_get_all_directory_groups,
+    mock_get_all_included_actors,
+    mock_get_all_excluded_actors,
+    mock_get_all_departments_v2,
+    mock_get_all_directory_groups_v2,
 ):
     # mock unordered token request to follow watchlist arg callback
     auth_response = dict(
@@ -1229,7 +1229,7 @@ def test_cli_show_makes_expected_call(
     )
 
     httpserver_auth.expect_request(
-        f"/v1/watchlists/{watchlist_expected}", method="GET"
+        f"/v2/watchlists/{watchlist_expected}", method="GET"
     ).respond_with_json(TEST_WATCHLIST_1)
 
     result = runner.invoke(incydr, ["watchlists", "show", watchlist_input])
@@ -1238,7 +1238,7 @@ def test_cli_show_makes_expected_call(
 
 
 def test_cli_create_default_watchlist_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, mock_create_departing_employee
+    httpserver_auth: HTTPServer, runner, mock_create_departing_employee_v2
 ):
     result = runner.invoke(incydr, ["watchlists", "create", "DEPARTING_EMPLOYEE"])
     httpserver_auth.check()
@@ -1246,7 +1246,7 @@ def test_cli_create_default_watchlist_makes_expected_call(
 
 
 def test_cli_create_custom_watchlist_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, mock_create_custom
+    httpserver_auth: HTTPServer, runner, mock_create_custom_v2
 ):
     result = runner.invoke(
         incydr,
@@ -1265,7 +1265,7 @@ def test_cli_create_custom_watchlist_makes_expected_call(
 
 
 def test_cli_delete_makes_expected_call(
-    httpserver_auth: HTTPServer, runner, mock_delete
+    httpserver_auth: HTTPServer, runner, mock_delete_v2
 ):
     result = runner.invoke(incydr, ["watchlists", "delete", TEST_WATCHLIST_ID])
     httpserver_auth.check()
@@ -1279,7 +1279,7 @@ def test_cli_update_makes_expected_call(httpserver_auth: HTTPServer, runner):
     watchlist["title"] = "updated title"
     watchlist["description"] = "updated description"
     httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}",
+        f"/v2/watchlists/{TEST_WATCHLIST_ID}",
         method="PATCH",
         query_string=urlencode(query, doseq=True),
         json=data,
@@ -1304,11 +1304,11 @@ def test_cli_update_makes_expected_call(httpserver_auth: HTTPServer, runner):
 @pytest.mark.parametrize(
     "command,mock_server_call",
     [
-        ("list-members", "mock_get_all_members"),
-        ("list-included-users", "mock_get_all_included_users"),
-        ("list-excluded-users", "mock_get_all_excluded_users"),
-        ("list-directory-groups", "mock_get_all_directory_groups"),
-        ("list-departments", "mock_get_all_departments"),
+        ("list-members", "mock_get_all_members_v2"),
+        ("list-included-actors", "mock_get_all_included_actors"),
+        ("list-excluded-actors", "mock_get_all_excluded_actors"),
+        ("list-directory-groups", "mock_get_all_directory_groups_v2"),
+        ("list-departments", "mock_get_all_departments_v2"),
     ],
 )
 def test_cli_list_members_makes_expected_call(
@@ -1325,21 +1325,27 @@ user_params = pytest.mark.parametrize(
     "option, command, path_group, url_path, expected_request",
     [
         (
-            "users",
+            "actors",
             "add",
-            "included-users",
+            "included-actors",
             "add",
-            {"userIds": USER_IDS, "watchlistId": TEST_WATCHLIST_ID},
+            {"actorIds": USER_IDS, "watchlistId": TEST_WATCHLIST_ID},
         ),
         (
-            "users",
+            "actors",
             "remove",
-            "included-users",
+            "included-actors",
             "delete",
-            {"userIds": USER_IDS, "watchlistId": TEST_WATCHLIST_ID},
+            {"actorIds": USER_IDS, "watchlistId": TEST_WATCHLIST_ID},
         ),
-        ("excluded-users", "add", "excluded-users", "add", {"userIds": USER_IDS}),
-        ("excluded-users", "remove", "excluded-users", "delete", {"userIds": USER_IDS}),
+        ("excluded-actors", "add", "excluded-actors", "add", {"actorIds": USER_IDS}),
+        (
+            "excluded-actors",
+            "remove",
+            "excluded-actors",
+            "delete",
+            {"actorIds": USER_IDS},
+        ),
     ],
 )
 
@@ -1355,7 +1361,7 @@ def test_cli_update_users_when_list_makes_expected_call(
     expected_request,
 ):
     httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/{path_group}/{url_path}",
+        f"/v2/watchlists/{TEST_WATCHLIST_ID}/{path_group}/{url_path}",
         method="POST",
         json=expected_request,
     ).respond_with_data()
@@ -1382,7 +1388,7 @@ def test_cli_update_users_when_csv_makes_expected_call(
     p.write_text("user\n" + "\n".join(USER_IDS))
 
     httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/{path_group}/{url_path}",
+        f"/v2/watchlists/{TEST_WATCHLIST_ID}/{path_group}/{url_path}",
         method="POST",
         json=expected_request,
     ).respond_with_data()
@@ -1409,7 +1415,7 @@ def test_cli_update_users_when_json_makes_expected_call(
     p.write_text("\n".join([f'{{ "userId": "{u}" }}' for u in USER_IDS]))
 
     httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/{path_group}/{url_path}",
+        f"/v2/watchlists/{TEST_WATCHLIST_ID}/{path_group}/{url_path}",
         method="POST",
         json=expected_request,
     ).respond_with_data()
@@ -1450,7 +1456,7 @@ def test_cli_update_departments_and_directory_groups_makes_expected_call(
     expected_request,
 ):
     httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-{option}/{url_path}",
+        f"/v2/watchlists/{TEST_WATCHLIST_ID}/included-{option}/{url_path}",
         method="POST",
         json=expected_request,
     ).respond_with_data()
@@ -1467,20 +1473,20 @@ def test_cli_update_users_batches_by_100(httpserver_auth: HTTPServer, runner, ac
     USER_IDS = [f"user-{i}" for i in range(150)]
 
     httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-users/{action[1]}",
+        f"/v2/watchlists/{TEST_WATCHLIST_ID}/included-actors/{action[1]}",
         method="POST",
-        json={"userIds": USER_IDS[:100], "watchlistId": TEST_WATCHLIST_ID},
+        json={"actorIds": USER_IDS[:100], "watchlistId": TEST_WATCHLIST_ID},
     ).respond_with_data()
 
     httpserver_auth.expect_request(
-        f"/v1/watchlists/{TEST_WATCHLIST_ID}/included-users/{action[1]}",
+        f"/v2/watchlists/{TEST_WATCHLIST_ID}/included-actors/{action[1]}",
         method="POST",
-        json={"userIds": USER_IDS[100:], "watchlistId": TEST_WATCHLIST_ID},
+        json={"actorIds": USER_IDS[100:], "watchlistId": TEST_WATCHLIST_ID},
     ).respond_with_data()
 
     result = runner.invoke(
         incydr,
-        ["watchlists", action[0], TEST_WATCHLIST_ID, "--users", ",".join(USER_IDS)],
+        ["watchlists", action[0], TEST_WATCHLIST_ID, "--actors", ",".join(USER_IDS)],
     )
     httpserver_auth.check()
     assert result.exit_code == 0

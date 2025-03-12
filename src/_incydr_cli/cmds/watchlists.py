@@ -15,8 +15,10 @@ from _incydr_cli.cmds.models import UserJSON
 from _incydr_cli.cmds.options.output_options import columns_option
 from _incydr_cli.cmds.options.output_options import table_format_option
 from _incydr_cli.cmds.options.output_options import TableFormat
+from _incydr_cli.cmds.options.utils import actor_lookup_callback
 from _incydr_cli.cmds.options.utils import user_lookup_callback
-from _incydr_cli.cmds.utils import user_lookup
+from _incydr_cli.cmds.utils import actor_lookup
+from _incydr_cli.cmds.utils import deprecation_warning
 from _incydr_cli.core import incompatible_with
 from _incydr_cli.core import IncydrCommand
 from _incydr_cli.core import IncydrGroup
@@ -28,6 +30,7 @@ from _incydr_sdk.utils import model_as_card
 from _incydr_sdk.watchlists.models.responses import IncludedDepartment
 from _incydr_sdk.watchlists.models.responses import IncludedDirectoryGroup
 from _incydr_sdk.watchlists.models.responses import Watchlist
+from _incydr_sdk.watchlists.models.responses import WatchlistActor
 from _incydr_sdk.watchlists.models.responses import WatchlistUser
 
 MAX_USER_DISPLAY_COUNT = 25
@@ -51,7 +54,7 @@ def get_watchlist_id_callback(ctx, param, value):
     except ValueError:
         # if not an ID value
         client = Client()
-        return client.watchlists.v1.get_id_by_name(value)
+        return client.watchlists.v2.get_id_by_name(value)
 
 
 @click.group(cls=IncydrGroup)
@@ -85,15 +88,22 @@ csv_option = click.option(
 
 @watchlists.command("list", cls=IncydrCommand)
 @click.option(
+    "--actor",
+    default=None,
+    help="Filter by watchlists where the actor is a member.  Accepts an actor ID or actor name.  Performs an additional lookup if an actor name is passed",
+    callback=actor_lookup_callback,
+)
+@click.option(
     "--user",
     default=None,
-    help="Filter by watchlists where the user is a member.  Accepts a user ID or a username.  Performs an additional lookup if a username is passed",
+    help="DEPRECATED. Use Actor instead. Filter by watchlists where the user is a member.  Accepts a user ID or a username.  Performs an additional lookup if a username is passed",
     callback=user_lookup_callback,
 )
 @table_format_option
 @columns_option
 @logging_options
 def list_(
+    actor: str = None,
     user: str = None,
     format_: TableFormat = None,
     columns: str = None,
@@ -101,8 +111,10 @@ def list_(
     """
     List watchlists.
     """
+    if user and not actor:
+        actor = user
     client = Client()
-    watchlists = client.watchlists.v1.iter_all(user_id=user)
+    watchlists = client.watchlists.v2.iter_all(actor_id=actor)
     _output_results(watchlists, Watchlist, format_, columns)
 
 
@@ -120,41 +132,45 @@ def show(
 
     If using `rich`, outputs a summary of watchlist information and membership. This includes the following:
 
-    * included_users
-    * excluded_users
+    * included_actors
+    * excluded_actors
     * included_departments
     * included_directory_groups
 
-    Lists of users will be truncated to only display the first 25 members, use the `list-included-users` and `list-excluded-users`
+    Lists of actors will be truncated to only display the first 25 members, use the `list-included-actors` and `list-excluded-actors`
     commands respectively to see more details.
 
     If not using `rich`, outputs watchlist information in JSON without additional membership summary information.
     """
     client = Client()
-    watchlist_response = client.watchlists.v1.get(watchlist)
+    watchlist_response = client.watchlists.v2.get(watchlist)
 
     if not client.settings.use_rich:
         click.echo(watchlist_response.json())
         return
 
-    included_users = client.watchlists.v1.list_included_users(watchlist).included_users
-    excluded_users = client.watchlists.v1.list_excluded_users(watchlist).excluded_users
-    departments = client.watchlists.v1.list_departments(watchlist).included_departments
-    dir_groups = client.watchlists.v1.list_directory_groups(
+    included_actors = client.watchlists.v2.list_included_actors(
+        watchlist
+    ).included_actors
+    excluded_actors = client.watchlists.v2.list_excluded_actors(
+        watchlist
+    ).excluded_actors
+    departments = client.watchlists.v2.list_departments(watchlist).included_departments
+    dir_groups = client.watchlists.v2.list_directory_groups(
         watchlist
     ).included_directory_groups
     t = Table(title=f"{watchlist_response.list_type} Watchlist")
     t.add_column("Stats")
 
     tables = []
-    if included_users:
+    if included_actors:
         tables.append(
-            models_as_table(WatchlistUser, included_users[:MAX_USER_DISPLAY_COUNT])
+            models_as_table(WatchlistActor, included_actors[:MAX_USER_DISPLAY_COUNT])
         )
         t.add_column("Included Users")
-    if excluded_users:
+    if excluded_actors:
         tables.append(
-            models_as_table(WatchlistUser, excluded_users[:MAX_USER_DISPLAY_COUNT])
+            models_as_table(WatchlistActor, excluded_actors[:MAX_USER_DISPLAY_COUNT])
         )
         t.add_column("Excluded Users")
     if departments:
@@ -201,7 +217,7 @@ def create(
     The `--title` (required) and `--description` (optional) options are exclusively for creating CUSTOM watchlists.
     """
     client = Client()
-    watchlist = client.watchlists.v1.create(watchlist_type, title, description)
+    watchlist = client.watchlists.v2.create(watchlist_type, title, description)
     console.print(
         f"Successfully created {watchlist.list_type} watchlist with ID: '{watchlist.watchlist_id}'."
     )
@@ -220,7 +236,7 @@ def delete(
     `CUSTOM` watchlists must be specified by title or ID.
     """
     client = Client()
-    client.watchlists.v1.delete(watchlist)
+    client.watchlists.v2.delete(watchlist)
     console.print(f"Successfully deleted watchlist with ID: '{watchlist}'.")
 
 
@@ -249,29 +265,29 @@ def update(
         description = ""
 
     client = Client()
-    client.watchlists.v1.update(watchlist_id, title, description)
+    client.watchlists.v2.update(watchlist_id, title, description)
     console.print(f"Successfully updated watchlist with ID: '{watchlist_id}'.")
 
 
 @watchlists.command(cls=IncydrCommand)
 @watchlist_arg
 @click.option(
-    "--users",
+    "--actors",
     default=None,
     type=FileOrString(),
-    help="List of user IDs or usernames to include on the watchlist. "
-    "An additional lookup is performed if a username is passed. Argument can be "
-    "passed as a comma-delimited string or from a CSV file with a single 'user' "
-    "column if prefixed with '@', e.g. '--users @users.csv'.",
+    help="List of actor IDs or actor names to include on the watchlist. "
+    "An additional lookup is performed if an actor name is passed. Argument can be "
+    "passed as a comma-delimited string or from a CSV file with a single 'actor' "
+    "column if prefixed with '@', e.g. '--actors @actors.csv'.",
 )
 @click.option(
-    "--excluded-users",
+    "--excluded-actors",
     default=None,
     type=FileOrString(),
-    help="List of user IDs or usernames to exclude from the watchlist. "
-    "An additional lookup is performed if a username is passed. Argument can be "
-    "passed as a comma-delimited string or from a CSV file with a single 'user' "
-    "column if prefixed with '@', e.g. '--users @users.csv'.",
+    help="List of actor IDs or actor names to exclude from the watchlist. "
+    "An additional lookup is performed if an actor name is passed. Argument can be "
+    "passed as a comma-delimited string or from a CSV file with a single 'actor' "
+    "column if prefixed with '@', e.g. '--excluded-actors @actors.csv'.",
 )
 @click.option(
     "--departments",
@@ -287,61 +303,86 @@ def update(
     "Individual users from the directory groups will be added as watchlist members, where group information comes "
     "from SCIM or User Directory Sync.",
 )
+@click.option(
+    "--users",
+    default=None,
+    type=FileOrString(),
+    help="DEPRECATED. Use --actors instead. List of user IDs or usernames to include on the watchlist. "
+    "An additional lookup is performed if a username is passed. Argument can be "
+    "passed as a comma-delimited string or from a CSV file with a single 'user' "
+    "column if prefixed with '@', e.g. '--users @users.csv'.",
+)
+@click.option(
+    "--excluded-users",
+    default=None,
+    type=FileOrString(),
+    help="DEPRECATED. Use --excluded-actors instead. List of user IDs or usernames to exclude from the watchlist. "
+    "An additional lookup is performed if a username is passed. Argument can be "
+    "passed as a comma-delimited string or from a CSV file with a single 'user' "
+    "column if prefixed with '@', e.g. '--users @users.csv'.",
+)
 @input_format_option
 @logging_options
 def add(
     watchlist: str,
-    users=None,
-    excluded_users=None,
+    actors=None,
+    excluded_actors=None,
     departments=None,
     directory_groups=None,
+    users=None,
+    excluded_users=None,
     format_=None,
 ):
     """
-    Manage watchlist membership by including or excluding individual users and/or groups.
+    Manage watchlist membership by including or excluding individual actors and/or groups.
 
     Add any of the following members to a watchlist with the corresponding options:
 
-    * users
-    * excluded-users
+    * actors
+    * excluded-actors
     * departments
     * directory-groups
 
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
 
-    If adding or excluding more than 100 users in a single run, the CLI will automatically batch
+    If adding or excluding more than 100 actors in a single run, the CLI will automatically batch
     requests due to a limit of 100 per request on the backend.
     """
     client = Client()
 
-    # Add included users
-    if users:
-        user_ids, errors = _get_user_ids(client, users, format_=format_)
+    if users and not actors:
+        actors = users
+    if excluded_users and not excluded_actors:
+        excluded_actors = excluded_users
+
+    # Add included actors
+    if actors:
+        actor_ids, errors = _get_actor_ids(client, actors, format_=format_)
         succeeded = 0
-        for chunk in chunked(user_ids, size=100):
+        for chunk in chunked(actor_ids, size=100):
             try:
-                client.watchlists.v1.add_included_users(watchlist, chunk)
+                client.watchlists.v2.add_included_actors(watchlist, chunk)
                 console.print(
-                    f"Successfully included {len(chunk)} users on watchlist with ID: '{watchlist}'"
+                    f"Successfully included {len(chunk)} actors on watchlist with ID: '{watchlist}'"
                 )
                 succeeded += len(chunk)
             except requests.HTTPError as err:
-                if "User not found" in err.response.text:
+                if "Actor not found" in err.response.text:
                     console.print(
-                        "Problem processing batch of users, will attempt each individually."
+                        "Problem processing batch of actors, will attempt each individually."
                     )
                     chunk_succeeded = 0
-                    for user in chunk:
+                    for actor in chunk:
                         try:
-                            client.watchlists.v1.add_included_users(watchlist, user)
+                            client.watchlists.v2.add_included_actors(watchlist, actor)
                             succeeded += 1
                             chunk_succeeded += 1
                         except requests.HTTPError as err:
                             client.settings.logger.error(
-                                f"Problem adding userId={user} to watchlist={watchlist}: {err.response.text}"
+                                f"Problem adding actorId={actor} to watchlist={watchlist}: {err.response.text}"
                             )
-                            errors.append(user)
+                            errors.append(actor)
                     console.print(
                         f"Successfully included {chunk_succeeded} users on watchlist with ID: '{watchlist}'"
                     )
@@ -351,45 +392,45 @@ def add(
             console.print("[red]The following usernames/user IDs were not found:")
             console.print("\t" + "\n\t".join(errors))
 
-    # Add excluded users
-    if excluded_users:
+    # Add excluded actors
+    if excluded_actors:
         succeeded = 0
-        user_ids, errors = _get_user_ids(client, excluded_users, format_=format_)
-        for chunk in chunked(user_ids, size=100):
+        actor_ids, errors = _get_actor_ids(client, excluded_actors, format_=format_)
+        for chunk in chunked(actor_ids, size=100):
             try:
-                client.watchlists.v1.add_excluded_users(watchlist, chunk)
+                client.watchlists.v2.add_excluded_actors(watchlist, chunk)
                 console.print(
-                    f"Successfully excluded {len(chunk)} users from watchlist with ID: '{watchlist}'"
+                    f"Successfully excluded {len(chunk)} actors from watchlist with ID: '{watchlist}'"
                 )
                 succeeded += len(chunk)
             except requests.HTTPError as err:
-                if "User not found" in err.response.text:
+                if "Actor not found" in err.response.text:
                     console.print(
-                        "Problem processing batch of users, will attempt each individually."
+                        "Problem processing batch of actors, will attempt each individually."
                     )
                     chunk_succeeded = 0
-                    for user in chunk:
+                    for actor in chunk:
                         try:
-                            client.watchlists.v1.add_excluded_users(watchlist, user)
+                            client.watchlists.v2.add_excluded_actors(watchlist, actor)
                             succeeded += 1
                             chunk_succeeded += 1
                         except requests.HTTPError as err:
                             client.settings.logger.error(
-                                f"Problem excluding userId={user} from watchlist={watchlist}: {err.response.text}"
+                                f"Problem excluding actorId={actor} from watchlist={watchlist}: {err.response.text}"
                             )
-                            errors.append(user)
+                            errors.append(actor)
                     console.print(
                         f"Successfully excluded {chunk_succeeded} users from watchlist with ID: '{watchlist}'"
                     )
                 else:
                     raise err
         if errors:
-            console.print("[red]The following usernames/user IDs were not found:")
+            console.print("[red]The following actornames/actor IDs were not found:")
             console.print("\t" + "\n\t".join(errors))
 
     # Add departments
     if departments:
-        client.watchlists.v1.add_departments(
+        client.watchlists.v2.add_departments(
             watchlist, [i.strip() for i in departments.split(",")]
         )
         console.print(
@@ -398,7 +439,7 @@ def add(
 
     # Add directory groups
     if directory_groups:
-        client.watchlists.v1.add_directory_groups(
+        client.watchlists.v2.add_directory_groups(
             watchlist, [i.strip() for i in directory_groups.split(",")]
         )
         console.print(
@@ -409,23 +450,25 @@ def add(
 @watchlists.command(cls=IncydrCommand)
 @watchlist_arg
 @click.option(
-    "--users",
+    "--actors",
     default=None,
     type=FileOrString(),
-    help="List of included user IDs or usernames to remove from the watchlist. "
-    "An additional lookup is performed if a username is passed.Argument can be "
-    "passed as a comma-delimited string or as a file if prefixed with '@', e.g. '--users @users.csv'. "
-    "File should have a single 'user' field.  File format can either be CSV or JSON Lines format, "
+    help="List of actor IDs or actor names to remove from the watchlist. "
+    "An additional lookup is performed if an actor name is passed. Argument can be "
+    "passed as a comma-delimited string or from a CSV file with a single 'actor' "
+    "column if prefixed with '@', e.g. '--actors @actors.csv'. "
+    "File should have a single 'actor' field.  File format can either be CSV or JSON Lines format, "
     "as specified with the --format option (Default is CSV).",
 )
 @click.option(
-    "--excluded-users",
+    "--excluded-actors",
     default=None,
     type=FileOrString(),
-    help="List of excluded user IDs or usernames to remove from the watchlist. "
-    "An additional lookup is performed if a username is passed. Argument can be "
-    "passed as a comma-delimited string or as a file if prefixed with '@', e.g. '--users @users.csv'. "
-    "File should have a single 'user' field.  File format can either be CSV or JSON Lines format, "
+    help="List of actor IDs or actor names to remove from the watchlist. "
+    "An additional lookup is performed if an actor name is passed. Argument can be "
+    "passed as a comma-delimited string or from a CSV file with a single 'actor' "
+    "column if prefixed with '@', e.g. '--excluded-actors @actors.csv'. "
+    "File should have a single 'actor' field.  File format can either be CSV or JSON Lines format, "
     "as specified with the --format option (Default is CSV).",
 )
 @click.option(
@@ -442,14 +485,36 @@ def add(
     "Individual users from the directory groups will be added as watchlist members, where group information comes "
     "from SCIM or User Directory Sync.",
 )
+@click.option(
+    "--users",
+    default=None,
+    type=FileOrString(),
+    help="DEPRECATED. Use --actors instead. List of included user IDs or usernames to remove from the watchlist. "
+    "An additional lookup is performed if a username is passed.Argument can be "
+    "passed as a comma-delimited string or as a file if prefixed with '@', e.g. '--users @users.csv'. "
+    "File should have a single 'user' field.  File format can either be CSV or JSON Lines format, "
+    "as specified with the --format option (Default is CSV).",
+)
+@click.option(
+    "--excluded-users",
+    default=None,
+    type=FileOrString(),
+    help="DEPRECATED. Use --excluded-actors instead. List of excluded user IDs or usernames to remove from the watchlist. "
+    "An additional lookup is performed if a username is passed. Argument can be "
+    "passed as a comma-delimited string or as a file if prefixed with '@', e.g. '--users @users.csv'. "
+    "File should have a single 'user' field.  File format can either be CSV or JSON Lines format, "
+    "as specified with the --format option (Default is CSV).",
+)
 @input_format_option
 @logging_options
 def remove(
     watchlist: str,
-    users=None,
-    excluded_users=None,
+    actors=None,
+    excluded_actors=None,
     departments=None,
     directory_groups=None,
+    users=None,
+    excluded_users=None,
     format_=None,
 ):
     """
@@ -470,81 +535,90 @@ def remove(
     """
     client = Client()
 
+    if users and not actors:
+        actors = users
+    if excluded_users and not excluded_actors:
+        excluded_actors = excluded_users
+
     # Remove included users
-    if users:
-        user_ids, errors = _get_user_ids(client, users, format_=format_)
+    if actors:
+        actor_ids, errors = _get_actor_ids(client, actors, format_=format_)
         succeeded = 0
-        for chunk in chunked(user_ids, size=100):
+        for chunk in chunked(actor_ids, size=100):
             try:
-                client.watchlists.v1.remove_included_users(watchlist, chunk)
+                client.watchlists.v2.remove_included_actors(watchlist, chunk)
                 console.print(
-                    f"Successfully removed {len(chunk)} included users on watchlist with ID: '{watchlist}'"
+                    f"Successfully removed {len(chunk)} included actors on watchlist with ID: '{watchlist}'"
                 )
                 succeeded += len(chunk)
             except requests.HTTPError as err:
-                if "User not found" in err.response.text:
+                if "Actor not found" in err.response.text:
                     console.print(
-                        "Problem processing batch of users, will attempt each individually."
+                        "Problem processing batch of actors, will attempt each individually."
                     )
                     chunk_succeeded = 0
-                    for user in chunk:
+                    for actor in chunk:
                         try:
-                            client.watchlists.v1.remove_included_users(watchlist, user)
+                            client.watchlists.v2.remove_included_actors(
+                                watchlist, actor
+                            )
                             succeeded += 1
                             chunk_succeeded += 1
                         except requests.HTTPError as err:
                             client.settings.logger.error(
-                                f"Problem removing userId={user} from watchlist={watchlist}: {err.response.text}"
+                                f"Problem removing actorId={actor} from watchlist={watchlist}: {err.response.text}"
                             )
-                            errors.append(user)
+                            errors.append(actor)
                     console.print(
-                        f"Successfully removed {chunk_succeeded} users from watchlist with ID: '{watchlist}'"
+                        f"Successfully removed {chunk_succeeded} actors from watchlist with ID: '{watchlist}'"
                     )
                 else:
                     raise err
         if errors:
-            console.print("[red]The following usernames/user IDs were not found:")
+            console.print("[red]The following actornames/actor IDs were not found:")
             console.print("\t" + "\n\t".join(errors))
 
     # Remove excluded users
-    if excluded_users:
-        user_ids, errors = _get_user_ids(client, excluded_users, format_=format_)
+    if excluded_actors:
+        actor_ids, errors = _get_actor_ids(client, excluded_actors, format_=format_)
         succeeded = 0
-        for chunk in chunked(user_ids, size=100):
+        for chunk in chunked(actor_ids, size=100):
             try:
-                client.watchlists.v1.remove_excluded_users(watchlist, chunk)
+                client.watchlists.v2.remove_excluded_actors(watchlist, chunk)
                 console.print(
-                    f"Successfully removed {len(chunk)} excluded users from watchlist with ID: '{watchlist}'"
+                    f"Successfully removed {len(chunk)} excluded actors from watchlist with ID: '{watchlist}'"
                 )
                 succeeded += len(chunk)
             except requests.HTTPError as err:
                 if "User not found" in err.response.text:
                     console.print(
-                        "Problem processing batch of users, will attempt each individually."
+                        "Problem processing batch of actors, will attempt each individually."
                     )
                     chunk_succeeded = 0
-                    for user in chunk:
+                    for actor in chunk:
                         try:
-                            client.watchlists.v1.remove_excluded_users(watchlist, user)
+                            client.watchlists.v2.remove_excluded_actors(
+                                watchlist, actor
+                            )
                             succeeded += 1
                             chunk_succeeded += 1
                         except requests.HTTPError as err:
                             client.settings.logger.error(
-                                f"Problem removing excluded userId={user} from watchlist={watchlist}: {err.response.text}"
+                                f"Problem removing excluded actorId={actor} from watchlist={watchlist}: {err.response.text}"
                             )
-                            errors.append(user)
+                            errors.append(actor)
                     console.print(
-                        f"Successfully removed {chunk_succeeded} excluded users from watchlist with ID: '{watchlist}'"
+                        f"Successfully removed {chunk_succeeded} excluded actors from watchlist with ID: '{watchlist}'"
                     )
                 else:
                     raise err
             if errors:
-                console.print("[red]The following usernames/user IDs were not found:")
+                console.print("[red]The following actornames/actor IDs were not found:")
                 console.print("\t" + "\n\t".join(errors))
 
     # Remove departments
     if departments:
-        client.watchlists.v1.remove_departments(
+        client.watchlists.v2.remove_departments(
             watchlist, [i.strip() for i in departments.split(",")]
         )
         console.print(
@@ -553,7 +627,7 @@ def remove(
 
     # Remove directory groups
     if directory_groups:
-        client.watchlists.v1.remove_directory_groups(
+        client.watchlists.v2.remove_directory_groups(
             watchlist, [i.strip() for i in directory_groups.split(",")]
         )
         console.print(
@@ -580,8 +654,8 @@ def list_members(
     `CUSTOM` watchlists must be specified by title or ID.
     """
     client = Client()
-    members = client.watchlists.v1.list_members(watchlist)
-    _output_results(members.watchlist_members, WatchlistUser, format_, columns)
+    members = client.watchlists.v2.list_members(watchlist)
+    _output_results(members.watchlist_members, WatchlistActor, format_, columns)
 
 
 @watchlists.command(cls=IncydrCommand)
@@ -589,20 +663,20 @@ def list_members(
 @table_format_option
 @columns_option
 @logging_options
-def list_included_users(
+def list_included_actors(
     watchlist: str,
     format_: str,
     columns: Optional[str],
 ):
     """
-    List users explicitly included on a watchlist.
+    List actors explicitly included on a watchlist.
 
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
     """
     client = Client()
-    users = client.watchlists.v1.list_included_users(watchlist)
-    _output_results(users.included_users, WatchlistUser, format_, columns)
+    users = client.watchlists.v2.list_included_actors(watchlist)
+    _output_results(users.included_actors, WatchlistActor, format_, columns)
 
 
 @watchlists.command(cls=IncydrCommand)
@@ -610,20 +684,20 @@ def list_included_users(
 @table_format_option
 @columns_option
 @logging_options
-def list_excluded_users(
+def list_excluded_actors(
     watchlist: str,
     format_: TableFormat,
     columns: Optional[str],
 ):
     """
-    List users excluded from a watchlist.
+    List actors excluded from a watchlist.
 
     WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
     `CUSTOM` watchlists must be specified by title or ID.
     """
     client = Client()
-    users = client.watchlists.v1.list_excluded_users(watchlist)
-    _output_results(users.excluded_users, WatchlistUser, format_, columns)
+    users = client.watchlists.v2.list_excluded_actors(watchlist)
+    _output_results(users.excluded_actors, WatchlistActor, format_, columns)
 
 
 @watchlists.command(cls=IncydrCommand)
@@ -643,7 +717,7 @@ def list_directory_groups(
     `CUSTOM` watchlists must be specified by title or ID.
     """
     client = Client()
-    groups = client.watchlists.v1.list_directory_groups(watchlist)
+    groups = client.watchlists.v2.list_directory_groups(watchlist)
     _output_results(
         groups.included_directory_groups, IncludedDirectoryGroup, format_, columns
     )
@@ -666,38 +740,38 @@ def list_departments(
     `CUSTOM` watchlists must be specified by title or ID.
     """
     client = Client()
-    deps = client.watchlists.v1.list_departments(watchlist)
+    deps = client.watchlists.v2.list_departments(watchlist)
     _output_results(deps.included_departments, IncludedDepartment, format_, columns)
 
 
-def _get_user_ids(client, users, format_=None):
+def _get_actor_ids(client, actors, format_=None):
     ids, errors = [], []
-    if isinstance(users, str):
-        for user in users.split(","):
+    if isinstance(actors, str):
+        for actor in actors.split(","):
             try:
-                user_id = user_lookup(client, user)
-                ids.append(user_id)
+                actor = actor_lookup(client, actor)
+                ids.append(actor)
             except ValueError:
                 client.settings.logger.error(
-                    f"Problem looking up userId for username: {user}"
+                    f"Problem looking up actorId for actor name: {actor}"
                 )
-                errors.append(user)
+                errors.append(actor)
     else:
         if format_ == "csv":
-            users = UserCSV.parse_csv(users)
+            actors = UserCSV.parse_csv(actors)
         else:
-            users = UserJSON.parse_json_lines(users)
+            actors = UserJSON.parse_json_lines(actors)
         for row in track(
-            users,
-            description="Reading users...",
+            actors,
+            description="Reading actors...",
             transient=True,
         ):
             try:
-                user_id = user_lookup(client, row.user)
-                ids.append(user_id)
+                actor_id = actor_lookup(client, row.user)
+                ids.append(actor_id)
             except ValueError:
                 client.settings.logger.error(
-                    f"Problem looking up userId for username: {row.user}"
+                    f"Problem looking up actorId for actor name: {row.user}"
                 )
                 errors.append(row.user)
     return ids, errors
@@ -714,3 +788,51 @@ def _output_results(results, model, format_, columns=None):
     else:
         for item in results:
             console.print(item.json(), highlight=False)
+
+
+# ---------- Deprecated 2025-03 ----------
+
+
+@watchlists.command(cls=IncydrCommand)
+@watchlist_arg
+@table_format_option
+@columns_option
+@logging_options
+def list_included_users(
+    watchlist: str,
+    format_: str,
+    columns: Optional[str],
+):
+    """
+    DEPRECATED. List users explicitly included on a watchlist.
+
+    WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
+    `CUSTOM` watchlists must be specified by title or ID.
+    """
+    deprecation_warning("DEPRECATED. Use list_included_actors instead.")
+    client = Client()
+    users = client.watchlists.v1.list_included_users(watchlist)
+    _output_results(users.included_users, WatchlistUser, format_, columns)
+
+
+@watchlists.command(cls=IncydrCommand)
+@watchlist_arg
+@table_format_option
+@columns_option
+@logging_options
+def list_excluded_users(
+    watchlist: str,
+    format_: TableFormat,
+    columns: Optional[str],
+):
+    """
+    DEPRECATED. List users excluded from a watchlist.
+
+    WATCHLIST can be specified by watchlist type (ex: `DEPARTING_EMPLOYEE`) or ID.
+    `CUSTOM` watchlists must be specified by title or ID.
+    """
+    deprecation_warning("DEPRECATED. Use list_excluded_actors instead.")
+
+    client = Client()
+    users = client.watchlists.v1.list_excluded_users(watchlist)
+    _output_results(users.excluded_users, WatchlistUser, format_, columns)

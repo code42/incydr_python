@@ -131,7 +131,9 @@ class ExcludedActorsList(ResponseModel):
     * **total_count**: `int`
     """
 
-    excluded_users: Optional[List[WatchlistActor]] = Field(None, alias="excludedActors")
+    excluded_actors: Optional[List[WatchlistActor]] = Field(
+        None, alias="excludedActors"
+    )
     total_count: Optional[int] = Field(
         None,
         description="The total count of all excluded actors.",
