@@ -9,6 +9,7 @@ from _incydr_cli.cmds.options.output_options import single_format_option
 from _incydr_cli.cmds.options.output_options import SingleFormat
 from _incydr_cli.cmds.options.output_options import table_format_option
 from _incydr_cli.cmds.options.output_options import TableFormat
+from _incydr_cli.cmds.utils import deprecation_warning
 from _incydr_cli.core import IncydrCommand
 from _incydr_cli.core import IncydrGroup
 from _incydr_sdk.core.client import Client
@@ -16,10 +17,15 @@ from _incydr_sdk.devices.models import Device
 from _incydr_sdk.utils import model_as_card
 
 
+# Deprecated 2025-03
+DEPRECATION_TEXT = "DeprecationWarning: Devices commands are deprecated. Use the 'incydr agents' command group instead."
+
+
 @click.group(cls=IncydrGroup)
 @logging_options
 def devices():
-    """View devices."""
+    """DEPRECATED. Use the agents command group instead. View devices."""
+    deprecation_warning(DEPRECATION_TEXT)
 
 
 @devices.command("list", cls=IncydrCommand)

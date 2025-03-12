@@ -1,5 +1,6 @@
 from itertools import count
 from typing import Iterator
+from warnings import warn
 
 from .models import Device
 from .models import DevicesPage
@@ -23,6 +24,8 @@ class DevicesClient:
 class DevicesV1:
     """Client for `/v1/devices` endpoints.
 
+    This client is deprecated. Use the Agents client instead.
+
     Usage example:
 
         >>> import incydr
@@ -43,6 +46,11 @@ class DevicesV1:
         **Returns**: A [`Device`][device-model] object representing the device.
 
         """
+        warn(
+            "Devices endpoints are deprecated. Replaced by Agents.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         response = self._parent.session.get(f"/v1/devices/{device_id}")
         return Device.parse_response(response)
 
@@ -71,6 +79,11 @@ class DevicesV1:
 
         **Returns**: A ['DevicesPage'][devicespage-model] object.
         """
+        warn(
+            "Devices endpoints are deprecated. Replaced by Agents.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         page_size = page_size or self._parent.settings.page_size
         data = QueryDevicesRequest(
             page=page_num,
@@ -98,6 +111,11 @@ class DevicesV1:
 
         **Returns**: A generator yielding individual [`Device`][device-model] objects.
         """
+        warn(
+            "Devices endpoints are deprecated. Replaced by Agents.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         page_size = page_size or self._parent.settings.page_size
         for page_num in count(1):
             page = self.get_page(

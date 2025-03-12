@@ -47,7 +47,7 @@ DEPRECATION_TEXT = "DeprecationWarning: Alerts commands are deprecated. Use the 
 @click.group(cls=IncydrGroup)
 @logging_options
 def alerts():
-    """View and manage alerts."""
+    """DEPRECATED. Use the Sessions command group instead. View and manage alerts."""
     deprecation_warning(DEPRECATION_TEXT)
 
 
