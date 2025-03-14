@@ -654,8 +654,8 @@ def list_members(
     `CUSTOM` watchlists must be specified by title or ID.
     """
     client = Client()
-    members = client.watchlists.v2.list_members(watchlist)
-    _output_results(members.watchlist_members, WatchlistActor, format_, columns)
+    members = list(client.watchlists.v2.iter_all_members(watchlist))
+    _output_results(members, WatchlistActor, format_, columns)
 
 
 @watchlists.command(cls=IncydrCommand)
@@ -675,8 +675,8 @@ def list_included_actors(
     `CUSTOM` watchlists must be specified by title or ID.
     """
     client = Client()
-    users = client.watchlists.v2.list_included_actors(watchlist)
-    _output_results(users.included_actors, WatchlistActor, format_, columns)
+    users = list(client.watchlists.v2.iter_all_included_actors(watchlist))
+    _output_results(users, WatchlistActor, format_, columns)
 
 
 @watchlists.command(cls=IncydrCommand)
@@ -696,8 +696,8 @@ def list_excluded_actors(
     `CUSTOM` watchlists must be specified by title or ID.
     """
     client = Client()
-    users = client.watchlists.v2.list_excluded_actors(watchlist)
-    _output_results(users.excluded_actors, WatchlistActor, format_, columns)
+    users = list(client.watchlists.v2.iter_all_excluded_actors(watchlist))
+    _output_results(users, WatchlistActor, format_, columns)
 
 
 @watchlists.command(cls=IncydrCommand)
@@ -717,9 +717,9 @@ def list_directory_groups(
     `CUSTOM` watchlists must be specified by title or ID.
     """
     client = Client()
-    groups = client.watchlists.v2.list_directory_groups(watchlist)
+    groups = list(client.watchlists.v2.iter_all_directory_groups(watchlist))
     _output_results(
-        groups.included_directory_groups, IncludedDirectoryGroup, format_, columns
+        groups, IncludedDirectoryGroup, format_, columns
     )
 
 
@@ -740,8 +740,8 @@ def list_departments(
     `CUSTOM` watchlists must be specified by title or ID.
     """
     client = Client()
-    deps = client.watchlists.v2.list_departments(watchlist)
-    _output_results(deps.included_departments, IncludedDepartment, format_, columns)
+    deps = list(client.watchlists.v2.iter_all_departments(watchlist))
+    _output_results(deps, IncludedDepartment, format_, columns)
 
 
 def _get_actor_ids(client, actors, format_=None):

@@ -254,7 +254,7 @@ def mock_get_all_departments(httpserver_auth: HTTPServer):
 @pytest.fixture
 def mock_get_all_departments_v2(httpserver_auth: HTTPServer):
     data = {
-        "includedDepartments": [TEST_DEPARTMENT_1, TEST_DEPARTMENT_2],
+        "included_departments": [TEST_DEPARTMENT_1, TEST_DEPARTMENT_2],
         "totalCount": 2,
     }
     httpserver_auth.expect_request(
