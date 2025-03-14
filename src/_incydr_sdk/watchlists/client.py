@@ -203,7 +203,10 @@ class WatchlistsV2:
         return WatchlistActor.parse_response(response)
 
     def list_members(
-        self, watchlist_id: Union[str, WatchlistType], page_num: int = None, page_size: int = None
+        self,
+        watchlist_id: Union[str, WatchlistType],
+        page_num: int = None,
+        page_size: int = None,
     ) -> WatchlistMembersListV2:
         """
         Get a list of all members of a watchlist. These actors may have been added as an included actor, or are members of an included department, etc.
@@ -212,16 +215,19 @@ class WatchlistsV2:
 
         * **watchlist_id**: `str`(required) - Watchlist ID.
         * **page_num**: `int` (optional) - The page number to fetch, starting at 1.
-        * **page_size**: `int` (optional) - Max number of results to return for a page. 
+        * **page_size**: `int` (optional) - Max number of results to return for a page.
 
         **Returns**: A [`WatchlistMembersListV2`][watchlistmemberslistv2-model] object.
         """
         page_size = page_size or self._parent.settings.page_size
-        response = self._parent.session.get(f"{self._uri}/{watchlist_id}/members", params = {"page": page_num, "page_size": page_size})
+        response = self._parent.session.get(
+            f"{self._uri}/{watchlist_id}/members",
+            params={"page": page_num, "page_size": page_size},
+        )
         return WatchlistMembersListV2.parse_response(response)
-    
+
     def iter_all_members(
-            self, watchlist_id: Union[str, WatchlistType], page_size: int = None
+        self, watchlist_id: Union[str, WatchlistType], page_size: int = None
     ) -> Iterator[WatchlistActor]:
         """
         Iterate over all members of a watchlist. These actors may have been added as an included actor, or are members of an included department, etc.
@@ -238,7 +244,6 @@ class WatchlistsV2:
             yield from page.watchlist_members
             if len(page.watchlist_members) < page_size:
                 break
-
 
     def add_included_actors(self, watchlist_id: str, actor_ids: Union[str, List[str]]):
         """
@@ -299,7 +304,9 @@ class WatchlistsV2:
         )
         return WatchlistActor.parse_response(response)
 
-    def list_included_actors(self, watchlist_id: str, page_num: int = None, page_size: int = None) -> IncludedActorsList:
+    def list_included_actors(
+        self, watchlist_id: str, page_num: int = None, page_size: int = None
+    ) -> IncludedActorsList:
         """
         List individual actors included on a watchlist.
 
@@ -307,18 +314,19 @@ class WatchlistsV2:
 
         * **watchlist_id**: `str` (required) - Watchlist ID.
         * **page_num**: `int` (optional) - The page number to fetch, starting at 1.
-        * **page_size**: `int` (optional) - Max number of results to return for a page. 
+        * **page_size**: `int` (optional) - Max number of results to return for a page.
 
         **Returns**: An [`IncludedActorsList`][includedactorslist-model] object.
         """
         page_size = page_size or self._parent.settings.page_size
         response = self._parent.session.get(
-            url=f"{self._uri}/{watchlist_id}/included-actors", params = {"page": page_num, "page_size": page_size}
+            url=f"{self._uri}/{watchlist_id}/included-actors",
+            params={"page": page_num, "page_size": page_size},
         )
         return IncludedActorsList.parse_response(response)
-    
+
     def iter_all_included_actors(
-            self, watchlist_id: str, page_size: int = None
+        self, watchlist_id: str, page_size: int = None
     ) -> Iterator[WatchlistActor]:
         """
         Iterate over all individual actors included on a watchlist.
@@ -330,13 +338,11 @@ class WatchlistsV2:
         page_size = page_size or self._parent.settings.page_size
         for page_num in count(1):
             page = self.list_included_actors(
-                watchlist_id = watchlist_id,
-                page_num=page_num, page_size=page_size
+                watchlist_id=watchlist_id, page_num=page_num, page_size=page_size
             )
             yield from page.included_actors
             if len(page.included_actors) < page_size:
                 break
-
 
     def add_excluded_actors(self, watchlist_id: str, actor_ids: Union[str, List[str]]):
         """
@@ -378,13 +384,15 @@ class WatchlistsV2:
             url=f"{self._uri}/{watchlist_id}/excluded-actors/delete", json=data.dict()
         )
 
-    def list_excluded_actors(self, watchlist_id: str, page_num: int = None, page_size: int = None) -> ExcludedActorsList:
+    def list_excluded_actors(
+        self, watchlist_id: str, page_num: int = None, page_size: int = None
+    ) -> ExcludedActorsList:
         """
         List individual actors excluded from a watchlist.
 
         * **watchlist_id**: `str` (required) - Watchlist ID.
         * **page_num**: `int` (optional) - The page number to fetch, starting at 1.
-        * **page_size**: `int` (optional) - Max number of results to return for a page. 
+        * **page_size**: `int` (optional) - Max number of results to return for a page.
 
 
         **Returns**: An [`ExcludedActorsList`][excludedactorslist-model] object.
@@ -392,11 +400,13 @@ class WatchlistsV2:
         page_size = page_size or self._parent.settings.page_size
         response = self._parent.session.get(
             f"{self._uri}/{watchlist_id}/excluded-actors",
-            params={"page": page_num, "page_size": page_size}
+            params={"page": page_num, "page_size": page_size},
         )
         return ExcludedActorsList.parse_response(response)
-    
-    def iter_all_excluded_actors(self, watchlist_id: str, page_size: int = None) -> Iterator[WatchlistActor]:
+
+    def iter_all_excluded_actors(
+        self, watchlist_id: str, page_size: int = None
+    ) -> Iterator[WatchlistActor]:
         """
         Iterate over all individual actors excluded from a watchlist.
 
@@ -469,7 +479,9 @@ class WatchlistsV2:
             json=data.dict(),
         )
 
-    def list_directory_groups(self, watchlist_id: str, page_num: int = None, page_size: int = None) -> IncludedDirectoryGroupsList:
+    def list_directory_groups(
+        self, watchlist_id: str, page_num: int = None, page_size: int = None
+    ) -> IncludedDirectoryGroupsList:
         """
         List directory groups included on a watchlist.
 
@@ -477,18 +489,20 @@ class WatchlistsV2:
 
         * **watchlist_id**: `str` (required) - Watchlist ID.
         * **page_num**: `int` (optional) - The page number to fetch, starting at 1.
-        * **page_size**: `int` (optional) - Max number of results to return for a page. 
+        * **page_size**: `int` (optional) - Max number of results to return for a page.
 
         **Returns**: An [`IncludedDirectoryGroupsList`][includeddirectorygroupslist-model] object.
         """
         page_size = page_size or self._parent.settings.page_size
         response = self._parent.session.get(
             f"{self._uri}/{watchlist_id}/included-directory-groups",
-            params={"page": page_num, "page_size": page_size}
+            params={"page": page_num, "page_size": page_size},
         )
         return IncludedDirectoryGroupsList.parse_response(response)
-    
-    def iter_all_directory_groups(self, watchlist_id: str, page_size: int = None) -> Iterator[IncludedDirectoryGroup]:
+
+    def iter_all_directory_groups(
+        self, watchlist_id: str, page_size: int = None
+    ) -> Iterator[IncludedDirectoryGroup]:
         """
         Iterate over all directory groups included on a watchlist.
 
@@ -504,7 +518,6 @@ class WatchlistsV2:
             yield from page.included_directory_groups
             if len(page.included_directory_groups) < page_size:
                 break
-
 
     def get_directory_group(
         self, watchlist_id: str, group_id: str
@@ -570,7 +583,9 @@ class WatchlistsV2:
             json=data.dict(),
         )
 
-    def list_departments(self, watchlist_id: str, page_num: int = None, page_size: int = None) -> IncludedDepartmentsList:
+    def list_departments(
+        self, watchlist_id: str, page_num: int = None, page_size: int = None
+    ) -> IncludedDepartmentsList:
         """
         List departments included on a watchlist.
 
@@ -584,18 +599,20 @@ class WatchlistsV2:
         """
         response = self._parent.session.get(
             f"{self._uri}/{watchlist_id}/included-departments",
-            params={"page": page_num, "page_size": page_size}
+            params={"page": page_num, "page_size": page_size},
         )
         return IncludedDepartmentsList.parse_response(response)
-    
-    def iter_all_departments(self, watchlist_id: str, page_size: int = None) -> Iterator[IncludedDepartment]:
+
+    def iter_all_departments(
+        self, watchlist_id: str, page_size: int = None
+    ) -> Iterator[IncludedDepartment]:
         """
         Iterate over all departments included on a watchlist.
 
         Accepts the same parameters as `.list_departments()` excepting `page_num`.
 
         **Returns**: A generator yielding individual [`IncludedDepartment`][includeddepartment-model] objects.
-       
+
         """
         page_size = page_size or self._parent.settings.page_size
         for page_num in count(1):
@@ -605,7 +622,6 @@ class WatchlistsV2:
             yield from page.included_departments
             if len(page.included_departments) < page_size:
                 break
-
 
     def get_department(self, watchlist_id: str, department: str) -> IncludedDepartment:
         """

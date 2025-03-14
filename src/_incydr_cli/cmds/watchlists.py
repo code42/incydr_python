@@ -718,9 +718,7 @@ def list_directory_groups(
     """
     client = Client()
     groups = list(client.watchlists.v2.iter_all_directory_groups(watchlist))
-    _output_results(
-        groups, IncludedDirectoryGroup, format_, columns
-    )
+    _output_results(groups, IncludedDirectoryGroup, format_, columns)
 
 
 @watchlists.command(cls=IncydrCommand)
