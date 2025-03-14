@@ -1,5 +1,6 @@
 import click
 
+from _incydr_cli.cmds.utils import actor_lookup
 from _incydr_cli.cmds.utils import user_lookup
 from _incydr_sdk.core.client import Client
 
@@ -20,4 +21,13 @@ def user_lookup_callback(ctx, param, value):
     # only call user_lookup if username to prevent unnecessary client inits with obj()
     if "@" in str(value):
         return user_lookup(Client(), value)
+    return value
+
+
+def actor_lookup_callback(ctx, param, value):
+    if not value:
+        return
+    # only call user_lookup if username to prevent unnecessary client inits with obj()
+    if "@" in str(value):
+        return actor_lookup(Client(), value)
     return value

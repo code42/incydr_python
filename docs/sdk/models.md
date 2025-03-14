@@ -124,7 +124,10 @@ Alerts has been replaced by [Sessions](#sessions).
 ::: incydr.models.DepartmentsPage
     :docstring:
 
-## Devices
+## Devices (Deprecated)
+
+Devices has been replaced by [Agents](#agents).
+
 ---
 
 ### `Device` model
@@ -220,7 +223,10 @@ Alerts has been replaced by [Sessions](#sessions).
 :::incydr.models.Role
     :docstring:
 
-## Risk Profiles
+## Risk Profiles (Deprecated)
+
+Risk Profiles have been replaced by [Actors](#actors).
+
 ---
 
 ### `RiskProfile` model

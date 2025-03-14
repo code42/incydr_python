@@ -124,7 +124,9 @@ Alerts has been replaced by [Sessions](#sessions).
 * **CLOSED**: `"CLOSED"`
 * **OPEN**: `"OPEN"`
 
-## Devices
+## Devices (Deprecated)
+
+Devices has been replaced by [Agents](#agents)
 
 ### Devices Sort Keys
 

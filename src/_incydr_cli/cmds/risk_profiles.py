@@ -29,7 +29,7 @@ DEPRECATION_TEXT = "DeprecationWarning: Risk Profile commands are deprecated. Us
 @click.group(cls=IncydrGroup)
 @logging_options
 def risk_profiles():
-    """View and manage risk profiles."""
+    """DEPRECATED. Use the Actors command group instead. View and manage risk profiles."""
     deprecation_warning(DEPRECATION_TEXT)
 
 

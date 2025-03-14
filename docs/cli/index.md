@@ -28,15 +28,18 @@ The following subcommand groups are available under the `incydr` command:
 * [Actors](cmds/actors.md)
 * [Agents](cmds/agents.md)
 * [Alert Rules](cmds/alert_rules.md)
-* [Alerts (Deprecated)](cmds/alerts.md)
 * [Audit Log](cmds/audit_log.md)
 * [Cases](cmds/cases.md)
 * [Departments](cmds/departments.md)
-* [Devices](cmds/devices.md)
 * [Directory Groups](cmds/directory_groups.md)
 * [File Events](cmds/file_events.md)
-* [Risk Profiles](cmds/risk_profiles.md)
 * [Sessions](cmds/sessions.md)
 * [Trusted Activities](cmds/trusted_activities.md)
 * [Users](cmds/users.md)
 * [Watchlists](cmds/watchlists.md)
+
+Deprecated command groups:
+
+* [Alerts (Deprecated)](cmds/alerts.md)
+* [Devices (Deprecated)](cmds/devices.md)
+* [Risk Profiles (Deprecated)](cmds/risk_profiles.md)

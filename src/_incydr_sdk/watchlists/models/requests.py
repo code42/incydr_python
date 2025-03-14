@@ -17,6 +17,14 @@ class UpdateExcludedUsersRequest(BaseModel):
     )
 
 
+class UpdateExcludedActorsRequest(BaseModel):
+    actorIds: Optional[List[str]] = Field(
+        None,
+        description="A list of actor IDs to add or remove.",
+        max_items=100,
+    )
+
+
 class UpdateIncludedDepartmentsRequest(BaseModel):
     departments: Optional[List[str]] = Field(
         None, description="A list of departments to add or remove."
@@ -33,6 +41,17 @@ class UpdateIncludedUsersRequest(BaseModel):
     userIds: Optional[List[str]] = Field(
         None,
         description="A list of user IDs to add or remove.",
+        max_items=100,
+    )
+    watchlistId: Optional[str] = Field(
+        None, description="A unique watchlist ID.", example="123"
+    )
+
+
+class UpdateIncludedActorsRequest(BaseModel):
+    actorIds: Optional[List[str]] = Field(
+        None,
+        description="A list of actor IDs to add or remove.",
         max_items=100,
     )
     watchlistId: Optional[str] = Field(
@@ -61,6 +80,12 @@ class ListWatchlistsRequest(BaseModel):
     page: int = 1
     pageSize: int = 100
     userId: Optional[str]
+
+
+class ListWatchlistsRequestV2(BaseModel):
+    page: int = 1
+    pageSize: int = 100
+    actorId: Optional[str]
 
 
 class UpdateWatchlistRequest(BaseModel):

@@ -8,6 +8,8 @@ import click
 from click import echo
 from click import style
 
+from _incydr_sdk.actors.client import ActorNotFoundError
+
 
 def deprecation_warning(text):
     echo(style(text, fg="red"), err=True)
@@ -25,6 +27,22 @@ def user_lookup(client, value):
         if len(users) < 1:
             raise ValueError(f"User with username '{value}' not found.")
         return users[0].user_id
+        # else return ID
+    return value
+
+
+def actor_lookup(client, value):
+    """
+    Returns the actor ID for a given actor name, or returns the value unchanged if not a username.
+
+    Used with the `actor_lookup_callback` method on user args.
+    """
+    if "@" in str(value):
+        # assume username/email was passed
+        try:
+            return client.actors.v1.get_actor_by_name(value).actor_id
+        except ActorNotFoundError:
+            raise ValueError(f"User with username '{value}' not found.")
         # else return ID
     return value
 

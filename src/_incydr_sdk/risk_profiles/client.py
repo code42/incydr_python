@@ -29,6 +29,8 @@ class RiskProfilesV1:
     """
     Client for `/v1/user-risk-profiles` endpoints.
 
+    This client is deprecated. Use the Actors client instead.
+
     Usage example:
 
         >>> import incydr

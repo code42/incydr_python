@@ -22,6 +22,8 @@ class AlertsV1:
     """
     Client for `/v1/alerts` endpoints.
 
+    This client is deprecated. Use the Sessions client instead.
+
     Usage example:
 
         >>> import incydr
