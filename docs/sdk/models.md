@@ -252,22 +252,50 @@ Risk Profiles have been replaced by [Actors](#actors).
 ::: incydr.models.WatchlistsPage
     :docstring:
 
+### `WatchlistActor` model
+
+::: incydr.models.WatchlistActor
+    :docstring:
+
 ### `WatchlistUser` model
+
+WatchlistUser is deprecated. Use WatchlistActor instead.
 
 ::: incydr.models.WatchlistUser
     :docstring:
 
+### `WatchlistMembersListV2` model
+
+::: incydr.models.WatchlistMembersListV2
+    :docstring:
+
 ### `WatchlistMembersList` model
+
+WatchlistMembersList is deprecated. Use WatchlistMembersListV2 instead.
 
 ::: incydr.models.WatchlistMembersList
     :docstring:
 
+### `IncludedActorsList` model
+
+::: incydr.models.IncludedActorsList
+    :docstring:
+
+### `ExcludedActorsList` model
+
+::: incydr.models.ExcludedActorsList
+    :docstring:
+
 ### `IncludedUsersList` model
+
+IncludedUsersList is deprecated. Use IncludedActorsList instead.
 
 ::: incydr.models.IncludedUsersList
     :docstring:
 
 ### `ExcludedUsersList` model
+
+ExcludedUsersList is deprecated. Use ExcludedActorsList instead.
 
 ::: incydr.models.ExcludedUsersList
     :docstring:

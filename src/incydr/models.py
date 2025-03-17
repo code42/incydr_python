@@ -33,16 +33,21 @@ from _incydr_sdk.users.models import Role
 from _incydr_sdk.users.models import UpdateRolesResponse
 from _incydr_sdk.users.models import UserRole
 from _incydr_sdk.users.models import UsersPage
+from _incydr_sdk.watchlists.models.responses import ExcludedActorsList
 from _incydr_sdk.watchlists.models.responses import ExcludedUsersList
+from _incydr_sdk.watchlists.models.responses import IncludedActorsList
 from _incydr_sdk.watchlists.models.responses import IncludedDepartment
 from _incydr_sdk.watchlists.models.responses import IncludedDepartmentsList
 from _incydr_sdk.watchlists.models.responses import IncludedDirectoryGroup
 from _incydr_sdk.watchlists.models.responses import IncludedDirectoryGroupsList
 from _incydr_sdk.watchlists.models.responses import IncludedUsersList
 from _incydr_sdk.watchlists.models.responses import Watchlist
+from _incydr_sdk.watchlists.models.responses import WatchlistActor
 from _incydr_sdk.watchlists.models.responses import WatchlistMembersList
+from _incydr_sdk.watchlists.models.responses import WatchlistMembersListV2
 from _incydr_sdk.watchlists.models.responses import WatchlistsPage
 from _incydr_sdk.watchlists.models.responses import WatchlistUser
+
 
 __all__ = [
     "Actor",
@@ -79,9 +84,13 @@ __all__ = [
     "DirectoryGroup",
     "Watchlist",
     "WatchlistsPage",
+    "WatchlistMembersListV2",
     "WatchlistMembersList",
+    "IncludedActorsList",
+    "ExcludedActorsList",
     "ExcludedUsersList",
     "IncludedUsersList",
+    "WatchlistActor",
     "WatchlistUser",
     "IncludedDepartmentsList",
     "IncludedDepartment",

@@ -498,7 +498,7 @@ def test_get_member_returns_expected_data_v2(mock_get_member_v2):
     member = c.watchlists.v2.get_member(TEST_WATCHLIST_ID, TEST_ID)
     assert isinstance(member, WatchlistActor)
     assert member.actor_id == TEST_ID
-    assert member.actorname == "foo@bar.com"
+    assert member.actor_name == "foo@bar.com"
     assert member.added_time == datetime.datetime.fromisoformat(
         TEST_ACTOR_1["addedTime"].replace("Z", "+00:00")
     )
@@ -569,7 +569,7 @@ def test_get_included_user_returns_expected_data_v2(mock_get_included_actor):
     user = c.watchlists.v2.get_included_actor(TEST_WATCHLIST_ID, TEST_ID)
     assert isinstance(user, WatchlistActor)
     assert user.actor_id == TEST_ID
-    assert user.actorname == "foo@bar.com"
+    assert user.actor_name == "foo@bar.com"
     assert user.added_time == datetime.datetime.fromisoformat(
         TEST_ACTOR_1["addedTime"].replace("Z", "+00:00")
     )
@@ -619,7 +619,7 @@ def test_get_excluded_user_returns_expected_data_v2(mock_get_excluded_actor):
     user = c.watchlists.v2.get_excluded_actor(TEST_WATCHLIST_ID, TEST_ID)
     assert isinstance(user, WatchlistActor)
     assert user.actor_id == TEST_ID
-    assert user.actorname == "foo@bar.com"
+    assert user.actor_name == "foo@bar.com"
     assert user.added_time == datetime.datetime.fromisoformat(
         TEST_ACTOR_1["addedTime"].replace("Z", "+00:00")
     )

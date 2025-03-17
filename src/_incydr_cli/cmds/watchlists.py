@@ -788,7 +788,7 @@ def _output_results(results, model, format_, columns=None):
             console.print(item.json(), highlight=False)
 
 
-# ---------- Deprecated 2025-03 ----------
+# Deprecated 2025-03. Will be removed 2026-03.
 
 
 @watchlists.command(cls=IncydrCommand)
