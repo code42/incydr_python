@@ -20,6 +20,10 @@
 
 - The CLI's `watchlists` commands now use the v2 watchlist API. These commands correctly use `actor_id` instead of `user_id`. While the previous user_id parameters will still work for now, we recommend that users switch as soon as possible to using actor_id instead.
 
+### Fixed
+
+- A bug where the api endpoint used to download audit log events was incorrect.
+
 ### Deprecated
 
 - Devices methods in the SDK and CLI are deprecated. Use the Agents methods instead.

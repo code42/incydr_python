@@ -166,7 +166,7 @@ def test_download_events_when_default_params_makes_expected_calls(
     }
 
     httpserver_auth.expect_request(
-        "/v1/audit/redeemDownloadToken", query_string=export_event_data
+        "/v1/audit/redeem-download-token", query_string=export_event_data
     ).respond_with_json(redeem_events_data)
 
     client = Client()
@@ -365,7 +365,7 @@ def test_cli_download_makes_expected_call(
     }
 
     httpserver_auth.expect_request(
-        "/v1/audit/redeemDownloadToken", query_string=export_event_data
+        "/v1/audit/redeem-download-token", query_string=export_event_data
     ).respond_with_json(redeem_events_data)
 
     result = runner.invoke(incydr, ["audit-log", "download", "--path", str(tmp_path)])

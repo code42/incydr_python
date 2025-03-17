@@ -244,7 +244,7 @@ class AuditLogV1:
         )
 
         download_response = self._parent.session.get(
-            f"/v1/audit/redeemDownloadToken?downloadToken={export_response.json()['downloadToken']}"
+            f"/v1/audit/redeem-download-token?downloadToken={export_response.json()['downloadToken']}"
         )
 
         filename = get_filename_from_content_disposition(
