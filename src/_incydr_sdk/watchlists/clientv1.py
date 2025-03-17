@@ -26,6 +26,7 @@ from _incydr_sdk.watchlists.models.responses import WatchlistUser
 
 # This client is deprecated 2025-03. It will be removed 2026-03.
 
+
 class WatchlistsV1:
     """
     Client for `/v1/watchlists` endpoints.
