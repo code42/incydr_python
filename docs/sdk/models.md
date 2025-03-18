@@ -124,7 +124,10 @@ Alerts has been replaced by [Sessions](#sessions).
 ::: incydr.models.DepartmentsPage
     :docstring:
 
-## Devices
+## Devices (Deprecated)
+
+Devices has been replaced by [Agents](#agents).
+
 ---
 
 ### `Device` model
@@ -220,7 +223,10 @@ Alerts has been replaced by [Sessions](#sessions).
 :::incydr.models.Role
     :docstring:
 
-## Risk Profiles
+## Risk Profiles (Deprecated)
+
+Risk Profiles have been replaced by [Actors](#actors).
+
 ---
 
 ### `RiskProfile` model
@@ -246,22 +252,50 @@ Alerts has been replaced by [Sessions](#sessions).
 ::: incydr.models.WatchlistsPage
     :docstring:
 
+### `WatchlistActor` model
+
+::: incydr.models.WatchlistActor
+    :docstring:
+
 ### `WatchlistUser` model
+
+WatchlistUser is deprecated. Use WatchlistActor instead.
 
 ::: incydr.models.WatchlistUser
     :docstring:
 
+### `WatchlistMembersListV2` model
+
+::: incydr.models.WatchlistMembersListV2
+    :docstring:
+
 ### `WatchlistMembersList` model
+
+WatchlistMembersList is deprecated. Use WatchlistMembersListV2 instead.
 
 ::: incydr.models.WatchlistMembersList
     :docstring:
 
+### `IncludedActorsList` model
+
+::: incydr.models.IncludedActorsList
+    :docstring:
+
+### `ExcludedActorsList` model
+
+::: incydr.models.ExcludedActorsList
+    :docstring:
+
 ### `IncludedUsersList` model
+
+IncludedUsersList is deprecated. Use IncludedActorsList instead.
 
 ::: incydr.models.IncludedUsersList
     :docstring:
 
 ### `ExcludedUsersList` model
+
+ExcludedUsersList is deprecated. Use ExcludedActorsList instead.
 
 ::: incydr.models.ExcludedUsersList
     :docstring:

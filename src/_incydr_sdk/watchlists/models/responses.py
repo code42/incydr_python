@@ -82,6 +82,24 @@ class WatchlistUser(ResponseModel):
     username: Optional[str] = Field(None, example="foo@bar.com")
 
 
+class WatchlistActor(ResponseModel):
+    """
+    A model representing a user whose associated with a watchlist.
+
+    **Fields**:
+
+    * **added_time**: `datetime` - The time the user was associated with the watchlist.
+    * **actor_id**: `str` - Unique actor ID.
+    * **actor_name**: `str - Actor name.
+    """
+
+    added_time: datetime = Field(None, alias="addedTime")
+    actor_id: Optional[str] = Field(
+        None, description="A unique actor ID.", example="23", alias="actorId"
+    )
+    actor_name: Optional[str] = Field(None, example="foo@bar.com", alias="actorname")
+
+
 class ExcludedUsersList(ResponseModel):
     """
     A model representing a list of users excluded from a watchlist.
@@ -97,6 +115,28 @@ class ExcludedUsersList(ResponseModel):
     total_count: Optional[int] = Field(
         None,
         description="The total count of all excluded users.",
+        example=10,
+        alias="totalCount",
+    )
+
+
+class ExcludedActorsList(ResponseModel):
+    """
+    A model representing a list of actors excluded from a watchlist.
+    Excluded actors are those that have been individually excluded from that list.
+
+    **Fields**:
+
+    * **excluded_actors**: `List[WatchlistActor]` - The list of excluded actors.
+    * **total_count**: `int`
+    """
+
+    excluded_actors: Optional[List[WatchlistActor]] = Field(
+        None, alias="excludedActors"
+    )
+    total_count: Optional[int] = Field(
+        None,
+        description="The total count of all excluded actors.",
         example=10,
         alias="totalCount",
     )
@@ -162,6 +202,26 @@ class IncludedUsersList(ResponseModel):
     )
 
 
+class IncludedActorsList(ResponseModel):
+    """
+    A model representing a list of actors included on a watchlist.
+    Included users are those that have been individually included on that list.
+
+    * **included_actors**: `List[WatchlistActor]` - The list of included actors.
+    * **total_count**: `int` - The total count of all included actors.
+    """
+
+    included_actors: Optional[List[WatchlistActor]] = Field(
+        None, alias="includedActors"
+    )
+    total_count: Optional[int] = Field(
+        None,
+        description="The total count of all included actors.",
+        example=10,
+        alias="totalCount",
+    )
+
+
 class WatchlistStats(ResponseModel):
     """
     A model representing stats for a watchlist.
@@ -217,11 +277,35 @@ class WatchlistMembersList(ResponseModel):
 
     total_count: Optional[int] = Field(
         None,
-        description="The total count of all included users..",
+        description="The total count of all included users.",
         example=10,
         alias="totalCount",
     )
     watchlist_members: Optional[List[WatchlistUser]] = Field(
+        None, alias="watchlistMembers"
+    )
+
+
+class WatchlistMembersListV2(ResponseModel):
+    """
+    A model representing a list of watchlist members.
+    Watchlist members are users who are on a list, whether it is because they are individually included,
+    or because they are part of a department or directory group that is included.
+
+
+    **Fields**:
+
+    * **watchlist_members**: `List[WatchlistActor]` - The list of watchlist members.
+    * **total_count**: `int` - Total count of members on the watchlist.
+    """
+
+    total_count: Optional[int] = Field(
+        None,
+        description="The total count of all included actors.",
+        example=10,
+        alias="totalCount",
+    )
+    watchlist_members: Optional[List[WatchlistActor]] = Field(
         None, alias="watchlistMembers"
     )
 
