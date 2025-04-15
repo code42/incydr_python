@@ -27,7 +27,7 @@ class UserJSON(Model):
 
 
 class AgentCSV(CSVModel):
-    agent_id: str = Field(csv_aliases=["agent_id", "agentId", "guid"])
+    agent_id: str = Field(csv_aliases=["agentGuid", "agent_id", "agentId", "guid"])
 
 
 class AgentJSON(Model):
@@ -35,7 +35,10 @@ class AgentJSON(Model):
 
     @root_validator(pre=True)
     def _validate(cls, values):  # noqa
-        if "agent_id" in values:
+        if "agentGuid" in values:
+            values["agent_id"] = values["agentGuid"]
+            return values
+        elif "agent_id" in values:
             return values
         elif "agentId" in values:
             values["agent_id"] = values["agentId"]
@@ -45,5 +48,5 @@ class AgentJSON(Model):
             return values
         else:
             raise ValueError(
-                "A json key of 'agent_id', 'agentId', or 'guid' is required"
+                "A json key of 'agentGuid', 'agent_id', 'agentId', or 'guid' is required"
             )

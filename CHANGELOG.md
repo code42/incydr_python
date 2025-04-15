@@ -9,6 +9,12 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## Unreleased
+
+### Updated
+
+- CSV and JSON input for the CLI's bulk agent commands will now look for `agentGuid` as a column header, in addition to `agent_id`, `agentId`, and `guid`.
+
 ## 2.3.0 - 2025-03-18
 
 ### Added
