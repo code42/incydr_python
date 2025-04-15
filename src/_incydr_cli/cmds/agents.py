@@ -140,7 +140,7 @@ def bulk_activate(file: Path, format_: str):
     Input files require a header (for CSV input) or JSON key for each object (for JSON-LINES input) to identify
     which agent ID to activate.
 
-    Header and JSON key values that are accepted are: agent_id, agentId, or guid
+    Header and JSON key values that are accepted are: agentGuid, agent_id, agentId, or guid
     """
     chunk_size = (
         environ.get("incydr_batch_size") or environ.get("INCYDR_BATCH_SIZE") or 50
@@ -190,7 +190,7 @@ def bulk_deactivate(file: Path, format_: str):
     Input files require a header (for CSV input) or JSON key for each object (for JSON-LINES input) to identify
     which agent ID to deactivate.
 
-    Header and JSON key values that are accepted are: agent_id, agentId, or guid
+    Header and JSON key values that are accepted are: agentGuid, agent_id, agentId, or guid
     """
     chunk_size = (
         environ.get("incydr_batch_size") or environ.get("INCYDR_BATCH_SIZE") or 50
