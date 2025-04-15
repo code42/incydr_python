@@ -36,7 +36,8 @@ class AgentJSON(Model):
     @root_validator(pre=True)
     def _validate(cls, values):  # noqa
         if "agentGuid" in values:
-            return values["agent_id"] = values["agentGuid"]
+            values["agent_id"] = values["agentGuid"]
+            return values
         elif "agent_id" in values:
             return values
         elif "agentId" in values:
