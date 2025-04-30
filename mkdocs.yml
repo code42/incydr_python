@@ -34,6 +34,7 @@ edit_uri: ""
 nav:
   - Introduction: 'index.md'
   - API Reference: 'api.md'
+  - Export Reference: 'export.md'
   - SDK:
     - Introduction: 'sdk/index.md'
     - Client: 'sdk/client.md'
