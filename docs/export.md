@@ -10,6 +10,7 @@ hide:
         hideHostname: true,
         hideDownloadButton: true,
         hideSingleRequestSampleTab: true,
+        expandResponses: 'all',
         theme: {
             colors: {
                 primary: {
