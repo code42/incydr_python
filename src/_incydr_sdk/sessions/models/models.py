@@ -18,11 +18,10 @@ class ContentInspectionEvent(Model):
 
 
 class ContentInspectionResult(Model):
-    event_results: List[ContentInspectionEvent] = Field(
-        alias="eventResults",
-        description="List of all content inspection events that have occurred.",
+    detected_on_alerts: List[str] = Field(
+        alias="detectedOnAlerts",
+        description="A list of content categories or types found on events which triggered alerts."
     )
-    status: Optional[str]
 
 
 class Note(Model):
