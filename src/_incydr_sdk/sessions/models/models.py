@@ -20,7 +20,7 @@ class ContentInspectionEvent(Model):
 class ContentInspectionResult(Model):
     detected_on_alerts: List[str] = Field(
         alias="detectedOnAlerts",
-        description="A list of content categories or types found on events which triggered alerts."
+        description="A list of content categories or types found on events which triggered alerts.",
     )
 
 
