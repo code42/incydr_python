@@ -9,7 +9,11 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
-## Unreleased
+## 2.3.1 - 2025-05-13
+
+### Fixed
+
+- An issue where Sessions validation would fail due to an updated content inspection schema.
 
 ### Updated
 

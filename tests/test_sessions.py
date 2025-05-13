@@ -31,12 +31,7 @@ END_TIMESTAMP = 1734652800000  # in ms
 TEST_SESSION = {
     "actorId": TEST_SESSION_ID,
     "beginTime": POSIX_TS,
-    "contentInspectionResults": {
-        "eventResults": [
-            {"eventId": "event-id", "piiType": ["string"], "status": "PENDING"}
-        ],
-        "status": "PENDING",
-    },
+    "contentInspectionResults": {"detectedOnAlerts": ["PII"]},
     "contextSummary": "string",
     "criticalEvents": 0,
     "endTime": POSIX_TS,
