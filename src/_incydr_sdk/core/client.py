@@ -22,6 +22,7 @@ from _incydr_sdk.devices.client import DevicesClient
 from _incydr_sdk.directory_groups.client import DirectoryGroupsClient
 from _incydr_sdk.exceptions import AuthMissingError
 from _incydr_sdk.file_events.client import FileEventsClient
+from _incydr_sdk.files.client import FilesClient
 from _incydr_sdk.risk_profiles.client import RiskProfiles
 from _incydr_sdk.sessions.client import SessionsClient
 from _incydr_sdk.trusted_activities.client import TrustedActivitiesClient
@@ -106,6 +107,7 @@ class Client:
         self._devices = DevicesClient(self)
         self._directory_groups = DirectoryGroupsClient(self)
         self._file_events = FileEventsClient(self)
+        self._files = FilesClient(self)
         self._sessions = SessionsClient(self)
         self._trusted_activities = TrustedActivitiesClient(self)
         self._users = UsersClient(self)
@@ -282,6 +284,16 @@ class Client:
 
         """
         return self._file_events
+
+    @property
+    def files(self):
+        """
+        Property returning a [`FilesClient`](../files) for interacting with `/v1/files` API endpoints.
+        Usage:
+
+            >>> client.files.v1.get_file_by_sha256("sha256 hash", "/path/to/file.extension")
+        """
+        return self._files
 
     @property
     def sessions(self):
