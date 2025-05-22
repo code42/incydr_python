@@ -8,6 +8,14 @@
  The intended audience of this file is for `incydr` SDK and CLI consumers -- as such, changes that don't affect
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
+## Unreleased
+
+### Added
+
+- The `files` client to the SDK with two methods:
+  - `sdk.files.v1.download_file_by_sha256` to download a file and save it in the file system.
+  - `sdk.files.v1.stream_file_by_sha256` to stream a file, allowing more control over how it is downloaded.
+- Added the `files download` command to the CLI to download a file by SHA256 hash.
 
 ## 2.3.1 - 2025-05-13
 
