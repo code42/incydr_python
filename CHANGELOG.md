@@ -10,7 +10,7 @@
  here.
 ## Unreleased
 
-### Added
+### 2.4.0 - 2025-05-27
 
 - The `files` client to the SDK with two methods:
   - `sdk.files.v1.download_file_by_sha256` to download a file and save it in the file system.
