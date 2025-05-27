@@ -10,6 +10,8 @@
  here.
 ## Unreleased
 
+## 2.4.0 - 2025-05-27
+
 ### Added
 
 - The `files` client to the SDK with two methods:
