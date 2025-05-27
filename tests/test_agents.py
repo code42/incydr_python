@@ -439,7 +439,7 @@ def test_cli_bulk_deactivate_JSON_file_input(httpserver_auth: HTTPServer, runner
 def test_cli_bulk_activate_retries_with_agent_ids_not_found_removed(
     httpserver_auth: HTTPServer, runner
 ):
-    input_lines = "\n".join(("agent_id", "1234", "5678", "2345", "9876"))
+    input_lines = ("agent_id", "1234", "5678", "2345", "9876")
 
     httpserver_auth.expect_request(
         uri="/v1/agents/activate",
@@ -453,21 +453,25 @@ def test_cli_bulk_activate_retries_with_agent_ids_not_found_removed(
     httpserver_auth.expect_request(
         uri="/v1/agents/activate", method="POST", json={"agentIds": ["2345", "1234"]}
     ).respond_with_data(status=204)
-
-    result = runner.invoke(
-        incydr, ["agents", "bulk-activate", "--format", "csv", "-"], input=input_lines
-    )
-    assert (
-        "404 Error processing batch of 4 agent activations, agent_ids not found: ['5678', '9876']"
-        in result.output
-    )
-    assert "Activating agents..." in result.output
+    with runner.isolated_filesystem():
+        with open("tmpfile", "w") as tmpfile:
+            for line in input_lines:
+                tmpfile.write(line)
+                tmpfile.write("\n")
+        result = runner.invoke(
+            incydr, ["agents", "bulk-activate", "--format", "csv", "tmpfile"]
+        )
+        assert (
+            "404 Error processing batch of 4 agent activations, agent_ids not found: ['5678', '9876']"
+            in result.output
+        )
+        assert "Activating agents..." in result.output
 
 
 def test_cli_bulk_activate_retries_ids_individually_when_unknown_error_occurs(
     httpserver_auth: HTTPServer, runner
 ):
-    input_lines = "\n".join(("agent_id", "1234", "5678", "2345", "9876"))
+    input_lines = ("agent_id", "1234", "5678", "2345", "9876")
 
     httpserver_auth.expect_request(
         uri="/v1/agents/activate",
@@ -487,21 +491,28 @@ def test_cli_bulk_activate_retries_ids_individually_when_unknown_error_occurs(
         uri="/v1/agents/activate", method="POST", json={"agentIds": ["9876"]}
     ).respond_with_data(status=204)
 
-    result = runner.invoke(
-        incydr, ["agents", "bulk-activate", "--format", "csv", "-"], input=input_lines
-    )
-    assert "Unknown error processing batch of 4 agent activations" in result.output
-    assert "Trying agent activation for this batch individually" in result.output
-    assert "Activating agents..." in result.output
-    assert (
-        "Failed to process activation for 5678: Unknown Server Error" in result.output
-    )
+    with runner.isolated_filesystem():
+        with open("tmpfile", "w") as tmpfile:
+            for line in input_lines:
+                tmpfile.write(line)
+                tmpfile.write("\n")
+
+        result = runner.invoke(
+            incydr, ["agents", "bulk-activate", "--format", "csv", "tmpfile"]
+        )
+        assert "Unknown error processing batch of 4 agent activations" in result.output
+        assert "Trying agent activation for this batch individually" in result.output
+        assert "Activating agents..." in result.output
+        assert (
+            "Failed to process activation for 5678: Unknown Server Error"
+            in result.output
+        )
 
 
 def test_cli_bulk_deactivate_retries_with_agent_ids_not_found_removed(
     httpserver_auth: HTTPServer, runner
 ):
-    input_lines = "\n".join(("agent_id", "1234", "5678", "2345", "9876"))
+    input_lines = ("agent_id", "1234", "5678", "2345", "9876")
 
     httpserver_auth.expect_request(
         uri="/v1/agents/deactivate",
@@ -515,21 +526,26 @@ def test_cli_bulk_deactivate_retries_with_agent_ids_not_found_removed(
     httpserver_auth.expect_request(
         uri="/v1/agents/deactivate", method="POST", json={"agentIds": ["2345", "1234"]}
     ).respond_with_data(status=204)
+    with runner.isolated_filesystem():
+        with open("tmpfile", "w") as tmpfile:
+            for line in input_lines:
+                tmpfile.write(line)
+                tmpfile.write("\n")
 
-    result = runner.invoke(
-        incydr, ["agents", "bulk-deactivate", "--format", "csv", "-"], input=input_lines
-    )
-    assert (
-        "404 Error processing batch of 4 agent deactivations, agent_ids not found: ['5678', '9876']"
-        in result.output
-    )
-    assert "Deactivating agents..." in result.output
+        result = runner.invoke(
+            incydr, ["agents", "bulk-deactivate", "--format", "csv", "tmpfile"]
+        )
+        assert (
+            "404 Error processing batch of 4 agent deactivations, agent_ids not found: ['5678', '9876']"
+            in result.output
+        )
+        assert "Deactivating agents..." in result.output
 
 
 def test_cli_bulk_deactivate_retries_ids_individually_when_unknown_error_occurs(
     httpserver_auth: HTTPServer, runner
 ):
-    input_lines = "\n".join(("agent_id", "1234", "5678", "2345", "9876"))
+    input_lines = ("agent_id", "1234", "5678", "2345", "9876")
 
     httpserver_auth.expect_request(
         uri="/v1/agents/deactivate",
@@ -548,13 +564,21 @@ def test_cli_bulk_deactivate_retries_ids_individually_when_unknown_error_occurs(
     httpserver_auth.expect_request(
         uri="/v1/agents/deactivate", method="POST", json={"agentIds": ["9876"]}
     ).respond_with_data(status=204)
+    with runner.isolated_filesystem():
+        with open("tmpfile", "w") as tmpfile:
+            for line in input_lines:
+                tmpfile.write(line)
+                tmpfile.write("\n")
 
-    result = runner.invoke(
-        incydr, ["agents", "bulk-deactivate", "--format", "csv", "-"], input=input_lines
-    )
-    assert "Unknown error processing batch of 4 agent deactivations" in result.output
-    assert "Trying agent deactivation for this batch individually" in result.output
-    assert "Deactivating agents..." in result.output
-    assert (
-        "Failed to process deactivation for 5678: Unknown Server Error" in result.output
-    )
+        result = runner.invoke(
+            incydr, ["agents", "bulk-deactivate", "--format", "csv", "tmpfile"]
+        )
+        assert (
+            "Unknown error processing batch of 4 agent deactivations" in result.output
+        )
+        assert "Trying agent deactivation for this batch individually" in result.output
+        assert "Deactivating agents..." in result.output
+        assert (
+            "Failed to process deactivation for 5678: Unknown Server Error"
+            in result.output
+        )

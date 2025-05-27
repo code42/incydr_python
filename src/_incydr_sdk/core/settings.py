@@ -225,8 +225,12 @@ class IncydrSettings(BaseSettings):
                 dumped = indent(dumped, prefix="\t")
             self.logger.debug(dumped)
         except Exception as err:
-            self.logger.debug(f"Error dumping request/response info: {err}")
-            self.logger.debug(response)
+            if isinstance(response.content, bytes):
+                self.logger.debug("Unable to log binary response data.")
+                self.logger.debug(response)
+            else:
+                self.logger.debug(f"Error dumping request/response info: {err}")
+                self.logger.debug(response)
 
     def _log_error(self, err, invocation_str=None):
         message = str(err) if err else None
