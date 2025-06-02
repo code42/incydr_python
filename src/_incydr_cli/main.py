@@ -19,6 +19,7 @@ from _incydr_cli.cmds.devices import devices
 from _incydr_cli.cmds.directory_groups import directory_groups
 from _incydr_cli.cmds.file_events import file_events
 from _incydr_cli.cmds.files import files as files_client
+from _incydr_cli.cmds.orgs import orgs
 from _incydr_cli.cmds.risk_profiles import risk_profiles
 from _incydr_cli.cmds.sessions import sessions
 from _incydr_cli.cmds.trusted_activities import trusted_activities
@@ -88,6 +89,7 @@ incydr.add_command(risk_profiles)
 incydr.add_command(sessions)
 incydr.add_command(trusted_activities)
 incydr.add_command(users)
+incydr.add_command(orgs)
 incydr.add_command(watchlists)
 
 if __name__ == "__main__":
