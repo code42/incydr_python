@@ -24,19 +24,19 @@ class Org(ResponseModel):
 
     **Fields**:
 
-    * **org_guid: `str` - The globally unique ID of this org.
-    * **org_name: `str` - The name of this org.
-    * **org_ext_ref: `str` - Optional external reference information, such as a serial number, asset tag, employee ID, or help desk issue ID.
-    * **notes: `str` - The notes for this org. Intended for optional additional descriptive information.
-    * **parent_org_guid: `str` - The globally unique ID of the parent org.
-    * **active: `bool` - Whether or not the org is currently active.
-    * **creation_date: `datetime` - Date and time this org was created.
-    * **modification_date: `datetime` - Date and time this org was last modified.
-    * **deactivation_date: `datetime` - Date and time this org was deactivated. Blank if org is active.
-    * **registration_key: `str` - The registration key for the org.
-    * **user_count: `int` - The count of users within this org.
-    * **computer_count: `int` - The count of computers within this org.
-    * **org_count: `int` - The count of child orgs for this org.
+    * **org_guid**: `str` - The globally unique ID of this org.
+    * **org_name**: `str` - The name of this org.
+    * **org_ext_ref**: `str` - Optional external reference information, such as a serial number, asset tag, employee ID, or help desk issue ID.
+    * **notes**: `str` - The notes for this org. Intended for optional additional descriptive information.
+    * **parent_org_guid**: `str` - The globally unique ID of the parent org.
+    * **active**: `bool` - Whether or not the org is currently active.
+    * **creation_date**: `datetime` - Date and time this org was created.
+    * **modification_date**: `datetime` - Date and time this org was last modified.
+    * **deactivation_date**: `datetime` - Date and time this org was deactivated. Blank if org is active.
+    * **registration_key**: `str` - The registration key for the org.
+    * **user_count**: `int` - The count of users within this org.
+    * **computer_count**: `int` - The count of computers within this org.
+    * **org_count**: `int` - The count of child orgs for this org.
     """
 
     org_guid: Optional[str] = Field(

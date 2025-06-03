@@ -93,7 +93,7 @@ def create(
     external_reference: Optional[str],
     notes: Optional[str],
     parent_org_guid: Optional[str],
-    format_: TableFormat,
+    format_: SingleFormat,
     columns: Optional[str],
 ):
     """
@@ -134,7 +134,7 @@ def deactivate_org(org_guid: str):
 @logging_options
 def show(
     org_guid: str,
-    format_: TableFormat,
+    format_: SingleFormat,
     columns: Optional[str],
 ):
     """
@@ -174,7 +174,7 @@ def update(
     name: str,
     external_reference: Optional[str],
     notes: Optional[str],
-    format_: TableFormat,
+    format_: SingleFormat,
     columns: Optional[str],
 ):
     """
