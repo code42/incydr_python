@@ -15,6 +15,13 @@ Install using pip:
 $ pip install incydr
 ```
 
+To upgrade an existing installation, use the `--upgrade` flag:
+
+```bash
+$ pip install incydr --upgrade
+```
+
+
 Import the `incydr.Client` initialize with your Incydr API Client:
 
 ```python

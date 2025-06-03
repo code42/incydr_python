@@ -13,6 +13,12 @@ Install the CLI extension to the Incydr SDK with pip.  Use the following command
 $ pip install 'incydr[cli]'
 ```
 
+To upgrade an existing installation, use the `--upgrade` flag:
+
+```bash
+$ pip install 'incydr[cli]' --upgrade
+```
+
 See [Getting Started](getting_started.md) for more further details on setting up your Incydr CLI.
 
 ## Commands
