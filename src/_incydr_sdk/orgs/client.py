@@ -111,7 +111,7 @@ class OrgsV1:
         self, org_guid: str, org_name: str, org_ext_ref: str = None, notes: str = None
     ) -> Org:
         """
-        Create an org.
+        Update an org.
 
         **Parameters:**
 

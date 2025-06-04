@@ -55,7 +55,7 @@ def list_matters_for_user(user_id: str, format_: TableFormat, columns: Optional[
 @columns_option
 @logging_options
 def list_custodians(matter_id: str, format_: TableFormat, columns: Optional[str]):
-    """List the matter memberships for a specific user."""
+    """List the custodians for a specific matter."""
     client = Client()
     memberships_ = client.legal_hold.v1.iter_all_custodians(matter_id=matter_id)
 
