@@ -10,6 +10,11 @@
  here.
 ## Unreleased
 
+### Added
+
+- The `orgs` and `legal_hold` clients to the SDK.
+- The `orgs` and `legal-hold` command groups to the CLI.
+
 ## 2.4.0 - 2025-05-27
 
 ### Added

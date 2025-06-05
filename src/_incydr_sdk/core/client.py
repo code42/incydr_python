@@ -23,6 +23,8 @@ from _incydr_sdk.directory_groups.client import DirectoryGroupsClient
 from _incydr_sdk.exceptions import AuthMissingError
 from _incydr_sdk.file_events.client import FileEventsClient
 from _incydr_sdk.files.client import FilesClient
+from _incydr_sdk.legal_hold.client import LegalHoldClient
+from _incydr_sdk.orgs.client import OrgsClient
 from _incydr_sdk.risk_profiles.client import RiskProfiles
 from _incydr_sdk.sessions.client import SessionsClient
 from _incydr_sdk.trusted_activities.client import TrustedActivitiesClient
@@ -108,6 +110,8 @@ class Client:
         self._directory_groups = DirectoryGroupsClient(self)
         self._file_events = FileEventsClient(self)
         self._files = FilesClient(self)
+        self._legal_hold = LegalHoldClient(self)
+        self._orgs = OrgsClient(self)
         self._sessions = SessionsClient(self)
         self._trusted_activities = TrustedActivitiesClient(self)
         self._users = UsersClient(self)
@@ -294,6 +298,27 @@ class Client:
             >>> client.files.v1.get_file_by_sha256("sha256 hash", "/path/to/file.extension")
         """
         return self._files
+
+    @property
+    def legal_hold(self):
+        """
+        Property returning a [`LegalHoldClient`](../legal_hold) for interacting with `/v1/legal-hold` API endpoints.
+
+        Usage:
+
+            >>> client.legal_hold.v1.iter_all_matters()
+        """
+        return self._legal_hold
+
+    @property
+    def orgs(self):
+        """
+        Property returning an ['OrgsClient'](../orgs) for interacting with `/v1/orgs` API endpoints.
+        Usage:
+
+            >>> client.orgs.v1.list()
+        """
+        return self._orgs
 
     @property
     def sessions(self):
