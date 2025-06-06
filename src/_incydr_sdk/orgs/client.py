@@ -75,6 +75,14 @@ class OrgsV1:
         pa
         **Returns**: An [`Org`][org-model] object representing the created org.
         """
+        # Ensure parent org guid
+        if not parent_org_guid:
+            orgslist = self.list().orgs
+            id_list = list(map(lambda x: x.org_guid, orgslist))
+            for org in orgslist:
+                if org.parent_org_guid not in id_list:
+                    parent_org_guid = org.org_guid
+                    break
         payload = {
             "orgName": org_name,
             "orgExtRef": org_ext_ref,

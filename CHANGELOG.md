@@ -8,7 +8,7 @@
  The intended audience of this file is for `incydr` SDK and CLI consumers -- as such, changes that don't affect
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
-## Unreleased
+## 2.5.0 - 2025-06-06
 
 ### Added
 
