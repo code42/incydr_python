@@ -25,7 +25,7 @@ TEST_CREATE_ORG_PAYLOAD = {
     "orgName": TEST_ORG_NAME,
     "orgExtRef": None,
     "notes": None,
-    "parentOrgGuid": None,
+    "parentOrgGuid": TEST_DATA["orgGuid"],
 }
 TEST_UPDATE_ORG_PAYLOAD = {"orgName": TEST_ORG_NAME, "orgExtRef": None, "notes": None}
 TEST_ORG_LIST = {"totalCount": 1, "orgs": [TEST_DATA]}
@@ -41,6 +41,9 @@ def mock_get_org(httpserver_auth: HTTPServer):
 
 @pytest.fixture
 def mock_create_org(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request("/v1/orgs", method="GET").respond_with_json(
+        response_json=TEST_ORG_LIST, status=200
+    )
     httpserver_auth.expect_request(
         "/v1/orgs", method="POST", json=TEST_CREATE_ORG_PAYLOAD
     ).respond_with_json(response_json=TEST_DATA, status=200)
