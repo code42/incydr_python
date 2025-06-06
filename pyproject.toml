@@ -35,7 +35,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-cli = ["click", "chardet"]
+cli = ["click==8.1.*", "chardet"]
 
 [project.urls]
 Documentation = "https://github.com/code42/incydr_python#readme"
