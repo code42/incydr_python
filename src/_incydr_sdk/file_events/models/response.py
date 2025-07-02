@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from typing import List
 from typing import Optional
@@ -29,6 +31,17 @@ class SearchFilterGroup(ResponseModel):
     )
     filters: List[SearchFilter] = Field(
         description="One or more SearchFilters to be combined in a query."
+    )
+
+
+class SearchFilterGroupV2(ResponseModel):
+    subgroup_clause: Optional[str] = Field(
+        alias="subgroupClause",
+        description="Grouping clause for subgroups.",
+        example="AND",
+    )
+    subgroups: Optional[List[Union[SearchFilterGroup, SearchFilterGroupV2]]] = Field(
+        description="One or more FilterGroups to be combined in a query, or a FilterSubgroupV2"
     )
 
 
@@ -99,7 +112,7 @@ class SavedSearch(ResponseModel):
     * **created_by_username**: `str` - The username of the user who created the saved search.
     * **creation_timestamp**: `datetime` - The time at which the saved search was created.
     * **group_clause**: `GroupClause` - `AND` or `OR`. Grouping clause for any specified groups. Defaults to `AND`.
-    * **groups**: `List[SearchFilterGroup]` - One or more FilterGroups to be combined in a query.
+    * **groups**: `List[Union[SearchFilterGroup, SearchFilterGroupV2]]` - One or more FilterGroups or FilterGroupV2s to be combined in a query.
     * **id**: `str` - The ID for the saved search.
     * **modified_by_uid**: `str` - The ID of the user who last modified the saved search.
     * **modified_by_username**: `str` - The username of the user who last modified the saved search.
@@ -139,7 +152,7 @@ class SavedSearch(ResponseModel):
         description="Grouping clause for any specified groups.",
         example="OR",
     )
-    groups: Optional[List[SearchFilterGroup]] = Field(
+    groups: Optional[List[Union[SearchFilterGroup, SearchFilterGroupV2]]] = Field(
         description="One or more FilterGroups to be combined in a query."
     )
     id: Optional[str] = Field(

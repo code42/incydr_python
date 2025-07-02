@@ -50,8 +50,7 @@ class IncydrSettings(BaseSettings):
     Usage:
 
         >> import incydr
-        >>> client = incydr.Client()
-        >>> client.settings.page_size = 10
+        >>> client = incydr.Client(page_size = 10)
 
     Settings can also be loaded from shell environment variables or .env files. Just prefix a setting's attribute name
     with `INCYDR_` when configuring via enviroment vars.

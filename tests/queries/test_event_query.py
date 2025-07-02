@@ -4,12 +4,101 @@ from datetime import timedelta
 import pytest
 from pydantic import ValidationError
 
+from _incydr_sdk.file_events.models.response import SavedSearch
 from _incydr_sdk.queries.file_events import Filter
 from _incydr_sdk.queries.file_events import FilterGroup
+from _incydr_sdk.queries.file_events import FilterGroupV2
 from incydr import EventQuery
 
 TEST_START_DATE = "P1D"
 TEST_TIMESTAMP = "2020-09-10 11:12:13"
+TEST_SAVED_SEARCH = SavedSearch().parse_obj(
+    {
+        "apiVersion": 2,
+        "columns": None,
+        "createdByUID": "testcreatoruid",
+        "createdByUsername": "example@code42.com",
+        "creationTimestamp": "2025-02-04T15:36:59.926404Z",
+        "groupClause": "AND",
+        "groups": [
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "operator": "WITHIN_THE_LAST",
+                        "term": "@timestamp",
+                        "value": "P90D",
+                        "display": None,
+                    }
+                ],
+                "display": '{"data":{"isMultivalue":false},"version":"v2"}',
+            },
+            {
+                "filterClause": "OR",
+                "filters": [
+                    {
+                        "operator": "IS",
+                        "term": "file.category",
+                        "value": "Image",
+                        "display": None,
+                    }
+                ],
+                "display": '{"data":{"isMultivalue":true},"version":"v2"}',
+            },
+            {
+                "subgroupClause": "OR",
+                "subgroups": [
+                    {
+                        "subgroupClause": "AND",
+                        "subgroups": [
+                            {
+                                "filterClause": "AND",
+                                "filters": [
+                                    {
+                                        "operator": "IS",
+                                        "term": "file.name",
+                                        "value": "*gomez*",
+                                        "display": None,
+                                    }
+                                ],
+                                "display": '{"data":{"isMultivalue":false},"version":"v2"}',
+                            }
+                        ],
+                        "display": None,
+                    },
+                    {
+                        "subgroupClause": "AND",
+                        "subgroups": [
+                            {
+                                "filterClause": "AND",
+                                "filters": [
+                                    {
+                                        "operator": "IS",
+                                        "term": "file.name",
+                                        "value": "*Ticia*",
+                                        "display": None,
+                                    }
+                                ],
+                                "display": '{"data":{"isMultivalue":false},"version":"v2"}',
+                            }
+                        ],
+                        "display": None,
+                    },
+                ],
+                "display": None,
+            },
+        ],
+        "id": "test-search-id",
+        "modifiedByUID": "test-modified-uid",
+        "modifiedByUsername": "example@code42.com",
+        "modifiedTimestamp": "2025-02-04T15:36:59.926404Z",
+        "name": "Chad Ticia/Gomez block saved search",
+        "notes": "testing functionality of search blocks",
+        "srtDir": "desc",
+        "srtKey": None,
+        "tenantId": "test-tenant-id",
+    }
+)
 
 
 @pytest.mark.parametrize(
@@ -223,3 +312,79 @@ def test_event_query_less_than_when_non_numerical_value_raises_error():
 def test_event_query_matches_any_sets_query_group_clause_to_or():
     q = EventQuery(start_date=TEST_START_DATE).matches_any()
     assert q.group_clause == "OR"
+
+
+def test_event_query_from_saved_search_creates_expected_filter_groups():
+    q = EventQuery().from_saved_search(TEST_SAVED_SEARCH)
+    assert isinstance(q.groups[0], FilterGroup)
+    assert isinstance(q.groups[1], FilterGroup)
+    assert isinstance(q.groups[2], FilterGroupV2)
+
+
+def test_event_query_is_any_creates_correct_filter():
+    q = EventQuery().is_any("term", ["value1", "value2"])
+    expected = FilterGroup(
+        filters=[Filter(term="term", operator="IS_ANY", value=["value1", "value2"])]
+    )
+    assert q.groups.pop() == expected
+
+
+def test_event_query_is_none_creates_correct_filter():
+    q = EventQuery().is_none("term", ["value1", "value2"])
+    expected = FilterGroup(
+        filters=[Filter(term="term", operator="IS_NONE", value=["value1", "value2"])]
+    )
+    assert q.groups.pop() == expected
+
+
+@pytest.mark.parametrize(
+    "start_timestamp",
+    [
+        TEST_TIMESTAMP,
+        1599736333.0,
+        1599736333,
+        datetime.strptime(TEST_TIMESTAMP, "%Y-%m-%d %H:%M:%S"),
+    ],
+)
+def test_date_range_filter_creates_correct_filter(start_timestamp):
+    q = EventQuery().date_range(term="date_term", start_date=start_timestamp)
+    expected = FilterGroup(
+        filters=[
+            Filter(
+                term="date_term",
+                operator="ON_OR_AFTER",
+                value="2020-09-10T11:12:13.000Z",
+            )
+        ]
+    )
+    assert q.groups.pop() == expected
+
+
+def test_subquery_creates_expected_filter_subgroup():
+    subgroup_q = (
+        EventQuery()
+        .matches_any()
+        .equals("destination.category", ["AI Tools", "Cloud Storage"])
+    )
+    expected = FilterGroup(
+        filters=[
+            Filter(term="destination.category", operator="IS", value="AI Tools"),
+            Filter(term="destination.category", operator="IS", value="Cloud Storage"),
+        ],
+        filterClause="OR",
+    )
+    q = EventQuery().subquery(subgroup_q)
+    assert q.group_clause == "AND"
+    assert q.groups[0].subgroupClause == "OR"
+    assert q.groups[0].subgroups[0] == expected
+
+
+def test_subquery_handles_nested_subquery():
+    q = EventQuery().subquery(
+        EventQuery().subquery(EventQuery().equals("term", "value"))
+    )
+    assert isinstance(q.groups[0], FilterGroupV2)
+    assert isinstance(q.groups[0].subgroups[0], FilterGroupV2)
+    assert isinstance(q.groups[0].subgroups[0].subgroups[0], FilterGroup)
+    assert q.groups[0].subgroups[0].subgroups[0].filters[0].term == "term"
+    assert q.groups[0].subgroups[0].subgroups[0].filters[0].value == "value"
