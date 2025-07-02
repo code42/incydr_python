@@ -360,7 +360,7 @@ def test_date_range_filter_creates_correct_filter(start_timestamp):
     assert q.groups.pop() == expected
 
 
-def test_subgroup_creates_expected_filter_subgroup():
+def test_subquery_creates_expected_filter_subgroup():
     subgroup_q = (
         EventQuery()
         .matches_any()
@@ -377,3 +377,14 @@ def test_subgroup_creates_expected_filter_subgroup():
     assert q.group_clause == "AND"
     assert q.groups[0].subgroupClause == "OR"
     assert q.groups[0].subgroups[0] == expected
+
+
+def test_subquery_handles_nested_subquery():
+    q = EventQuery().subquery(
+        EventQuery().subquery(EventQuery().equals("term", "value"))
+    )
+    assert isinstance(q.groups[0], FilterGroupV2)
+    assert isinstance(q.groups[0].subgroups[0], FilterGroupV2)
+    assert isinstance(q.groups[0].subgroups[0].subgroups[0], FilterGroup)
+    assert q.groups[0].subgroups[0].subgroups[0].filters[0].term == "term"
+    assert q.groups[0].subgroups[0].subgroups[0].filters[0].value == "value"

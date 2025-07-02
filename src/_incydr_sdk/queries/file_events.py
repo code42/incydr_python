@@ -92,7 +92,7 @@ class FilterGroup(BaseModel):
 
 class FilterGroupV2(BaseModel):
     subgroupClause: str = "AND"
-    subgroups: List[Union[FilterGroup, FilterGroupV2]]
+    subgroups: List[Union[FilterGroupV2, FilterGroup]]
 
 
 class Query(Model):
@@ -373,7 +373,7 @@ class EventQuery(Model):
         self.groups.append(
             FilterGroupV2(
                 subgroupClause=subgroup_query.group_clause,
-                subgroups=[x for x in subgroup_query.groups],
+                subgroups=subgroup_query.groups,
             )
         )
         return self
