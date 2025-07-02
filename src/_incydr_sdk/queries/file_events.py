@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from datetime import timedelta
 from typing import List
@@ -24,6 +26,8 @@ from _incydr_sdk.enums.file_events import RiskSeverity
 from _incydr_sdk.enums.file_events import ShareType
 from _incydr_sdk.enums.file_events import TrustReason
 from _incydr_sdk.file_events.models.response import SavedSearch
+from _incydr_sdk.file_events.models.response import SearchFilterGroup
+from _incydr_sdk.file_events.models.response import SearchFilterGroupV2
 from _incydr_sdk.queries.utils import parse_ts_to_ms_str
 
 _term_enum_map = {
@@ -42,7 +46,7 @@ _term_enum_map = {
 class Filter(BaseModel):
     term: str
     operator: Union[Operator, str]
-    value: Optional[Union[int, str]]
+    value: Optional[Union[int, str, List[str]]]
 
     class Config:
         use_enum_values = True
@@ -84,6 +88,11 @@ class Filter(BaseModel):
 class FilterGroup(BaseModel):
     filterClause: str = "AND"
     filters: Optional[List[Filter]]
+
+
+class FilterGroupV2(BaseModel):
+    subgroupClause: str = "AND"
+    subgroups: List[Union[FilterGroup, FilterGroupV2]]
 
 
 class Query(Model):
@@ -271,6 +280,73 @@ class EventQuery(Model):
         )
         return self
 
+    @validate_arguments
+    def is_any(self, term: str, values: List[str]):
+        """
+        Adds a `is_any` filter to the query. The opposite of the `is_none` filter.
+
+        When passed as part of a query, returns events when the field corresponding to the filter term matches any of the provided values.
+
+        Example:
+            `EventQuery(**kwargs).is_any("destination.category", ["AI Tools", "Cloud Storage"])` creates a query which will return file events where the destination category is either AI Tools or Cloud Storage.
+
+        **Parameters**:
+
+        * **term**: `str` - The term which corresponds to a file event field.
+        * **values**: `List[str]` - The values to match.
+        """
+        self.groups.append(
+            FilterGroup(
+                filters=[Filter(term=term, operator=Operator.IS_ANY, value=values)]
+            )
+        )
+        return self
+
+    @validate_arguments
+    def is_none(self, term: str, values: List[str]):
+        """
+        Adds a `is_none` filter to the query. The opposite of the `is_any` filter.
+
+        When passed as part of a query, returns events when the field corresponding to the filter term matches none of the provided values.
+
+        Example:
+            `EventQuery(**kwargs).is_any("destination.category", ["AI Tools", "Cloud Storage"])` creates a query which will return file events where the destination category is anything other than AI Tools or Cloud Storage.
+
+        **Parameters**:
+
+        * **term**: `str` - The term which corresponds to a file event field.
+        * **values**: `List[str]` - The values for the term to not match.
+        """
+        self.groups.append(
+            FilterGroup(
+                filters=[Filter(term=term, operator=Operator.IS_NONE, value=values)]
+            )
+        )
+        return self
+
+    def date_range(self, term: str, start_date=None, end_date=None):
+        """
+        Adds a date-based filter for the specified term.
+
+        When passed as part of a query, returns events within the specified date range, or all events before/after the specified date if only one of start_date or end_date is given.
+
+        Example:
+            `EventQuery(**kwargs).date_range(term="event.inserted", start_date="P1D")` creates a query that returns all events inserted into Forensic Search within the past day.
+
+        **Parameters**:
+
+        * **term**: `str` - The term which corresponds to a file event field.
+        * **start_date**: `int`, `float`, `str`, `datetime`, `timedelta` -  Start of the date range to query for events. Defaults to None.
+        * **end_date**: `int`, `float`, `str`, `datetime` - End of the date range to query for events.  Defaults to None.
+        """
+        if start_date or end_date:
+            self.groups.append(
+                _create_date_range_filter_group(
+                    start_date=start_date, end_date=end_date, term=term
+                )
+            )
+        return self
+
     def matches_any(self):
         """
         Sets operator to combine multiple filters to `OR`.
@@ -279,6 +355,26 @@ class EventQuery(Model):
         Default operator is `AND`, which returns events that match all filters in the query.
         """
         self.group_clause = "OR"
+        return self
+
+    def subquery(self, subgroup_clause: str, subgroup_query: EventQuery):
+        """
+        Adds a subgroup to the query, with any filter groups or subgroups from the subgroup_query added to the present query.
+
+        **Parameters**:
+
+        * **subgroup_clause**: `str` - OR or AND
+        * **subgroup_query**: `EventQuery` - An EventQuery object. The filter groups and subgroups will be added to the present query.
+
+        Example usage:
+        >>> EventQuery().greater_than("risk.score", 1).subquery("OR", EventQuery().equals("destination.category", "AI Tools"))
+        """
+        self.groups.append(
+            FilterGroupV2(
+                subgroupClause=subgroup_clause,
+                subgroups=[x for x in subgroup_query.groups],
+            )
+        )
         return self
 
     @classmethod
@@ -291,13 +387,7 @@ class EventQuery(Model):
             query.group_clause = saved_search.group_clause
         if saved_search.groups:
             for i in saved_search.groups:
-                filters = [
-                    Filter.construct(value=f.value, operator=f.operator, term=f.term)
-                    for f in i.filters
-                ]
-                query.groups.append(
-                    FilterGroup.construct(filterClause=i.filter_clause, filters=filters)
-                )
+                query.groups.append(_handle_filter_group_type(i))
         if saved_search.srt_dir:
             query.sort_dir = saved_search.srt_dir
         if saved_search.srt_key:
@@ -305,7 +395,7 @@ class EventQuery(Model):
         return query
 
 
-def _create_date_range_filter_group(start_date, end_date):
+def _create_date_range_filter_group(start_date, end_date, term=None):
     def _validate_duration_str(iso_duration_str):
         try:
             parse_duration(iso_duration_str)
@@ -320,7 +410,7 @@ def _create_date_range_filter_group(start_date, end_date):
             start_date = duration_isoformat(start_date)
         filters.append(
             Filter(
-                term=EventSearchTerm.TIMESTAMP,
+                term=term or EventSearchTerm.TIMESTAMP,
                 operator=Operator.WITHIN_THE_LAST,
                 value=start_date,
             )
@@ -329,7 +419,7 @@ def _create_date_range_filter_group(start_date, end_date):
         if start_date:
             filters.append(
                 Filter(
-                    term=EventSearchTerm.TIMESTAMP,
+                    term=term or EventSearchTerm.TIMESTAMP,
                     operator=Operator.ON_OR_AFTER,
                     value=parse_ts_to_ms_str(start_date),
                 )
@@ -338,9 +428,41 @@ def _create_date_range_filter_group(start_date, end_date):
         if end_date:
             filters.append(
                 Filter(
-                    term=EventSearchTerm.TIMESTAMP,
+                    term=term or EventSearchTerm.TIMESTAMP,
                     operator=Operator.ON_OR_BEFORE,
                     value=parse_ts_to_ms_str(end_date),
                 )
             )
     return FilterGroup(filters=filters)
+
+
+def _create_filter_group(filter_group: SearchFilterGroup) -> FilterGroup:
+    filters = [
+        Filter.construct(value=f.value, operator=f.operator, term=f.term)
+        for f in filter_group.filters
+    ]
+    return FilterGroup.construct(
+        filterClause=filter_group.filter_clause, filters=filters
+    )
+
+
+def _create_filter_group_v2(filter_group_v2: SearchFilterGroupV2) -> FilterGroupV2:
+    subgroups = []
+    for subgroup in filter_group_v2.subgroups:
+        subgroups.append(_handle_filter_group_type(subgroup))
+    return FilterGroupV2.construct(
+        subgroupClause=filter_group_v2.subgroup_clause, subgroups=subgroups
+    )
+
+
+def _handle_filter_group_type(
+    filter_group: Union[SearchFilterGroup, SearchFilterGroupV2]
+) -> Union[FilterGroup, FilterGroupV2]:
+    if isinstance(filter_group, SearchFilterGroup):
+        return _create_filter_group(filter_group)
+    if isinstance(filter_group, SearchFilterGroupV2):
+        return _create_filter_group_v2(filter_group)
+    else:
+        raise TypeError(
+            "Query filter group must be one of: SearchFilterGroup, SearchFilterGroupV2"
+        )
