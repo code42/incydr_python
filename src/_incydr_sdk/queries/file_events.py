@@ -357,21 +357,22 @@ class EventQuery(Model):
         self.group_clause = "OR"
         return self
 
-    def subquery(self, subgroup_clause: str, subgroup_query: EventQuery):
+    def subquery(self, subgroup_query: EventQuery):
         """
         Adds a subgroup to the query, with any filter groups or subgroups from the subgroup_query added to the present query.
 
+        Example:
+            `EventQuery().greater_than("risk.score", 1).subquery(EventQuery().matches_any().equals("destination.category", "AI Tools").equals("file.name", "example"))`
+
+        This example creates a query which matches events having a risk score of 1 or greater and have a destination category equal to "AI Tools" or have a filename equal to "example"
+
         **Parameters**:
 
-        * **subgroup_clause**: `str` - OR or AND
-        * **subgroup_query**: `EventQuery` - An EventQuery object. The filter groups and subgroups will be added to the present query.
-
-        Example usage:
-        >>> EventQuery().greater_than("risk.score", 1).subquery("OR", EventQuery().equals("destination.category", "AI Tools"))
+        * **subgroup_query**: `EventQuery` - An EventQuery object. The filter groups and subgroups will be added to the present query. The subgroup query's group clause will be used for the created subgroup.
         """
         self.groups.append(
             FilterGroupV2(
-                subgroupClause=subgroup_clause,
+                subgroupClause=subgroup_query.group_clause,
                 subgroups=[x for x in subgroup_query.groups],
             )
         )

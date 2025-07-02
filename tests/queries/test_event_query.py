@@ -358,3 +358,22 @@ def test_date_range_filter_creates_correct_filter(start_timestamp):
         ]
     )
     assert q.groups.pop() == expected
+
+
+def test_subgroup_creates_expected_filter_subgroup():
+    subgroup_q = (
+        EventQuery()
+        .matches_any()
+        .equals("destination.category", ["AI Tools", "Cloud Storage"])
+    )
+    expected = FilterGroup(
+        filters=[
+            Filter(term="destination.category", operator="IS", value="AI Tools"),
+            Filter(term="destination.category", operator="IS", value="Cloud Storage"),
+        ],
+        filterClause="OR",
+    )
+    q = EventQuery().subquery(subgroup_q)
+    assert q.group_clause == "AND"
+    assert q.groups[0].subgroupClause == "OR"
+    assert q.groups[0].subgroups[0] == expected
