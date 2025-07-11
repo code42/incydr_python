@@ -406,7 +406,93 @@ TEST_SAVED_SEARCH_2 = SavedSearch(
     srt_key=None,
     tenantId="c4e43418-07d9-4a9f-a138-29f39a124d33",
 )
-
+TEST_SAVED_SEARCH_3 = SavedSearch().parse_obj(
+    {
+        "apiVersion": 2,
+        "columns": None,
+        "createdByUID": "testcreatoruid",
+        "createdByUsername": "example@code42.com",
+        "creationTimestamp": "2025-02-04T15:36:59.926404Z",
+        "groupClause": "AND",
+        "groups": [
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "operator": "WITHIN_THE_LAST",
+                        "term": "@timestamp",
+                        "value": "P90D",
+                        "display": None,
+                    }
+                ],
+                "display": '{"data":{"isMultivalue":false},"version":"v2"}',
+            },
+            {
+                "filterClause": "OR",
+                "filters": [
+                    {
+                        "operator": "IS",
+                        "term": "file.category",
+                        "value": "Image",
+                        "display": None,
+                    }
+                ],
+                "display": '{"data":{"isMultivalue":true},"version":"v2"}',
+            },
+            {
+                "subgroupClause": "OR",
+                "subgroups": [
+                    {
+                        "subgroupClause": "AND",
+                        "subgroups": [
+                            {
+                                "filterClause": "AND",
+                                "filters": [
+                                    {
+                                        "operator": "IS",
+                                        "term": "file.name",
+                                        "value": "*gomez*",
+                                        "display": None,
+                                    }
+                                ],
+                                "display": '{"data":{"isMultivalue":false},"version":"v2"}',
+                            }
+                        ],
+                        "display": None,
+                    },
+                    {
+                        "subgroupClause": "AND",
+                        "subgroups": [
+                            {
+                                "filterClause": "AND",
+                                "filters": [
+                                    {
+                                        "operator": "IS",
+                                        "term": "file.name",
+                                        "value": "*Ticia*",
+                                        "display": None,
+                                    }
+                                ],
+                                "display": '{"data":{"isMultivalue":false},"version":"v2"}',
+                            }
+                        ],
+                        "display": None,
+                    },
+                ],
+                "display": None,
+            },
+        ],
+        "id": "test-search-id",
+        "modifiedByUID": "test-modified-uid",
+        "modifiedByUsername": "example@code42.com",
+        "modifiedTimestamp": "2025-02-04T15:36:59.926404Z",
+        "name": "Chad Ticia/Gomez block saved search",
+        "notes": "testing functionality of search blocks",
+        "srtDir": "desc",
+        "srtKey": None,
+        "tenantId": "test-tenant-id",
+    }
+)
 
 TEST_DICT_QUERY = {
     "groupClause": "AND",
@@ -488,6 +574,14 @@ def mock_get_saved_search(httpserver_auth):
 
 
 @pytest.fixture
+def mock_get_saved_search_with_subgroups(httpserver_auth):
+    search_data = {"searches": [json.loads(TEST_SAVED_SEARCH_3.json())]}
+    httpserver_auth.expect_request(
+        f"/v2/file-events/saved-searches/{TEST_SAVED_SEARCH_ID}", method="GET"
+    ).respond_with_json(search_data)
+
+
+@pytest.fixture
 def mock_list_saved_searches(httpserver_auth):
     search_data = {
         "searches": [
@@ -557,6 +651,15 @@ def test_get_saved_search_returns_expected_data(mock_get_saved_search):
     search = client.file_events.v2.get_saved_search(TEST_SAVED_SEARCH_ID)
     assert isinstance(search, SavedSearch)
     assert search.json() == TEST_SAVED_SEARCH_1.json()
+
+
+def test_get_saved_search_returns_expected_data_when_search_has_subgroups(
+    mock_get_saved_search_with_subgroups,
+):
+    client = Client()
+    search = client.file_events.v2.get_saved_search(TEST_SAVED_SEARCH_ID)
+    assert isinstance(search, SavedSearch)
+    assert search.json() == TEST_SAVED_SEARCH_3.json()
 
 
 # ************************************************ CLI ************************************************
