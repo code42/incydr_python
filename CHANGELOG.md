@@ -17,6 +17,9 @@
   - `is_none`
   - `date_range`
   - `subquery`
+- New methods to download files by XFC content ID.
+  - `sdk.files.download_file_by_xfc_content_id` and `sdk.files.stream_file_by_xfc_content_id`
+  - `incydr files download-by-xfc-id`
 
 ### Fixed
 - An issue where in some cases saved searches could not be retrieved.

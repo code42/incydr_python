@@ -31,3 +31,17 @@ def download(sha256: str, path: str):
     """
     client = Client()
     client.files.v1.download_file_by_sha256(sha256, path)
+
+
+@files.command(cls=IncydrCommand)
+@click.argument("XFC_ID")
+@path_option
+@logging_options
+def download_by_xfc_id(xfc_id: str, path: str):
+    """
+    Download the file matching the given XFC content ID hash to the target path.
+    """
+    client = Client()
+    client.files.v1.download_file_by_xfc_content_id(
+        xfc_content_id=xfc_id, target_path=path
+    )
