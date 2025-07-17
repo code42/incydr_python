@@ -20,8 +20,9 @@ class InvalidQueryException(IncydrException):
             "400 Response Error: Invalid query. Please double check your query filters are valid. "
             "\nTip: Make sure you're specifying your filter fields in dot notation. "
             "\nFor example, filter by 'file.archiveId' to filter by the archiveId field within the file object.)"
-            f"\nRaw problem data from the response: {exception.response.json()['problems']}"
         )
+        if 'problems' in exception.response.json().keys():
+            self.message += f"\nRaw problem data from the response: {exception.response.json()['problems']}"
         self.original_exception = exception
         super().__init__(self.message)
 
