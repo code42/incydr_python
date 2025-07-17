@@ -709,6 +709,11 @@ class Event(Model):
         example="GIT_PUSH",
         title="The method of file movement. For example: UPLOADED, DOWNLOADED, EMAILED.",
     )
+    xfc_event_id: Optional[str] = Field(
+        None,
+        alias="xfcEventId",
+        description="The identifier for the exfiltrated file collection data associated with this event.",
+    )
 
 
 class Git(Model):
