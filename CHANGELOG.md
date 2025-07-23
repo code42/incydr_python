@@ -8,6 +8,23 @@
  The intended audience of this file is for `incydr` SDK and CLI consumers -- as such, changes that don't affect
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
+
+## 2.6.0 - 2025-07-23
+
+### Added
+- Support for subgroups in file event queries and saved searches. See [this documentation](https://support.code42.com/hc/en-us/articles/14827671672087-Forensic-Search-reference#h_01JKEF6ESSMTEGFG28WZM6TNDR) for more details about this type of query.
+- New methods for EventQuery() to enable more flexible filtering:
+  - `is_any`
+  - `is_none`
+  - `date_range`
+  - `subquery`
+- New methods to download files by XFC content ID.
+  - `sdk.files.download_file_by_xfc_content_id` and `sdk.files.stream_file_by_xfc_content_id`
+  - `incydr files download-by-xfc-id`
+
+### Fixed
+- An issue where in some cases saved searches could not be retrieved.
+
 ## 2.5.0 - 2025-06-06
 
 ### Added

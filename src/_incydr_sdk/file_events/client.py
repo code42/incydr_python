@@ -14,13 +14,16 @@ from _incydr_sdk.queries.file_events import EventQuery
 class InvalidQueryException(IncydrException):
     """Raised when the file events search endpoint returns a 400."""
 
-    def __init__(self, query=None):
+    def __init__(self, query=None, exception=None):
         self.query = query
         self.message = (
             "400 Response Error: Invalid query. Please double check your query filters are valid. "
             "\nTip: Make sure you're specifying your filter fields in dot notation. "
             "\nFor example, filter by 'file.archiveId' to filter by the archiveId field within the file object.)"
         )
+        if "problems" in exception.response.json().keys():
+            self.message += f"\nRaw problem data from the response: {exception.response.json()['problems']}"
+        self.original_exception = exception
         super().__init__(self.message)
 
 
@@ -65,7 +68,7 @@ class FileEventsV2:
             response = self._parent.session.post("/v2/file-events", json=query.dict())
         except HTTPError as err:
             if err.response.status_code == 400:
-                raise InvalidQueryException(query)
+                raise InvalidQueryException(query=query, exception=err)
             raise err
         page = FileEventsPage.parse_response(response)
         query.page_token = page.next_pg_token

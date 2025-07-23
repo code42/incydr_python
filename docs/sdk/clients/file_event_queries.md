@@ -6,7 +6,7 @@ Use the `EventQuery` class to create a query for searching and filtering file ev
 
 ::: _incydr_sdk.queries.file_events.EventQuery
     :docstring:
-    :members: equals not_equals exists does_not_exist greater_than less_than matches_any
+    :members: equals not_equals exists does_not_exist greater_than less_than matches_any is_any is_none date_range subquery
 
 ## Query Building
 

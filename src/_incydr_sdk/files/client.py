@@ -65,3 +65,46 @@ class FilesV1:
         return self._parent.session.get(
             f"/v1/files/get-file-by-sha256/{sha256}", stream=True
         )
+
+    def download_file_by_xfc_content_id(
+        self, xfc_content_id: str, target_path: Path
+    ) -> Path:
+        """Download a file that matches the given XFC content ID.
+
+        **Parameters:**
+
+        * **xfc_content_id**: `str` (required) The XFC content ID for file you wish to download.
+        * **target_path**: `Path | str` a string or `pathlib.Path` object that represents the target file path and
+            name to which the file will be saved to.
+
+        **Returns**: A `pathlib.Path` object representing the location of the downloaded file.
+        """
+        target = Path(
+            target_path
+        )  # ensure that target is a path even if we're given a string
+        response = self._parent.session.get(
+            f"/v1/files/get-file-by-xfc-content-id/{xfc_content_id}"
+        )
+        target.write_bytes(response.content)
+        return target
+
+    def stream_file_by_xfc_content_id(self, xfc_content_id: str):
+        """Stream a file that matches the given XFC content ID.
+
+        **Example usage:**
+        ```
+        >>> with sdk.files.v1.stream_file_by_xfc_content_id("content_id_example") as response:
+        >>>     with open("./testfile.zip", "wb") as file:
+        >>>         for chunk in response.iter_content(chunk_size=128):
+        >>>             file.write(chunk)
+        ```
+
+        **Parameters:**
+
+        * **xfc_content_id**: `str` (required) The XFC content ID for file you wish to download.
+
+        **Returns**: A `requests.Response` object with a stream of the requested file.
+        """
+        return self._parent.session.get(
+            f"/v1/files/get-file-by-xfc-content-id/{xfc_content_id}", stream=True
+        )

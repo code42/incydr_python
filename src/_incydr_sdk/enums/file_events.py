@@ -5,6 +5,8 @@ class Operator(_Enum):
     # all valid filter operators for querying file events
     IS = "IS"
     IS_NOT = "IS_NOT"
+    IS_ANY = "IS_ANY"
+    IS_NONE = "IS_NONE"
     EXISTS = "EXISTS"
     DOES_NOT_EXIST = "DOES_NOT_EXIST"
     GREATER_THAN = "GREATER_THAN"
