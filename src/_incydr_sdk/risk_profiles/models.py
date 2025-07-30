@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import List
 from typing import Optional
 
+from pydantic import ConfigDict
 from pydantic import Field
 from rich.markdown import Markdown
 
@@ -119,7 +120,7 @@ class RiskProfilesPage(ResponseModel):
     total_count: Optional[int] = Field(
         None,
         description="The total count of all risk profiles.",
-        example=10,
+        examples=[10],
         alias="totalCount",
     )
     user_risk_profiles: Optional[List[RiskProfile]] = Field(
@@ -141,9 +142,7 @@ class QueryRiskProfilesRequest(Model):
     active: Optional[bool]
     deleted: Optional[bool]
     support_user: Optional[bool]
-
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class UpdateRiskProfileRequest(Model):
@@ -151,7 +150,7 @@ class UpdateRiskProfileRequest(Model):
     notes: Optional[str] = Field(
         None,
         description="Notes to add to the risk profile.",
-        example="These are my notes",
+        examples=["These are my notes"],
     )
     startDate: Optional[Date] = None
 
@@ -159,12 +158,14 @@ class UpdateRiskProfileRequest(Model):
 class AddCloudAliasesRequest(Model):
     cloudAliases: Optional[List[str]] = None
     userId: Optional[str] = Field(
-        None, description="The ID of the actor to add cloud aliases.", example="123"
+        None, description="The ID of the actor to add cloud aliases.", examples=["123"]
     )
 
 
 class DeleteCloudAliasesRequest(Model):
     cloudAliases: Optional[List[str]] = None
     userId: Optional[str] = Field(
-        None, description="The ID of the actor to delete cloud aliases.", example="123"
+        None,
+        description="The ID of the actor to delete cloud aliases.",
+        examples=["123"],
     )

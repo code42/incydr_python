@@ -38,6 +38,7 @@ class TestLogLevels:
             ("INFO", "ERROR", logging.ERROR),
             ("INFO", "WARNING", logging.WARNING),
             ("WARNING", "INFO", logging.INFO),
+            ("ERROR", "INFO", logging.INFO),
         ],
     )
     def test_init_param_overrides_env_var(

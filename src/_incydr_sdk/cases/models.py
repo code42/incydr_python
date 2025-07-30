@@ -42,33 +42,31 @@ class Case(ResponseModel, validate_assignment=True):
     """
 
     number: Optional[int] = Field(
-        allow_mutation=False, description="The identifier of the case."
+        None, frozen=True, description="The identifier of the case."
     )
     name: Optional[str]
-    created_at: Optional[datetime] = Field(allow_mutation=False, alias="createdAt")
-    updated_at: Optional[datetime] = Field(allow_mutation=False, alias="updatedAt")
-    subject: Optional[str]
-    subject_username: Optional[str] = Field(alias="subjectUsername")
-    status: Union[CaseStatus, str]
-    assignee: Optional[str]
+    created_at: Optional[datetime] = Field(None, frozen=True, alias="createdAt")
+    updated_at: Optional[datetime] = Field(None, frozen=True, alias="updatedAt")
+    subject: Optional[str] = None
+    subject_username: Optional[str] = Field(None, alias="subjectUsername")
+    status: Union[CaseStatus, str] = None
+    assignee: Optional[str] = None
     assignee_username: Optional[str] = Field(
-        allow_mutation=False, alias="assigneeUsername"
+        None, frozen=True, alias="assigneeUsername"
     )
     created_by_user_id: Optional[str] = Field(
-        allow_mutation=False, alias="createdByUserUid"
+        None, frozen=True, alias="createdByUserUid"
     )
     created_by_username: Optional[str] = Field(
-        allow_mutation=False, alias="createdByUsername"
+        None, frozen=True, alias="createdByUsername"
     )
     last_modified_by_user_id: Optional[str] = Field(
-        allow_mutation=False, alias="lastModifiedByUserUid"
+        None, frozen=True, alias="lastModifiedByUserUid"
     )
     last_modified_by_username: Optional[str] = Field(
-        allow_mutation=False, alias="lastModifiedByUsername"
+        None, frozen=True, alias="lastModifiedByUsername"
     )
-    archival_time: Optional[datetime] = Field(
-        allow_mutation=False, alias="archivalTime"
-    )
+    archival_time: Optional[datetime] = Field(None, frozen=True, alias="archivalTime")
 
 
 class CaseDetail(Case):
@@ -82,8 +80,10 @@ class CaseDetail(Case):
     * **findings**: `str | None` Markdown formatted text summarizing the findings for a case.
     """
 
-    description: Optional[str]
-    findings: Optional[str] = Field(table=lambda f: f if f is None else Markdown(f))
+    description: Optional[str] = None
+    findings: Optional[str] = Field(
+        None, table=lambda f: f if f is None else Markdown(f)
+    )
 
 
 class CasesPage(ResponseModel):
@@ -101,38 +101,40 @@ class CasesPage(ResponseModel):
 
 
 class QueryCasesRequest(Model):
-    assignee: Optional[str]
-    createdAt: Optional[str]
-    isAssigned: Optional[bool]
-    lastModifiedBy: Optional[str]
-    name: Optional[str]
+    assignee: Optional[str] = None
+    createdAt: Optional[str] = None
+    isAssigned: Optional[bool] = None
+    lastModifiedBy: Optional[str] = None
+    name: Optional[str] = None
     pgNum: Optional[int] = 1
     pgSize: Optional[int] = 100
     srtDir: SortDirection = SortDirection.ASC
     srtKey: SortKeys = SortKeys.NUMBER
-    status: Optional[CaseStatus]
+    status: Optional[CaseStatus] = None
 
 
 class CreateCaseRequest(Model):
     name: str = Field(max_length=50)
-    assignee: Optional[str]
-    description: Optional[str] = Field(max_length=250)
-    findings: Optional[str] = Field(max_length=30_000)
-    subject: Optional[str]
+    assignee: Optional[str] = None
+    description: Optional[str] = Field(None, max_length=250)
+    findings: Optional[str] = Field(None, max_length=30_000)
+    subject: Optional[str] = None
 
 
 class UpdateCaseRequest(Model, extra=Extra.ignore):
-    name: Optional[str] = Field(description="The name of the case.", max_length=50)
-    assignee: Optional[str]
-    description: Optional[str] = Field(max_length=250)
-    findings: Optional[str] = Field(max_length=30_000)
-    subject: Optional[str]
-    status: Optional[CaseStatus]
+    name: Optional[str] = Field(
+        None, description="The name of the case.", max_length=50
+    )
+    assignee: Optional[str] = None
+    description: Optional[str] = Field(None, max_length=250)
+    findings: Optional[str] = Field(None, max_length=30_000)
+    subject: Optional[str] = None
+    status: Optional[CaseStatus] = None
 
 
 class RiskIndicator(BaseModel):
-    name: str
-    weight: int
+    name: str = None
+    weight: int = None
 
 
 class FileEvent(Model):
@@ -140,36 +142,38 @@ class FileEvent(Model):
         None,
         alias="eventId",
         description="The unique identifier for the event.",
-        example="0_147e9445-2f30-4a91-8b2a-9455332e880a_973435567569502913_986467523038446097_163",
+        examples=[
+            "0_147e9445-2f30-4a91-8b2a-9455332e880a_973435567569502913_986467523038446097_163"
+        ],
     )
     event_timestamp: Optional[datetime] = Field(
         None,
         alias="eventTimestamp",
         description="Date and time that the Code42 service on the device detected an event; based on the deviceâ€™s system clock and reported in Coordinated Universal Time (UTC).",
-        example="2020-12-23T14:24:44.593Z",
+        examples=["2020-12-23T14:24:44.593Z"],
     )
     exposure: Optional[List[str]] = Field(
         None,
         description="Lists indicators that the data may be exposed.",
-        example=["OutsideTrustedDomains", "IsPublic"],
+        examples=[["OutsideTrustedDomains", "IsPublic"]],
     )
     file_availability: Optional[Union[FileAvailability, str]] = Field(
         None,
         alias="fileAvailability",
         description="The download availability status of the file associated with the event.",
-        example="EXACT_FILE_AVAILABLE",
+        examples=["EXACT_FILE_AVAILABLE"],
     )
     file_name: Optional[str] = Field(
         None,
         alias="fileName",
         description="The name of the file, including the file extension.",
-        example="example.docx",
+        examples=["example.docx"],
     )
     file_path: Optional[str] = Field(
         None,
         alias="filePath",
         description="The file location on the user's device; a path forward or backslash should be included at the end of the filepath. Possibly null if the file event occurred on a cloud provider.",
-        example="/Users/casey/Documents/",
+        examples=["/Users/casey/Documents/"],
     )
     risk_indicators: Optional[List[Union[RiskIndicator, str]]] = Field(
         None,
@@ -183,13 +187,13 @@ class FileEvent(Model):
         None,
         alias="riskScore",
         description="Sum of the weights for each risk indicator. This score is used to determine the overall risk severity of the event.",
-        example=12,
+        examples=[12],
     )
     risk_severity: Optional[str] = Field(
         None,
         alias="riskSeverity",
         description="The general risk assessment of the event, based on the numeric score.",
-        example="CRITICAL",
+        examples=["CRITICAL"],
     )
 
 
@@ -209,5 +213,5 @@ class CaseFileEvents(ResponseModel):
         None,
         alias="totalCount",
         description="Total number of events associated with the case.",
-        example=42,
+        examples=[42],
     )

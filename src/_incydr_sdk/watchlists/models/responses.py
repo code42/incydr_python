@@ -37,7 +37,7 @@ class IncludedDepartment(ResponseModel):
     """
 
     added_time: datetime = Field(None, alias="addedTime")
-    name: Optional[str] = Field(None, example="Engineering")
+    name: Optional[str] = Field(None, examples=["Engineering"])
 
 
 class IncludedDirectoryGroup(ResponseModel):
@@ -54,14 +54,14 @@ class IncludedDirectoryGroup(ResponseModel):
 
     added_time: datetime = Field(None, alias="addedTime")
     group_id: Optional[str] = Field(
-        None, description="A unique group ID.", example="23", alias="groupId"
+        None, description="A unique group ID.", examples=["23"], alias="groupId"
     )
     is_deleted: Optional[bool] = Field(
         None,
         description="Whether the included group was deleted by the directory provider but still referenced by the watchlist",
         alias="isDeleted",
     )
-    name: Optional[str] = Field(None, example="Research and development")
+    name: Optional[str] = Field(None, examples=["Research and development"])
 
 
 class WatchlistUser(ResponseModel):
@@ -77,9 +77,9 @@ class WatchlistUser(ResponseModel):
 
     added_time: datetime = Field(None, alias="addedTime")
     user_id: Optional[str] = Field(
-        None, description="A unique user ID.", example="23", alias="userId"
+        None, description="A unique user ID.", examples=["23"], alias="userId"
     )
-    username: Optional[str] = Field(None, example="foo@bar.com")
+    username: Optional[str] = Field(None, examples=["foo@bar.com"])
 
 
 class WatchlistActor(ResponseModel):
@@ -95,9 +95,9 @@ class WatchlistActor(ResponseModel):
 
     added_time: datetime = Field(None, alias="addedTime")
     actor_id: Optional[str] = Field(
-        None, description="A unique actor ID.", example="23", alias="actorId"
+        None, description="A unique actor ID.", examples=["23"], alias="actorId"
     )
-    actor_name: Optional[str] = Field(None, example="foo@bar.com", alias="actorname")
+    actor_name: Optional[str] = Field(None, examples=["foo@bar.com"], alias="actorname")
 
 
 class ExcludedUsersList(ResponseModel):
@@ -115,7 +115,7 @@ class ExcludedUsersList(ResponseModel):
     total_count: Optional[int] = Field(
         None,
         description="The total count of all excluded users.",
-        example=10,
+        examples=[10],
         alias="totalCount",
     )
 
@@ -137,7 +137,7 @@ class ExcludedActorsList(ResponseModel):
     total_count: Optional[int] = Field(
         None,
         description="The total count of all excluded actors.",
-        example=10,
+        examples=[10],
         alias="totalCount",
     )
 
@@ -158,7 +158,7 @@ class IncludedDepartmentsList(ResponseModel):
     total_count: Optional[int] = Field(
         None,
         description="The total count of all included departments.",
-        example=10,
+        examples=[10],
         alias="totalCount",
     )
 
@@ -179,7 +179,7 @@ class IncludedDirectoryGroupsList(ResponseModel):
     total_count: Optional[int] = Field(
         None,
         description="The total count of all included directory groups.",
-        example=10,
+        examples=[10],
         alias="totalCount",
     )
 
@@ -197,7 +197,7 @@ class IncludedUsersList(ResponseModel):
     total_count: Optional[int] = Field(
         None,
         description="The total count of all included users.",
-        example=10,
+        examples=[10],
         alias="totalCount",
     )
 
@@ -217,7 +217,7 @@ class IncludedActorsList(ResponseModel):
     total_count: Optional[int] = Field(
         None,
         description="The total count of all included actors.",
-        example=10,
+        examples=[10],
         alias="totalCount",
     )
 
@@ -278,7 +278,7 @@ class WatchlistMembersList(ResponseModel):
     total_count: Optional[int] = Field(
         None,
         description="The total count of all included users.",
-        example=10,
+        examples=[10],
         alias="totalCount",
     )
     watchlist_members: Optional[List[WatchlistUser]] = Field(
@@ -302,7 +302,7 @@ class WatchlistMembersListV2(ResponseModel):
     total_count: Optional[int] = Field(
         None,
         description="The total count of all included actors.",
-        example=10,
+        examples=[10],
         alias="totalCount",
     )
     watchlist_members: Optional[List[WatchlistActor]] = Field(
@@ -351,7 +351,7 @@ class WatchlistsPage(ResponseModel):
     total_count: Optional[int] = Field(
         None,
         description="The total count of all watchlists.",
-        example=10,
+        examples=[10],
         alias="totalCount",
     )
     watchlists: Optional[List[Watchlist]] = Field(

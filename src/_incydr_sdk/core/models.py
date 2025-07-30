@@ -9,8 +9,9 @@ from json import JSONDecodeError
 import requests
 from boltons.jsonutils import JSONLIterator
 from pydantic import BaseModel
+from pydantic import ConfigDict
+from pydantic import model_validator
 from pydantic import PrivateAttr
-from pydantic import root_validator
 from pydantic import SecretStr
 from pydantic import ValidationError
 
@@ -27,29 +28,23 @@ class Model(BaseModel):
         include=None,
         exclude=None,
         by_alias=True,
-        skip_defaults=None,
         exclude_unset=False,
         exclude_defaults=False,
         exclude_none=False,
-        encoder=None,
-        models_as_dict=True,
         **dumps_kwargs,
     ):
         """
         Generate a JSON representation of the model, optionally specifying which fields to include or exclude.
 
-        See [Pydantic docs](https://pydantic-docs.helpmanual.io/usage/exporting_models/#modeljson) for full details.
+        See [Pydantic docs](https://docs.pydantic.dev/latest/concepts/serialization/#modelmodel_dump_json) for full details.
         """
-        return super().json(
+        return super().model_dump_json(
             include=include,
             exclude=exclude,
             by_alias=by_alias,
-            skip_defaults=skip_defaults,
             exclude_unset=exclude_unset,
             exclude_defaults=exclude_defaults,
             exclude_none=exclude_none,
-            encoder=encoder,
-            models_as_dict=models_as_dict,
             **dumps_kwargs,
         )
 
@@ -59,7 +54,6 @@ class Model(BaseModel):
         include=None,
         exclude=None,
         by_alias=True,
-        skip_defaults=None,
         exclude_unset=False,
         exclude_defaults=False,
         exclude_none=False,
@@ -67,13 +61,12 @@ class Model(BaseModel):
         """
         Generate a dict representation of the model, optionally specifying which fields to include or exclude.
 
-        See [Pydantic docs](https://pydantic-docs.helpmanual.io/usage/exporting_models/#modeldict) for full details.
+        See [Pydantic docs](https://docs.pydantic.dev/latest/concepts/serialization/#modelmodel_dump) for full details.
         """
-        return super().dict(
+        return super().model_dump(
             include=include,
             exclude=exclude,
             by_alias=by_alias,
-            skip_defaults=skip_defaults,
             exclude_unset=exclude_unset,
             exclude_defaults=exclude_defaults,
             exclude_none=exclude_none,
@@ -100,18 +93,21 @@ class Model(BaseModel):
                 f"Unable to parse line {num}. Expecting JSONLines format: https://jsonlines.org"
             )
 
-    class Config:
-        allow_population_by_field_name = True
-        use_enum_values = True
-        json_encoders = {datetime: lambda dt: dt.isoformat().replace("+00:00", "Z")}
-        extra = "allow"
+    # TODO[pydantic]: The following keys were removed: `json_encoders`.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
+    model_config = ConfigDict(
+        populate_by_name=True,
+        use_enum_values=True,
+        json_encoders={datetime: lambda dt: dt.isoformat().replace("+00:00", "Z")},
+        extra="allow",
+    )
 
 
 class ResponseModel(Model):
     @classmethod
     def parse_response(cls, response: requests.Response):
         try:
-            return cls.parse_raw(response.text)
+            return cls.model_validate_json(response.text)
         except ValidationError as err:
             err.response = response
             raise
@@ -134,7 +130,7 @@ class AuthResponse(ResponseModel):
         )
 
 
-class CSVModel(BaseModel, allow_population_by_field_name=True, extra="allow"):
+class CSVModel(BaseModel):
     """
     Pydantic model class enables multiple aliases to be assigned to a single field value. If the field is required
     then at least one of the aliases must be supplied or validation will fail.
@@ -156,16 +152,22 @@ class CSVModel(BaseModel, allow_population_by_field_name=True, extra="allow"):
     model also allows extra values, "username" will still be accessible on the model at `model.username`.
     """
 
-    @root_validator(pre=True)
+    model_config = ConfigDict(extra="allow", validate_by_name=True)
+
+    @model_validator(mode="before")
+    @classmethod
     def _alias_validator(cls, values):  # noqa
-        for name, field in cls.__fields__.items():
-            aliases = field.field_info.extra.get("csv_aliases", [])
+        for name, field_info in cls.model_fields.items():
+            if field_info.json_schema_extra:
+                aliases = field_info.json_schema_extra.get("csv_aliases", [])
+            else:
+                aliases = []
             for alias in aliases:
                 if alias in values and values[alias]:
                     values[name] = values[alias]
                     break
             else:  # no break
-                if field.required:
+                if field_info.is_required():
                     raise ValueError(
                         f"'{name}' required. Valid column aliases: {aliases}"
                     )

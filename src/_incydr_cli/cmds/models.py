@@ -1,7 +1,7 @@
 from typing import Optional
 
 from pydantic import Field
-from pydantic import root_validator
+from pydantic import model_validator
 
 from _incydr_sdk.core.models import CSVModel
 from _incydr_sdk.core.models import Model
@@ -12,10 +12,11 @@ class UserCSV(CSVModel):
 
 
 class UserJSON(Model):
-    username: Optional[str]
-    userId: Optional[str]
+    username: Optional[str] = None
+    userId: Optional[str] = None
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
+    @classmethod
     def _validate(cls, values):  # noqa
         if "username" not in values and "userId" not in values:
             raise ValueError("A json key of 'username' or 'userId' is required")
@@ -31,9 +32,10 @@ class AgentCSV(CSVModel):
 
 
 class AgentJSON(Model):
-    agent_id: Optional[str]
+    agent_id: Optional[str] = None
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
+    @classmethod
     def _validate(cls, values):  # noqa
         if "agentGuid" in values:
             values["agent_id"] = values["agentGuid"]

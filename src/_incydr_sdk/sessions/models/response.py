@@ -41,28 +41,28 @@ class Session(ResponseModel):
     * **triggered_alerts**: `str` The list of all alerts that were triggered by activity in this session.
     """
 
-    actor_id: Optional[str] = Field(alias="actorId")
-    begin_time: Optional[int] = Field(alias="beginTime")
+    actor_id: Optional[str] = Field(None, alias="actorId")
+    begin_time: Optional[int] = Field(None, alias="beginTime")
     content_inspection_results: Optional[ContentInspectionResult] = Field(
-        alias="contentInspectionResults"
+        None, alias="contentInspectionResults"
     )
-    context_summary: Optional[str] = Field(alias="contextSummary")
-    critical_events: Optional[int] = Field(alias="criticalEvents")
-    end_time: Optional[int] = Field(alias="endTime")
-    exfiltration_summary: Optional[str] = Field(alias="exfiltrationSummary")
-    first_observed: Optional[int] = Field(alias="firstObserved")
-    high_events: Optional[int] = Field(alias="highEvents")
-    last_updated: Optional[int] = Field(alias="lastUpdated")
-    low_events: Optional[int] = Field(alias="lowEvents")
-    moderate_events: Optional[int] = Field(alias="moderateEvents")
-    no_risk_events: Optional[int] = Field(alias="noRiskEvents")
-    notes: Optional[List[Note]]
-    risk_indicators: Optional[List[RiskIndicator]] = Field(alias="riskIndicators")
-    scores: Optional[List[Score]]
-    session_id: Optional[str] = Field(alias="sessionId")
-    states: Optional[List[State]]
-    tenant_id: Optional[str] = Field(alias="tenantId")
-    triggered_alerts: Optional[List[Alert]] = Field(alias="triggeredAlerts")
+    context_summary: Optional[str] = Field(None, alias="contextSummary")
+    critical_events: Optional[int] = Field(None, alias="criticalEvents")
+    end_time: Optional[int] = Field(None, alias="endTime")
+    exfiltration_summary: Optional[str] = Field(None, alias="exfiltrationSummary")
+    first_observed: Optional[int] = Field(None, alias="firstObserved")
+    high_events: Optional[int] = Field(None, alias="highEvents")
+    last_updated: Optional[int] = Field(None, alias="lastUpdated")
+    low_events: Optional[int] = Field(None, alias="lowEvents")
+    moderate_events: Optional[int] = Field(None, alias="moderateEvents")
+    no_risk_events: Optional[int] = Field(None, alias="noRiskEvents")
+    notes: Optional[List[Note]] = None
+    risk_indicators: Optional[List[RiskIndicator]] = Field(None, alias="riskIndicators")
+    scores: Optional[List[Score]] = None
+    session_id: Optional[str] = Field(None, alias="sessionId")
+    states: Optional[List[State]] = None
+    tenant_id: Optional[str] = Field(None, alias="tenantId")
+    triggered_alerts: Optional[List[Alert]] = Field(None, alias="triggeredAlerts")
     user_id: Optional[str] = Field(None, alias="userId")
 
 
@@ -85,4 +85,4 @@ class SessionEvents(ResponseModel):
     The wrapped file event search response returned when retrieving the events attached to a session.
     """
 
-    query_result: FileEventsPage = Field(alias="queryResult")
+    query_result: FileEventsPage = Field(None, alias="queryResult")

@@ -291,7 +291,7 @@ def test_event_query_greater_than_creates_expected_filter_group(input, expected_
 def test_event_query_greater_than_when_non_numerical_value_raises_error():
     with pytest.raises(ValidationError) as e:
         EventQuery(start_date=TEST_START_DATE).greater_than("risk.score", "a string")
-    assert "value is not a valid integer" in str(e.value)
+    assert "Input should be a valid integer" in str(e.value)
 
 
 @pytest.mark.parametrize("input,expected_value", [(10, 10), ("10", 10.0), (10.0, 10.0)])
@@ -306,7 +306,7 @@ def test_event_query_less_than_creates_expected_filter_group(input, expected_val
 def test_event_query_less_than_when_non_numerical_value_raises_error():
     with pytest.raises(ValidationError) as e:
         EventQuery(start_date=TEST_START_DATE).less_than("risk.score", "a string")
-    assert "value is not a valid integer" in str(e.value)
+    assert "Input should be a valid integer" in str(e.value)
 
 
 def test_event_query_matches_any_sets_query_group_clause_to_or():

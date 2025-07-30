@@ -2,6 +2,7 @@ from typing import List
 from typing import Optional
 
 from pydantic import BaseModel
+from pydantic import ConfigDict
 from pydantic import Field
 
 from _incydr_sdk.core.models import Model
@@ -12,13 +13,14 @@ from _incydr_sdk.enums.sessions import SortKeys
 
 
 class ContentInspectionEvent(Model):
-    event_id: Optional[str] = Field(alias="eventId")
-    pii_type: Optional[List[str]] = Field(alias="piiType")
-    status: Optional[str]
+    event_id: Optional[str] = Field(None, alias="eventId")
+    pii_type: Optional[List[str]] = Field(None, alias="piiType")
+    status: Optional[str] = None
 
 
 class ContentInspectionResult(Model):
     detected_on_alerts: List[str] = Field(
+        None,
         alias="detectedOnAlerts",
         description="A list of content categories or types found on events which triggered alerts.",
     )
@@ -32,23 +34,23 @@ class Note(Model):
 
 
 class RiskIndicator(Model):
-    event_count: Optional[int] = Field(alias="eventCount")
-    id: Optional[str]
-    name: Optional[str]
-    weight: Optional[int]
+    event_count: Optional[int] = Field(None, alias="eventCount")
+    id: Optional[str] = None
+    name: Optional[str] = None
+    weight: Optional[int] = None
 
 
 class Score(Model):
-    score: Optional[int]
-    severity: Optional[int]
+    score: Optional[int] = None
+    severity: Optional[int] = None
     source_timestamp: Optional[int] = Field(alias="sourceTimestamp")
 
 
 class State(Model):
-    source_timestamp: Optional[int] = Field(alias="sourceTimestamp")
-    state: SessionStates
+    source_timestamp: Optional[int] = Field(None, alias="sourceTimestamp")
+    state: SessionStates = None
     user_id: Optional[str] = Field(
-        alias="userId", description="A User ID. (Deprecated)"
+        None, alias="userId", description="A User ID. (Deprecated)"
     )
 
 
@@ -61,28 +63,26 @@ class Alert(Model):
 
 
 class SessionsCriteriaRequest(BaseModel):
-    actor_id: Optional[str]
-    on_or_after: Optional[int]
-    before: Optional[int]
-    has_alerts: Optional[str]
-    risk_indicators: Optional[List[str]]
-    state: Optional[List[SessionStates]]
-    severity: Optional[List[int]]
-    rule_id: Optional[List[str]]
-    watchlist_id: Optional[List[str]]
-    content_inspection_status: Optional[ContentInspectionStatuses]
-
-    class Config:
-        use_enum_values = True
+    actor_id: Optional[str] = None
+    on_or_after: Optional[int] = None
+    before: Optional[int] = None
+    has_alerts: Optional[str] = None
+    risk_indicators: Optional[List[str]] = None
+    state: Optional[List[SessionStates]] = None
+    severity: Optional[List[int]] = None
+    rule_id: Optional[List[str]] = None
+    watchlist_id: Optional[List[str]] = None
+    content_inspection_status: Optional[ContentInspectionStatuses] = None
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class SessionsQueryRequest(SessionsCriteriaRequest):
-    order_by: Optional[SortKeys]
-    sort_direction: Optional[SortDirection]
-    page_number: Optional[int]
-    page_size: Optional[int]
+    order_by: Optional[SortKeys] = None
+    sort_direction: Optional[SortDirection] = None
+    page_number: Optional[int] = None
+    page_size: Optional[int] = None
 
 
 class SessionsChangeStateRequest(BaseModel):
-    ids: Optional[List[str]]
-    newState: Optional[str]
+    ids: Optional[List[str]] = None
+    newState: Optional[str] = None

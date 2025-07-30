@@ -6,68 +6,72 @@ from typing import List
 from typing import Optional
 
 import rich.box
-from pydantic import constr
 from pydantic import Field
-from pydantic import validator
+from pydantic import field_validator
+from pydantic import StringConstraints
 from rich.markdown import Markdown
 from rich.panel import Panel
+from typing_extensions import Annotated
 
 from _incydr_sdk.core.models import Model
 
 
 class Observation(Model):
     id: Optional[str] = Field(
-        None, description="Id of given observation.", example="uniqueObservationId"
+        None, description="Id of given observation.", examples=["uniqueObservationId"]
     )
     observed_at: datetime = Field(
-        ...,
+        None,
         alias="observedAt",
         description="Timestamp when the activity was first observed.",
-        example="2020-02-19T01:57:45.006683Z",
+        examples=["2020-02-19T01:57:45.006683Z"],
     )
     last_observed_at: Optional[datetime] = Field(
         None,
         alias="lastObservedAt",
         description="Timestamp when the activity was last observed.",
-        example="2020-02-19T01:57:45.006683Z",
+        examples=["2020-02-19T01:57:45.006683Z"],
     )
     type: Optional[str] = Field(
         None,
         description="The type of observation data recorded.",
-        example="FedCloudSharePermissions",
+        examples=["FedCloudSharePermissions"],
     )
     data: Optional[dict] = Field(
         None,
         description="The JSON formatted observation data rolled into one aggregation.",
-        example='{"type$":"OBSERVED_CLOUD_SHARE_ACTIVITY","id":"exampleId","sources":["OneDrive"],"exposureTypes":["PublicLinkShare"],"firstActivityAt":"2020-02-19T01:50:00.0000000Z","lastActivityAt":"2020-02-19T01:55:00.0000000Z","fileCount":2,"totalFileSize":200,"fileCategories":[{"type$":"OBSERVED_FILE_CATEGORY","category":"Document","fileCount":2,"totalFileSize":53,"isSignificant":false}],"outsideTrustedDomainsEmailsCount":0,"outsideTrustedDomainsTotalDomainCount":0,"outsideTrustedDomainsTotalDomainCountTruncated":false}',
+        examples=[
+            '{"type$":"OBSERVED_CLOUD_SHARE_ACTIVITY","id":"exampleId","sources":["OneDrive"],"exposureTypes":["PublicLinkShare"],"firstActivityAt":"2020-02-19T01:50:00.0000000Z","lastActivityAt":"2020-02-19T01:55:00.0000000Z","fileCount":2,"totalFileSize":200,"fileCategories":[{"type$":"OBSERVED_FILE_CATEGORY","category":"Document","fileCount":2,"totalFileSize":53,"isSignificant":false}],"outsideTrustedDomainsEmailsCount":0,"outsideTrustedDomainsTotalDomainCount":0,"outsideTrustedDomainsTotalDomainCountTruncated":false}'
+        ],
         table=lambda data: json.dumps(data, indent=2),
     )
 
-    @validator("data", pre=True)
+    @field_validator("data", mode="before")
+    @classmethod
     def parse_data_json(cls, value):  # noqa
         return json.loads(value) if value else None
 
 
 class Note(Model):
     id: Optional[str] = Field(
-        None, description="Unique id of the note.", example="noteId"
+        None, description="Unique id of the note.", examples=["noteId"]
     )
     last_modified_at: datetime = Field(
-        ...,
+        None,
         alias="lastModifiedAt",
         description="Timestamp of when the note was last modified.",
-        example="2020-02-19T01:57:45.006683Z",
+        examples=["2020-02-19T01:57:45.006683Z"],
     )
     last_modified_by: Optional[str] = Field(
         None,
         alias="lastModifiedBy",
         description="User who last modified the note.",
-        example="exampleUsername",
+        examples=["exampleUsername"],
     )
     message: Optional[str] = Field(
         None,
         description="The note itself.",
-        example="This is a note.",
+        examples=["This is a note."],
         table=lambda note: Panel(Markdown(note), width=120, box=rich.box.MINIMAL)
         if note
         else note,
@@ -79,31 +83,31 @@ class AuditInfo(Model):
         None,
         alias="modifiedBy",
         description="Username of the individual who last modified the rule.",
-        example="UserWhoMostRecentlyModifiedTheRule",
+        examples=["UserWhoMostRecentlyModifiedTheRule"],
     )
     modified_at: datetime = Field(
-        ...,
+        None,
         alias="modifiedAt",
         description="Timestamp of when the rule was last modified.",
-        example="2020-02-19T01:57:45.006683Z",
+        examples=["2020-02-19T01:57:45.006683Z"],
     )
 
 
 class Watchlist(Model):
     id: Optional[str] = Field(
-        None, description="Unique id of this watchlist.", example="guid"
+        None, description="Unique id of this watchlist.", examples=["guid"]
     )
     name: Optional[str] = Field(
-        None, description="Name of the watchlist.", example="Development Department"
+        None, description="Name of the watchlist.", examples=["Development Department"]
     )
     type: Optional[str] = Field(
-        ..., description="Type of watchlist.", example="DEPARTING_EMPLOYEE"
+        None, description="Type of watchlist.", examples=["DEPARTING_EMPLOYEE"]
     )
     is_significant: bool = Field(
-        ...,
+        None,
         alias="isSignificant",
         description="Indicates whether the watchlist was part of the triggering rule's criteria.",
-        example="true",
+        examples=["true"],
     )
 
 
@@ -111,12 +115,12 @@ class ObserverRuleMetadata(AuditInfo):
     name: Optional[str] = Field(
         None,
         description="The name of the rule.",
-        example="My Removable Media Exfiltration Rule",
+        examples=["My Removable Media Exfiltration Rule"],
     )
     description: Optional[str] = Field(
         None,
         description="The description of the rule.",
-        example="Will generate alerts when files moved to USB.",
+        examples=["Will generate alerts when files moved to USB."],
     )
     severity: Optional[str] = Field(
         None, description="The static severity of the rule (deprecated)."
@@ -125,19 +129,19 @@ class ObserverRuleMetadata(AuditInfo):
         None,
         alias="isSystem",
         description="Boolean indicating if the rule was created from another Code42 Application.",
-        example="FALSE",
+        examples=["FALSE"],
     )
     is_enabled: bool = Field(
-        ...,
+        None,
         alias="isEnabled",
         description="Boolean indicating if the rule is enabled to trigger alerts.",
-        example="TRUE",
+        examples=["TRUE"],
     )
     rule_source: Optional[str] = Field(
         None,
         alias="ruleSource",
         description="The source of the rule.  Will be one of [DepartingEmployee, Alerting, HighRiskEmployee]",
-        example="Alerting",
+        examples=["Alerting"],
     )
 
 
@@ -165,21 +169,21 @@ class AlertSummary(Model):
     * **watchlists**: `str` Watchlists the actor is on at the time of the alert (if any).
     """
 
-    tenant_id: constr(max_length=40) = Field(
-        ...,
+    tenant_id: Annotated[str, StringConstraints(max_length=40)] = Field(
+        None,
         alias="tenantId",
         description="The unique identifier representing the tenant.",
-        example="MyExampleTenant",
+        examples=["MyExampleTenant"],
     )
     type: Optional[str] = Field(..., description="Rule type that generated the alert.")
     id: Optional[str] = Field(
-        None, description="The unique id of the alert.", example="alertId"
+        None, description="The unique id of the alert.", examples=["alertId"]
     )
     created_at: datetime = Field(
-        ...,
+        None,
         alias="createdAt",
         description="The timestamp when the alert was created.",
-        example="2020-02-19T01:57:45.006683Z",
+        examples=["2020-02-19T01:57:45.006683Z"],
     )
     state: Optional[str] = Field(..., description="The current state of the alert.")
     state_last_modified_by: Optional[str] = Field(None, alias="stateLastModifiedBy")
@@ -189,23 +193,23 @@ class AlertSummary(Model):
     name: Optional[str] = Field(
         None,
         description="The name of the alert.  Same as the name of the rule that triggered it.",
-        example="Removable Media Exfiltration Rule",
+        examples=["Removable Media Exfiltration Rule"],
     )
     description: Optional[str] = Field(
         None,
         description="The description of the alert.  Same as the description of the rule that triggered it.",
-        example="Alert me on all removable media exfiltration.",
+        examples=["Alert me on all removable media exfiltration."],
     )
     actor: Optional[str] = Field(
         None,
         description="The user who triggered the alert.",
-        example="exampleUser@mycompany.com",
+        examples=["exampleUser@mycompany.com"],
     )
     actor_id: Optional[str] = Field(
         None,
         alias="actorId",
         description="The authority user id who triggered the alert, if it is available.",
-        example="authorityUserId",
+        examples=["authorityUserId"],
     )
     target: Optional[str] = None
     severity: Optional[str] = Field(
@@ -215,18 +219,18 @@ class AlertSummary(Model):
         None,
         alias="riskSeverity",
         description="Indicates event risk severity of the alert.",
-        example="MODERATE",
+        examples=["MODERATE"],
     )
     rule_id: Optional[str] = Field(
         None,
         alias="ruleId",
         description="The unique id corresponding to the rule which triggered the alert.",
-        example="uniqueRuleId",
+        examples=["uniqueRuleId"],
     )
     watchlists: Optional[List[Watchlist]] = Field(
         None,
         description="Watchlists the actor is on at the time of the alert.",
-        example=[],
+        examples=[[]],
         table=lambda watchlists: "\n".join((w.name or w.type) for w in watchlists)
         if watchlists
         else watchlists,
@@ -237,19 +241,19 @@ class AlertSummary(Model):
 
 
 class ObserverRuleMetadataEssentials(ObserverRuleMetadata):
-    tenant_id: constr(max_length=40) = Field(
-        ...,
+    tenant_id: Annotated[str, StringConstraints(max_length=40)] = Field(
+        None,
         alias="tenantId",
         description="The unique identifier representing the tenant.",
-        example="MyExampleTenant",
+        examples=["MyExampleTenant"],
     )
     observer_rule_id: Optional[str] = Field(
         None,
         alias="observerRuleId",
         description="Id of the rule in the observer.",
-        example="UniqueRuleId",
+        examples=["UniqueRuleId"],
     )
-    type: Optional[str] = Field(..., description="Rule type of the rule.")
+    type: Optional[str] = Field(None, description="Rule type of the rule.")
 
 
 class AlertDetails(AlertSummary):
@@ -263,5 +267,5 @@ class AlertDetails(AlertSummary):
     * **note**: `str` Most recent note added to the alert.
     """
 
-    observations: Optional[List[Observation]]
-    note: Optional[Note]
+    observations: Optional[List[Observation]] = None
+    note: Optional[Note] = None

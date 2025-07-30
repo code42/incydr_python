@@ -84,15 +84,21 @@ def test_get_single_trusted_activity_when_default_params_returns_expected_data(
     trusted_activity = client.trusted_activities.v2.get_trusted_activity("1234")
     assert isinstance(trusted_activity, TrustedActivity)
     assert trusted_activity.activity_id == "1234"
-    assert trusted_activity.json() == json.dumps(TEST_TRUSTED_ACTIVITY_1)
+    assert trusted_activity.json() == json.dumps(
+        TEST_TRUSTED_ACTIVITY_1, separators=(",", ":")
+    )
 
 
 def test_get_page_when_default_params_returns_expected_data(mock_get_all):
     client = Client()
     page = client.trusted_activities.v2.get_page()
     assert isinstance(page, TrustedActivitiesPage)
-    assert page.trusted_activities[0].json() == json.dumps(TEST_TRUSTED_ACTIVITY_1)
-    assert page.trusted_activities[1].json() == json.dumps(TEST_TRUSTED_ACTIVITY_2)
+    assert page.trusted_activities[0].json() == json.dumps(
+        TEST_TRUSTED_ACTIVITY_1, separators=(",", ":")
+    )
+    assert page.trusted_activities[1].json() == json.dumps(
+        TEST_TRUSTED_ACTIVITY_2, separators=(",", ":")
+    )
     assert page.total_count == len(page.trusted_activities) == 2
 
 
@@ -130,7 +136,9 @@ def test_iter_all_when_default_params_returns_expected_data(
     for item in iterator:
         total_trusted_activities += 1
         assert isinstance(item, TrustedActivity)
-        assert item.json() == json.dumps(expected_trusted_activities.pop(0))
+        assert item.json() == json.dumps(
+            expected_trusted_activities.pop(0), separators=(",", ":")
+        )
     assert total_trusted_activities == 2
 
 
@@ -200,7 +208,10 @@ def test_add_domain_when_default_params_returns_expected_data(
     assert trusted_activity.type == activity_type
     assert trusted_activity.value == domain
     assert trusted_activity.description == test_data["description"]
-    assert trusted_activity.activity_action_groups == activity_action_groups
+    assert (
+        json.loads(trusted_activity.json())["activityActionGroups"]
+        == activity_action_groups
+    )
 
 
 def test_add_domain_when_invalid_trusted_provider_value_raises_error(
@@ -336,7 +347,10 @@ def test_add_account_name_when_default_params_returns_expected_data(
     assert trusted_activity.type == activity_type
     assert trusted_activity.value == account_name
     assert trusted_activity.description == test_data["description"]
-    assert trusted_activity.activity_action_groups == activity_action_groups
+    assert (
+        json.loads(trusted_activity.activity_action_groups[0].json())
+        == activity_action_groups[0]
+    )
 
 
 def test_add_account_name_when_no_trusted_providers_raises_error(
@@ -388,7 +402,10 @@ def test_add_git_repository_when_default_params_returns_expected_data(
     assert trusted_activity.type == activity_type
     assert trusted_activity.value == git_uri
     assert trusted_activity.description == test_data["description"]
-    assert trusted_activity.activity_action_groups == activity_action_groups
+    assert (
+        json.loads(trusted_activity.activity_action_groups[0].json())
+        == activity_action_groups[0]
+    )
 
 
 def test_delete_trusted_activity_when_default_params_returns_expected_data(

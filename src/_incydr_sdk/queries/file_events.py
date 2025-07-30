@@ -9,10 +9,11 @@ from typing import Union
 from isodate import duration_isoformat
 from isodate import parse_duration
 from pydantic import BaseModel
-from pydantic import conint
+from pydantic import ConfigDict
 from pydantic import Field
-from pydantic import root_validator
+from pydantic import model_validator
 from pydantic import validate_arguments
+from typing_extensions import Annotated
 
 from _incydr_sdk.core.models import Model
 from _incydr_sdk.enums.file_events import Category
@@ -46,12 +47,11 @@ _term_enum_map = {
 class Filter(BaseModel):
     term: str
     operator: Union[Operator, str]
-    value: Optional[Union[int, str, List[str]]]
+    value: Optional[Union[int, str, List[str]]] = None
+    model_config = ConfigDict(use_enum_values=True)
 
-    class Config:
-        use_enum_values = True
-
-    @root_validator(pre=True)
+    @model_validator(mode="before")
+    @classmethod
     def _validate_enums(cls, values: dict):  # noqa `root_validator` is a classmethod
         term = values.get("term")
         operator = values.get("operator")
@@ -87,7 +87,7 @@ class Filter(BaseModel):
 
 class FilterGroup(BaseModel):
     filterClause: str = "AND"
-    filters: Optional[List[Filter]]
+    filters: Optional[List[Filter]] = None
 
 
 class FilterGroupV2(BaseModel):
@@ -118,15 +118,17 @@ class EventQuery(Model):
     group_clause: str = Field("AND", alias="groupClause")
     groups: Optional[List[FilterGroup]]
     page_num: int = Field(1, alias="pgNum")
-    page_size: conint(le=10000) = Field(100, alias="pgSize")
+    page_size: Annotated[int, Field(le=10000)] = Field(100, alias="pgSize")
     page_token: Optional[str] = Field("", alias="pgToken")
     sort_dir: str = Field("asc", alias="srtDir")
     sort_key: EventSearchTerm = Field("event.id", alias="srtKey")
-
-    class Config:
-        validate_assignment = True
-        use_enum_values = True
-        json_encoders = {datetime: lambda dt: dt.isoformat().replace("+00:00", "Z")}
+    # TODO[pydantic]: The following keys were removed: `json_encoders`.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
+    model_config = ConfigDict(
+        validate_assignment=True,
+        use_enum_values=True,
+        json_encoders={datetime: lambda dt: dt.isoformat().replace("+00:00", "Z")},
+    )
 
     def __init__(
         self,
