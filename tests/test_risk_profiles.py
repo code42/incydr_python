@@ -128,7 +128,9 @@ def test_get_single_user_risk_profile_when_default_params_returns_expected_data(
     user_risk_profile = client.risk_profiles.v1.get_risk_profile(TEST_USER_ID)
     assert isinstance(user_risk_profile, RiskProfile)
     assert user_risk_profile.user_id == TEST_USER_ID
-    assert user_risk_profile.json() == json.dumps(TEST_USER_RISK_PROFILE_1)
+    assert user_risk_profile.json() == json.dumps(
+        TEST_USER_RISK_PROFILE_1, separators=(",", ":")
+    )
 
 
 def test_get_page_when_default_params_returns_expected_data(
@@ -148,8 +150,12 @@ def test_get_page_when_default_params_returns_expected_data(
     client = Client()
     page = client.risk_profiles.v1.get_page()
     assert isinstance(page, RiskProfilesPage)
-    assert page.user_risk_profiles[0].json() == json.dumps(TEST_USER_RISK_PROFILE_1)
-    assert page.user_risk_profiles[1].json() == json.dumps(TEST_USER_RISK_PROFILE_2)
+    assert page.user_risk_profiles[0].json() == json.dumps(
+        TEST_USER_RISK_PROFILE_1, separators=(",", ":")
+    )
+    assert page.user_risk_profiles[1].json() == json.dumps(
+        TEST_USER_RISK_PROFILE_2, separators=(",", ":")
+    )
     assert page.total_count == len(page.user_risk_profiles) == 2
 
 
@@ -186,7 +192,9 @@ def test_iter_all_when_default_params_returns_expected_data(
     for item in iterator:
         total_user_risk_profiles += 1
         assert isinstance(item, RiskProfile)
-        assert item.json() == json.dumps(expected_user_risk_profiles.pop(0))
+        assert item.json() == json.dumps(
+            expected_user_risk_profiles.pop(0), separators=(",", ":")
+        )
     assert total_user_risk_profiles == 2
 
 
@@ -200,7 +208,9 @@ def test_update_when_default_params_returns_expected_data(mock_update_profile):
     )
 
     assert isinstance(user_risk_profile, RiskProfile)
-    assert user_risk_profile.json() == json.dumps(TEST_USER_RISK_PROFILE_2)
+    assert user_risk_profile.json() == json.dumps(
+        TEST_USER_RISK_PROFILE_2, separators=(",", ":")
+    )
 
 
 # ************************************************ CLI ************************************************

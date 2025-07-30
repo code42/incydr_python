@@ -78,7 +78,7 @@ def test_csv_model_parsing():
         list(Test.parse_csv(csv_with_no_required_aliases))
     assert (
         str(err.value)
-        == "CSV header missing column: 'required_field' required. Valid column aliases: ['required_field', 'requiredField', 'RF']"
+        == "CSV header missing column: Value error, 'required_field' required. Valid column aliases: ['required_field', 'requiredField', 'RF']"
     )
 
 
@@ -116,7 +116,7 @@ def test_json_lines_model_parsing():
     assert "Error parsing object on line 2: 1 validation error for Test" in str(
         err.value
     )
-    assert "value is not a valid integer" in str(err.value)
+    assert "Input should be a valid integer" in str(err.value)
 
 
 def test_user_agent(httpserver_auth: HTTPServer):

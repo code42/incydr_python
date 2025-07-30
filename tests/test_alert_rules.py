@@ -302,8 +302,8 @@ def test_get_page_when_default_params_returns_expected_data(
     assert isinstance(response, List)
     for rule in response:
         assert isinstance(rule, RuleDetails)
-    assert response[0].json() == json.dumps(TEST_RULE_1)
-    assert response[1].json() == json.dumps(TEST_RULE_2)
+    assert response[0].json() == json.dumps(TEST_RULE_1, separators=(",", ":"))
+    assert response[1].json() == json.dumps(TEST_RULE_2, separators=(",", ":"))
 
 
 def test_get_page_when_custom_params_makes_expected_call(httpserver_auth: HTTPServer):
@@ -321,8 +321,8 @@ def test_get_page_when_custom_params_makes_expected_call(httpserver_auth: HTTPSe
     assert isinstance(response, List)
     for rule in response:
         assert isinstance(rule, RuleDetails)
-    assert response[0].json() == json.dumps(TEST_RULE_1)
-    assert response[1].json() == json.dumps(TEST_RULE_2)
+    assert response[0].json() == json.dumps(TEST_RULE_1, separators=(",", ":"))
+    assert response[1].json() == json.dumps(TEST_RULE_2, separators=(",", ":"))
     assert len(response) == 2
 
 
@@ -358,7 +358,7 @@ def test_iter_all_returns_expected_data(
     for item in iterator:
         total += 1
         assert isinstance(item, RuleDetails)
-        assert item.json() == json.dumps(expected.pop(0))
+        assert item.json() == json.dumps(expected.pop(0), separators=(",", ":"))
     assert total == 3
 
 
@@ -373,7 +373,7 @@ def test_get_rule_returns_expected_data(mock_get):
     assert response.modified_at == datetime.datetime.fromisoformat(
         TEST_RULE_1["modifiedAt"].replace("Z", "+00:00")
     )
-    assert response.json() == json.dumps(TEST_RULE_1)
+    assert response.json() == json.dumps(TEST_RULE_1, separators=(",", ":"))
 
 
 def test_enable_rules_when_single_rule_id_returns_expected_data(
@@ -439,8 +439,12 @@ def test_get_users_when_default_params_returns_expected_data(mock_get_users):
     assert response.mode == "INCLUDE"
     for user in response.users:
         assert isinstance(user, RuleUser)
-    assert response.users[0].json() == json.dumps(TEST_RULE_USER_1)
-    assert response.users[1].json() == json.dumps(TEST_RULE_USER_2)
+    assert response.users[0].json() == json.dumps(
+        TEST_RULE_USER_1, separators=(",", ":")
+    )
+    assert response.users[1].json() == json.dumps(
+        TEST_RULE_USER_2, separators=(",", ":")
+    )
 
 
 def test_get_users_when_400_raises_missing_username_criterion_error(

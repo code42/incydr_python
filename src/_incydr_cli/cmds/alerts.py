@@ -273,13 +273,13 @@ def bulk_update_state(
 
     class AlertBulkCSV(CSVModel):
         alert_id: str = Field(csv_aliases=["id", "alert_id"])
-        state: state_type = Field(csv_aliases=["state"])
-        note: Optional[str]
+        state: state_type = Field(None, csv_aliases=["state"])  # type: ignore
+        note: Optional[str] = None
 
     class AlertBulkJSON(Model):
         alert_id: str = Field(alias="id")
-        state: state_type
-        note: Optional[str]
+        state: state_type = None  # type: ignore
+        note: Optional[str] = None
 
     client = Client()
     if format_ == "csv":

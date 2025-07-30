@@ -355,8 +355,12 @@ def test_get_page_when_default_params_returns_expected_data_v2(mock_get_all_v2):
     c = Client()
     page = c.watchlists.v2.get_page()
     assert isinstance(page, WatchlistsPage)
-    assert page.watchlists[0].json() == json.dumps(TEST_WATCHLIST_1)
-    assert page.watchlists[1].json() == json.dumps(TEST_WATCHLIST_2)
+    assert page.watchlists[0].json() == json.dumps(
+        TEST_WATCHLIST_1, separators=(",", ":")
+    )
+    assert page.watchlists[1].json() == json.dumps(
+        TEST_WATCHLIST_2, separators=(",", ":")
+    )
     assert page.total_count == len(page.watchlists) == 2
 
 
@@ -374,8 +378,12 @@ def test_get_page_when_custom_params_returns_expected_data_v2(
     c = Client()
     page = c.watchlists.v2.get_page(page_num=2, page_size=42, actor_id="user-42")
     assert isinstance(page, WatchlistsPage)
-    assert page.watchlists[0].json() == json.dumps(TEST_WATCHLIST_1)
-    assert page.watchlists[1].json() == json.dumps(TEST_WATCHLIST_2)
+    assert page.watchlists[0].json() == json.dumps(
+        TEST_WATCHLIST_1, separators=(",", ":")
+    )
+    assert page.watchlists[1].json() == json.dumps(
+        TEST_WATCHLIST_2, separators=(",", ":")
+    )
     assert page.total_count == len(page.watchlists) == 2
 
 
@@ -408,7 +416,7 @@ def test_iter_all_when_default_params_returns_expected_data_v2(
     for item in iterator:
         total += 1
         assert isinstance(item, Watchlist)
-        assert item.json() == json.dumps(expected.pop(0))
+        assert item.json() == json.dumps(expected.pop(0), separators=(",", ":"))
     assert total == 3
 
 
@@ -421,7 +429,7 @@ def test_get_returns_expected_data_v2(httpserver_auth: HTTPServer):
     watchlist = c.watchlists.v2.get(TEST_WATCHLIST_ID)
     assert isinstance(watchlist, Watchlist)
     assert watchlist.watchlist_id == TEST_WATCHLIST_ID
-    assert watchlist.json() == json.dumps(TEST_WATCHLIST_1)
+    assert watchlist.json() == json.dumps(TEST_WATCHLIST_1, separators=(",", ":"))
 
 
 def test_create_when_required_params_returns_expected_data_v2(
@@ -430,7 +438,7 @@ def test_create_when_required_params_returns_expected_data_v2(
     c = Client()
     watchlist = c.watchlists.v2.create(WatchlistType.DEPARTING_EMPLOYEE)
     assert isinstance(watchlist, Watchlist)
-    assert watchlist.json() == json.dumps(TEST_WATCHLIST_1)
+    assert watchlist.json() == json.dumps(TEST_WATCHLIST_1, separators=(",", ":"))
 
 
 def test_create_when_all_params_returns_expected_data_v2(mock_create_custom_v2):
@@ -439,7 +447,7 @@ def test_create_when_all_params_returns_expected_data_v2(mock_create_custom_v2):
         "CUSTOM", title="test", description="custom watchlist"
     )
     assert isinstance(watchlist, Watchlist)
-    assert watchlist.json() == json.dumps(TEST_WATCHLIST_2)
+    assert watchlist.json() == json.dumps(TEST_WATCHLIST_2, separators=(",", ":"))
 
 
 def test_create_when_custom_and_no_title_raises_error_v2(httpserver_auth: HTTPServer):
@@ -472,7 +480,7 @@ def test_update_when_all_params_returns_expected_data_v2(httpserver_auth: HTTPSe
         TEST_WATCHLIST_ID, title="updated title", description="updated description"
     )
     assert isinstance(response, Watchlist)
-    assert response.json() == json.dumps(watchlist)
+    assert response.json() == json.dumps(watchlist, separators=(",", ":"))
 
 
 def test_update_when_one_param_returns_expected_data_v2(httpserver_auth: HTTPServer):
@@ -490,7 +498,7 @@ def test_update_when_one_param_returns_expected_data_v2(httpserver_auth: HTTPSer
     c = Client()
     response = c.watchlists.v2.update(TEST_WATCHLIST_ID, title="updated title")
     assert isinstance(response, Watchlist)
-    assert response.json() == json.dumps(watchlist)
+    assert response.json() == json.dumps(watchlist, separators=(",", ":"))
 
 
 def test_get_member_returns_expected_data_v2(mock_get_member_v2):
@@ -502,7 +510,7 @@ def test_get_member_returns_expected_data_v2(mock_get_member_v2):
     assert member.added_time == datetime.datetime.fromisoformat(
         TEST_ACTOR_1["addedTime"].replace("Z", "+00:00")
     )
-    assert member.json() == json.dumps(TEST_ACTOR_1)
+    assert member.json() == json.dumps(TEST_ACTOR_1, separators=(",", ":"))
 
 
 def test_list_members_returns_expected_data_v2(mock_get_all_members_v2):
@@ -510,8 +518,12 @@ def test_list_members_returns_expected_data_v2(mock_get_all_members_v2):
     members = c.watchlists.v2.list_members(TEST_WATCHLIST_ID)
     assert isinstance(members, WatchlistMembersListV2)
     assert isinstance(members.watchlist_members[0], WatchlistActor)
-    assert members.watchlist_members[0].json() == json.dumps(TEST_ACTOR_1)
-    assert members.watchlist_members[1].json() == json.dumps(TEST_ACTOR_2)
+    assert members.watchlist_members[0].json() == json.dumps(
+        TEST_ACTOR_1, separators=(",", ":")
+    )
+    assert members.watchlist_members[1].json() == json.dumps(
+        TEST_ACTOR_2, separators=(",", ":")
+    )
     assert members.total_count == len(members.watchlist_members) == 2
 
 
@@ -573,15 +585,19 @@ def test_get_included_user_returns_expected_data_v2(mock_get_included_actor):
     assert user.added_time == datetime.datetime.fromisoformat(
         TEST_ACTOR_1["addedTime"].replace("Z", "+00:00")
     )
-    assert user.json() == json.dumps(TEST_ACTOR_1)
+    assert user.json() == json.dumps(TEST_ACTOR_1, separators=(",", ":"))
 
 
 def test_list_included_users_returns_expected_data_v2(mock_get_all_included_actors):
     c = Client()
     users = c.watchlists.v2.list_included_actors(TEST_WATCHLIST_ID)
     assert isinstance(users, IncludedActorsList)
-    assert users.included_actors[0].json() == json.dumps(TEST_ACTOR_1)
-    assert users.included_actors[1].json() == json.dumps(TEST_ACTOR_2)
+    assert users.included_actors[0].json() == json.dumps(
+        TEST_ACTOR_1, separators=(",", ":")
+    )
+    assert users.included_actors[1].json() == json.dumps(
+        TEST_ACTOR_2, separators=(",", ":")
+    )
     assert users.total_count == len(users.included_actors) == 2
 
 
@@ -623,15 +639,19 @@ def test_get_excluded_user_returns_expected_data_v2(mock_get_excluded_actor):
     assert user.added_time == datetime.datetime.fromisoformat(
         TEST_ACTOR_1["addedTime"].replace("Z", "+00:00")
     )
-    assert user.json() == json.dumps(TEST_ACTOR_1)
+    assert user.json() == json.dumps(TEST_ACTOR_1, separators=(",", ":"))
 
 
 def test_list_excluded_users_returns_expected_data_v2(mock_get_all_excluded_actors):
     c = Client()
     users = c.watchlists.v2.list_excluded_actors(TEST_WATCHLIST_ID)
     assert isinstance(users, ExcludedActorsList)
-    assert users.excluded_actors[0].json() == json.dumps(TEST_ACTOR_1)
-    assert users.excluded_actors[1].json() == json.dumps(TEST_ACTOR_2)
+    assert users.excluded_actors[0].json() == json.dumps(
+        TEST_ACTOR_1, separators=(",", ":")
+    )
+    assert users.excluded_actors[1].json() == json.dumps(
+        TEST_ACTOR_2, separators=(",", ":")
+    )
     assert users.total_count == len(users.excluded_actors) == 2
 
 
@@ -671,8 +691,12 @@ def test_list_included_directory_groups_returns_expected_data_v2(
     c = Client()
     groups = c.watchlists.v2.list_directory_groups(TEST_WATCHLIST_ID)
     assert isinstance(groups, IncludedDirectoryGroupsList)
-    assert groups.included_directory_groups[0].json() == json.dumps(TEST_GROUP_1)
-    assert groups.included_directory_groups[1].json() == json.dumps(TEST_GROUP_2)
+    assert groups.included_directory_groups[0].json() == json.dumps(
+        TEST_GROUP_1, separators=(",", ":")
+    )
+    assert groups.included_directory_groups[1].json() == json.dumps(
+        TEST_GROUP_2, separators=(",", ":")
+    )
     assert groups.total_count == len(groups.included_directory_groups) == 2
 
 
@@ -685,7 +709,7 @@ def test_get_directory_group_returns_expected_data_v2(mock_get_directory_group_v
     assert group.added_time == datetime.datetime.fromisoformat(
         TEST_GROUP_1["addedTime"].replace("Z", "+00:00")
     )
-    assert group.json() == json.dumps(TEST_GROUP_1)
+    assert group.json() == json.dumps(TEST_GROUP_1, separators=(",", ":"))
 
 
 @valid_ids_param
@@ -720,8 +744,12 @@ def test_list_included_departments_returns_expected_data_v2(
     c = Client()
     departments = c.watchlists.v2.list_departments(TEST_WATCHLIST_ID)
     assert isinstance(departments, IncludedDepartmentsList)
-    assert departments.included_departments[0].json() == json.dumps(TEST_DEPARTMENT_1)
-    assert departments.included_departments[1].json() == json.dumps(TEST_DEPARTMENT_2)
+    assert departments.included_departments[0].json() == json.dumps(
+        TEST_DEPARTMENT_1, separators=(",", ":")
+    )
+    assert departments.included_departments[1].json() == json.dumps(
+        TEST_DEPARTMENT_2, separators=(",", ":")
+    )
     assert departments.total_count == len(departments.included_departments) == 2
 
 
@@ -733,7 +761,7 @@ def test_get_department_returns_expected_data_v2(mock_get_department_v2):
     assert department.added_time == datetime.datetime.fromisoformat(
         TEST_DEPARTMENT_1["addedTime"].replace("Z", "+00:00")
     )
-    assert department.json() == json.dumps(TEST_DEPARTMENT_1)
+    assert department.json() == json.dumps(TEST_DEPARTMENT_1, separators=(",", ":"))
 
 
 @pytest.mark.parametrize(
@@ -778,8 +806,12 @@ def test_get_page_when_default_params_returns_expected_data(mock_get_all):
     c = Client()
     page = c.watchlists.v1.get_page()
     assert isinstance(page, WatchlistsPage)
-    assert page.watchlists[0].json() == json.dumps(TEST_WATCHLIST_1)
-    assert page.watchlists[1].json() == json.dumps(TEST_WATCHLIST_2)
+    assert page.watchlists[0].json() == json.dumps(
+        TEST_WATCHLIST_1, separators=(",", ":")
+    )
+    assert page.watchlists[1].json() == json.dumps(
+        TEST_WATCHLIST_2, separators=(",", ":")
+    )
     assert page.total_count == len(page.watchlists) == 2
 
 
@@ -795,8 +827,12 @@ def test_get_page_when_custom_params_returns_expected_data(httpserver_auth: HTTP
     c = Client()
     page = c.watchlists.v1.get_page(page_num=2, page_size=42, user_id="user-42")
     assert isinstance(page, WatchlistsPage)
-    assert page.watchlists[0].json() == json.dumps(TEST_WATCHLIST_1)
-    assert page.watchlists[1].json() == json.dumps(TEST_WATCHLIST_2)
+    assert page.watchlists[0].json() == json.dumps(
+        TEST_WATCHLIST_1, separators=(",", ":")
+    )
+    assert page.watchlists[1].json() == json.dumps(
+        TEST_WATCHLIST_2, separators=(",", ":")
+    )
     assert page.total_count == len(page.watchlists) == 2
 
 
@@ -829,7 +865,7 @@ def test_iter_all_when_default_params_returns_expected_data(
     for item in iterator:
         total += 1
         assert isinstance(item, Watchlist)
-        assert item.json() == json.dumps(expected.pop(0))
+        assert item.json() == json.dumps(expected.pop(0), separators=(",", ":"))
     assert total == 3
 
 
@@ -842,7 +878,7 @@ def test_get_returns_expected_data(httpserver_auth: HTTPServer):
     watchlist = c.watchlists.v1.get(TEST_WATCHLIST_ID)
     assert isinstance(watchlist, Watchlist)
     assert watchlist.watchlist_id == TEST_WATCHLIST_ID
-    assert watchlist.json() == json.dumps(TEST_WATCHLIST_1)
+    assert watchlist.json() == json.dumps(TEST_WATCHLIST_1, separators=(",", ":"))
 
 
 def test_create_when_required_params_returns_expected_data(
@@ -851,7 +887,7 @@ def test_create_when_required_params_returns_expected_data(
     c = Client()
     watchlist = c.watchlists.v1.create(WatchlistType.DEPARTING_EMPLOYEE)
     assert isinstance(watchlist, Watchlist)
-    assert watchlist.json() == json.dumps(TEST_WATCHLIST_1)
+    assert watchlist.json() == json.dumps(TEST_WATCHLIST_1, separators=(",", ":"))
 
 
 def test_create_when_all_params_returns_expected_data(mock_create_custom):
@@ -860,7 +896,7 @@ def test_create_when_all_params_returns_expected_data(mock_create_custom):
         "CUSTOM", title="test", description="custom watchlist"
     )
     assert isinstance(watchlist, Watchlist)
-    assert watchlist.json() == json.dumps(TEST_WATCHLIST_2)
+    assert watchlist.json() == json.dumps(TEST_WATCHLIST_2, separators=(",", ":"))
 
 
 def test_create_when_custom_and_no_title_raises_error(httpserver_auth: HTTPServer):
@@ -893,7 +929,7 @@ def test_update_when_all_params_returns_expected_data(httpserver_auth: HTTPServe
         TEST_WATCHLIST_ID, title="updated title", description="updated description"
     )
     assert isinstance(response, Watchlist)
-    assert response.json() == json.dumps(watchlist)
+    assert response.json() == json.dumps(watchlist, separators=(",", ":"))
 
 
 def test_update_when_one_param_returns_expected_data(httpserver_auth: HTTPServer):
@@ -911,7 +947,7 @@ def test_update_when_one_param_returns_expected_data(httpserver_auth: HTTPServer
     c = Client()
     response = c.watchlists.v1.update(TEST_WATCHLIST_ID, title="updated title")
     assert isinstance(response, Watchlist)
-    assert response.json() == json.dumps(watchlist)
+    assert response.json() == json.dumps(watchlist, separators=(",", ":"))
 
 
 def test_get_member_returns_expected_data(mock_get_member):
@@ -923,15 +959,19 @@ def test_get_member_returns_expected_data(mock_get_member):
     assert member.added_time == datetime.datetime.fromisoformat(
         TEST_USER_1["addedTime"].replace("Z", "+00:00")
     )
-    assert member.json() == json.dumps(TEST_USER_1)
+    assert member.json() == json.dumps(TEST_USER_1, separators=(",", ":"))
 
 
 def test_list_members_returns_expected_data(mock_get_all_members):
     c = Client()
     members = c.watchlists.v1.list_members(TEST_WATCHLIST_ID)
     assert isinstance(members, WatchlistMembersList)
-    assert members.watchlist_members[0].json() == json.dumps(TEST_USER_1)
-    assert members.watchlist_members[1].json() == json.dumps(TEST_USER_2)
+    assert members.watchlist_members[0].json() == json.dumps(
+        TEST_USER_1, separators=(",", ":")
+    )
+    assert members.watchlist_members[1].json() == json.dumps(
+        TEST_USER_2, separators=(",", ":")
+    )
     assert members.total_count == len(members.watchlist_members) == 2
 
 
@@ -993,15 +1033,19 @@ def test_get_included_user_returns_expected_data(mock_get_included_user):
     assert user.added_time == datetime.datetime.fromisoformat(
         TEST_USER_1["addedTime"].replace("Z", "+00:00")
     )
-    assert user.json() == json.dumps(TEST_USER_1)
+    assert user.json() == json.dumps(TEST_USER_1, separators=(",", ":"))
 
 
 def test_list_included_users_returns_expected_data(mock_get_all_included_users):
     c = Client()
     users = c.watchlists.v1.list_included_users(TEST_WATCHLIST_ID)
     assert isinstance(users, IncludedUsersList)
-    assert users.included_users[0].json() == json.dumps(TEST_USER_1)
-    assert users.included_users[1].json() == json.dumps(TEST_USER_2)
+    assert users.included_users[0].json() == json.dumps(
+        TEST_USER_1, separators=(",", ":")
+    )
+    assert users.included_users[1].json() == json.dumps(
+        TEST_USER_2, separators=(",", ":")
+    )
     assert users.total_count == len(users.included_users) == 2
 
 
@@ -1043,15 +1087,19 @@ def test_get_excluded_user_returns_expected_data(mock_get_excluded_user):
     assert user.added_time == datetime.datetime.fromisoformat(
         TEST_USER_1["addedTime"].replace("Z", "+00:00")
     )
-    assert user.json() == json.dumps(TEST_USER_1)
+    assert user.json() == json.dumps(TEST_USER_1, separators=(",", ":"))
 
 
 def test_list_excluded_users_returns_expected_data(mock_get_all_excluded_users):
     c = Client()
     users = c.watchlists.v1.list_excluded_users(TEST_WATCHLIST_ID)
     assert isinstance(users, ExcludedUsersList)
-    assert users.excluded_users[0].json() == json.dumps(TEST_USER_1)
-    assert users.excluded_users[1].json() == json.dumps(TEST_USER_2)
+    assert users.excluded_users[0].json() == json.dumps(
+        TEST_USER_1, separators=(",", ":")
+    )
+    assert users.excluded_users[1].json() == json.dumps(
+        TEST_USER_2, separators=(",", ":")
+    )
     assert users.total_count == len(users.excluded_users) == 2
 
 
@@ -1091,8 +1139,12 @@ def test_list_included_directory_groups_returns_expected_data(
     c = Client()
     groups = c.watchlists.v1.list_directory_groups(TEST_WATCHLIST_ID)
     assert isinstance(groups, IncludedDirectoryGroupsList)
-    assert groups.included_directory_groups[0].json() == json.dumps(TEST_GROUP_1)
-    assert groups.included_directory_groups[1].json() == json.dumps(TEST_GROUP_2)
+    assert groups.included_directory_groups[0].json() == json.dumps(
+        TEST_GROUP_1, separators=(",", ":")
+    )
+    assert groups.included_directory_groups[1].json() == json.dumps(
+        TEST_GROUP_2, separators=(",", ":")
+    )
     assert groups.total_count == len(groups.included_directory_groups) == 2
 
 
@@ -1105,7 +1157,7 @@ def test_get_directory_group_returns_expected_data(mock_get_directory_group):
     assert group.added_time == datetime.datetime.fromisoformat(
         TEST_GROUP_1["addedTime"].replace("Z", "+00:00")
     )
-    assert group.json() == json.dumps(TEST_GROUP_1)
+    assert group.json() == json.dumps(TEST_GROUP_1, separators=(",", ":"))
 
 
 @valid_ids_param
@@ -1138,8 +1190,12 @@ def test_list_included_departments_returns_expected_data(mock_get_all_department
     c = Client()
     departments = c.watchlists.v1.list_departments(TEST_WATCHLIST_ID)
     assert isinstance(departments, IncludedDepartmentsList)
-    assert departments.included_departments[0].json() == json.dumps(TEST_DEPARTMENT_1)
-    assert departments.included_departments[1].json() == json.dumps(TEST_DEPARTMENT_2)
+    assert departments.included_departments[0].json() == json.dumps(
+        TEST_DEPARTMENT_1, separators=(",", ":")
+    )
+    assert departments.included_departments[1].json() == json.dumps(
+        TEST_DEPARTMENT_2, separators=(",", ":")
+    )
     assert departments.total_count == len(departments.included_departments) == 2
 
 
@@ -1151,7 +1207,7 @@ def test_get_department_returns_expected_data(mock_get_department):
     assert department.added_time == datetime.datetime.fromisoformat(
         TEST_DEPARTMENT_1["addedTime"].replace("Z", "+00:00")
     )
-    assert department.json() == json.dumps(TEST_DEPARTMENT_1)
+    assert department.json() == json.dumps(TEST_DEPARTMENT_1, separators=(",", ":"))
 
 
 @pytest.mark.parametrize(

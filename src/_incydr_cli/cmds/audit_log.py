@@ -280,9 +280,9 @@ def _get_cursor_store(api_key):
 
 
 class DefaultAuditEvent(Model):
-    type: str = Field(None, alias="type$")
-    actor_id: str = Field(None, alias="actorId")
-    actor_name: str = Field(None, alias="actorName")
-    actor_agent: str = Field(None, alias="actorAgent")
-    actor_ip_addresses: str = Field(None, alias="actorIpAddress")
-    timestamp: str
+    type: Optional[str] = Field(None, alias="type$")
+    actor_id: Optional[str] = Field(None, alias="actorId")
+    actor_name: Optional[str] = Field(None, alias="actorName")
+    actor_agent: Optional[str] = Field(None, alias="actorAgent")
+    actor_ip_addresses: Optional[str] = Field(None, alias="actorIpAddress")
+    timestamp: str = None

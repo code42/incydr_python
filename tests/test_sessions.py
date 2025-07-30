@@ -109,7 +109,7 @@ def test_get_page_when_default_params_returns_expected_data(
     client = Client()
     page = client.sessions.v1.get_page()
     assert isinstance(page, SessionsPage)
-    assert page.items[0].json() == json.dumps(TEST_SESSION)
+    assert page.items[0].json() == json.dumps(TEST_SESSION, separators=(",", ":"))
     assert len(page.items) == 1 == page.total_count
 
 
@@ -153,7 +153,7 @@ def test_get_page_when_custom_params_returns_expected_data(httpserver_auth: HTTP
         content_inspection_status=ContentInspectionStatuses.PENDING,
     )
     assert isinstance(page, SessionsPage)
-    assert page.items[0].json() == json.dumps(TEST_SESSION)
+    assert page.items[0].json() == json.dumps(TEST_SESSION, separators=(",", ":"))
     assert len(page.items) == 1 == page.total_count
 
 
@@ -197,7 +197,7 @@ def test_get_page_when_given_date_uses_correct_timestamp(httpserver_auth: HTTPSe
         content_inspection_status=ContentInspectionStatuses.PENDING,
     )
     assert isinstance(page, SessionsPage)
-    assert page.items[0].json() == json.dumps(TEST_SESSION)
+    assert page.items[0].json() == json.dumps(TEST_SESSION, separators=(",", ":"))
     assert len(page.items) == 1 == page.total_count
 
 
@@ -234,7 +234,9 @@ def test_iter_all_when_default_params_returns_expected_data(
     for item in iterator:
         total_count += 1
         assert isinstance(item, Session)
-        assert item.json() == json.dumps(expected_sessions.pop(0))
+        assert item.json() == json.dumps(
+            expected_sessions.pop(0), separators=(",", ":")
+        )
     assert total_count == 1
 
 
@@ -299,7 +301,9 @@ def test_iter_all_when_custom_params_returns_expected_data(httpserver_auth: HTTP
     for item in iterator:
         total_count += 1
         assert isinstance(item, Session)
-        assert item.json() == json.dumps(expected_sessions.pop(0))
+        assert item.json() == json.dumps(
+            expected_sessions.pop(0), separators=(",", ":")
+        )
     assert total_count == 1
 
 
@@ -307,7 +311,7 @@ def test_get_session_details_returns_expected_data(mock_get_session):
     client = Client()
     response = client.sessions.v1.get_session_details(TEST_SESSION_ID)
     assert isinstance(response, Session)
-    assert response.json() == json.dumps(TEST_SESSION)
+    assert response.json() == json.dumps(TEST_SESSION, separators=(",", ":"))
 
 
 def test_get_session_events_returns_expected_data(

@@ -4,14 +4,16 @@ from itertools import chain
 from itertools import repeat
 from typing import Any
 from typing import Generator
+from typing import get_args
+from typing import get_origin
 from typing import List
 from typing import Tuple
 from typing import Type
+from typing import Union
 
 import rich.box
 from pydantic import BaseModel
-from pydantic.fields import ModelField
-from pydantic.fields import SHAPE_SINGLETON
+from pydantic.fields import FieldInfo
 from rich.console import ConsoleRenderable
 from rich.console import Group
 from rich.console import group
@@ -21,9 +23,9 @@ from rich.text import Text
 
 def get_field_value_and_info(
     model: BaseModel, path: List[str]
-) -> Tuple[Any, ModelField]:
+) -> Tuple[Any, FieldInfo]:
     """
-    Traverse a pydantic model and its sub-models to retrieve both the value and `ModelField` data for a given attribute
+    Traverse a pydantic model and its sub-models to retrieve both the value and `FieldInfo` data for a given attribute
     path.
 
     For example, given the following model hierarchy:
@@ -41,7 +43,7 @@ def get_field_value_and_info(
     >>> value, field = get_field_value_and_info(model, path=["child", "field_1"])
 
     The `value` var would contain the string "example", and `field` would be the Field object for `Child.field_1`, where
-    the 'extra_data' would be accessible in `field.field_info.extra`.
+    the 'extra_data' would be accessible in `field.json_schema_extra`.
     """
     for p in path[:-1]:
         next_model = getattr(model, p)
@@ -49,14 +51,14 @@ def get_field_value_and_info(
         # class and use that to "construct" an empty version of the model, so child fields will still return valid
         # field_info, but the value will be `None` for every field on "missing" child models.
         if next_model is None:
-            model_type = model.__fields__[p].type_
-            model = model_type.construct(
-                **{field: None for field in model_type.__fields__}
+            model_type = _get_model_type(type(model).model_fields[p].annotation)
+            model = model_type.model_construct(
+                **{field: None for field in model_type.model_fields}
             )
         else:
             model = next_model
     value = getattr(model, path[-1])
-    field = model.__fields__.get(path[-1])
+    field = type(model).model_fields.get(path[-1])
     return value, field
 
 
@@ -72,21 +74,25 @@ def iter_model_formatted(
     Accepts a list of field names to filter by (if flat=True, `include` list must be flattened dot-notation names).
 
     Will automatically attempt to "render" the field values in the following order:
-       - if `render` arg is a string, it will look in the "extra" section of the pydantic model's Field Info for that
+       - if `render` arg is a string, it will look in the "json_schema_extra" section of the pydantic model's Field Info for that
           name (expects a callable to be there)
        - if value is of a type that the model has a `json_encoder` for, it will use that encoder
        - otherwise will leave the value unchanged
     """
-    fields = get_fields(model.__class__, include=include, flat=flat)
+    fields = get_fields(type(model), include=include, flat=flat)
     for name in fields:
         path = name.split(".")
-        value, field = get_field_value_and_info(model, path)
-        field_renderer = None if not field else field.field_info.extra.get(render)
+        value, field_info = get_field_value_and_info(model, path)
+        field_renderer = (
+            None
+            if not field_info.json_schema_extra
+            else field_info.json_schema_extra.get(render)
+        )
         if render and field_renderer:
             value = field_renderer(value)
             yield name, value
             continue
-        json_encoder = model.Config.json_encoders.get(type(value))
+        json_encoder = model.model_config.get("json_encoders").get(type(value))
         if json_encoder:
             value = json_encoder(value)
         yield name, value
@@ -128,7 +134,7 @@ def list_as_panel(
 
 
 @group()
-def model_as_card(model, include=None):
+def model_as_card(model: BaseModel, include=None):
     """
     Renders a pydantic model in 'card' format, where field name/value pairs are presented vertically, and when a field
     is a list of items, it renders it as a separate panel.
@@ -171,18 +177,13 @@ def flatten_fields(model: Type[BaseModel]) -> Generator[str, None, None]:
 
     flatten_fields(Parent) would yield: ['field', 'child.field_1', 'child.field_2']
     """
-    for name, field in model.__fields__.items():
-        # the field.shape tells us if the field contains a single `BaseModel` or something like a `List[BaseModel]`
-        # we can only traverse singleton models when flattening
-        try:
-            is_subclass = issubclass(field.type_, BaseModel)
-        # TypeError is thrown if field.type_ is a Union type.
-        # Assumes our endpoints won't return a field that can be one of multiple models
-        # This would be a pretty odd API design anyway
-        except TypeError:
-            is_subclass = False
-        if field.shape == SHAPE_SINGLETON and is_subclass:
-            for child_name in flatten_fields(field.type_):
+    # We want the model type, not an instance thereof
+    if isinstance(model, BaseModel):
+        model = type(model)
+    for name, field in model.model_fields.items():
+        model_field_type = _get_model_type(field.annotation)
+        if _is_singleton(field.annotation) and issubclass(model_field_type, BaseModel):
+            for child_name in flatten_fields(model_field_type):
                 yield f"{name}.{child_name}"
         else:
             yield name
@@ -202,7 +203,10 @@ def get_fields(
 
     Order is preserved to match `include` order, to allow precise table/csv column ordering based on user input.
     """
-    fields = list(flatten_fields(model)) if flat else model.__fields__
+    # We want the model type, not an instance thereof
+    if isinstance(model, BaseModel):
+        model = type(model)
+    fields = list(flatten_fields(model)) if flat else model.model_fields.keys()
     if not include:
         yield from fields
     else:
@@ -222,3 +226,26 @@ def get_fields(
                     f"'{i}' is not a valid field path for model: {model.__name__}",
                     list(fields),
                 )
+
+
+def _is_singleton(type) -> bool:
+    """Returns `true` if the given type is a single object (for example, Union[int, str]);
+    returns false if it is a list (e.g. Union[List[int], List[str]])"""
+    origin = get_origin(type) if get_origin(type) else type
+    if origin == Union:
+        return all([_is_singleton(item) for item in get_args(type)])
+    if origin in (list, tuple, set):
+        return False
+    return True
+
+
+def _get_model_type(type) -> Type[BaseModel]:
+    """Given a type annotation, gets the type that subclasses BaseModel"""
+    if issubclass(type, BaseModel):
+        return type
+    elif get_origin(type):
+        return next(
+            (_get_model_type(item) for item in get_args(type) if _get_model_type(item)),
+            None,
+        )
+    return None

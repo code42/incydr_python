@@ -24,13 +24,13 @@ class RuleUser(ResponseModel):
     user_id_from_authority: str = Field(
         None,
         description="User ID from authority.",
-        example="userIdFromAuthority",
+        examples=["userIdFromAuthority"],
         alias="userIdFromAuthority",
     )
     aliases: List[str] = Field(
         None,
         description="List of user aliases corresponding to the user ID from the authority.",
-        example=["userAlias1", "userAlias2"],
+        examples=[["userAlias1", "userAlias2"]],
     )
 
 
@@ -48,7 +48,7 @@ class RuleUsersList(ResponseModel):
     id: Optional[str] = Field(
         None,
         description="The id of the rule.",
-        example="669bb117-d07a-4bd9-9f19-f1d85102cf55",
+        examples=["669bb117-d07a-4bd9-9f19-f1d85102cf55"],
     )
     users: Optional[List[RuleUser]] = Field(
         None, description="A list of users in the rule's username filter."
@@ -64,7 +64,7 @@ class CloudSharingDetails(Model):
     observe_all: bool = Field(
         None,
         description="Indicates whether we are watching the cloud sharing connector or not.",
-        example=True,
+        examples=[True],
         alias="observeAll",
     )
     public_link_share: bool = Field(None, alias="publicLinkShare")
@@ -91,13 +91,13 @@ class FileUploadCategory(Model):
     observe_all: bool = Field(
         None,
         description="Indicates whether we are watching all of the destinations in the category.",
-        example=True,
+        examples=[True],
         alias="observeAll",
     )
     destinations: Optional[List[str]] = Field(
         None,
         description="A list of specific destinations to watch within the category.",
-        example=[],
+        examples=[[]],
     )
 
 
@@ -109,13 +109,13 @@ class RemovableMediaVector(Model):
     is_enabled: bool = Field(
         None,
         description="Indicates whether to watch removable media destinations or not.",
-        example=True,
+        examples=[True],
         alias="isEnabled",
     )
     criteria_order: int = Field(
         None,
         description="Order in which this vector was added to the rule.",
-        example=3,
+        examples=[3],
         alias="criteriaOrder",
     )
 
@@ -124,12 +124,12 @@ class FileCategoryFilter(Model):
     categories: Optional[List[str]] = Field(
         None,
         description="List of file categories to alert on.",
-        example=["Archive", "Pdf", "SourceCode"],
+        examples=[["Archive", "Pdf", "SourceCode"]],
     )
     criteria_order: int = Field(
         None,
         description="Order in which this vector was added to the rule.",
-        example=3,
+        examples=[3],
         alias="criteriaOrder",
     )
 
@@ -138,12 +138,12 @@ class FileNameFilter(Model):
     patterns: Optional[List[str]] = Field(
         None,
         description="List of file name patterns to alert on.",
-        example=["*.cs", "*.sh"],
+        examples=[["*.cs", "*.sh"]],
     )
     criteria_order: int = Field(
         None,
         description="Order in which this vector was added to the rule.",
-        example=3,
+        examples=[3],
         alias="criteriaOrder",
     )
 
@@ -152,13 +152,13 @@ class FileTypeMismatchFilter(Model):
     is_enabled: bool = Field(
         None,
         description="Indicates whether or not to alert on file type mismatches only.",
-        example=True,
+        examples=[True],
         alias="isEnabled",
     )
     criteria_order: int = Field(
         None,
         description="Order in which this vector was added to the rule.",
-        example=3,
+        examples=[3],
         alias="criteriaOrder",
     )
 
@@ -185,16 +185,16 @@ class NotificationContact(Model):
     is_enabled: bool = Field(
         None,
         description="Indicates whether the notifications for this contact are enabled.",
-        example=True,
+        examples=[True],
         alias="isEnabled",
     )
     type: Optional[str] = Field(
-        None, description="Type of notification.", example="EMAIL"
+        None, description="Type of notification.", examples=["EMAIL"]
     )
     address: Optional[str] = Field(
         None,
         description="Address notifications are configured to send to.",
-        example="myUsername@company.com",
+        examples=["myUsername@company.com"],
     )
 
 
@@ -202,7 +202,7 @@ class CloudSharingVector(Model):
     observe_all: Optional[bool] = Field(
         None,
         description="Indicates whether to watch all cloud sharing connectors.",
-        example=False,
+        examples=[False],
         alias="observeAll",
     )
     box: Optional[CloudSharingDetails] = Field(
@@ -222,7 +222,7 @@ class CloudSharingVector(Model):
     criteria_order: int = Field(
         None,
         description="Order in which this vector was added to the rule.",
-        example=3,
+        examples=[3],
         alias="criteriaOrder",
     )
 
@@ -277,7 +277,7 @@ class FileUploadVector(Model):
     criteria_order: int = Field(
         None,
         description="Order in which this vector was added to the rule.",
-        example=3,
+        examples=[3],
         alias="criteriaOrder",
     )
 
@@ -286,7 +286,7 @@ class FileVolumeFilter(Model):
     count_greater_than: int = Field(
         None,
         description="File count threshold that must be exceeded to trigger an alert.",
-        example=125,
+        examples=[125],
         alias="countGreaterThan",
     )
     operator: Optional[str] = Field(
@@ -296,13 +296,13 @@ class FileVolumeFilter(Model):
     size_greater_than_in_bytes: int = Field(
         None,
         description="File size threshold that must be exceeded to trigger an alert.",
-        example=1024,
+        examples=[1024],
         alias="sizeGreaterThanInBytes",
     )
     criteria_order: int = Field(
         None,
         description="Order in which this vector was added to the rule.",
-        example=3,
+        examples=[3],
         alias="criteriaOrder",
     )
 
@@ -314,12 +314,12 @@ class UsernameFilter(Model):
     usernames: Optional[List[str]] = Field(
         None,
         description="List of usernames.  Will either alert only on these users or on any user not in list.",
-        example=["myUsername@company.com", "anotherUsername@company.com"],
+        examples=[["myUsername@company.com", "anotherUsername@company.com"]],
     )
     criteria_order: int = Field(
         None,
         description="Order in which this vector was added to the rule.",
-        example=3,
+        examples=[3],
         alias="criteriaOrder",
     )
 
@@ -333,7 +333,7 @@ class NotificationSettings(Model):
     is_enabled: bool = Field(
         None,
         description="Indicates whether notifications are enabled.",
-        example=True,
+        examples=[True],
         alias="isEnabled",
     )
     contacts: Optional[List[NotificationContact]] = Field(
@@ -425,26 +425,30 @@ class RuleDetails(ResponseModel):
     name: Optional[str] = Field(
         None,
         description="Unique name of the rule.",
-        example="Suspicious File Mismatch Rule",
+        examples=["Suspicious File Mismatch Rule"],
     )
     description: Optional[str] = Field(
         None,
         description="Description of the rule.",
-        example="A rule created to trigger alerts on suspicious file mismatch exfiltration",
+        examples=[
+            "A rule created to trigger alerts on suspicious file mismatch exfiltration"
+        ],
     )
     severity: Optional[str] = Field(
-        None, description="[Deprecated field] Indicates severity of rule.", example=""
+        None,
+        description="[Deprecated field] Indicates severity of rule.",
+        examples=[""],
     )
     is_enabled: Optional[bool] = Field(
         None,
         description="Indicates whether the rule is enabled or not.",
-        example=True,
+        examples=[True],
         alias="isEnabled",
     )
     source: Optional[str] = Field(
         None,
         description="[Deprecated field] Indicates source of rule creation.",
-        example="",
+        examples=[""],
     )
     notifications: Optional[NotificationSettings] = Field(
         None, description="Notifications configuration settings for this rule."
@@ -461,35 +465,35 @@ class RuleDetails(ResponseModel):
     id: Optional[str] = Field(
         None,
         description="Unique identifier of the rule.",
-        example="ecec5037-aedc-4cf9-aad3-57dcafe1f204",
+        examples=["ecec5037-aedc-4cf9-aad3-57dcafe1f204"],
     )
     created_at: Optional[datetime] = Field(
         None,
         description="Time when the rule was created.",
-        example="2022-10-04T17:53:26.4534999Z",
+        examples=["2022-10-04T17:53:26.4534999Z"],
         alias="createdAt",
     )
     created_by: Optional[str] = Field(
         None,
         description="Individual or service who created the rule.",
-        example="my-username@company.com",
+        examples=["my-username@company.com"],
         alias="createdBy",
     )
     modified_at: Optional[datetime] = Field(
         None,
         description="Time when the rule was last modified.",
-        example="2022-10-04T17:53:26.453532Z",
+        examples=["2022-10-04T17:53:26.453532Z"],
         alias="modifiedAt",
     )
     modified_by: Optional[str] = Field(
         None,
         description="Individual or service who last modified the rule.",
-        example="my-username@company.com",
+        examples=["my-username@company.com"],
         alias="modifiedBy",
     )
     is_system_rule: Optional[bool] = Field(
         None,
         description="Boolean indicator of whether or not the rule is connected to a lens.",
-        example=True,
+        examples=[True],
         alias="isSystemRule",
     )
