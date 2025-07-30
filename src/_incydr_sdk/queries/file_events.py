@@ -122,8 +122,6 @@ class EventQuery(Model):
     page_token: Optional[str] = Field("", alias="pgToken")
     sort_dir: str = Field("asc", alias="srtDir")
     sort_key: EventSearchTerm = Field("event.id", alias="srtKey")
-    # TODO[pydantic]: The following keys were removed: `json_encoders`.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
     model_config = ConfigDict(
         validate_assignment=True,
         use_enum_values=True,
