@@ -5,9 +5,8 @@ from typing import List
 from unittest import mock
 
 import pytest
-from pytest_httpserver import HTTPServer
 from pydantic import ValidationError
-
+from pytest_httpserver import HTTPServer
 
 from _incydr_cli.cmds.options.output_options import TableFormat
 from _incydr_cli.cursor import CursorStore
@@ -566,7 +565,7 @@ TEST_SAVED_SEARCH_QUERY = {
 
 TEST_SAVED_SEARCH_ID = "saved-search-1"
 
-TEST_BAD_EVENT_JSON = """{
+TEST_BAD_EVENT_JSON = r"""{
     "fileEvents": [
         {
             "@timestamp": "2025-08-04T01:01:01.081Z",
@@ -811,6 +810,7 @@ def mock_list_saved_searches(httpserver_auth):
         "/v2/file-events/saved-searches", method="GET"
     ).respond_with_json(search_data)
 
+
 @pytest.mark.parametrize(
     "query, expected_query",
     [(TEST_EVENT_QUERY, TEST_DICT_QUERY)],
@@ -877,6 +877,7 @@ def test_get_saved_search_returns_expected_data_when_search_has_subgroups(
     search = client.file_events.v2.get_saved_search(TEST_SAVED_SEARCH_ID)
     assert isinstance(search, SavedSearch)
     assert search.json() == TEST_SAVED_SEARCH_3.json()
+
 
 def test_search_raises_exception_when_bad_event_json(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request("/v2/file-events", method="POST").respond_with_data(
