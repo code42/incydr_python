@@ -182,7 +182,7 @@ def flatten_fields(model: Type[BaseModel]) -> Generator[str, None, None]:
         model = type(model)
     for name, field in model.model_fields.items():
         model_field_type = _get_model_type(field.annotation)
-        if _is_singleton(field.annotation) and issubclass(model_field_type, BaseModel):
+        if _is_single(field.annotation) and issubclass(model_field_type, BaseModel):
             for child_name in flatten_fields(model_field_type):
                 yield f"{name}.{child_name}"
         else:
@@ -228,12 +228,12 @@ def get_fields(
                 )
 
 
-def _is_singleton(type) -> bool:
+def _is_single(type) -> bool:
     """Returns `true` if the given type is a single object (for example, Union[int, str]);
     returns false if it is a list (e.g. Union[List[int], List[str]])"""
     origin = get_origin(type) if get_origin(type) else type
     if origin == Union:
-        return all([_is_singleton(item) for item in get_args(type)])
+        return all([_is_single(item) for item in get_args(type)])
     if origin in (list, tuple, set):
         return False
     return True
