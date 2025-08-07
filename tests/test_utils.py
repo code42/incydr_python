@@ -9,7 +9,7 @@ from pydantic import Field
 
 from _incydr_sdk.queries.utils import parse_str_to_dt
 from _incydr_sdk.utils import _get_model_type
-from _incydr_sdk.utils import _is_singleton
+from _incydr_sdk.utils import _is_single
 from _incydr_sdk.utils import flatten_fields
 from _incydr_sdk.utils import get_field_value_and_info
 from _incydr_sdk.utils import get_fields
@@ -247,8 +247,8 @@ def test_parse_str_to_dt(ts_str, expected):
         (tuple, False),
     ],
 )
-def test_is_singleton(type, expected):
-    assert _is_singleton(type) == expected
+def test_is_single(type, expected):
+    assert _is_single(type) == expected
 
 
 @pytest.mark.parametrize(
