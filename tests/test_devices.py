@@ -133,8 +133,7 @@ def test_get_device_returns_expected_data(mock_get):
     device = client.devices.v1.get_device("device-1")
     assert isinstance(device, Device)
     assert device.device_id == "device-1"
-    assert device.json() == json.dumps(TEST_DEVICE_1)
-
+    assert json.loads(device.json()) == TEST_DEVICE_1
     # test timestamp conversion
     assert device.last_connected == datetime.fromisoformat(
         TEST_DEVICE_1["lastConnected"].replace("Z", "+00:00")
@@ -154,8 +153,8 @@ def test_get_page_when_default_query_params_returns_expected_data(mock_get_all_d
     client = Client()
     page = client.devices.v1.get_page()
     assert isinstance(page, DevicesPage)
-    assert page.devices[0].json() == json.dumps(TEST_DEVICE_1)
-    assert page.devices[1].json() == json.dumps(TEST_DEVICE_2)
+    assert json.loads(page.devices[0].json()) == TEST_DEVICE_1
+    assert json.loads(page.devices[1].json()) == TEST_DEVICE_2
     assert page.total_count == len(page.devices) == 2
 
 
@@ -186,8 +185,8 @@ def test_get_page_when_custom_query_params_returns_expected_data(
         sort_key=SortKeys.LAST_CONNECTED,
     )
     assert isinstance(page, DevicesPage)
-    assert page.devices[0].json() == json.dumps(TEST_DEVICE_1)
-    assert page.devices[1].json() == json.dumps(TEST_DEVICE_2)
+    assert json.loads(page.devices[0].json()) == TEST_DEVICE_1
+    assert json.loads(page.devices[1].json()) == TEST_DEVICE_2
     assert page.total_count == len(page.devices) == 2
 
 
@@ -224,7 +223,7 @@ def test_iter_all_when_default_params_returns_expected_data(
     for item in iterator:
         total_devices += 1
         assert isinstance(item, Device)
-        assert item.json() == json.dumps(expected_devices.pop(0))
+        assert json.loads(item.json()) == expected_devices.pop(0)
     assert total_devices == 3
 
 

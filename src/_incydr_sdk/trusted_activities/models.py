@@ -76,7 +76,7 @@ class TrustedActivity(ResponseModel, validate_assignment=True):
         None,
         description="The unique identifier of the trusted activity.",
         alias="activityId",
-        allow_mutation=False,
+        frozen=True,
     )
     is_high_value_source: Optional[bool] = Field(
         None,
@@ -87,7 +87,7 @@ class TrustedActivity(ResponseModel, validate_assignment=True):
         None, description="A description of the trusted activity."
     )
     principal_type: Optional[Union[PrincipalType, str]] = Field(
-        None, alias="principalType", allow_mutation=False
+        None, alias="principalType", frozen=True
     )
     type: Optional[Union[ActivityType, str]] = Field(
         None, description="The type of the trusted activity.", alias="type"
@@ -96,19 +96,19 @@ class TrustedActivity(ResponseModel, validate_assignment=True):
         None,
         description="The time at which the trust activity was last created or modified.",
         alias="updateTime",
-        allow_mutation=False,
+        frozen=True,
     )
     updated_by_principal_id: Optional[str] = Field(
         None,
         description="The unique identifier of the user who last updated the trust activity.",
         alias="updatedByPrincipalId",
-        allow_mutation=False,
+        frozen=True,
     )
     updated_by_principal_name: Optional[str] = Field(
         None,
         description="The username of the user who last updated the trusted activity.",
         alias="updatedByPrincipalName",
-        allow_mutation=False,
+        frozen=True,
     )
     value: Optional[str] = Field(None, description="The value of the trusted activity.")
 

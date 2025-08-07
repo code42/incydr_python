@@ -236,8 +236,8 @@ def test_get_page_with_default_params_returns_expected_data(
     client = Client()
     page = client.actors.v1.get_page()
     assert isinstance(page, ActorsPage)
-    assert page.actors[0].json() == json.dumps(PARENT_ACTOR)
-    assert page.actors[1].json() == json.dumps(CHILD_ACTOR)
+    assert page.actors[0].json() == json.dumps(PARENT_ACTOR, separators=(",", ":"))
+    assert page.actors[1].json() == json.dumps(CHILD_ACTOR, separators=(",", ":"))
     assert len(page.actors) == 2
 
 
@@ -267,7 +267,7 @@ def test_get_page_when_custom_query_params_returns_expected_data(
         page_num=2,
     )
     assert isinstance(page, ActorsPage)
-    assert page.actors[0].json() == json.dumps(CHILD_ACTOR)
+    assert page.actors[0].json() == json.dumps(CHILD_ACTOR, separators=(",", ":"))
     assert len(page.actors) == 1
 
 
@@ -286,7 +286,7 @@ def test_get_page_when_prefer_parent_returns_expected_data(httpserver_auth: HTTP
     client = Client()
     page = client.actors.v1.get_page(prefer_parent=True)
     assert isinstance(page, ActorsPage)
-    assert page.actors[0].json() == json.dumps(PARENT_ACTOR)
+    assert page.actors[0].json() == json.dumps(PARENT_ACTOR, separators=(",", ":"))
     assert len(page.actors) == 1
 
 
@@ -312,7 +312,7 @@ def test_iter_all_with_default_params_returns_expected_data(
     for item in iterator:
         total_count += 1
         assert isinstance(item, Actor)
-        assert item.json() == json.dumps(expected_actors.pop(0))
+        assert item.json() == json.dumps(expected_actors.pop(0), separators=(",", ":"))
     assert total_count == 2
 
 
@@ -356,7 +356,7 @@ def test_iter_all_when_custom_params_returns_expected_data(
     for item in iterator:
         total_count += 1
         assert isinstance(item, Actor)
-        assert item.json() == json.dumps(expected_actors.pop(0))
+        assert item.json() == json.dumps(expected_actors.pop(0), separators=(",", ":"))
     assert total_count == 2
 
 
@@ -386,7 +386,7 @@ def test_iter_all_when_prefer_parent_returns_expected_data(httpserver_auth: HTTP
     for item in iterator:
         total_count += 1
         assert isinstance(item, Actor)
-        assert item.json() == json.dumps(expected_actors.pop(0))
+        assert item.json() == json.dumps(expected_actors.pop(0), separators=(",", ":"))
     assert total_count == 2
 
 
@@ -395,7 +395,7 @@ def test_get_actor_by_id_returns_expected_data(mock_get_actor_by_id):
     response = client.actors.v1.get_actor_by_id(CHILD_ACTOR_ID)
     assert isinstance(response, Actor)
     assert response.actor_id == CHILD_ACTOR_ID
-    assert response.json() == json.dumps(CHILD_ACTOR)
+    assert response.json() == json.dumps(CHILD_ACTOR, separators=(",", ":"))
 
 
 def test_get_actor_by_id_with_prefer_parent_returns_expected_data(
@@ -405,7 +405,7 @@ def test_get_actor_by_id_with_prefer_parent_returns_expected_data(
     response = client.actors.v1.get_actor_by_id(CHILD_ACTOR_ID, prefer_parent=True)
     assert isinstance(response, Actor)
     assert response.actor_id == PARENT_ACTOR_ID
-    assert response.json() == json.dumps(PARENT_ACTOR)
+    assert response.json() == json.dumps(PARENT_ACTOR, separators=(",", ":"))
 
 
 def test_get_actor_by_name_returns_expected_data(mock_get_actor_by_name):
@@ -414,7 +414,7 @@ def test_get_actor_by_name_returns_expected_data(mock_get_actor_by_name):
     assert isinstance(response, Actor)
     assert response.actor_id == CHILD_ACTOR_ID
     assert response.name == CHILD_ACTOR_NAME
-    assert response.json() == json.dumps(CHILD_ACTOR)
+    assert response.json() == json.dumps(CHILD_ACTOR, separators=(",", ":"))
 
 
 def test_get_actor_by_name_when_prefer_parent_returns_expected_data(
@@ -425,7 +425,7 @@ def test_get_actor_by_name_when_prefer_parent_returns_expected_data(
     assert isinstance(response, Actor)
     assert response.actor_id == PARENT_ACTOR_ID
     assert response.name == PARENT_ACTOR_NAME
-    assert response.json() == json.dumps(PARENT_ACTOR)
+    assert response.json() == json.dumps(PARENT_ACTOR, separators=(",", ":"))
 
 
 def test_get_actor_by_name_when_actor_not_found_raises_error(
@@ -451,7 +451,7 @@ def test_get_family_by_member_id_returns_expected_data(mock_get_family_by_member
     assert isinstance(response, ActorFamily)
     assert isinstance(response.children[0], Actor)
     assert isinstance(response.parent, Actor)
-    assert response.json() == json.dumps(ACTOR_FAMILY)
+    assert response.json() == json.dumps(ACTOR_FAMILY, separators=(",", ":"))
 
 
 def test_get_family_by_member_name_returns_expected_data(
@@ -462,7 +462,7 @@ def test_get_family_by_member_name_returns_expected_data(
     assert isinstance(response, ActorFamily)
     assert isinstance(response.children[0], Actor)
     assert isinstance(response.parent, Actor)
-    assert response.json() == json.dumps(ACTOR_FAMILY)
+    assert response.json() == json.dumps(ACTOR_FAMILY, separators=(",", ":"))
 
 
 def test_update_updates_actor(mock_update_actor):
@@ -471,7 +471,7 @@ def test_update_updates_actor(mock_update_actor):
         PARENT_ACTOR_ID, notes="example note", start_date="", end_date=None
     )
     assert isinstance(response, Actor)
-    assert response.json() == json.dumps(UPDATED_ACTOR)
+    assert response.json() == json.dumps(UPDATED_ACTOR, separators=(",", ":"))
 
 
 def test_update_when_keyword_arg_provided_updates_actor(mock_update_actor):
@@ -480,7 +480,7 @@ def test_update_when_keyword_arg_provided_updates_actor(mock_update_actor):
         actor=PARENT_ACTOR_ID, notes="example note", start_date="", end_date=None
     )
     assert isinstance(response, Actor)
-    assert response.json() == json.dumps(UPDATED_ACTOR)
+    assert response.json() == json.dumps(UPDATED_ACTOR, separators=(",", ":"))
 
 
 def test_update_actor_accepts_actor_arg(mock_update_actor):
@@ -490,7 +490,7 @@ def test_update_actor_accepts_actor_arg(mock_update_actor):
     )
     response = client.actors.v1.update_actor(test_actor)
     assert isinstance(response, Actor)
-    assert response.json() == json.dumps(UPDATED_ACTOR)
+    assert response.json() == json.dumps(UPDATED_ACTOR, separators=(",", ":"))
 
 
 def test_update_when_parameter_not_provided_does_not_update_parameter(

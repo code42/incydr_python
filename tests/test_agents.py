@@ -105,7 +105,7 @@ def test_get_agent_returns_expected_data(mock_get_agent):
     agent = client.agents.v1.get_agent("agent-1")
     assert isinstance(agent, Agent)
     assert agent.agent_id == "agent-1"
-    assert agent.json() == json.dumps(TEST_AGENT_1)
+    assert agent.json() == json.dumps(TEST_AGENT_1, separators=(",", ":"))
 
     # test timestamp conversion
     assert agent.last_connected == datetime.fromisoformat(
@@ -125,8 +125,8 @@ def test_get_page_when_default_query_params_returns_expected_data(
     client = Client()
     page = client.agents.v1.get_page()
     assert isinstance(page, AgentsPage)
-    assert page.agents[0].json() == json.dumps(TEST_AGENT_1)
-    assert page.agents[1].json() == json.dumps(TEST_AGENT_2)
+    assert page.agents[0].json() == json.dumps(TEST_AGENT_1, separators=(",", ":"))
+    assert page.agents[1].json() == json.dumps(TEST_AGENT_2, separators=(",", ":"))
     assert page.total_count == len(page.agents) == 2
 
 
@@ -160,8 +160,8 @@ def test_get_page_when_custom_query_params_returns_expected_data(
         sort_key=SortKeys.LAST_CONNECTED,
     )
     assert isinstance(page, AgentsPage)
-    assert page.agents[0].json() == json.dumps(TEST_AGENT_1)
-    assert page.agents[1].json() == json.dumps(TEST_AGENT_2)
+    assert page.agents[0].json() == json.dumps(TEST_AGENT_1, separators=(",", ":"))
+    assert page.agents[1].json() == json.dumps(TEST_AGENT_2, separators=(",", ":"))
     assert page.total_count == len(page.agents) == 2
 
 
@@ -208,7 +208,7 @@ def test_iter_all_when_default_params_returns_expected_data(
     for item in iterator:
         total_agents += 1
         assert isinstance(item, Agent)
-        assert item.json() == json.dumps(expected_agents.pop(0))
+        assert item.json() == json.dumps(expected_agents.pop(0), separators=(",", ":"))
     assert total_agents == 3
 
 

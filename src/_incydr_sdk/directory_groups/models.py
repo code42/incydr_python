@@ -8,9 +8,9 @@ from _incydr_sdk.core.models import ResponseModel
 
 class DirectoryGroup(ResponseModel):
     group_id: Optional[str] = Field(
-        None, description="A unique group ID.", example="23", alias="groupId"
+        None, description="A unique group ID.", examples=["23"], alias="groupId"
     )
-    name: Optional[str] = Field(None, example="Research and development")
+    name: Optional[str] = Field(None, examples=["Research and development"])
 
 
 class DirectoryGroupsPage(ResponseModel):
@@ -29,6 +29,6 @@ class DirectoryGroupsPage(ResponseModel):
     total_count: Optional[int] = Field(
         None,
         description="The total count of all directory groups.",
-        example=10,
+        examples=[10],
         alias="totalCount",
     )

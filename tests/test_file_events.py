@@ -5,6 +5,7 @@ from typing import List
 from unittest import mock
 
 import pytest
+from pydantic import ValidationError
 from pytest_httpserver import HTTPServer
 
 from _incydr_cli.cmds.options.output_options import TableFormat
@@ -564,6 +565,222 @@ TEST_SAVED_SEARCH_QUERY = {
 
 TEST_SAVED_SEARCH_ID = "saved-search-1"
 
+TEST_BAD_EVENT_JSON = r"""{
+    "fileEvents": [
+        {
+            "@timestamp": "2025-08-04T01:01:01.081Z",
+            "event": {
+                "id": "example_id",
+                "inserted": "2025-08-04T01:01:01.816033973Z",
+                "action": "removable-media-created",
+                "observer": "Endpoint",
+                "detectorDisplayName": null,
+                "shareType": [],
+                "ingested": "2025-08-04T01:01:01.366Z",
+                "vector": "REMOVABLE_MEDIA_OUT",
+                "xfcEventId": "exampleid"
+            },
+            "user": {
+                "email": "example@example.com",
+                "id": "12345678",
+                "deviceUid": "1234565",
+                "actorHour": "12345678/2025-08-04T09:00:00Z",
+                "department": "12345",
+                "groups": [
+                    {
+                        "id": "12345",
+                        "displayName": "examplegroup"
+                    }
+                ]
+            },
+            "file": {
+                "name": "examplename.GIF",
+                "originalName": "examplename.GIF",
+                "directory": "D:/exaple/path/on/drive/",
+                "originalDirectory": "C:/example/path/to/original/",
+                "category": "Image",
+                "mimeType": "image/gif",
+                "mimeTypeByBytes": "image/gif",
+                "categoryByBytes": null,
+                "mimeTypeByExtension": "image/gif",
+                "categoryByExtension": null,
+                "sizeInBytes": 37757,
+                "owner":"\Everyone",
+                "created": "2018-08-14T05:55:09.650Z",
+                "modified": "2009-02-04T05:49:16Z",
+                "hash": {
+                    "md5": "da4655be40a207f0ae3bf53c7d255cb9",
+                    "sha256": "2dbc974a038924019344cf44858a863c90f64a3a6c6d2ad24e61d1b019aae9a7",
+                    "md5Error": null,
+                    "sha256Error": null
+                },
+                "id": null,
+                "url": null,
+                "directoryId": [],
+                "cloudDriveId": null,
+                "classifications": [],
+                "acquiredFrom": [],
+                "changeType": "COPIED",
+                "archiveId": null,
+                "parentArchiveId": null,
+                "passwordProtected": null
+            },
+            "report": {
+                "id": null,
+                "name": null,
+                "description": null,
+                "headers": [],
+                "count": null,
+                "type": null
+            },
+            "source": {
+                "category": "Device",
+                "name": "example-device",
+                "user": {
+                    "email": []
+                },
+                "domain": "example.domain.com",
+                "ip": "1.2.3.4",
+                "privateIp": [
+                    "1.2.3.4"
+                ],
+                "operatingSystem": "Windows",
+                "email": {
+                    "sender": null,
+                    "from": null
+                },
+                "removableMedia": {
+                    "vendor": null,
+                    "name": null,
+                    "serialNumber": null,
+                    "capacity": null,
+                    "busType": null,
+                    "mediaName": null,
+                    "volumeName": [],
+                    "partitionId": []
+                },
+                "tabs": [],
+                "accountName": null,
+                "accountType": null,
+                "domains": [],
+                "remoteHostname": null,
+                "identifiers": null
+            },
+            "destination": {
+                "category": "Device",
+                "name": "Removable Media",
+                "user": {
+                    "email": [],
+                    "emailDomain": []
+                },
+                "ip": null,
+                "privateIp": [],
+                "operatingSystem": null,
+                "printJobName": null,
+                "printerName": null,
+                "printedFilesBackupPath": null,
+                "removableMedia": {
+                    "vendor": "example vendor",
+                    "name": "example name",
+                    "serialNumber": "exampleserial",
+                    "capacity": 1000204883968,
+                    "busType": "USB",
+                    "mediaName": "example name",
+                    "volumeName": [
+                        "Kavitha-HDD (D:)"
+                    ],
+                    "partitionId": [
+                        "exampleid"
+                    ]
+                },
+                "email": {
+                    "recipients": [],
+                    "subject": null
+                },
+                "tabs": [],
+                "accountName": null,
+                "accountType": null,
+                "domains": [],
+                "remoteHostname": null,
+                "identifiers": [
+                    {
+                        "key": "mediaName",
+                        "value": "example name"
+                    },
+                    {
+                        "key": "serialNumber",
+                        "value": "asdf"
+                    }
+                ]
+            },
+            "process": {
+                "executable": "C:/Windows/explorer.exe",
+                "owner": "exampleowner",
+                "extension": {
+                    "browser": null,
+                    "version": null,
+                    "loggedInUser": null
+                }
+            },
+            "risk": {
+                "score": 3,
+                "severity": "LOW",
+                "indicators": [
+                    {
+                        "name": "Remote",
+                        "id": "Remote",
+                        "weight": 0
+                    },
+                    {
+                        "name": "Removable media",
+                        "id": "Removable media",
+                        "weight": 3
+                    },
+                    {
+                        "name": "Image",
+                        "id": "Image",
+                        "weight": 0
+                    }
+                ],
+                "activityTier": "Default",
+                "trusted": false,
+                "trustReason": null,
+                "untrustedValues": {
+                    "accountNames": [],
+                    "domains": [],
+                    "gitRepositoryUris": [],
+                    "slackWorkspaces": [],
+                    "urlPaths": []
+                }
+            },
+            "git": {
+                "eventId": null,
+                "lastCommitHash": null,
+                "repositoryUri": null,
+                "repositoryUser": null,
+                "repositoryEmail": null,
+                "repositoryEndpointPath": null
+            },
+            "responseControls": {
+                "preventativeControl": null,
+                "reason": null,
+                "userJustification": {
+                    "reason": null,
+                    "text": null
+                }
+            },
+            "paste": {
+                "mimeTypes": [],
+                "totalContentSize": null,
+                "visibleContentSize": null
+            }
+        }
+    ],
+    "nextPgToken": "",
+    "problems": null,
+    "totalCount": 1
+}"""
+
 
 @pytest.fixture
 def mock_get_saved_search(httpserver_auth):
@@ -660,6 +877,17 @@ def test_get_saved_search_returns_expected_data_when_search_has_subgroups(
     search = client.file_events.v2.get_saved_search(TEST_SAVED_SEARCH_ID)
     assert isinstance(search, SavedSearch)
     assert search.json() == TEST_SAVED_SEARCH_3.json()
+
+
+def test_search_raises_exception_when_bad_event_json(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request("/v2/file-events", method="POST").respond_with_data(
+        TEST_BAD_EVENT_JSON
+    )
+
+    client = Client()
+    query = EventQuery.construct(**TEST_DICT_QUERY)
+    with pytest.raises(ValidationError):
+        client.file_events.v2.search(query)
 
 
 # ************************************************ CLI ************************************************

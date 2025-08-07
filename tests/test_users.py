@@ -254,7 +254,7 @@ def test_get_user_when_user_id_returns_expected_data(mock_get):
     user = client.users.v1.get_user("user-1")
     assert isinstance(user, User)
     assert user.user_id == "user-1"
-    assert user.json() == json.dumps(TEST_USER_1)
+    assert user.json() == json.dumps(TEST_USER_1, separators=(",", ":"))
 
     # test timestamp conversion
     assert user.creation_date == datetime.fromisoformat(
@@ -298,8 +298,8 @@ def test_get_page_when_default_query_params_returns_expected_data(
     client = Client()
     page = client.users.v1.get_page()
     assert isinstance(page, UsersPage)
-    assert page.users[0].json() == json.dumps(TEST_USER_1)
-    assert page.users[1].json() == json.dumps(TEST_USER_2)
+    assert page.users[0].json() == json.dumps(TEST_USER_1, separators=(",", ":"))
+    assert page.users[1].json() == json.dumps(TEST_USER_2, separators=(",", ":"))
     assert page.total_count == len(page.users) == 2
 
 
@@ -318,8 +318,8 @@ def test_get_page_when_custom_query_params_returns_expected_data(
         active=True, blocked=False, page_num=2, page_size=10
     )
     assert isinstance(page, UsersPage)
-    assert page.users[0].json() == json.dumps(TEST_USER_1)
-    assert page.users[1].json() == json.dumps(TEST_USER_2)
+    assert page.users[0].json() == json.dumps(TEST_USER_1, separators=(",", ":"))
+    assert page.users[1].json() == json.dumps(TEST_USER_2, separators=(",", ":"))
     assert page.total_count == len(page.users) == 2
 
 
@@ -336,7 +336,7 @@ def test_get_page_when_custom_username_query_param_returns_expected_data(
     client = Client()
     page = client.users.v1.get_page(username="username-1")
     assert isinstance(page, UsersPage)
-    assert page.users[0].json() == json.dumps(TEST_USER_1)
+    assert page.users[0].json() == json.dumps(TEST_USER_1, separators=(",", ":"))
     assert page.total_count == len(page.users) == 1
 
 
@@ -366,7 +366,7 @@ def test_iter_all_when_default_params_returns_expected_data(
     for item in iterator:
         total_users += 1
         assert isinstance(item, User)
-        assert item.json() == json.dumps(expected_users.pop(0))
+        assert item.json() == json.dumps(expected_users.pop(0), separators=(",", ":"))
     assert total_users == 3
 
 
@@ -374,8 +374,8 @@ def test_get_devices_when_default_query_params_returns_expected_data(mock_get_de
     client = Client()
     page = client.users.v1.get_devices(user_id="user-1")
     assert isinstance(page, DevicesPage)
-    assert page.devices[0].json() == json.dumps(TEST_USER_1_DEVICE_1)
-    assert page.devices[1].json() == json.dumps(TEST_USER_1_DEVICE_2)
+    assert json.loads(page.devices[0].json()) == TEST_USER_1_DEVICE_1
+    assert json.loads(page.devices[1].json()) == TEST_USER_1_DEVICE_2
     assert page.total_count == len(page.devices) == 2
 
 
@@ -410,8 +410,8 @@ def test_get_devices_when_custom_query_params_returns_expected_data(
         sort_key=SortKeys.LAST_CONNECTED,
     )
     assert isinstance(page, DevicesPage)
-    assert page.devices[0].json() == json.dumps(TEST_USER_1_DEVICE_1)
-    assert page.devices[1].json() == json.dumps(TEST_USER_1_DEVICE_2)
+    assert json.loads(page.devices[0].json()) == TEST_USER_1_DEVICE_1
+    assert json.loads(page.devices[1].json()) == TEST_USER_1_DEVICE_2
     assert page.total_count == len(page.devices) == 2
 
 
@@ -421,8 +421,8 @@ def test_get_roles_returns_expected_data(mock_get_user_roles):
     assert isinstance(roles, list)
     assert isinstance(roles[0], UserRole)
     assert isinstance(roles[1], UserRole)
-    assert roles[0].json() == json.dumps(TEST_USER_ROLE_1)
-    assert roles[1].json() == json.dumps(TEST_USER_ROLE_2)
+    assert json.loads(roles[0].json()) == TEST_USER_ROLE_1
+    assert json.loads(roles[1].json()) == TEST_USER_ROLE_2
 
 
 @pytest.mark.parametrize(
@@ -445,7 +445,7 @@ def test_update_roles_returns_expected_data(
         roles=input_roles,
     )
     assert isinstance(response, UpdateRolesResponse)
-    assert response.json() == json.dumps(TEST_USER_ROLE_UPDATE)
+    assert response.json() == json.dumps(TEST_USER_ROLE_UPDATE, separators=(",", ":"))
 
 
 def test_get_available_roles_returns_expected_data(mock_list_roles):
@@ -454,8 +454,8 @@ def test_get_available_roles_returns_expected_data(mock_list_roles):
     assert isinstance(roles, list)
     assert isinstance(roles[0], Role)
     assert isinstance(roles[1], Role)
-    assert roles[0].json() == json.dumps(TEST_ROLE_1)
-    assert roles[1].json() == json.dumps(TEST_ROLE_2)
+    assert json.loads(roles[0].json()) == TEST_ROLE_1
+    assert json.loads(roles[1].json()) == TEST_ROLE_2
 
 
 @pytest.mark.parametrize("role", ["test-role", "Test Role"])
@@ -465,7 +465,7 @@ def test_get_role_returns_expected_data(
     client = Client()
     role = client.users.v1.get_role(role)
     assert isinstance(role, Role)
-    assert role.json() == json.dumps(TEST_ROLE_1)
+    assert json.loads(role.json()) == TEST_ROLE_1
 
 
 add_roles_input = pytest.mark.parametrize(

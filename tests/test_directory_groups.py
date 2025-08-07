@@ -27,10 +27,11 @@ def test_get_page_when_default_params_returns_expected_data(
     page = c.directory_groups.v1.get_page()
     assert isinstance(page, DirectoryGroupsPage)
     assert page.directory_groups[0].json() == json.dumps(
-        {"groupId": "group-42", "name": "Sales"}
+        {"groupId": "group-42", "name": "Sales"}, separators=(",", ":")
     )
     assert page.directory_groups[1].json() == json.dumps(
-        {"groupId": "group-43", "name": "Research and Development"}
+        {"groupId": "group-43", "name": "Research and Development"},
+        separators=(",", ":"),
     )
     assert page.total_count == len(page.directory_groups) == 2
 
@@ -55,7 +56,7 @@ def test_get_page_when_custom_params_returns_expected_data(
     page = c.directory_groups.v1.get_page(page_num=1, page_size=2, name="Sales")
     assert isinstance(page, DirectoryGroupsPage)
     assert page.directory_groups[0].json() == json.dumps(
-        {"groupId": "group-42", "name": "Sales"}
+        {"groupId": "group-42", "name": "Sales"}, separators=(",", ":")
     )
     assert page.total_count == len(page.directory_groups) == 1
 
@@ -102,7 +103,7 @@ def test_iter_all_returns_expected_data(httpserver_auth: HTTPServer):
     for item in iterator:
         total += 1
         assert isinstance(item, DirectoryGroup)
-        assert item.json() == json.dumps(expected.pop(0))
+        assert item.json() == json.dumps(expected.pop(0), separators=(",", ":"))
     assert total == 3
 
 

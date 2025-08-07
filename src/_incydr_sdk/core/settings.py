@@ -7,11 +7,12 @@ from pathlib import Path
 from textwrap import indent
 from typing import Union
 
-from pydantic import BaseSettings
 from pydantic import Field
-from pydantic import root_validator
+from pydantic import field_validator
+from pydantic import model_validator
 from pydantic import SecretStr
-from pydantic import validator
+from pydantic_settings import BaseSettings
+from pydantic_settings import SettingsConfigDict
 from requests_toolbelt.utils.dump import dump_response
 from rich import pretty
 from rich.console import Console
@@ -84,20 +85,27 @@ class IncydrSettings(BaseSettings):
         and the Python repl. Defaults to True. env_var=`INCYDR_USE_RICH`
     """
 
-    api_client_id: str = Field(env="incydr_api_client_id")
-    api_client_secret: SecretStr = Field(env="incydr_api_client_secret")
-    url: str = Field(env="incydr_url")
-    page_size: int = Field(default=100, env="incydr_page_size")
-    max_response_history: int = Field(default=5, env="incydr_max_response_history")
-    use_rich: bool = Field(default=True, env="incydr_use_rich")
-    log_stderr: bool = Field(default=True, env="incydr_log_stderr")
-    log_file: Union[str, Path, IOBase] = Field(default=None, env="incydr_log_file")
-    log_level: Union[int, str] = Field(
-        default=logging.WARNING,
-        env="incydr_log_level",
+    api_client_id: str
+    api_client_secret: SecretStr
+    url: str
+    page_size: int = Field(default=100)
+    max_response_history: int = Field(default=5)
+    use_rich: bool = Field(default=True)
+    log_stderr: bool = Field(default=True)
+    log_file: Union[str, Path, IOBase] = Field(default=None)
+    log_level: Union[int, str] = Field(default=logging.WARNING, validate_default=True)
+    logger: logging.Logger = Field(default=None)
+    user_agent_prefix: Union[str] = Field(default="")
+
+    model_config = SettingsConfigDict(
+        env_prefix="incydr_",
+        extra="ignore",
+        env_file=str(Path.home() / ".config" / "incydr" / ".env"),
+        validate_assignment=True,
+        custom_logger=False,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
-    logger: logging.Logger = None
-    user_agent_prefix: str = Field(default=None, env="incydr_user_agent_prefix")
 
     def __init__(self, **kwargs):
         # clear any keys from kwargs that are passed as None, which forces lookup of values
@@ -108,12 +116,7 @@ class IncydrSettings(BaseSettings):
             kwargs["_env_file"] = ".env"
         super().__init__(**kwargs)
 
-    class Config:
-        env_file = str(Path.home() / ".config" / "incydr" / ".env")
-        validate_assignment = True
-        custom_logger = False
-
-    @validator("log_level", pre=True, always=True)
+    @field_validator("log_level", mode="before")
     def _validate_log_level(cls, value, **kwargs):  # noqa
         try:
             return int(value)
@@ -122,7 +125,8 @@ class IncydrSettings(BaseSettings):
             LogLevel(value)
             return _log_level_map[value]
 
-    @validator("log_file")
+    @field_validator("log_file", mode="plain")
+    @classmethod
     def _validate_log_file(cls, value, **kwargs):  # noqa
         if isinstance(value, (str, Path)):
             p = Path(value)
@@ -136,7 +140,8 @@ class IncydrSettings(BaseSettings):
                 raise ValueError(f"{value} is not a valid file path for logging.")
         return value
 
-    @validator("use_rich")
+    @field_validator("use_rich", mode="before")
+    @classmethod
     def _validate_use_rich(cls, value, **kwargs):  # noqa
         if value:
             pretty.install()
@@ -144,7 +149,8 @@ class IncydrSettings(BaseSettings):
             sys.displayhook = _sys_displayhook
         return value
 
-    @validator("logger")
+    @field_validator("logger", mode="before")
+    @classmethod
     def _validate_logger(cls, value, **kwargs):  # noqa
         if value is None:
             logger = logging.getLogger("incydr")
@@ -156,13 +162,15 @@ class IncydrSettings(BaseSettings):
         else:
             raise ValueError(f"{value} is not a `logging.Logger`.")
 
-    @root_validator(skip_on_failure=True)
+    @model_validator(mode="after")
+    @classmethod
     def _configure_logging(cls, values):  # noqa
-        use_rich = values["use_rich"]
-        log_file = values["log_file"]
-        log_stderr = values["log_stderr"]
-        log_level = values["log_level"]
-        logger = values["logger"]
+        values_dict = values.dict()
+        use_rich = values_dict["use_rich"]
+        log_file = values_dict["log_file"]
+        log_stderr = values_dict["log_stderr"]
+        log_level = values_dict["log_level"]
+        logger = values_dict["logger"]
 
         if not hasattr(logger, "_incydr"):
             warnings.warn(
@@ -202,7 +210,7 @@ class IncydrSettings(BaseSettings):
             logger.addHandler(std_file_handler)
 
         logger.setLevel(log_level)
-        values["logger"] = logger
+        cls.logger = logger
         return values
 
     def _log_response_info(self, response):
