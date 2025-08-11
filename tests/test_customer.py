@@ -17,4 +17,4 @@ def test_get_returns_expected_data(httpserver_auth: HTTPServer):
     client = Client()
     customer = client.customer.v1.get()
     assert isinstance(customer, Customer)
-    assert customer.json() == json.dumps(TEST_CUSTOMER)
+    assert customer.json() == json.dumps(TEST_CUSTOMER, separators=(",", ":"))

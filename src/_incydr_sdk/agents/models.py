@@ -7,7 +7,7 @@ from typing import Union
 
 from pydantic import BaseModel
 from pydantic import Field
-from pydantic import validator
+from pydantic import field_validator
 
 from _incydr_sdk.core.models import ResponseModel
 from _incydr_sdk.enums import _Enum
@@ -98,16 +98,17 @@ class AgentUpdateRequest(BaseModel):
 
 
 class QueryAgentsRequest(BaseModel):
-    active: Optional[bool]
-    agentType: Optional[Union[AgentType, str]]
-    agentHealthy: Optional[bool]
-    anyOfAgentHealthIssueTypes: Optional[List[str]]
-    srtKey: Optional[Union[SortKeys, str]]
-    srtDir: Optional[str]
-    pageSize: Optional[int]
-    page: Optional[int]
+    active: Optional[bool] = None
+    agentType: Optional[Union[AgentType, str]] = None
+    agentHealthy: Optional[bool] = None
+    anyOfAgentHealthIssueTypes: Optional[List[str]] = None
+    srtKey: Optional[Union[SortKeys, str]] = None
+    srtDir: Optional[str] = None
+    pageSize: Optional[int] = None
+    page: Optional[int] = None
 
-    @validator("srtDir")
+    @field_validator("srtDir")
+    @classmethod
     def _validate(cls, value):  # noqa
         value = str(value).upper()
         assert value in ("ASC", "DESC")

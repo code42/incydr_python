@@ -5,7 +5,7 @@ from typing import Optional
 
 import click
 from pydantic import Field
-from pydantic import root_validator
+from pydantic import model_validator
 from requests.exceptions import HTTPError
 from rich.panel import Panel
 from rich.progress import track
@@ -51,7 +51,8 @@ class FileEventCSV(CSVModel):
 class FileEventJSON(FileEventV2):
     event_id: str = Field(alias="eventId")
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
+    @classmethod
     def _event_id_required(cls, values):  # noqa
         # check if input is V2 file event
         event = values.get("event")

@@ -344,14 +344,14 @@ def bulk_update_state(
     # Validate input models
 
     class SessionCSV(CSVModel):
-        session_id: str = Field(csv_aliases=["session_id", "sessionId"])
-        state: state_type = Field(csv_aliases=["state"])
-        note: Optional[str]
+        session_id: str = Field(None, csv_aliases=["session_id", "sessionId"])
+        state: state_type = Field(None, csv_aliases=["state"])  # type: ignore
+        note: Optional[str] = None
 
     class SessionJSON(Model):
         session_id: str = Field(alias="sessionId")
-        state: state_type
-        note: Optional[str]
+        state: state_type = None  # type: ignore
+        note: Optional[str] = None
 
     if format_ == "csv":
         models = SessionCSV.parse_csv(file)

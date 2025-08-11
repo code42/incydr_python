@@ -1,5 +1,6 @@
 from typing import Optional
 
+from pydantic import ConfigDict
 from pydantic import Field
 
 from _incydr_sdk.core.models import ResponseModel
@@ -16,11 +17,7 @@ class Customer(ResponseModel):
     * **tenant_id**: `str` The unique identifier for the account within Code42.
     """
 
-    name: Optional[str] = Field(allow_mutation=False)
-    registration_key: Optional[str] = Field(
-        allow_mutation=False, alias="registrationKey"
-    )
-    tenant_id: Optional[str] = Field(allow_mutation=False, alias="tenantId")
-
-    class Config:
-        validate_assignment = True
+    name: Optional[str] = Field(frozen=True)
+    registration_key: Optional[str] = Field(frozen=True, alias="registrationKey")
+    tenant_id: Optional[str] = Field(frozen=True, alias="tenantId")
+    model_config = ConfigDict(validate_assignment=True)

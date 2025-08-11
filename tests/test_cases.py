@@ -169,7 +169,7 @@ def test_get_single_case(mock_case_get):
     assert case.created_at == datetime.datetime.fromisoformat(
         TEST_CASE_2["createdAt"].replace("Z", "+00:00")
     )
-    assert case.json() == json.dumps(TEST_CASE_2)
+    assert case.json() == json.dumps(TEST_CASE_2, separators=(",", ":"))
 
 
 def test_get_page_when_default_params_returns_expected_data(
@@ -200,8 +200,8 @@ def test_get_page_when_default_params_returns_expected_data(
     client.settings.page_size = 15
     page = client.cases.v1.get_page()
     assert isinstance(page, CasesPage)
-    assert page.cases[0].json() == json.dumps(slim_1)
-    assert page.cases[1].json() == json.dumps(slim_2)
+    assert page.cases[0].json() == json.dumps(slim_1, separators=(",", ":"))
+    assert page.cases[1].json() == json.dumps(slim_2, separators=(",", ":"))
     assert page.total_count == len(page.cases)
 
 

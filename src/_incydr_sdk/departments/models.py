@@ -21,12 +21,12 @@ class DepartmentsPage(ResponseModel):
     total_count: Optional[int] = Field(
         None,
         description="The total count of all departments.",
-        example=10,
+        examples=[10],
         alias="totalCount",
     )
 
 
 class GetPageRequest(BaseModel):
     page: int = 1
-    page_size: int = None
-    name: str = None
+    page_size: Optional[int] = None
+    name: Optional[str] = None

@@ -23,8 +23,8 @@ class UserTypes(str, Enum):
 
 
 class DateRange(BaseModel):
-    endTime: Optional[float]
-    startTime: Optional[float]
+    endTime: Optional[float] = None
+    startTime: Optional[float] = None
 
 
 class AuditEventsPage(ResponseModel):
@@ -46,13 +46,13 @@ class AuditEventsPage(ResponseModel):
     pagination_range_end_index: int = Field(
         None,
         description="The index of the last result returned, in relation to total results found",
-        example=62,
+        examples=[62],
         alias="paginationRangeEndIndex",
     )
     pagination_range_start_index: int = Field(
         None,
         description="The index of the first result returned, in relation to total results found",
-        example=0,
+        examples=[0],
         alias="paginationRangeStartIndex",
     )
 

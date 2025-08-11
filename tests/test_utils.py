@@ -1,11 +1,15 @@
 import datetime
+from typing import List
 from typing import Optional
+from typing import Union
 
 import pytest
 from pydantic import BaseModel
 from pydantic import Field
 
 from _incydr_sdk.queries.utils import parse_str_to_dt
+from _incydr_sdk.utils import _get_model_type
+from _incydr_sdk.utils import _is_single
 from _incydr_sdk.utils import flatten_fields
 from _incydr_sdk.utils import get_field_value_and_info
 from _incydr_sdk.utils import get_fields
@@ -13,27 +17,28 @@ from _incydr_sdk.utils import iter_model_formatted
 
 
 class GrandChildTestModel(BaseModel):
-    string_field: Optional[str] = Field(table=lambda x: str(x))
+    string_field: Optional[str] = Field(None, table=lambda x: str(x))
 
 
 class ChildTestModel(BaseModel):
-    string_field: Optional[str]
+    string_field: Optional[str] = None
     int_field: Optional[int] = Field(
+        None,
         table=lambda x: str(x + 1) if isinstance(x, int) else x,
         csv=lambda x: str(x + 2) if isinstance(x, int) else x,
     )
-    grand_child: Optional[GrandChildTestModel]
+    grand_child: Optional[GrandChildTestModel] = None
 
     class Config:
         json_encoders = {int: lambda i: str(float(i))}
 
 
 class ParentTestModel(BaseModel):
-    string_field: Optional[str]
+    string_field: Optional[str] = None
     int_field: Optional[int] = Field(
-        table=lambda x: str(x + 1), csv=lambda x: str(x + 2)
+        None, table=lambda x: str(x + 1), csv=lambda x: str(x + 2)
     )
-    child_model: Optional[ChildTestModel]
+    child_model: Optional[ChildTestModel] = None
 
     class Config:
         json_encoders = {int: lambda i: str(float(i))}
@@ -183,26 +188,26 @@ def test_get_field_value_and_info():
     )
     value, field = get_field_value_and_info(model, ["int_field"])
     assert value == 0
-    assert "table" in field.field_info.extra
+    assert "table" in field.json_schema_extra
 
     child_value, child_field = get_field_value_and_info(
         model, ["child_model", "int_field"]
     )
     assert child_value == 1
-    assert "table" in child_field.field_info.extra
+    assert "table" in child_field.json_schema_extra
 
     empty_child_model = ParentTestModel(string_field="test", int_field=0)
     child_value, child_field = get_field_value_and_info(
         empty_child_model, ["child_model", "int_field"]
     )
     assert child_value is None
-    assert "table" in child_field.field_info.extra
+    assert "table" in child_field.json_schema_extra
 
     grandchild_value, grandchild_field = get_field_value_and_info(
         empty_child_model, ["child_model", "grand_child", "string_field"]
     )
     assert grandchild_value is None
-    assert "table" in grandchild_field.field_info.extra
+    assert "table" in grandchild_field.json_schema_extra
 
 
 @pytest.mark.parametrize(
@@ -227,3 +232,34 @@ def test_get_field_value_and_info():
 )
 def test_parse_str_to_dt(ts_str, expected):
     assert parse_str_to_dt(ts_str) == expected
+
+
+@pytest.mark.parametrize(
+    "type,expected",
+    [
+        (Union[int, str], True),
+        (list, False),
+        (List[int], False),
+        (Union[List[int], List[str]], False),
+        (str, True),
+        (BaseModel, True),
+        (set, False),
+        (tuple, False),
+    ],
+)
+def test_is_single(type, expected):
+    assert _is_single(type) == expected
+
+
+@pytest.mark.parametrize(
+    "type,expected",
+    [
+        (int, None),
+        (ParentTestModel, ParentTestModel),
+        (List[ParentTestModel], ParentTestModel),
+        (Union[int, ParentTestModel], ParentTestModel),
+        (Union[ParentTestModel, ChildTestModel], ParentTestModel),
+    ],
+)
+def test_get_model_type(type, expected):
+    assert _get_model_type(type) == expected

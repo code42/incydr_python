@@ -3,6 +3,7 @@ from typing import List
 from typing import Optional
 
 from pydantic import BaseModel
+from pydantic import ConfigDict
 from pydantic import Field
 
 from _incydr_sdk.core.models import ResponseModel
@@ -99,7 +100,7 @@ class Device(ResponseModel):
         description="The last day and time this device was connected to the server.",
     )
     os_name: Optional[str] = Field(
-        alias="osHostname",
+        alias="osName",
         description="Operating system name. Values: Windows*, Mac OS X, Linux, Android, iOS, SunOS, etc",
     )
     os_version: Optional[str] = Field(
@@ -156,12 +157,10 @@ class DevicesPage(ResponseModel):
 
 
 class QueryDevicesRequest(BaseModel):
-    active: Optional[bool]
-    blocked: Optional[bool]
+    active: Optional[bool] = None
+    blocked: Optional[bool] = None
     page: Optional[int] = 1
     pageSize: Optional[int] = 100
     sortDirection: SortDirection = SortDirection.ASC
     sortKey: SortKeys = SortKeys.NAME
-
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)

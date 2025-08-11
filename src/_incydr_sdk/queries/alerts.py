@@ -6,10 +6,11 @@ from typing import Optional
 from typing import Union
 
 from pydantic import BaseModel
-from pydantic import conint
+from pydantic import ConfigDict
 from pydantic import Field
-from pydantic import root_validator
+from pydantic import model_validator
 from pydantic import StrictBool
+from typing_extensions import Annotated
 
 from _incydr_sdk.core.models import Model
 from _incydr_sdk.enums.alerts import AlertSeverity
@@ -30,12 +31,11 @@ _term_enum_map = {
 class Filter(BaseModel):
     term: AlertTerm
     operator: Operator
-    value: Optional[Union[StrictBool, int, str]]
+    value: Optional[Union[StrictBool, int, str]] = None
+    model_config = ConfigDict(use_enum_values=True)
 
-    class Config:
-        use_enum_values = True
-
-    @root_validator(pre=True)
+    @model_validator(mode="before")
+    @classmethod
     def _validate_enums(cls, values: dict):  # noqa `root_validator` is a classmethod
         term = values.get("term")
         operator = values.get("operator")
@@ -61,7 +61,7 @@ class Filter(BaseModel):
 
 class FilterGroup(BaseModel):
     filterClause: str = "AND"
-    filters: Optional[List[Filter]]
+    filters: Optional[List[Filter]] = None
 
 
 class AlertQuery(Model):
@@ -99,7 +99,7 @@ class AlertQuery(Model):
     group_clause: str = Field("AND", alias="groupClause")
     groups: Optional[List[FilterGroup]]
     page_num: int = Field(0, alias="pgNum")
-    page_size: conint(gt=0, le=500) = Field(100, alias="pgSize")
+    page_size: Annotated[int, Field(gt=0, le=500)] = Field(100, alias="pgSize")
     sort_dir: str = Field("DESC", alias="srtDirection")
     sort_key: AlertTerm = Field("CreatedAt", alias="srtKey")
 

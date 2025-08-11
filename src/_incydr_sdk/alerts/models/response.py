@@ -38,10 +38,10 @@ class AlertQueryPage(ResponseModel):
         ...,
         alias="totalCount",
         description="The number of alerts that match the given query.",
-        example="3",
+        examples=["3"],
     )
     problems: Optional[List[QueryProblem]] = Field(
         None,
         description="Potential issues that were hit while trying to run the query.",
-        example=[],
+        examples=[[]],
     )

@@ -7,14 +7,14 @@ class IncydrException(Exception):
     ...
 
 
-class AuthMissingError(ValidationError, IncydrException):
+class AuthMissingError(IncydrException):
     def __init__(self, validation_error: ValidationError):
         self.pydantic_error = str(validation_error)
-        super().__init__(validation_error.raw_errors, validation_error.model)
+        self.errors = validation_error.errors()
 
     @property
     def error_keys(self):
-        return [e["loc"][0] for e in self.errors()]
+        return [e["loc"][0] for e in self.errors]
 
     def __str__(self):
         return (
