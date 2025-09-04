@@ -4,6 +4,7 @@ from datetime import timedelta
 from typing import List
 from typing import Optional
 from typing import Union
+from warnings import warn
 
 from pydantic import BaseModel
 from pydantic import ConfigDict
@@ -66,6 +67,8 @@ class FilterGroup(BaseModel):
 
 class AlertQuery(Model):
     """
+    This class is deprecated. Use the Sessions client instead.
+
     Class to build an alert query. Use the class methods to attach additional filter operators.
 
     Usage examples:
@@ -110,6 +113,11 @@ class AlertQuery(Model):
         on: Union[date, datetime, int, float, str] = None,
         **kwargs,
     ):
+        warn(
+            "Alerts are deprecated. Replaced by Sessions.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         groups = kwargs.get("groups") or []
         if on and any((start_date, end_date)):
             raise ValueError(
