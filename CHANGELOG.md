@@ -30,6 +30,9 @@
 ### Fixed
 - An issue where in some cases saved searches could not be retrieved.
 
+### Deprecated
+- Alert queries methods in the SDK, already deprecated, are more clearly marked.
+
 ## 2.5.0 - 2025-06-06
 
 ### Added
