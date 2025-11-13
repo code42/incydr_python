@@ -28,7 +28,7 @@ dependencies = [
   "requests",
   "requests-toolbelt",
   "rich",
-  "pydantic>=2.11",
+  "pydantic>=2.11.7",
   "pydantic-settings",
   "isodate",
   "python-dateutil",
@@ -86,7 +86,7 @@ svg = "python docs/example_logging.py"
 
 
 [[tool.hatch.envs.test.matrix]]
-python = ["37", "38", "39", "310","311", "312"]
+python = ["39", "310","311", "312"]
 [tool.hatch.envs.test]
 dependencies = [
   "pytest",

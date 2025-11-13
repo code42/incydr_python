@@ -17,6 +17,9 @@ jobs:
     - name: Ensure latest pip
       run: python -m pip install --upgrade pip
 
+    - name: Install click
+      run: pip install click===8.1.8
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip

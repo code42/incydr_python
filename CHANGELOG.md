@@ -9,7 +9,7 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
-## Unreleased
+## 2.7.0 - 2025-11-13
 
 ### Updated
 - The Incydr SDK and CLI now rely on Pydantic v2, instead of previously when they used v1. This means that the methods available on the models accepted and returned by many SDK methods have changed in some small ways. For most SDK and CLI workflows, no changes will need to be made to accommodate this upgrade. Details of the transition may be found [in Pydantic's documentation](https://docs.pydantic.dev/dev/migration/).
