@@ -182,7 +182,11 @@ def flatten_fields(model: Type[BaseModel]) -> Generator[str, None, None]:
         model = type(model)
     for name, field in model.model_fields.items():
         model_field_type = _get_model_type(field.annotation)
-        if _is_single(field.annotation) and issubclass(model_field_type, BaseModel):
+        if (
+            _is_single(field.annotation)
+            and isinstance(model_field_type, type)
+            and issubclass(model_field_type, BaseModel)
+        ):
             for child_name in flatten_fields(model_field_type):
                 yield f"{name}.{child_name}"
         else:
@@ -239,13 +243,17 @@ def _is_single(type) -> bool:
     return True
 
 
-def _get_model_type(type) -> Type[BaseModel]:
+def _get_model_type(inputType) -> Type[BaseModel]:
     """Given a type annotation, gets the type that subclasses BaseModel"""
-    if issubclass(type, BaseModel):
-        return type
-    elif get_origin(type):
+    if isinstance(inputType, type) and issubclass(inputType, BaseModel):
+        return inputType
+    elif get_origin(inputType):
         return next(
-            (_get_model_type(item) for item in get_args(type) if _get_model_type(item)),
+            (
+                _get_model_type(item)
+                for item in get_args(inputType)
+                if _get_model_type(item)
+            ),
             None,
         )
     return None

@@ -334,7 +334,7 @@ def _output_trusted_activity(
         t.add_column("Action Groups")
 
         # exclude activity action groups from the info panel
-        include = list(TrustedActivity.__fields__.keys())
+        include = list(TrustedActivity.model_fields.keys())
         include.remove("activity_action_groups")
         t.add_row(
             model_as_card(
