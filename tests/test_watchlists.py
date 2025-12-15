@@ -23,13 +23,61 @@ from _incydr_sdk.watchlists.models.responses import WatchlistActor
 from _incydr_sdk.watchlists.models.responses import WatchlistMembersList
 from _incydr_sdk.watchlists.models.responses import WatchlistMembersListV2
 from _incydr_sdk.watchlists.models.responses import WatchlistsPage
+from _incydr_sdk.watchlists.models.responses import WatchlistsPageV2
 from _incydr_sdk.watchlists.models.responses import WatchlistUser
+from _incydr_sdk.watchlists.models.responses import WatchlistV2
 from tests.conftest import TEST_TOKEN
 
 TEST_WATCHLIST_ID = "1c7dd799-1aa0-4f3a-bae8-1d3242fc2af6"
 TEST_ID = "b799bf9c-8838-480f-85dc-438d74e3ca0d"
 
 TEST_WATCHLIST_1 = {
+    "description": None,
+    "listType": "DEPARTING_EMPLOYEE",
+    "stats": {
+        "includedDepartmentsCount": 2,
+        "includedDirectoryGroupsCount": 1,
+        "includedActorsCount": 42,
+        "excludedActorsCount": 4,
+        "excludedDepartmentsCount": 0,
+        "excludedDirectoryGroupsCount": 0,
+    },
+    "tenantId": "code-42",
+    "title": "departing employee",
+    "watchlistId": TEST_WATCHLIST_ID,
+}
+TEST_WATCHLIST_2 = {
+    "description": "custom watchlist",
+    "listType": "CUSTOM",
+    "stats": {
+        "includedDepartmentsCount": 0,
+        "includedDirectoryGroupsCount": 10,
+        "includedActorsCount": 43,
+        "excludedActorsCount": 13,
+        "excludedDepartmentsCount": 0,
+        "excludedDirectoryGroupsCount": 0,
+    },
+    "tenantId": "code-42",
+    "title": "test",
+    "watchlistId": "1-watchlist-43",
+}
+
+TEST_WATCHLIST_3 = {
+    "description": None,
+    "listType": "NEW_EMPLOYEE",
+    "stats": {
+        "includedDepartmentsCount": 0,
+        "includedDirectoryGroupsCount": 1,
+        "includedActorsCount": 10,
+        "excludedActorsCount": 1,
+        "excludedDepartmentsCount": 0,
+        "excludedDirectoryGroupsCount": 0,
+    },
+    "tenantId": "code-42",
+    "title": None,
+    "watchlistId": "1-watchlist-44",
+}
+TEST_WATCHLIST_V1_1 = {
     "description": None,
     "listType": "DEPARTING_EMPLOYEE",
     "stats": {
@@ -42,7 +90,7 @@ TEST_WATCHLIST_1 = {
     "title": "departing employee",
     "watchlistId": TEST_WATCHLIST_ID,
 }
-TEST_WATCHLIST_2 = {
+TEST_WATCHLIST_V1_2 = {
     "description": "custom watchlist",
     "listType": "CUSTOM",
     "stats": {
@@ -55,8 +103,7 @@ TEST_WATCHLIST_2 = {
     "title": "test",
     "watchlistId": "1-watchlist-43",
 }
-
-TEST_WATCHLIST_3 = {
+TEST_WATCHLIST_V1_3 = {
     "description": None,
     "listType": "NEW_EMPLOYEE",
     "stats": {
@@ -69,7 +116,6 @@ TEST_WATCHLIST_3 = {
     "title": None,
     "watchlistId": "1-watchlist-44",
 }
-
 TEST_USER_1 = {
     "addedTime": "2022-07-18T16:39:51.356082Z",
     "userId": TEST_ID,
@@ -125,7 +171,7 @@ def mock_create_custom(httpserver_auth: HTTPServer):
     }
     httpserver_auth.expect_request(
         "/v1/watchlists", method="POST", json=data
-    ).respond_with_json(TEST_WATCHLIST_2)
+    ).respond_with_json(TEST_WATCHLIST_V1_2)
 
 
 @pytest.fixture
@@ -145,7 +191,7 @@ def mock_create_departing_employee(httpserver_auth: HTTPServer):
     data = {"description": None, "title": None, "watchlistType": "DEPARTING_EMPLOYEE"}
     httpserver_auth.expect_request(
         "/v1/watchlists", method="POST", json=data
-    ).respond_with_json(TEST_WATCHLIST_1)
+    ).respond_with_json(TEST_WATCHLIST_V1_1)
 
 
 @pytest.fixture
@@ -172,7 +218,7 @@ def mock_delete_v2(httpserver_auth: HTTPServer):
 
 @pytest.fixture
 def mock_get_all(httpserver_auth: HTTPServer):
-    data = {"watchlists": [TEST_WATCHLIST_1, TEST_WATCHLIST_2], "totalCount": 2}
+    data = {"watchlists": [TEST_WATCHLIST_V1_1, TEST_WATCHLIST_V1_2], "totalCount": 2}
 
     query = {"page": 1, "pageSize": 100}
 
@@ -354,7 +400,7 @@ def mock_get_directory_group_v2(httpserver_auth: HTTPServer):
 def test_get_page_when_default_params_returns_expected_data_v2(mock_get_all_v2):
     c = Client()
     page = c.watchlists.v2.get_page()
-    assert isinstance(page, WatchlistsPage)
+    assert isinstance(page, WatchlistsPageV2)
     assert page.watchlists[0].json() == json.dumps(
         TEST_WATCHLIST_1, separators=(",", ":")
     )
@@ -377,7 +423,7 @@ def test_get_page_when_custom_params_returns_expected_data_v2(
 
     c = Client()
     page = c.watchlists.v2.get_page(page_num=2, page_size=42, actor_id="user-42")
-    assert isinstance(page, WatchlistsPage)
+    assert isinstance(page, WatchlistsPageV2)
     assert page.watchlists[0].json() == json.dumps(
         TEST_WATCHLIST_1, separators=(",", ":")
     )
@@ -415,7 +461,7 @@ def test_iter_all_when_default_params_returns_expected_data_v2(
     expected = [TEST_WATCHLIST_1, TEST_WATCHLIST_2, TEST_WATCHLIST_3]
     for item in iterator:
         total += 1
-        assert isinstance(item, Watchlist)
+        assert isinstance(item, WatchlistV2)
         assert item.json() == json.dumps(expected.pop(0), separators=(",", ":"))
     assert total == 3
 
@@ -427,7 +473,7 @@ def test_get_returns_expected_data_v2(httpserver_auth: HTTPServer):
 
     c = Client()
     watchlist = c.watchlists.v2.get(TEST_WATCHLIST_ID)
-    assert isinstance(watchlist, Watchlist)
+    assert isinstance(watchlist, WatchlistV2)
     assert watchlist.watchlist_id == TEST_WATCHLIST_ID
     assert watchlist.json() == json.dumps(TEST_WATCHLIST_1, separators=(",", ":"))
 
@@ -437,7 +483,7 @@ def test_create_when_required_params_returns_expected_data_v2(
 ):
     c = Client()
     watchlist = c.watchlists.v2.create(WatchlistType.DEPARTING_EMPLOYEE)
-    assert isinstance(watchlist, Watchlist)
+    assert isinstance(watchlist, WatchlistV2)
     assert watchlist.json() == json.dumps(TEST_WATCHLIST_1, separators=(",", ":"))
 
 
@@ -446,7 +492,7 @@ def test_create_when_all_params_returns_expected_data_v2(mock_create_custom_v2):
     watchlist = c.watchlists.v2.create(
         "CUSTOM", title="test", description="custom watchlist"
     )
-    assert isinstance(watchlist, Watchlist)
+    assert isinstance(watchlist, WatchlistV2)
     assert watchlist.json() == json.dumps(TEST_WATCHLIST_2, separators=(",", ":"))
 
 
@@ -479,7 +525,7 @@ def test_update_when_all_params_returns_expected_data_v2(httpserver_auth: HTTPSe
     response = c.watchlists.v2.update(
         TEST_WATCHLIST_ID, title="updated title", description="updated description"
     )
-    assert isinstance(response, Watchlist)
+    assert isinstance(response, WatchlistV2)
     assert response.json() == json.dumps(watchlist, separators=(",", ":"))
 
 
@@ -497,7 +543,7 @@ def test_update_when_one_param_returns_expected_data_v2(httpserver_auth: HTTPSer
 
     c = Client()
     response = c.watchlists.v2.update(TEST_WATCHLIST_ID, title="updated title")
-    assert isinstance(response, Watchlist)
+    assert isinstance(response, WatchlistV2)
     assert response.json() == json.dumps(watchlist, separators=(",", ":"))
 
 
@@ -807,16 +853,16 @@ def test_get_page_when_default_params_returns_expected_data(mock_get_all):
     page = c.watchlists.v1.get_page()
     assert isinstance(page, WatchlistsPage)
     assert page.watchlists[0].json() == json.dumps(
-        TEST_WATCHLIST_1, separators=(",", ":")
+        TEST_WATCHLIST_V1_1, separators=(",", ":")
     )
     assert page.watchlists[1].json() == json.dumps(
-        TEST_WATCHLIST_2, separators=(",", ":")
+        TEST_WATCHLIST_V1_2, separators=(",", ":")
     )
     assert page.total_count == len(page.watchlists) == 2
 
 
 def test_get_page_when_custom_params_returns_expected_data(httpserver_auth: HTTPServer):
-    data = {"watchlists": [TEST_WATCHLIST_1, TEST_WATCHLIST_2], "totalCount": 2}
+    data = {"watchlists": [TEST_WATCHLIST_V1_1, TEST_WATCHLIST_V1_2], "totalCount": 2}
 
     query = {"page": 2, "pageSize": 42, "userId": "user-42"}
 
@@ -828,10 +874,10 @@ def test_get_page_when_custom_params_returns_expected_data(httpserver_auth: HTTP
     page = c.watchlists.v1.get_page(page_num=2, page_size=42, user_id="user-42")
     assert isinstance(page, WatchlistsPage)
     assert page.watchlists[0].json() == json.dumps(
-        TEST_WATCHLIST_1, separators=(",", ":")
+        TEST_WATCHLIST_V1_1, separators=(",", ":")
     )
     assert page.watchlists[1].json() == json.dumps(
-        TEST_WATCHLIST_2, separators=(",", ":")
+        TEST_WATCHLIST_V1_2, separators=(",", ":")
     )
     assert page.total_count == len(page.watchlists) == 2
 
@@ -848,8 +894,8 @@ def test_iter_all_when_default_params_returns_expected_data(
         "pageSize": 2,
     }
 
-    data_1 = {"watchlists": [TEST_WATCHLIST_1, TEST_WATCHLIST_2], "totalCount": 2}
-    data_2 = {"watchlists": [TEST_WATCHLIST_3], "totalCount": 1}
+    data_1 = {"watchlists": [TEST_WATCHLIST_V1_1, TEST_WATCHLIST_V1_2], "totalCount": 2}
+    data_2 = {"watchlists": [TEST_WATCHLIST_V1_3], "totalCount": 1}
 
     httpserver_auth.expect_ordered_request(
         "/v1/watchlists", method="GET", query_string=urlencode(query_1)
@@ -861,7 +907,7 @@ def test_iter_all_when_default_params_returns_expected_data(
     client = Client()
     iterator = client.watchlists.v1.iter_all(page_size=2)
     total = 0
-    expected = [TEST_WATCHLIST_1, TEST_WATCHLIST_2, TEST_WATCHLIST_3]
+    expected = [TEST_WATCHLIST_V1_1, TEST_WATCHLIST_V1_2, TEST_WATCHLIST_V1_3]
     for item in iterator:
         total += 1
         assert isinstance(item, Watchlist)
@@ -872,13 +918,13 @@ def test_iter_all_when_default_params_returns_expected_data(
 def test_get_returns_expected_data(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request(
         f"/v1/watchlists/{TEST_WATCHLIST_ID}", method="GET"
-    ).respond_with_json(TEST_WATCHLIST_1)
+    ).respond_with_json(TEST_WATCHLIST_V1_1)
 
     c = Client()
     watchlist = c.watchlists.v1.get(TEST_WATCHLIST_ID)
     assert isinstance(watchlist, Watchlist)
     assert watchlist.watchlist_id == TEST_WATCHLIST_ID
-    assert watchlist.json() == json.dumps(TEST_WATCHLIST_1, separators=(",", ":"))
+    assert watchlist.json() == json.dumps(TEST_WATCHLIST_V1_1, separators=(",", ":"))
 
 
 def test_create_when_required_params_returns_expected_data(
@@ -887,7 +933,7 @@ def test_create_when_required_params_returns_expected_data(
     c = Client()
     watchlist = c.watchlists.v1.create(WatchlistType.DEPARTING_EMPLOYEE)
     assert isinstance(watchlist, Watchlist)
-    assert watchlist.json() == json.dumps(TEST_WATCHLIST_1, separators=(",", ":"))
+    assert watchlist.json() == json.dumps(TEST_WATCHLIST_V1_1, separators=(",", ":"))
 
 
 def test_create_when_all_params_returns_expected_data(mock_create_custom):
@@ -896,7 +942,7 @@ def test_create_when_all_params_returns_expected_data(mock_create_custom):
         "CUSTOM", title="test", description="custom watchlist"
     )
     assert isinstance(watchlist, Watchlist)
-    assert watchlist.json() == json.dumps(TEST_WATCHLIST_2, separators=(",", ":"))
+    assert watchlist.json() == json.dumps(TEST_WATCHLIST_V1_2, separators=(",", ":"))
 
 
 def test_create_when_custom_and_no_title_raises_error(httpserver_auth: HTTPServer):
@@ -914,7 +960,7 @@ def test_delete_returns_expected_data(mock_delete):
 def test_update_when_all_params_returns_expected_data(httpserver_auth: HTTPServer):
     query = {"paths": ["title", "description"]}
     data = {"description": "updated description", "title": "updated title"}
-    watchlist = TEST_WATCHLIST_2.copy()
+    watchlist = TEST_WATCHLIST_V1_2.copy()
     watchlist["title"] = "updated title"
     watchlist["description"] = "updated description"
     httpserver_auth.expect_request(
@@ -935,7 +981,7 @@ def test_update_when_all_params_returns_expected_data(httpserver_auth: HTTPServe
 def test_update_when_one_param_returns_expected_data(httpserver_auth: HTTPServer):
     query = {"paths": ["title"]}
     data = {"title": "updated title", "description": None}
-    watchlist = TEST_WATCHLIST_2.copy()
+    watchlist = TEST_WATCHLIST_V1_2.copy()
     watchlist["title"] = "updated title"
     httpserver_auth.expect_request(
         f"/v1/watchlists/{TEST_WATCHLIST_ID}",

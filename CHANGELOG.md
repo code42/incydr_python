@@ -9,6 +9,11 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## Unreleased
+
+### Fixed
+- A bug where the SDK's V2 Watchlist methods were returning the wrong models.
+
 ## 2.7.0 - 2025-11-13
 
 ### Updated
