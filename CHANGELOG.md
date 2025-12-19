@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+### Added
+- Added the `state_v2` field to session states. Added the new session state `CLOSED_TP_BENIGN`.
+
 ### Fixed
 - A bug where the SDK's V2 Watchlist methods were returning the wrong models.
 

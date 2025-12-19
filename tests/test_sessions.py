@@ -59,6 +59,7 @@ TEST_SESSION = {
         {
             "sourceTimestamp": POSIX_TS,
             "state": "OPEN",
+            "stateV2": "OPEN",
             "userId": "string",
         }
     ],

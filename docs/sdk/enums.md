@@ -555,6 +555,7 @@ Devices has been replaced by [Agents](#agents)
 * **IN_PROGRESS** = `"IN_PROGRESS"`
 * **CLOSED** = `"CLOSED"`
 * **CLOSED_TP** = `"CLOSED_TP"`
+* **CLOSED_TP_BENIGN** = `"CLOSED_TP_BENIGN"`
 * **CLOSED_FP** = `"CLOSED_FP"`
 * **OPEN_NEW_DATA** = `"OPEN_NEW_DATA"`
 

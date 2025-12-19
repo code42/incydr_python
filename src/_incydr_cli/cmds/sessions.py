@@ -322,7 +322,7 @@ def bulk_update_state(
     Bulk update the state of multiple sessions. Optionally attach a note.
 
     NEW_STATE specifies the new state to which sessions will be updated.
-    Must be one of the following: 'OPEN', 'IN_PROGRESS', 'CLOSED', 'CLOSED_TP', 'CLOSED_FP', 'OPEN_NEW_DATA'
+    Must be one of the following: 'OPEN', 'IN_PROGRESS', 'CLOSED', 'CLOSED_TP', 'CLOSED_TP_BENIGN', 'CLOSED_FP', 'OPEN_NEW_DATA'
 
     Takes a single arg `FILE` which specifies the path to the file (use "-" to read from stdin).
     File format can either be CSV or [JSON Lines format](https://jsonlines.org) (Default is CSV).
