@@ -30,6 +30,7 @@ from _incydr_sdk.file_events.models.response import SavedSearch
 from _incydr_sdk.file_events.models.response import SearchFilterGroup
 from _incydr_sdk.file_events.models.response import SearchFilterGroupV2
 from _incydr_sdk.queries.utils import parse_ts_to_ms_str
+from _incydr_sdk.queries.utils import parse_ts_to_date_str
 
 _term_enum_map = {
     "file.category": FileCategory,
@@ -346,6 +347,29 @@ class EventQuery(Model):
                 )
             )
         return self
+    
+    def on(self, term: str, date=None):
+        """
+        Adds a date-based filter for the specified term.
+
+        When passed as part of a query, returns events on the specified date.
+
+        Example:
+            `EventQuery(**kwargs).date_range(term="event.inserted", start_date="P1D")` creates a query that returns all events inserted into Forensic Search within the past day.
+
+        **Parameters**:
+
+        * **term**: `str` - The term which corresponds to a file event field.
+        * **date**: `int`, `float`, `str`, `datetime` -  The date to query for events. Defaults to None.
+        """
+        self.groups.append(
+            FilterGroup(
+                filters=[Filter(term = term, operator=Operator.ON, value = parse_ts_to_date_str(date))]
+            )
+        )
+        return self
+
+
 
     def matches_any(self):
         """
@@ -439,10 +463,10 @@ def _create_date_range_filter_group(start_date, end_date, term=None):
 
 def _create_filter_group(filter_group: SearchFilterGroup) -> FilterGroup:
     filters = [
-        Filter.construct(value=f.value, operator=f.operator, term=f.term)
+        Filter.model_construct(value=f.value, operator=f.operator, term=f.term)
         for f in filter_group.filters
     ]
-    return FilterGroup.construct(
+    return FilterGroup.model_construct(
         filterClause=filter_group.filter_clause, filters=filters
     )
 
@@ -451,7 +475,7 @@ def _create_filter_group_v2(filter_group_v2: SearchFilterGroupV2) -> FilterGroup
     subgroups = []
     for subgroup in filter_group_v2.subgroups:
         subgroups.append(_handle_filter_group_type(subgroup))
-    return FilterGroupV2.construct(
+    return FilterGroupV2.model_construct(
         subgroupClause=filter_group_v2.subgroup_clause, subgroups=subgroups
     )
 

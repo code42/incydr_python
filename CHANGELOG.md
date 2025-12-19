@@ -13,6 +13,7 @@
 
 ### Added
 - Added the `state_v2` field to session states. Added the new session state `CLOSED_TP_BENIGN`.
+- Added support for the `ON` filter in file event queries.
 
 ### Fixed
 - A bug where the SDK's V2 Watchlist methods were returning the wrong models.
