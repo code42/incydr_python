@@ -389,8 +389,9 @@ def test_subquery_handles_nested_subquery():
     assert q.groups[0].subgroups[0].subgroups[0].filters[0].term == "term"
     assert q.groups[0].subgroups[0].subgroups[0].filters[0].value == "value"
 
+
 def test_on_filter_creates_correct_filter():
-    q = EventQuery().on(term="date_term", date=datetime(2025,1,1,1,1,1,1))
+    q = EventQuery().on(term="date_term", date=datetime(2025, 1, 1, 1, 1, 1, 1))
     expected = FilterGroup(
         filters=[
             Filter(

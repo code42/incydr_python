@@ -48,8 +48,12 @@ class Score(Model):
 
 class State(Model):
     source_timestamp: Optional[int] = Field(None, alias="sourceTimestamp")
-    state: SessionStates = Field(None, description = "Deprecated. Use state_v2 instead.")
-    state_v2: str = Field(None, alias = "stateV2", description="The state assigned to the session. The value is an item from the SessionStates enum. Clients should be tolerant of additional values that may be added in the future.")
+    state: SessionStates = Field(None, description="Deprecated. Use state_v2 instead.")
+    state_v2: str = Field(
+        None,
+        alias="stateV2",
+        description="The state assigned to the session. The value is an item from the SessionStates enum. Clients should be tolerant of additional values that may be added in the future.",
+    )
     user_id: Optional[str] = Field(
         None, alias="userId", description="A User ID. (Deprecated)"
     )

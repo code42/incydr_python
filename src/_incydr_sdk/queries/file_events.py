@@ -29,8 +29,8 @@ from _incydr_sdk.enums.file_events import TrustReason
 from _incydr_sdk.file_events.models.response import SavedSearch
 from _incydr_sdk.file_events.models.response import SearchFilterGroup
 from _incydr_sdk.file_events.models.response import SearchFilterGroupV2
-from _incydr_sdk.queries.utils import parse_ts_to_ms_str
 from _incydr_sdk.queries.utils import parse_ts_to_date_str
+from _incydr_sdk.queries.utils import parse_ts_to_ms_str
 
 _term_enum_map = {
     "file.category": FileCategory,
@@ -347,7 +347,7 @@ class EventQuery(Model):
                 )
             )
         return self
-    
+
     def on(self, term: str, date=None):
         """
         Adds a date-based filter for the specified term.
@@ -364,12 +364,16 @@ class EventQuery(Model):
         """
         self.groups.append(
             FilterGroup(
-                filters=[Filter(term = term, operator=Operator.ON, value = parse_ts_to_date_str(date))]
+                filters=[
+                    Filter(
+                        term=term,
+                        operator=Operator.ON,
+                        value=parse_ts_to_date_str(date),
+                    )
+                ]
             )
         )
         return self
-
-
 
     def matches_any(self):
         """

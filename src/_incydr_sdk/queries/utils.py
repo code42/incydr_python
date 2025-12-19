@@ -11,6 +11,7 @@ MICROSECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 DATETIME_STR_FORMAT = "%Y-%m-%d %H:%M:%S"
 DATE_STR_FORMAT = "%Y-%m-%d"
 
+
 def parse_ts_to_date_str(timestamp: Union[str, int, float, datetime, date]):
     """
     Parse int/float/str/datetime timestamp to string milliseconds precision.
@@ -21,7 +22,7 @@ def parse_ts_to_date_str(timestamp: Union[str, int, float, datetime, date]):
     **Returns**:
         (str): A str representing the given date. Example output looks like
         '2020-03-25'.
-    """    
+    """
     # convert str/int/float values to datetime
     if isinstance(timestamp, (int, float)):
         timestamp = datetime.fromtimestamp(timestamp, tz=timezone.utc)
