@@ -9,7 +9,7 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
-## Unreleased
+## 2.8.0 - 2026-01-16
 
 ### Added
 - Added the `state_v2` field to session states. Added the new session state `CLOSED_TP_BENIGN`.
