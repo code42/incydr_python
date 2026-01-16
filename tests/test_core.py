@@ -6,7 +6,6 @@ from pytest_httpserver import HTTPServer
 
 from .conftest import TEST_HOST
 from .conftest import TEST_TOKEN
-from _incydr_sdk.core.auth import APIClientAuth
 from _incydr_sdk.core.auth import RefreshTokenAuth
 from _incydr_sdk.core.models import CSVModel
 from _incydr_sdk.core.models import Model
