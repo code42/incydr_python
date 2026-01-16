@@ -29,9 +29,9 @@ from _incydr_sdk.core.client import Client
 from _incydr_sdk.utils import model_as_card
 from _incydr_sdk.watchlists.models.responses import IncludedDepartment
 from _incydr_sdk.watchlists.models.responses import IncludedDirectoryGroup
-from _incydr_sdk.watchlists.models.responses import Watchlist
 from _incydr_sdk.watchlists.models.responses import WatchlistActor
 from _incydr_sdk.watchlists.models.responses import WatchlistUser
+from _incydr_sdk.watchlists.models.responses import WatchlistV2
 
 MAX_USER_DISPLAY_COUNT = 25
 
@@ -115,7 +115,7 @@ def list_(
         actor = user
     client = Client()
     watchlists = client.watchlists.v2.iter_all(actor_id=actor)
-    _output_results(watchlists, Watchlist, format_, columns)
+    _output_results(watchlists, WatchlistV2, format_, columns)
 
 
 @watchlists.command(cls=IncydrCommand)

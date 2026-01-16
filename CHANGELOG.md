@@ -9,6 +9,15 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## 2.8.0 - 2026-01-16
+
+### Added
+- Added the `state_v2` field to session states. Added the new session state `CLOSED_TP_BENIGN`.
+- Added support for the `ON` filter in file event queries.
+
+### Fixed
+- A bug where the SDK's V2 Watchlist methods were returning the wrong models.
+
 ## 2.7.0 - 2025-11-13
 
 ### Updated

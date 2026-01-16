@@ -19,10 +19,10 @@ from _incydr_sdk.watchlists.models.responses import IncludedDepartment
 from _incydr_sdk.watchlists.models.responses import IncludedDepartmentsList
 from _incydr_sdk.watchlists.models.responses import IncludedDirectoryGroup
 from _incydr_sdk.watchlists.models.responses import IncludedDirectoryGroupsList
-from _incydr_sdk.watchlists.models.responses import Watchlist
 from _incydr_sdk.watchlists.models.responses import WatchlistActor
 from _incydr_sdk.watchlists.models.responses import WatchlistMembersListV2
-from _incydr_sdk.watchlists.models.responses import WatchlistsPage
+from _incydr_sdk.watchlists.models.responses import WatchlistsPageV2
+from _incydr_sdk.watchlists.models.responses import WatchlistV2
 
 
 class WatchlistsClient:
@@ -62,7 +62,7 @@ class WatchlistsV2:
 
     def get_page(
         self, page_num: int = 1, page_size: int = None, actor_id: str = None
-    ) -> WatchlistsPage:
+    ) -> WatchlistsPageV2:
         """
         Get a page of watchlists.
 
@@ -81,11 +81,11 @@ class WatchlistsV2:
             page=page_num, pageSize=page_size, actorId=actor_id
         )
         response = self._parent.session.get(self._uri, params=data.dict())
-        return WatchlistsPage.parse_response(response)
+        return WatchlistsPageV2.parse_response(response)
 
     def iter_all(
         self, page_size: int = None, actor_id: str = None
-    ) -> Iterator[Watchlist]:
+    ) -> Iterator[WatchlistV2]:
         """
         Iterate over all watchlists.
 
@@ -102,7 +102,7 @@ class WatchlistsV2:
             if len(page.watchlists) < page_size:
                 break
 
-    def get(self, watchlist_id: str) -> Watchlist:
+    def get(self, watchlist_id: str) -> WatchlistV2:
         """
         Get a single watchlist.
 
@@ -113,11 +113,11 @@ class WatchlistsV2:
         **Returns**: A [`Watchlist`][watchlist-model] object.
         """
         response = self._parent.session.get(f"{self._uri}/{watchlist_id}")
-        return Watchlist.parse_response(response)
+        return WatchlistV2.parse_response(response)
 
     def create(
         self, watchlist_type: WatchlistType, title: str = None, description: str = None
-    ) -> Watchlist:
+    ) -> WatchlistV2:
         """
         Create a new watchlist.
 
@@ -137,7 +137,7 @@ class WatchlistsV2:
             description=description, title=title, watchlistType=watchlist_type
         )
         response = self._parent.session.post(url=self._uri, json=data.dict())
-        watchlist = Watchlist.parse_response(response)
+        watchlist = WatchlistV2.parse_response(response)
         self._watchlist_type_id_map[watchlist_type] = watchlist.watchlist_id
         return watchlist
 
@@ -155,7 +155,7 @@ class WatchlistsV2:
 
     def update(
         self, watchlist_id: str, title: str = None, description: str = None
-    ) -> Watchlist:
+    ) -> WatchlistV2:
         """
         Update a custom watchlist.
 
@@ -177,7 +177,7 @@ class WatchlistsV2:
         response = self._parent.session.patch(
             f"{self._uri}/{watchlist_id}", params=query, json=data.dict()
         )
-        return Watchlist.parse_response(response)
+        return WatchlistV2.parse_response(response)
 
     def get_member(self, watchlist_id: str, actor_id: str) -> WatchlistActor:
         """

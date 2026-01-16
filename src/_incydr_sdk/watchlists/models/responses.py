@@ -222,6 +222,61 @@ class IncludedActorsList(ResponseModel):
     )
 
 
+class WatchlistStatsV2(ResponseModel):
+    """
+    A model representing stats for a watchlist.
+
+    **Fields**:
+
+    * **included_actors_count**: `int` - The number of actors explicitly included on the watchlist.
+    * **included_departments_count**: `int` - The number of departments explicitly included on the watchlist.
+    * **included_directory_groups_count**: `int` - The number of directory groups explicitly included on the watchlist.
+    * **excluded_actors_count**: `int` - The number of actors explicitly excluded from the watchlist.
+    * **excluded_departments_count**: `int` - The number of departments explicitly excluded from the watchlist.
+    * **excluded_directory_groups_count**: `int` - The number of directory groups explicitly excluded from the watchlist.
+    """
+
+    included_departments_count: Optional[int] = Field(
+        None,
+        description="The number of departments explicitly included on the watchlist.",
+        alias="includedDepartmentsCount",
+        table=lambda included_departments_count: included_departments_count or 0,
+    )
+    included_directory_groups_count: Optional[int] = Field(
+        None,
+        description="The number of directory groups explicitly included on the watchlist.",
+        alias="includedDirectoryGroupsCount",
+        table=lambda included_directory_groups_count: included_directory_groups_count
+        or 0,
+    )
+    included_actors_count: Optional[int] = Field(
+        None,
+        description="The number of actors explicitly included on the watchlist.",
+        alias="includedActorsCount",
+        table=lambda included_users_count: included_users_count or 0,
+    )
+    excluded_actors_count: Optional[int] = Field(
+        None,
+        description="The number of actors explicitly excluded from the watchlist.",
+        alias="excludedActorsCount",
+        # displays a value of None as 0
+        table=lambda excluded_users_count: excluded_users_count or 0,
+    )
+    excluded_departments_count: Optional[int] = Field(
+        None,
+        description="The number of departments explicitly excluded from the watchlist.",
+        alias="excludedDepartmentsCount",
+        table=lambda included_departments_count: included_departments_count or 0,
+    )
+    excluded_directory_groups_count: Optional[int] = Field(
+        None,
+        description="The number of directory groups explicitly excluded from the watchlist.",
+        alias="excludedDirectoryGroupsCount",
+        table=lambda included_directory_groups_count: included_directory_groups_count
+        or 0,
+    )
+
+
 class WatchlistStats(ResponseModel):
     """
     A model representing stats for a watchlist.
@@ -338,6 +393,34 @@ class Watchlist(ResponseModel):
     )
 
 
+class WatchlistV2(ResponseModel):
+    """
+    A model representing an Incydr Watchlist.
+
+    **Fields**:
+
+    * **description**: `str` - Optional description for a custom watchlist.
+    * **list_type**: [`WatchlistType`][watchlist-types] - The watchlist type.
+    * **stats**: `WatchlistStatsV2` - Watchlist membership information.
+    * **tenant_id**: `str` - A unique tenant ID.
+    * **title**: `str` - Title for a custom watchlist.
+    * **watchlist_id**: `str` - A unique watchlist ID.
+    """
+
+    description: Optional[str] = Field(
+        None, description="Description for a custom watchlist."
+    )
+    list_type: Union[WatchlistType, str] = Field(alias="listType")
+    stats: Optional[WatchlistStatsV2] = None
+    tenant_id: Optional[str] = Field(
+        None, description="A unique tenant ID.", alias="tenantId"
+    )
+    title: Optional[str] = Field(None, description="Title for a custom watchlist.")
+    watchlist_id: Optional[str] = Field(
+        None, description="A unique watchlist ID.", alias="watchlistId"
+    )
+
+
 class WatchlistsPage(ResponseModel):
     """
     A model representing a page of `Watchlist` objects.
@@ -355,5 +438,26 @@ class WatchlistsPage(ResponseModel):
         alias="totalCount",
     )
     watchlists: Optional[List[Watchlist]] = Field(
+        None, description="The list of watchlists."
+    )
+
+
+class WatchlistsPageV2(ResponseModel):
+    """
+    A model representing a page of `Watchlist` objects.
+
+    **Fields**:
+
+    * **total_count**: `int` - Total count of watchlists found by the query.
+    * **watchlists**: `List[WatchlistV2]` - The list `n` number of watchlists retrieved from the query, where `n=page_size`.
+    """
+
+    total_count: Optional[int] = Field(
+        None,
+        description="The total count of all watchlists.",
+        examples=[10],
+        alias="totalCount",
+    )
+    watchlists: Optional[List[WatchlistV2]] = Field(
         None, description="The list of watchlists."
     )

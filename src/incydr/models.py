@@ -46,7 +46,9 @@ from _incydr_sdk.watchlists.models.responses import WatchlistActor
 from _incydr_sdk.watchlists.models.responses import WatchlistMembersList
 from _incydr_sdk.watchlists.models.responses import WatchlistMembersListV2
 from _incydr_sdk.watchlists.models.responses import WatchlistsPage
+from _incydr_sdk.watchlists.models.responses import WatchlistsPageV2
 from _incydr_sdk.watchlists.models.responses import WatchlistUser
+from _incydr_sdk.watchlists.models.responses import WatchlistV2
 
 
 __all__ = [
@@ -82,7 +84,9 @@ __all__ = [
     "DepartmentsPage",
     "DirectoryGroupsPage",
     "DirectoryGroup",
+    "WatchlistV2",
     "Watchlist",
+    "WatchlistsPageV2",
     "WatchlistsPage",
     "WatchlistMembersListV2",
     "WatchlistMembersList",
