@@ -1,6 +1,3 @@
-from pydantic import ValidationError
-
-
 class IncydrException(Exception):
     """Base class for all Incydr specific exceptions."""
 
@@ -8,17 +5,13 @@ class IncydrException(Exception):
 
 
 class AuthMissingError(IncydrException):
-    def __init__(self, validation_error: ValidationError):
-        self.pydantic_error = str(validation_error)
-        self.errors = validation_error.errors()
-
-    @property
-    def error_keys(self):
-        return [e["loc"][0] for e in self.errors]
+    def __init__(self, error_keys):
+        self.error_keys = error_keys
 
     def __str__(self):
+        errors_formatted = "\n - ".join(self.error_keys)
         return (
-            f"{self.pydantic_error}\n\n"
+            f"Missing required authentication variables in environment or in initialization\n\n - {errors_formatted}\n\n"
             "Pass required args to the `incydr.Client` or set required values in your environment.\n\n"
             "See https://developer.code42.com/sdk/settings for more details."
         )

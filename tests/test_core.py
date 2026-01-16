@@ -5,8 +5,13 @@ from pydantic import Field
 from pytest_httpserver import HTTPServer
 
 from .conftest import TEST_HOST
+from .conftest import TEST_TOKEN
+from _incydr_sdk.core.auth import APIClientAuth
+from _incydr_sdk.core.auth import RefreshTokenAuth
 from _incydr_sdk.core.models import CSVModel
 from _incydr_sdk.core.models import Model
+from _incydr_sdk.core.settings import IncydrSettings
+from _incydr_sdk.exceptions import AuthMissingError
 from incydr import Client
 
 
@@ -122,3 +127,120 @@ def test_json_lines_model_parsing():
 def test_user_agent(httpserver_auth: HTTPServer):
     c = Client()
     assert c._session.headers["User-Agent"].startswith("incydrSDK")
+
+
+@pytest.fixture
+def httpserver_refresh_token_auth(httpserver: HTTPServer, monkeypatch):
+    monkeypatch.setenv("incydr_url", TEST_HOST)
+    monkeypatch.setenv("incydr_refresh_token", "test_refresh_token")
+    monkeypatch.setenv("incydr_refresh_url", f"{TEST_HOST}/v1/refresh")
+
+    refresh_response = {
+        "accessToken": {
+            "tokenValue": TEST_TOKEN,
+            "expiresAt": "2099-01-01T00:00:00Z",
+        },
+        "refreshToken": {
+            "tokenValue": "new_refresh_token",
+            "expiresAt": "2099-01-01T00:00:00Z",
+        },
+    }
+    httpserver.expect_request("/v1/refresh", method="POST").respond_with_json(
+        refresh_response
+    )
+    return httpserver
+
+
+def test_client_init_with_refresh_token_and_refresh_url_uses_refresh_token_auth(
+    httpserver_refresh_token_auth: HTTPServer,
+):
+    c = Client()
+    assert isinstance(c._session.auth, RefreshTokenAuth)
+    assert c.settings.refresh_token.get_secret_value() == "test_refresh_token"
+    assert c.settings.refresh_url == f"{TEST_HOST}/v1/refresh"
+
+
+def test_client_init_with_refresh_token_does_not_require_api_client_credentials(
+    httpserver_refresh_token_auth: HTTPServer,
+):
+    c = Client()
+    assert c.settings.api_client_id is None
+    assert c.settings.api_client_secret is None
+
+
+def test_client_init_with_refresh_token_passed_as_args(
+    httpserver: HTTPServer, monkeypatch
+):
+    monkeypatch.setenv("incydr_url", TEST_HOST)
+
+    refresh_response = {
+        "accessToken": {
+            "tokenValue": TEST_TOKEN,
+            "expiresAt": "2099-01-01T00:00:00Z",
+        },
+        "refreshToken": {
+            "tokenValue": "new_refresh_token",
+            "expiresAt": "2099-01-01T00:00:00Z",
+        },
+    }
+    httpserver.expect_request("/v1/refresh", method="POST").respond_with_json(
+        refresh_response
+    )
+
+    c = Client(
+        refresh_token="arg_refresh_token",
+        refresh_url=f"{TEST_HOST}/v1/refresh",
+    )
+    assert isinstance(c._session.auth, RefreshTokenAuth)
+    assert c.settings.refresh_token.get_secret_value() == "arg_refresh_token"
+
+
+def test_settings_with_only_refresh_token_raises_auth_missing_error(monkeypatch):
+    with pytest.raises(AuthMissingError) as exc_info:
+        IncydrSettings(
+            url=TEST_HOST,
+            refresh_token="test_refresh_token",
+            _env_file="",
+        )
+
+    assert "api_client_id" in exc_info.value.error_keys
+    assert "api_client_secret" in exc_info.value.error_keys
+
+
+def test_settings_with_only_refresh_url_raises_auth_missing_error(monkeypatch):
+    with pytest.raises(AuthMissingError) as exc_info:
+        IncydrSettings(
+            url=TEST_HOST,
+            refresh_url=f"{TEST_HOST}/v1/refresh",
+            _env_file="",
+        )
+
+    assert "api_client_id" in exc_info.value.error_keys
+    assert "api_client_secret" in exc_info.value.error_keys
+
+
+def test_client_prefers_refresh_token_auth_when_both_auth_methods_provided(
+    httpserver: HTTPServer, monkeypatch
+):
+    monkeypatch.setenv("incydr_url", TEST_HOST)
+    monkeypatch.setenv("incydr_api_client_id", "env_id")
+    monkeypatch.setenv("incydr_api_client_secret", "env_secret")
+    monkeypatch.setenv("incydr_refresh_token", "test_refresh_token")
+    monkeypatch.setenv("incydr_refresh_url", f"{TEST_HOST}/v1/refresh")
+
+    refresh_response = {
+        "accessToken": {
+            "tokenValue": TEST_TOKEN,
+            "expiresAt": "2099-01-01T00:00:00Z",
+        },
+        "refreshToken": {
+            "tokenValue": "new_refresh_token",
+            "expiresAt": "2099-01-01T00:00:00Z",
+        },
+    }
+    httpserver.expect_request("/v1/refresh", method="POST").respond_with_json(
+        refresh_response
+    )
+
+    c = Client()
+    assert isinstance(c._session.auth, RefreshTokenAuth)

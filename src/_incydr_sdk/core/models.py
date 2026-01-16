@@ -128,6 +128,20 @@ class AuthResponse(ResponseModel):
         )
 
 
+class TokenDetails(Model):
+    tokenValue: SecretStr
+    expiresAt: datetime
+
+    @property
+    def expired(self):
+        return datetime.now(timezone.utc) >= self.expiresAt
+
+
+class RefreshTokenAuthResponse(ResponseModel):
+    accessToken: TokenDetails
+    refreshToken: TokenDetails
+
+
 class CSVModel(BaseModel):
     """
     Pydantic model class enables multiple aliases to be assigned to a single field value. If the field is required

@@ -5,6 +5,7 @@ import warnings
 from io import IOBase
 from pathlib import Path
 from textwrap import indent
+from typing import Optional
 from typing import Union
 
 from pydantic import Field
@@ -19,6 +20,8 @@ from rich.console import Console
 from rich.logging import RichHandler
 
 from _incydr_sdk.enums import _Enum
+from _incydr_sdk.exceptions import AuthMissingError
+
 
 # capture default displayhook so we can "uninstall" rich
 _sys_displayhook = sys.displayhook
@@ -85,8 +88,8 @@ class IncydrSettings(BaseSettings):
         and the Python repl. Defaults to True. env_var=`INCYDR_USE_RICH`
     """
 
-    api_client_id: str
-    api_client_secret: SecretStr
+    api_client_id: Optional[str] = Field(default=None)
+    api_client_secret: Optional[SecretStr] = Field(default=None)
     url: str
     page_size: int = Field(default=100)
     max_response_history: int = Field(default=5)
@@ -96,6 +99,8 @@ class IncydrSettings(BaseSettings):
     log_level: Union[int, str] = Field(default=logging.WARNING, validate_default=True)
     logger: logging.Logger = Field(default=None)
     user_agent_prefix: Union[str] = Field(default="")
+    refresh_token: Optional[SecretStr] = Field(default=None)
+    refresh_url: Optional[str] = Field(default=None)
 
     model_config = SettingsConfigDict(
         env_prefix="incydr_",
@@ -211,6 +216,28 @@ class IncydrSettings(BaseSettings):
 
         logger.setLevel(log_level)
         cls.logger = logger
+        return values
+
+    @model_validator(mode="after")
+    @classmethod
+    def _auth_validator(cls, values):  # noqa
+        values_dict = values.dict()
+
+        # if we have a refresh token and a refresh url, don't validate api client auth/secret
+        if values_dict.get("refresh_url") and values_dict.get("refresh_token"):
+            return values
+
+        errors = []
+
+        if not values_dict.get("api_client_id"):
+            errors.append("api_client_id")
+
+        if not values_dict.get("api_client_secret"):
+            errors.append("api_client_secret")
+
+        if len(errors) > 0:
+            raise AuthMissingError(errors)
+
         return values
 
     def _log_response_info(self, response):
