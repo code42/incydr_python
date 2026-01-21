@@ -21,10 +21,12 @@ from _incydr_cli.cmds.options.output_options import SingleFormat
 from _incydr_cli.cmds.options.output_options import table_format_option
 from _incydr_cli.cmds.options.output_options import TableFormat
 from _incydr_cli.cmds.options.utils import user_lookup_callback
+from _incydr_cli.cmds.utils import deprecation_warning
 from _incydr_cli.cmds.utils import user_lookup
 from _incydr_cli.core import IncydrCommand
 from _incydr_cli.core import IncydrGroup
 from _incydr_cli.file_readers import AutoDecodedFile
+from _incydr_sdk.agents.models import Agent
 from _incydr_sdk.core.client import Client
 from _incydr_sdk.devices.models import Device
 from _incydr_sdk.users.client import RoleNotFoundError
@@ -136,8 +138,9 @@ def list_devices(
     columns: Optional[str],
 ):
     """
-    List devices associated with a particular user.
+    DEPRECATED - use list-agents instead.
     """
+    deprecation_warning("DEPRECATED. Use list-agents instead.")
     client = Client()
     devices = client.users.v1.get_devices(user).devices
 
@@ -156,6 +159,45 @@ def list_devices(
             "login_date",
         ]
         render.table(Device, devices, columns=columns, flat=False)
+    elif format_ == TableFormat.json_pretty:
+        for item in devices:
+            console.print_json(item.json())
+    else:
+        for item in devices:
+            click.echo(item.json())
+
+
+@users.command(cls=IncydrCommand)
+@user_arg
+@table_format_option
+@columns_option
+@logging_options
+def list_agents(
+    user,
+    format_: TableFormat,
+    columns: Optional[str],
+):
+    """
+    List agents associated with a particular user.
+    """
+    client = Client()
+    if "@" in user:
+        user = client.users.v1.get_user(user).user_id
+    devices = list(client.agents.v1.iter_all(user_id=user))
+
+    if format_ == TableFormat.csv:
+        render.csv(Agent, devices, columns=columns, flat=True)
+    elif format_ == TableFormat.table:
+        columns = columns or [
+            "agent_id",
+            "name",
+            "os_hostname",
+            "active",
+            "agent_type",
+            "agent_health_issue_types",
+            "last_connected",
+        ]
+        render.table(Agent, devices, columns=columns, flat=False)
     elif format_ == TableFormat.json_pretty:
         for item in devices:
             console.print_json(item.json())

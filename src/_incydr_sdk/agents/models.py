@@ -106,6 +106,7 @@ class QueryAgentsRequest(BaseModel):
     srtDir: Optional[str] = None
     pageSize: Optional[int] = None
     page: Optional[int] = None
+    userId: Optional[str] = None
 
     @field_validator("srtDir")
     @classmethod

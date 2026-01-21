@@ -39,6 +39,7 @@ class AgentsV1:
         page_size: int = 500,
         agent_healthy: bool = None,
         agent_health_issue_types: Union[List[str], str] = None,
+        user_id: str = None,
     ) -> AgentsPage:
         """
         Get a page of agents.
@@ -55,6 +56,7 @@ class AgentsV1:
         * **sort_key**: [`SortKeys`][agents-sort-keys] - Values on which the response will be sorted. Defaults to agent name.
         * **agent_healthy**: `bool | None` - Optionally retrieve agents with this health status. Agents that have no health issue types are considered healthy.
         * **agent_health_issue_types**: `List[str] | str` - Optionally retrieve agents that have (at least) any of the given issue type(s). Health issue types include the following: `NOT_CONNECTING`, `NOT_SENDING_SECURITY_EVENTS`, `SECURITY_INGEST_REJECTED`, `MISSING_MACOS_PERMISSION_FULL_DISK_ACCESS`, `MISSING_MACOS_PERMISSION_ACCESSIBILITY`.
+        * **user_id**: `str` - Optionally retrieve only agents associated with this user ID.
 
         **Returns**: An [`AgentsPage`][agentspage-model] object.
         """
@@ -69,6 +71,7 @@ class AgentsV1:
             srtKey=sort_key,
             pageSize=page_size,
             page=page_num,
+            userId=user_id,
         )
         response = self._parent.session.get("/v1/agents", params=data.dict())
         return AgentsPage.parse_response(response)
@@ -82,6 +85,7 @@ class AgentsV1:
         page_size: int = 500,
         agent_healthy: bool = None,
         agent_health_issue_types: List[str] = None,
+        user_id: str = None,
     ) -> Iterator[Agent]:
         """
         Iterate over all agents.
@@ -100,6 +104,7 @@ class AgentsV1:
                 sort_key=sort_key,
                 page_num=page_num,
                 page_size=page_size,
+                user_id=user_id,
             )
             yield from page.agents
             if len(page.agents) < page_size:
