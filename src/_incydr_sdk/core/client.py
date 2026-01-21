@@ -3,7 +3,6 @@ import json
 import logging
 from collections import deque
 
-import pydantic
 from requests_toolbelt import user_agent
 from requests_toolbelt.sessions import BaseUrlSession
 
@@ -15,12 +14,12 @@ from _incydr_sdk.alerts.client import AlertsClient
 from _incydr_sdk.audit_log.client import AuditLogClient
 from _incydr_sdk.cases.client import CasesClient
 from _incydr_sdk.core.auth import APIClientAuth
+from _incydr_sdk.core.auth import RefreshTokenAuth
 from _incydr_sdk.core.settings import IncydrSettings
 from _incydr_sdk.customer.client import CustomerClient
 from _incydr_sdk.departments.client import DepartmentsClient
 from _incydr_sdk.devices.client import DevicesClient
 from _incydr_sdk.directory_groups.client import DirectoryGroupsClient
-from _incydr_sdk.exceptions import AuthMissingError
 from _incydr_sdk.file_events.client import FileEventsClient
 from _incydr_sdk.files.client import FilesClient
 from _incydr_sdk.legal_hold.client import LegalHoldClient
@@ -60,31 +59,30 @@ class Client:
         skip_auth: bool = False,
         **settings_kwargs,
     ):
-        try:
-            self._settings = IncydrSettings(
-                url=url,
-                api_client_id=api_client_id,
-                api_client_secret=api_client_secret,
-                **settings_kwargs,
-            )
-        except pydantic.ValidationError as err:
-            auth_keys = {"api_client_id", "api_client_secret", "url"}
-            error_keys = {e["loc"][0] for e in err.errors()}
-            if auth_keys & error_keys:
-                raise AuthMissingError(err)
-            else:
-                raise
+        self._settings = IncydrSettings(
+            url=url,
+            api_client_id=api_client_id,
+            api_client_secret=api_client_secret,
+            **settings_kwargs,
+        )
         self._request_history = deque(maxlen=self._settings.max_response_history)
 
         self._session = BaseUrlSession(base_url=self._settings.url)
         self._session.headers["User-Agent"] = (
             self._settings.user_agent_prefix or ""
         ) + _base_user_agent
-        self._session.auth = APIClientAuth(
-            session=self._session,
-            api_client_id=self._settings.api_client_id,
-            api_client_secret=self._settings.api_client_secret,
-        )
+        if self._settings.refresh_token and self._settings.refresh_url:
+            self._session.auth = RefreshTokenAuth(
+                session=self._session,
+                refresh_url=self._settings.refresh_url,
+                refresh_token=self._settings.refresh_token.get_secret_value(),
+            )
+        else:
+            self._session.auth = APIClientAuth(
+                session=self._session,
+                api_client_id=self._settings.api_client_id,
+                api_client_secret=self._settings.api_client_secret,
+            )
 
         def response_hook(response, *args, **kwargs):
             level = self._settings.log_level

@@ -65,7 +65,11 @@ class ExceptionHandlingGroup(IncydrGroup):
         return super().make_context(info_name, args, parent=parent, **extra)
 
     def invoke(self, ctx):
-        settings = IncydrSettings(url="", api_client_id="", api_client_secret="")
+        settings = IncydrSettings(
+            url="temp value for logging initialization",
+            api_client_id="temp value for logging initialization",
+            api_client_secret="temp value for logging initialization",
+        )
         try:
             return super().invoke(ctx)
         except click.UsageError as err:
