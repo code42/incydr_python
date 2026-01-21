@@ -9,6 +9,11 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## 2.8.1 - 2026-01-21
+
+### Added
+- A new authorization type to facilitate internal development and testing. No user-facing changes are present in this release.
+
 ## 2.8.0 - 2026-01-16
 
 ### Added
