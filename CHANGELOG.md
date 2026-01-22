@@ -9,6 +9,18 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## 2.9.0 - 2026-01-22
+
+### Added
+- The `incydr users list-agents` command to list all agents associated with a user.
+
+### Deprecated
+- The `incydr users list-devices` command is now properly marked as deprecated. Use `incydr users list-agents` instead.
+- The `sdk.users.v1.get_devices` method is now properly marked as deprecated. Use `sdk.agents.v1.iter_all` instead.
+
+### Fixed
+- A bug where `sdk.users.v1.get_devices` would cause an error.
+
 ## 2.8.1 - 2026-01-21
 
 ### Added

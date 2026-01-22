@@ -2,6 +2,7 @@ from itertools import count
 from typing import Iterator
 from typing import List
 from typing import Union
+from warnings import warn
 
 from pydantic import parse_obj_as
 from requests import Response
@@ -113,6 +114,52 @@ class UsersV1:
     ) -> User:
         """
         Get a page of devices associated with a specific user.
+
+        Filter results by passing the appropriate parameters:
+
+        **Parameters**:
+
+        * **user_id**: `str` (required) - The unique ID for the user.
+        * **active**: `bool` - Whether or not the device is active. If true, the device will show up on reports, etc.
+        * **blocked**: `bool` - Whether or not the device is blocked.  If true, restores and logins are disabled.
+        * **page_num**: `int` - Page number for results. Defaulting to 1.
+        * **page_size**: `int` - Max number of results to return per page. Defaulting to client's `page_size` settings.
+        * **sort_dir**: `SortDirection` - 'asc' or 'desc'. The direction in which to sort the response based on the corresponding key. Defaults to 'asc'.
+        * **sort_key**: `SortKeys` - One or more values on which the response will be sorted. Defaults to device name.
+
+        **Returns**: A [`DevicesPage`][devicespage-model] object.
+        """
+        warn(
+            "users.v1.get_devices is deprecated and replaced by agents.v1.iter_all.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        page_size = page_size or self._parent.settings.page_size
+        data = QueryDevicesRequest(
+            page=page_num,
+            pageSize=page_size,
+            sortKey=sort_key,
+            sortDirection=sort_dir,
+            active=active,
+            blocked=blocked,
+        )
+        response = self._parent.session.get(
+            f"/v1/users/{user_id}/devices", params=data.dict()
+        )
+        return DevicesPage.parse_response(response)
+
+    def get_agents(
+        self,
+        user_id: str,
+        active: bool = None,
+        blocked: bool = None,
+        page_num: int = 1,
+        page_size: int = None,
+        sort_dir: SortDirection = SortDirection.ASC,
+        sort_key: SortKeys = SortKeys.NAME,
+    ) -> DevicesPage:
+        """
+        Get a page of agents associated with a specific user.
 
         Filter results by passing the appropriate parameters:
 

@@ -20,6 +20,67 @@ from incydr import Client
 TEST_USER_ID = "user-1"
 TEST_ORG_GUID = "orgGuid-1"
 
+
+TEST_AGENT_ID = "agent-1"
+
+TEST_AGENT_1 = {
+    "agentId": TEST_AGENT_ID,
+    "name": "DESKTOP-H6V9R95",
+    "userId": "user-1",
+    "osHostname": "DESKTOP-H6V9R95",
+    "osName": "Win",
+    "machineId": "123",
+    "serialNumber": "A12B34",
+    "active": True,
+    "agentType": "COMBINED",
+    "agentHealthIssueTypes": ["NOT_CONNECTING"],
+    "appVersion": "1.0",
+    "productVersion": "2.0",
+    "lastConnected": "2022-07-14T17:05:44.524000Z",
+    "externalReference": None,
+    "creationDate": "2022-07-14T16:49:11.166000Z",
+    "modificationDate": "2022-07-14T17:05:44.524000Z",
+}
+
+
+TEST_AGENT_2 = {
+    "agentId": TEST_AGENT_ID,
+    "name": "DESKTOP-H6V9R95",
+    "userId": "user-1",
+    "osHostname": "DESKTOP-H6V9R95",
+    "osName": "Win",
+    "machineId": "456",
+    "serialNumber": "A45B67",
+    "active": True,
+    "agentType": "COMBINED",
+    "agentHealthIssueTypes": [],
+    "appVersion": "1.0",
+    "productVersion": "2.0",
+    "lastConnected": "2022-07-14T17:05:44.524000Z",
+    "externalReference": None,
+    "creationDate": "2022-07-14T16:49:11.166000Z",
+    "modificationDate": "2022-07-14T17:05:44.524000Z",
+}
+
+TEST_AGENT_3 = {
+    "agentId": TEST_AGENT_ID,
+    "name": "DESKTOP-H6V9R95",
+    "userId": "user-1",
+    "osHostname": "DESKTOP-H6V9R95",
+    "osName": "Win",
+    "machineId": "1",
+    "serialNumber": "C42",
+    "active": True,
+    "agentType": "COMBINED",
+    "agentHealthIssueTypes": [],
+    "appVersion": "1.0",
+    "productVersion": "2.0",
+    "lastConnected": "2022-07-14T17:05:44.524000Z",
+    "externalReference": None,
+    "creationDate": "2022-07-14T16:49:11.166000Z",
+    "modificationDate": "2022-07-14T17:05:44.524000Z",
+}
+
 TEST_USER_1 = {
     "legacyUserId": "legacyUserId-1",
     "userId": TEST_USER_ID,
@@ -209,6 +270,26 @@ def mock_get_devices(httpserver_auth: HTTPServer):
     httpserver_auth.expect_request(
         f"/v1/users/{TEST_USER_ID}/devices", method="GET", query_string=urlencode(query)
     ).respond_with_json(devices_data)
+
+
+@pytest.fixture
+def mock_get_agents(httpserver_auth: HTTPServer):
+    query = {
+        "srtKey": "NAME",
+        "srtDir": "ASC",
+        "pageSize": 500,
+        "page": 1,
+        "userId": TEST_USER_ID,
+    }
+    agents_data = {
+        "agents": [TEST_AGENT_1, TEST_AGENT_2],
+        "totalCount": 2,
+        "pageSize": 500,
+        "page": 1,
+    }
+    httpserver_auth.expect_request(
+        "/v1/agents", method="GET", query_string=urlencode(query)
+    ).respond_with_json(agents_data)
 
 
 @pytest.fixture
@@ -660,6 +741,15 @@ def test_cli_list_devices_makes_expected_call(
     httpserver_auth: HTTPServer, runner, mock_get_devices, user, mock_user_lookup
 ):
     result = runner.invoke(incydr, ["users", "list-devices", user])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+@user_input
+def test_cli_list_agents_makes_expected_call(
+    httpserver_auth: HTTPServer, runner, mock_get_agents, user, mock_user_lookup
+):
+    result = runner.invoke(incydr, ["users", "list-agents", user])
     httpserver_auth.check()
     assert result.exit_code == 0
 
