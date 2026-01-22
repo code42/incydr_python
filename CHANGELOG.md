@@ -9,7 +9,7 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
-## Unreleased
+## 2.9.0 - 2026-01-22
 
 ### Added
 - The `incydr users list-agents` command to list all agents associated with a user.
