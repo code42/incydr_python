@@ -60,6 +60,12 @@ def agents():
     "of the given health issue type(s). Health issue types include the following: NOT_CONNECTING, NOT_SENDING_SECURITY_EVENTS, SECURITY_INGEST_REJECTED, MISSING_MACOS_PERMISSION_FULL_DISK_ACCESS, MISSING_MACOS_PERMISSION_ACCESSIBILITY.",
     cls=incompatible_with("healthy"),
 )
+@click.option(
+    "--agent-health-modified-within-days",
+    type=int,
+    default=None,
+    help="Filter agents that have had agent health modified in the last N days (starting from midnight this morning), where N is the value of the parameter.",
+)
 @table_format_option
 @columns_option
 @logging_options
@@ -67,6 +73,7 @@ def list_(
     active: bool = None,
     healthy: bool = None,
     unhealthy: str = None,
+    agent_health_modified_within_days: int = None,
     format_: TableFormat = None,
     columns: str = None,
 ):
@@ -90,6 +97,7 @@ def list_(
         active=active,
         agent_healthy=agent_healthy,
         agent_health_issue_types=health_issues,
+        agent_health_modified_in_last_days=agent_health_modified_within_days,
     )
 
     if format_ == TableFormat.table:

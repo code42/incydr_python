@@ -39,6 +39,7 @@ class AgentsV1:
         page_size: int = 500,
         agent_healthy: bool = None,
         agent_health_issue_types: Union[List[str], str] = None,
+        agent_health_modified_in_last_days: Optional[int] = None,
         user_id: str = None,
     ) -> AgentsPage:
         """
@@ -56,6 +57,7 @@ class AgentsV1:
         * **sort_key**: [`SortKeys`][agents-sort-keys] - Values on which the response will be sorted. Defaults to agent name.
         * **agent_healthy**: `bool | None` - Optionally retrieve agents with this health status. Agents that have no health issue types are considered healthy.
         * **agent_health_issue_types**: `List[str] | str` - Optionally retrieve agents that have (at least) any of the given issue type(s). Health issue types include the following: `NOT_CONNECTING`, `NOT_SENDING_SECURITY_EVENTS`, `SECURITY_INGEST_REJECTED`, `MISSING_MACOS_PERMISSION_FULL_DISK_ACCESS`, `MISSING_MACOS_PERMISSION_ACCESSIBILITY`.
+        * **agent_health_modified_in_last_days**: `int | None` - Optionally retrieve agents that have had their agent health modified in the last N days.
         * **user_id**: `str` - Optionally retrieve only agents associated with this user ID.
 
         **Returns**: An [`AgentsPage`][agentspage-model] object.
@@ -67,6 +69,7 @@ class AgentsV1:
             anyOfAgentHealthIssueTypes=[agent_health_issue_types]
             if isinstance(agent_health_issue_types, str)
             else agent_health_issue_types,
+            agentHealthModifiedInLastDays=agent_health_modified_in_last_days,
             srtDir=sort_dir,
             srtKey=sort_key,
             pageSize=page_size,
@@ -85,6 +88,7 @@ class AgentsV1:
         page_size: int = 500,
         agent_healthy: bool = None,
         agent_health_issue_types: List[str] = None,
+        agent_health_modified_in_last_days: Optional[int] = None,
         user_id: str = None,
     ) -> Iterator[Agent]:
         """
@@ -100,6 +104,7 @@ class AgentsV1:
                 agent_type=agent_type,
                 agent_healthy=agent_healthy,
                 agent_health_issue_types=agent_health_issue_types,
+                agent_health_modified_in_last_days=agent_health_modified_in_last_days,
                 sort_dir=sort_dir,
                 sort_key=sort_key,
                 page_num=page_num,
