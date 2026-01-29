@@ -26,6 +26,7 @@ TEST_AGENT_1 = {
     "active": True,
     "agentType": "COMBINED",
     "agentHealthIssueTypes": ["NOT_CONNECTING"],
+    "agentHealthModificationDate": "2022-07-14T17:03:22.123000Z",
     "appVersion": "1.0",
     "productVersion": "2.0",
     "lastConnected": "2022-07-14T17:05:44.524000Z",
@@ -46,6 +47,7 @@ TEST_AGENT_2 = {
     "active": True,
     "agentType": "COMBINED",
     "agentHealthIssueTypes": [],
+    "agentHealthModificationDate": "2022-07-14T17:02:15.456000Z",
     "appVersion": "1.0",
     "productVersion": "2.0",
     "lastConnected": "2022-07-14T17:05:44.524000Z",
@@ -65,6 +67,7 @@ TEST_AGENT_3 = {
     "active": True,
     "agentType": "COMBINED",
     "agentHealthIssueTypes": [],
+    "agentHealthModificationDate": "2022-07-14T17:01:30.789000Z",
     "appVersion": "1.0",
     "productVersion": "2.0",
     "lastConnected": "2022-07-14T17:05:44.524000Z",
@@ -117,6 +120,9 @@ def test_get_agent_returns_expected_data(mock_get_agent):
     assert agent.modification_date == datetime.fromisoformat(
         TEST_AGENT_1["modificationDate"].replace("Z", "+00:00")
     )
+    assert agent.agent_health_modification_date == datetime.fromisoformat(
+        TEST_AGENT_1["agentHealthModificationDate"].replace("Z", "+00:00")
+    )
 
 
 def test_get_page_when_default_query_params_returns_expected_data(
@@ -159,6 +165,35 @@ def test_get_page_when_custom_query_params_returns_expected_data(
         sort_dir=SortDirection.DESC,
         sort_key=SortKeys.LAST_CONNECTED,
     )
+    assert isinstance(page, AgentsPage)
+    assert page.agents[0].json() == json.dumps(TEST_AGENT_1, separators=(",", ":"))
+    assert page.agents[1].json() == json.dumps(TEST_AGENT_2, separators=(",", ":"))
+    assert page.total_count == len(page.agents) == 2
+
+
+def test_get_page_when_agent_health_modified_in_last_days_passed_makes_expected_call(
+    httpserver_auth: HTTPServer,
+):
+    query = {
+        "agentHealthModifiedInLastDays": 7,
+        "srtKey": "NAME",
+        "srtDir": "ASC",
+        "pageSize": 500,
+        "page": 1,
+    }
+
+    agents_data = {
+        "agents": [TEST_AGENT_1, TEST_AGENT_2],
+        "totalCount": 2,
+        "pageSize": 500,
+        "page": 1,
+    }
+    httpserver_auth.expect_request(
+        uri="/v1/agents", method="GET", query_string=urlencode(query)
+    ).respond_with_json(agents_data)
+
+    client = Client()
+    page = client.agents.v1.get_page(agent_health_modified_in_last_days=7)
     assert isinstance(page, AgentsPage)
     assert page.agents[0].json() == json.dumps(TEST_AGENT_1, separators=(",", ":"))
     assert page.agents[1].json() == json.dumps(TEST_AGENT_2, separators=(",", ":"))
@@ -341,6 +376,34 @@ def test_cli_list_when_unhealthy_option_passed_with_string_parses_issue_types_co
 
     result = runner.invoke(
         incydr, ["agents", "list", "--unhealthy", "NOT_CONNECTED,TEST_VALUE"]
+    )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_list_when_health_modified_days_option_passed_makes_expected_call(
+    httpserver_auth: HTTPServer, runner
+):
+    query = {
+        "agentHealthModifiedInLastDays": 7,
+        "srtKey": "NAME",
+        "srtDir": "ASC",
+        "pageSize": 500,
+        "page": 1,
+    }
+
+    agents_data = {
+        "agents": [TEST_AGENT_1, TEST_AGENT_2],
+        "totalCount": 2,
+        "pageSize": 500,
+        "page": 1,
+    }
+    httpserver_auth.expect_request(
+        uri="/v1/agents", method="GET", query_string=urlencode(query)
+    ).respond_with_json(agents_data)
+
+    result = runner.invoke(
+        incydr, ["agents", "list", "--agent-health-modified-within-days", "7"]
     )
     httpserver_auth.check()
     assert result.exit_code == 0

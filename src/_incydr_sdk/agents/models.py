@@ -48,6 +48,7 @@ class Agent(ResponseModel):
     * **active**: `bool` If the agent status is active.
     * **agent_type**: [`AgentType`][agent-type] The type of agent.
     * **agent_health_issue_types: `List[str]` List of health issues with the agent. Health issue types include the following: `NOT_CONNECTING`, `NOT_SENDING_SECURITY_EVENTS`, `SECURITY_INGEST_REJECTED`, `MISSING_MACOS_PERMISSION_FULL_DISK_ACCESS`, `MISSING_MACOS_PERMISSION_ACCESSIBILITY`.
+    * **agent_health_modification_date**: `datetime` The time the agent's health state was last modified.
     * **app_version**: `str` The app version of the agent.
     * **product_version**: `str` The product version of the agent.
     * **last_connected**: `datetime` The time the agent last connected to a Code42 Authority server.
@@ -66,6 +67,9 @@ class Agent(ResponseModel):
     active: Optional[bool]
     agent_type: Optional[Union[AgentType, str]] = Field(alias="agentType")
     agent_health_issue_types: Optional[List[str]] = Field(alias="agentHealthIssueTypes")
+    agent_health_modification_date: Optional[datetime] = Field(
+        alias="agentHealthModificationDate"
+    )
     app_version: Optional[str] = Field(alias="appVersion")
     product_version: Optional[str] = Field(alias="productVersion")
     last_connected: Optional[datetime] = Field(alias="lastConnected")
@@ -102,6 +106,7 @@ class QueryAgentsRequest(BaseModel):
     agentType: Optional[Union[AgentType, str]] = None
     agentHealthy: Optional[bool] = None
     anyOfAgentHealthIssueTypes: Optional[List[str]] = None
+    agentHealthModifiedInLastDays: Optional[int] = None
     srtKey: Optional[Union[SortKeys, str]] = None
     srtDir: Optional[str] = None
     pageSize: Optional[int] = None

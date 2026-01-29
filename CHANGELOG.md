@@ -9,6 +9,14 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## 2.10.0 - 2026-01-27
+
+### Added
+- Added support for filtering agents by agent health state modification date.
+  - Added the `agent_health_modified_in_last_days` parameter in the SDK's agent get methods to filter agents by health state modification date.
+  - Added the `--agent-health-modified-within-days` option to the CLI's `incydr agents list` command to filter agents by health state modification date.
+  - Added the `agent_health_modification_date` field to the Agent response model.
+
 ## 2.9.0 - 2026-01-22
 
 ### Added
