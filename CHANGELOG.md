@@ -51,7 +51,7 @@
 ## 2.6.0 - 2025-07-23
 
 ### Added
-- Support for subgroups in file event queries and saved searches. See [this documentation](https://support.code42.com/hc/en-us/articles/14827671672087-Forensic-Search-reference#h_01JKEF6ESSMTEGFG28WZM6TNDR) for more details about this type of query.
+- Support for subgroups in file event queries and saved searches. See [this documentation](https://mimecastsupport.zendesk.com/hc/en-us/articles/42666115380371-Forensic-Search-reference) for more details about this type of query.
 - New methods for EventQuery() to enable more flexible filtering:
   - `is_any`
   - `is_none`
