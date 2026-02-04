@@ -41,7 +41,7 @@ class Client:
 
     * **url**: `str` The url of your Incydr API gateway. See the [developer getting started guide](https://developer.code42.com/api/#section/User-Guides/Get-started)
         to find your API domain based on your console login URL.
-    * **api_client_id**: `str` The ID of your [Incydr API Client](https://mimecastsupport.zendesk.com/hc/en-us/articles/42665971063059-API-clients)
+    * **api_client_id**: `str` The ID of your [Incydr API Client](https://code42.com/r/support/api-client-create)
     * **api_client_secret**: `str` The Secret for your Incydr API Client.
 
     Usage example:
