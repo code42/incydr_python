@@ -30,8 +30,22 @@ TEST_USER = {
 
 
 @pytest.fixture(autouse=True)
-def clean_environment(mocker):
+def clean_environment(mocker, tmp_path, monkeypatch):
     mocker.patch.dict(os.environ, clear=True)
+    # Change to temp directory to prevent reading project's .env file
+    monkeypatch.chdir(tmp_path)
+
+    # Patch IncydrSettings to disable reading .env files entirely
+    from _incydr_sdk.core.settings import IncydrSettings
+
+    _original_init = IncydrSettings.__init__
+
+    def _patched_init(self, **kwargs):
+        # Force _env_file="" to disable env file reading
+        kwargs["_env_file"] = ""
+        _original_init(self, **kwargs)
+
+    monkeypatch.setattr(IncydrSettings, "__init__", _patched_init)
 
 
 @pytest.fixture(scope="session")
