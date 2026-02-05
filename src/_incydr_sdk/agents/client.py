@@ -41,6 +41,10 @@ class AgentsV1:
         agent_health_issue_types: Union[List[str], str] = None,
         agent_health_modified_in_last_days: Optional[int] = None,
         user_id: str = None,
+        connected_in_last_days: int = None,
+        not_connected_in_last_days: int = None,
+        serial_number: str = None,
+        agent_os_types: Union[List[str], str] = None,
     ) -> AgentsPage:
         """
         Get a page of agents.
@@ -59,6 +63,10 @@ class AgentsV1:
         * **agent_health_issue_types**: `List[str] | str` - Optionally retrieve agents that have (at least) any of the given issue type(s). Health issue types include the following: `NOT_CONNECTING`, `NOT_SENDING_SECURITY_EVENTS`, `SECURITY_INGEST_REJECTED`, `MISSING_MACOS_PERMISSION_FULL_DISK_ACCESS`, `MISSING_MACOS_PERMISSION_ACCESSIBILITY`.
         * **agent_health_modified_in_last_days**: `int | None` - Optionally retrieve agents that have had their agent health modified in the last N days.
         * **user_id**: `str` - Optionally retrieve only agents associated with this user ID.
+        * **connected_in_last_days**: `int` - When specified, agents are filtered to include only those that have connected in the last N days (starting from midnight this morning), where N is the value of the parameter.
+        * **not_connected_in_last_days**: `int` - When specified, agents are filtered to include only those that have not connected in the last N days (starting from midnight this morning), where N is the value of the parameter.
+        * **serial_number**: `str` - When specified, returns agents that have this serial number.
+        * **agent_os_types: `List[str] | str` - When specified, agents are filtered to include only those of the given OS types.
 
         **Returns**: An [`AgentsPage`][agentspage-model] object.
         """
@@ -75,6 +83,12 @@ class AgentsV1:
             pageSize=page_size,
             page=page_num,
             userId=user_id,
+            connectedInLastDays=connected_in_last_days,
+            notConnectedInLastDays=not_connected_in_last_days,
+            serialNumber=serial_number,
+            anyOfAgentOsTypes=[agent_os_types]
+            if isinstance(agent_os_types, str)
+            else agent_os_types,
         )
         response = self._parent.session.get("/v1/agents", params=data.dict())
         return AgentsPage.parse_response(response)
@@ -90,6 +104,10 @@ class AgentsV1:
         agent_health_issue_types: List[str] = None,
         agent_health_modified_in_last_days: Optional[int] = None,
         user_id: str = None,
+        connected_in_last_days: int = None,
+        not_connected_in_last_days: int = None,
+        serial_number: str = None,
+        agent_os_types: Union[List[str], str] = None,
     ) -> Iterator[Agent]:
         """
         Iterate over all agents.
@@ -110,6 +128,10 @@ class AgentsV1:
                 page_num=page_num,
                 page_size=page_size,
                 user_id=user_id,
+                connected_in_last_days=connected_in_last_days,
+                not_connected_in_last_days=not_connected_in_last_days,
+                serial_number=serial_number,
+                agent_os_types=agent_os_types,
             )
             yield from page.agents
             if len(page.agents) < page_size:

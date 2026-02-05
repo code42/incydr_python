@@ -102,16 +102,20 @@ class AgentUpdateRequest(BaseModel):
 
 
 class QueryAgentsRequest(BaseModel):
-    active: Optional[bool] = None
+    userId: Optional[str] = None
     agentType: Optional[Union[AgentType, str]] = None
+    active: Optional[bool] = None
+    connectedInLastDays: Optional[int] = None
+    notConnectedInLastDays: Optional[int] = None
     agentHealthy: Optional[bool] = None
     anyOfAgentHealthIssueTypes: Optional[List[str]] = None
     agentHealthModifiedInLastDays: Optional[int] = None
+    serialNumber: Optional[str] = None
+    anyOfAgentOsTypes: Optional[List[str]] = None
     srtKey: Optional[Union[SortKeys, str]] = None
     srtDir: Optional[str] = None
     pageSize: Optional[int] = None
     page: Optional[int] = None
-    userId: Optional[str] = None
 
     @field_validator("srtDir")
     @classmethod

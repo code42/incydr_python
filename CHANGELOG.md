@@ -9,6 +9,20 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## Unreleased
+
+### Added
+- Added several parameters to the `sdk.agents.v1.get_page` and `sdk.agents.v1.list` methods:
+  - `serial_number` - the serial number of the agents to match.
+  - `agent_os_types` - the list of operating systems ("LINUX", "MAC", "WIN") to match.
+  - `connected_in_last_days` - filter to agents that have connected in this number of days.
+  - `not_connected_in_last_days` - filter to agents that have not connected in this number of days.
+- Added corresponding options to the `incydr agents list` command.
+  - `--serial-number`
+  - `--agent-os-types`
+  - `--connected-in-last-days`
+  - `--not-connected-in-last-days`
+
 ## 2.10.0 - 2026-01-27
 
 ### Added

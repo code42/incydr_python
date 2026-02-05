@@ -200,6 +200,122 @@ def test_get_page_when_agent_health_modified_in_last_days_passed_makes_expected_
     assert page.total_count == len(page.agents) == 2
 
 
+def test_get_page_when_connected_in_last_days_passed_makes_expected_call(
+    httpserver_auth: HTTPServer,
+):
+    query = {
+        "connectedInLastDays": 7,
+        "srtKey": "NAME",
+        "srtDir": "ASC",
+        "pageSize": 500,
+        "page": 1,
+    }
+
+    agents_data = {
+        "agents": [TEST_AGENT_1, TEST_AGENT_2],
+        "totalCount": 2,
+        "pageSize": 500,
+        "page": 1,
+    }
+    httpserver_auth.expect_request(
+        uri="/v1/agents", method="GET", query_string=urlencode(query)
+    ).respond_with_json(agents_data)
+
+    client = Client()
+    page = client.agents.v1.get_page(connected_in_last_days=7)
+    assert isinstance(page, AgentsPage)
+    assert page.agents[0].json() == json.dumps(TEST_AGENT_1, separators=(",", ":"))
+    assert page.agents[1].json() == json.dumps(TEST_AGENT_2, separators=(",", ":"))
+    assert page.total_count == len(page.agents) == 2
+
+
+def test_get_page_when_not_connected_in_last_days_passed_makes_expected_call(
+    httpserver_auth: HTTPServer,
+):
+    query = {
+        "notConnectedInLastDays": 7,
+        "srtKey": "NAME",
+        "srtDir": "ASC",
+        "pageSize": 500,
+        "page": 1,
+    }
+
+    agents_data = {
+        "agents": [TEST_AGENT_1, TEST_AGENT_2],
+        "totalCount": 2,
+        "pageSize": 500,
+        "page": 1,
+    }
+    httpserver_auth.expect_request(
+        uri="/v1/agents", method="GET", query_string=urlencode(query)
+    ).respond_with_json(agents_data)
+
+    client = Client()
+    page = client.agents.v1.get_page(not_connected_in_last_days=7)
+    assert isinstance(page, AgentsPage)
+    assert page.agents[0].json() == json.dumps(TEST_AGENT_1, separators=(",", ":"))
+    assert page.agents[1].json() == json.dumps(TEST_AGENT_2, separators=(",", ":"))
+    assert page.total_count == len(page.agents) == 2
+
+
+def test_get_page_when_serial_number_passed_makes_expected_call(
+    httpserver_auth: HTTPServer,
+):
+    query = {
+        "serialNumber": "example",
+        "srtKey": "NAME",
+        "srtDir": "ASC",
+        "pageSize": 500,
+        "page": 1,
+    }
+
+    agents_data = {
+        "agents": [TEST_AGENT_1, TEST_AGENT_2],
+        "totalCount": 2,
+        "pageSize": 500,
+        "page": 1,
+    }
+    httpserver_auth.expect_request(
+        uri="/v1/agents", method="GET", query_string=urlencode(query)
+    ).respond_with_json(agents_data)
+
+    client = Client()
+    page = client.agents.v1.get_page(serial_number="example")
+    assert isinstance(page, AgentsPage)
+    assert page.agents[0].json() == json.dumps(TEST_AGENT_1, separators=(",", ":"))
+    assert page.agents[1].json() == json.dumps(TEST_AGENT_2, separators=(",", ":"))
+    assert page.total_count == len(page.agents) == 2
+
+
+def test_get_page_when_agent_os_types_passed_makes_expected_call(
+    httpserver_auth: HTTPServer,
+):
+    query = {
+        "anyOfAgentOsTypes": ["LINUX", "MAC"],
+        "srtKey": "NAME",
+        "srtDir": "ASC",
+        "pageSize": 500,
+        "page": 1,
+    }
+
+    agents_data = {
+        "agents": [TEST_AGENT_1, TEST_AGENT_2],
+        "totalCount": 2,
+        "pageSize": 500,
+        "page": 1,
+    }
+    httpserver_auth.expect_request(
+        uri="/v1/agents", method="GET", query_string=urlencode(query, doseq=True)
+    ).respond_with_json(agents_data)
+
+    client = Client()
+    page = client.agents.v1.get_page(agent_os_types=["LINUX", "MAC"])
+    assert isinstance(page, AgentsPage)
+    assert page.agents[0].json() == json.dumps(TEST_AGENT_1, separators=(",", ":"))
+    assert page.agents[1].json() == json.dumps(TEST_AGENT_2, separators=(",", ":"))
+    assert page.total_count == len(page.agents) == 2
+
+
 def test_iter_all_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
@@ -303,6 +419,7 @@ def test_cli_list_when_custom_params_makes_expected_call(
 ):
     query = {
         "active": True,
+        "notConnectedInLastDays": 5,
         "agentHealthy": True,
         "srtKey": "NAME",
         "srtDir": "ASC",
@@ -320,7 +437,17 @@ def test_cli_list_when_custom_params_makes_expected_call(
         uri="/v1/agents", method="GET", query_string=urlencode(query)
     ).respond_with_json(agents_data)
 
-    result = runner.invoke(incydr, ["agents", "list", "--active", "--healthy"])
+    result = runner.invoke(
+        incydr,
+        [
+            "agents",
+            "list",
+            "--active",
+            "--healthy",
+            "--not-connected-in-last-days",
+            "5",
+        ],
+    )
     httpserver_auth.check()
     assert result.exit_code == 0
 
@@ -377,6 +504,33 @@ def test_cli_list_when_unhealthy_option_passed_with_string_parses_issue_types_co
     result = runner.invoke(
         incydr, ["agents", "list", "--unhealthy", "NOT_CONNECTED,TEST_VALUE"]
     )
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_list_when_agent_os_types_passed_with_string_parses_os_types_correctly(
+    httpserver_auth: HTTPServer, runner
+):
+    query = [
+        ("anyOfAgentOsTypes", "LINUX"),
+        ("anyOfAgentOsTypes", "MAC"),
+        ("srtKey", "NAME"),
+        ("srtDir", "ASC"),
+        ("pageSize", 500),
+        ("page", 1),
+    ]
+
+    agents_data = {
+        "agents": [TEST_AGENT_1, TEST_AGENT_2],
+        "totalCount": 2,
+        "pageSize": 500,
+        "page": 1,
+    }
+    httpserver_auth.expect_request(
+        uri="/v1/agents", method="GET", query_string=urlencode(query)
+    ).respond_with_json(agents_data)
+
+    result = runner.invoke(incydr, ["agents", "list", "--agent-os-types", "LINUX,MAC"])
     httpserver_auth.check()
     assert result.exit_code == 0
 

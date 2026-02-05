@@ -66,6 +66,30 @@ def agents():
     default=None,
     help="Filter agents that have had agent health modified in the last N days (starting from midnight this morning), where N is the value of the parameter.",
 )
+@click.option(
+    "--connected-in-last-days",
+    type=int,
+    default=None,
+    help="When specified, agents are filtered to include only those that have connected in the last N days (starting from midnight this morning), where N is the value of the parameter.",
+)
+@click.option(
+    "--not-connected-in-last-days",
+    type=int,
+    default=None,
+    help="When specified, agents are filtered to include only those that have not connected in the last N days (starting from midnight this morning), where N is the value of the parameter.",
+)
+@click.option(
+    "--serial-number",
+    type=str,
+    default=None,
+    help="When specified, returns agents that have this serial number.",
+)
+@click.option(
+    "--agent-os-types",
+    type=str,
+    default=None,
+    help="When specified, agents are filtered to include only those of the given OS types. Pass a comma-delimited list of the OS types you wish to search. OS types include the following: WINDOWS, MAC, LINUX.",
+)
 @table_format_option
 @columns_option
 @logging_options
@@ -74,6 +98,10 @@ def list_(
     healthy: bool = None,
     unhealthy: str = None,
     agent_health_modified_within_days: int = None,
+    connected_in_last_days: int = None,
+    not_connected_in_last_days: int = None,
+    serial_number: int = None,
+    agent_os_types: str = None,
     format_: TableFormat = None,
     columns: str = None,
 ):
@@ -91,6 +119,9 @@ def list_(
         ):  # If the unhealthy value is FLAG_VALUE then we know the option was passed with no values
             health_issues = unhealthy.split(",")
 
+    if agent_os_types:
+        agent_os_types = agent_os_types.split(",")
+
     client = Client()
 
     agents = client.agents.v1.iter_all(
@@ -98,6 +129,10 @@ def list_(
         agent_healthy=agent_healthy,
         agent_health_issue_types=health_issues,
         agent_health_modified_in_last_days=agent_health_modified_within_days,
+        connected_in_last_days=connected_in_last_days,
+        not_connected_in_last_days=not_connected_in_last_days,
+        serial_number=serial_number,
+        agent_os_types=agent_os_types,
     )
 
     if format_ == TableFormat.table:

@@ -278,11 +278,11 @@ def mock_get_devices(httpserver_auth: HTTPServer):
 @pytest.fixture
 def mock_get_agents(httpserver_auth: HTTPServer):
     query = {
+        "userId": TEST_USER_ID,
         "srtKey": "NAME",
         "srtDir": "ASC",
         "pageSize": 500,
         "page": 1,
-        "userId": TEST_USER_ID,
     }
     agents_data = {
         "agents": [TEST_AGENT_1, TEST_AGENT_2],
