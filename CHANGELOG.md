@@ -9,7 +9,7 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
-## Unreleased
+## 2.11.0 - 2026-02-10
 
 ### Added
 - Added several parameters to the `sdk.agents.v1.get_page` and `sdk.agents.v1.list` methods:
