@@ -106,23 +106,13 @@ class Query(Model):
     srtKey: EventSearchTerm = "event.id"
 
 
-class EventQuery(Model):
+class BaseEventQuery(Model):
     """
-    Class to build a file event query. Use the class methods to attach additional filter operators.
-
-    **Parameters**:
-
-         * **start_date**: `int`, `float`, `str`, `datetime`, `timedelta` -  Start of the date range to query for events. Defaults to None.
-         * **end_date**: `int`, `float`, `str`, `datetime` - End of the date range to query for events.  Defaults to None.
+    Base class used for EventQuery and GroupingEventQuery.
     """
 
     group_clause: str = Field("AND", alias="groupClause")
     groups: Optional[List[FilterGroup]]
-    page_num: int = Field(1, alias="pgNum")
-    page_size: Annotated[int, Field(le=10000)] = Field(100, alias="pgSize")
-    page_token: Optional[str] = Field("", alias="pgToken")
-    sort_dir: str = Field("asc", alias="srtDir")
-    sort_key: EventSearchTerm = Field("event.id", alias="srtKey")
     model_config = ConfigDict(
         validate_assignment=True,
         use_enum_values=True,
@@ -422,6 +412,52 @@ class EventQuery(Model):
         if saved_search.srt_key:
             query.sort_key = saved_search.srt_key
         return query
+
+
+class EventQuery(BaseEventQuery):
+    """
+    Class to build a file event query. Use the class methods to attach additional filter operators.
+
+    **Parameters**:
+
+         * **start_date**: `int`, `float`, `str`, `datetime`, `timedelta` -  Start of the date range to query for events. Defaults to None.
+         * **end_date**: `int`, `float`, `str`, `datetime` - End of the date range to query for events.  Defaults to None.
+    """
+
+    page_num: int = Field(1, alias="pgNum")
+    page_size: Annotated[int, Field(le=10000)] = Field(100, alias="pgSize")
+    page_token: Optional[str] = Field("", alias="pgToken")
+    sort_dir: str = Field("asc", alias="srtDir")
+    sort_key: EventSearchTerm = Field("event.id", alias="srtKey")
+
+
+class GroupingEventQuery(BaseEventQuery):
+    """
+    Class to build a file event query for use in grouped searches, which return aggregated counts. The `grouping_term` parameter determines by what term the result will be aggregated.
+
+    Use the class methods to attach additional filter operators.
+
+    **Parameters**:
+
+         * **start_date**: `int`, `float`, `str`, `datetime`, `timedelta` -  Start of the date range to query for events. Defaults to None.
+         * **end_date**: `int`, `float`, `str`, `datetime` - End of the date range to query for events.  Defaults to None.
+         * **grouping_term**: `str` - The search term to use to form the groups
+         * **size**: `int` - The maximum number of groups that will be returned for this query. Default value is 1000. Maximum possible value is 10,000.
+    """
+
+    grouping_term: str = Field("", alias="groupingTerm")
+    size: int = Field(1000)
+
+    def group_by(self, grouping_term: str):
+        """Sets the grouping term for this query. When the query is run, it will group events by this term. For example, to group by file category,
+        set the term to `file.category`"""
+        self.grouping_term = grouping_term
+        return self
+
+    def maximum_size(self, size: int):
+        """Sets the maximum number of groups that will be returned for this query. Defaults to 1000. Maximum possible value supported by the API is 10000."""
+        self.size = size
+        return self
 
 
 def _create_date_range_filter_group(start_date, end_date, term=None):

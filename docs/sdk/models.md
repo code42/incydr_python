@@ -171,6 +171,16 @@ Devices has been replaced by [Agents](#agents).
 ::: incydr.models.SavedSearch
     :docstring:
 
+### `GroupedFileEventResponse` model
+
+::: incydr.models.GroupedFileEventResponse
+    :docstring:
+
+### `FileEventGroup` model
+
+::: incydr.models.FileEventGroup
+    :docstring:
+
 ## Roles
 ---
 

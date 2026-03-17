@@ -9,6 +9,14 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## Unreleased
+
+### Added
+- Added the `sdk.file-events.v2.search_groups` method to get approximate aggregate file event counts by a given grouping term.
+- Added the `GroupingEventQuery` class, used to make these queries.
+- Added the cli command `incydr file-events search-groups` to get approximate aggregate file event counts by a given grouping term.
+
+
 ## 2.11.0 - 2026-02-10
 
 ### Added

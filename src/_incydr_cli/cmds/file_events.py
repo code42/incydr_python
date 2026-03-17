@@ -31,8 +31,10 @@ from _incydr_sdk.core.client import Client
 from _incydr_sdk.enums.file_events import RiskIndicators
 from _incydr_sdk.enums.file_events import RiskSeverity
 from _incydr_sdk.file_events.models.event import FileEventV2
+from _incydr_sdk.file_events.models.response import FileEventGroup
 from _incydr_sdk.file_events.models.response import SavedSearch
 from _incydr_sdk.queries.file_events import EventQuery
+from _incydr_sdk.queries.file_events import GroupingEventQuery
 from _incydr_sdk.utils import model_as_card
 
 
@@ -100,7 +102,7 @@ def search(
     elif advanced_query:
         if not isinstance(advanced_query, str):
             advanced_query = advanced_query.read()
-        query = EventQuery.parse_raw(advanced_query)
+        query = EventQuery.model_validate_json(advanced_query)
     else:
         if not start:
             raise BadOptionUsage(
@@ -108,6 +110,7 @@ def search(
                 "--start option required if not using --saved-search or --advanced-query options.",
             )
         query = _create_query(
+            cls=EventQuery,
             start=start,
             end=end,
             event_action=event_action,
@@ -191,6 +194,121 @@ def search(
                 console.print("No results found.")
 
 
+@file_events.command(cls=IncydrCommand)
+@click.option(
+    "--group-by",
+    default=None,
+    help="(required) The term by which approximate counts will be grouped. Example: `user.email`.",
+    required=True,
+)
+@table_format_option
+@columns_option
+@output_options
+@advanced_query_option
+@saved_search_option
+@event_filter_options
+@logging_options
+def search_groups(
+    format_: TableFormat,
+    columns: Optional[str],
+    output: Optional[str],
+    certs: Optional[str],
+    ignore_cert_validation: Optional[bool],
+    advanced_query: Optional[Union[str, File]],
+    saved_search: Optional[str],
+    start: Optional[str],
+    end: Optional[str],
+    event_action: Optional[str],
+    username: Optional[str],
+    md5: Optional[str],
+    sha256: Optional[str],
+    source_category: Optional[str],
+    destination_category: Optional[str],
+    file_name: Optional[str],
+    file_directory: Optional[str],
+    file_category: Optional[str],
+    risk_indicator: Optional[RiskIndicators],
+    risk_severity: Optional[RiskSeverity],
+    risk_score: Optional[int],
+    group_by: Optional[str],
+):
+    """
+    Retrieve approximate aggregated file event counts. Various options are provided to filter query results.
+
+    Use the `--saved-search` or the `--advanced-query` option if the available filters don't satisfy your requirements.
+
+    Results will be output to the console by default, use the `--output` option to send data to a server.
+
+    This method returns approximate counts, grouped by the provided term. To obtain full event details, use the `search` method.
+    """
+    if output:
+        format_ = TableFormat.json_lines
+
+    client = Client()
+
+    if not group_by:
+        raise BadOptionUsage(
+            "group_by",
+            "--group-by option is required.",
+        )
+
+    if saved_search:
+        saved_search = client.file_events.v2.get_saved_search(saved_search)
+        query = GroupingEventQuery.from_saved_search(saved_search)
+    elif advanced_query:
+        if not isinstance(advanced_query, str):
+            advanced_query = advanced_query.read()
+        query = GroupingEventQuery.model_validate_json(advanced_query)
+    else:
+        if not start:
+            raise BadOptionUsage(
+                "start",
+                "--start option required if not using --saved-search or --advanced-query options.",
+            )
+        query = _create_query(
+            cls=GroupingEventQuery,
+            start=start,
+            end=end,
+            event_action=event_action,
+            username=username,
+            md5=md5,
+            sha256=sha256,
+            source_category=source_category,
+            destination_category=destination_category,
+            file_name=file_name,
+            file_directory=file_directory,
+            file_category=file_category,
+            risk_indicator=risk_indicator,
+            risk_severity=risk_severity,
+            risk_score=risk_score,
+        )
+
+    query.group_by(group_by).maximum_size(10000)
+
+    groups = client.file_events.v2.search_groups(query).groups or []
+
+    if output:
+        logger = get_server_logger(output, certs, ignore_cert_validation)
+        for group in groups:
+            logger.info(json.dumps(group))
+        return
+
+    if format_ == TableFormat.csv:
+        render.csv(FileEventGroup, groups, columns=columns, flat=True)
+    elif format_ == TableFormat.table:
+        render.table(FileEventGroup, groups, columns=columns, flat=False)
+    else:
+        printed = False
+        for group in groups:
+            printed = True
+            if format_ == TableFormat.json_pretty:
+                console.print_json(data=group)
+            else:
+                click.echo(json.dumps(group.dict()))
+        if not printed:
+            console.print("No results found.")
+
+
 @file_events.command()
 @click.argument("checkpoint-name")
 def clear_checkpoint(checkpoint_name: str):
@@ -262,8 +380,8 @@ field_option_map = {
 }
 
 
-def _create_query(**kwargs):
-    query = EventQuery(start_date=kwargs["start"], end_date=kwargs["end"])
+def _create_query(cls, **kwargs):
+    query = cls(start_date=kwargs["start"], end_date=kwargs["end"])
     for k, v in kwargs.items():
         if v:
             if k in ["start", "end"]:

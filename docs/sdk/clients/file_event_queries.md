@@ -8,6 +8,14 @@ Use the `EventQuery` class to create a query for searching and filtering file ev
     :docstring:
     :members: equals not_equals exists does_not_exist greater_than less_than matches_any is_any is_none date_range subquery
 
+## GroupingEventQuery Class
+
+Use the `GroupingEventQuery` class to create a query for searching for approximate event counts, grouped by a term called the `grouping_term`. `GroupingEventQuery` supports all of the same operators as `EventQuery`, with the addition of `group_by` and `maximum_size`, which can be used to control the grouping term and the maximum size of the response.
+
+::: _incydr_sdk.queries.file_events.GroupingEventQuery
+    :docstring:
+    :members: group_by maximum_size
+
 ## Query Building
 
 The `EventQuery` class can be imported directly from the `incydr` module.
