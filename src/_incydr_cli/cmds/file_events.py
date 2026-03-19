@@ -246,12 +246,6 @@ def search_groups(
 
     client = Client()
 
-    if not group_by:
-        raise BadOptionUsage(
-            "group_by",
-            "--group-by option is required.",
-        )
-
     if saved_search:
         saved_search = client.file_events.v2.get_saved_search(saved_search)
         query = GroupingEventQuery.from_saved_search(saved_search)
@@ -290,7 +284,7 @@ def search_groups(
     if output:
         logger = get_server_logger(output, certs, ignore_cert_validation)
         for group in groups:
-            logger.info(json.dumps(group))
+            logger.info(json.dumps(group.dict()))
         return
 
     if format_ == TableFormat.csv:
