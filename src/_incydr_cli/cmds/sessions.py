@@ -73,6 +73,11 @@ def sessions():
     "Accepts a date/time in yyyy-MM-dd (UTC) or yyyy-MM-dd HH:MM:SS (UTC+24-hr time) format.",
 )
 @click.option(
+    "--type",
+    default=None,
+    help="Limit search to sessions of this type. Acceptable types are STANDARD or ACCOUNT_TAKE_OVER"
+)
+@click.option(
     "--no-alerts",
     is_flag=True,
     default=False,
@@ -123,6 +128,7 @@ def search(
     actor_id: Optional[str] = None,
     start: Optional[str] = None,
     end: Optional[str] = None,
+    type: Optional[str] = None,
     no_alerts: bool = False,
     risk_indicators: Optional[str] = None,
     state: Optional[List[str]] = None,
@@ -162,6 +168,7 @@ def search(
     sessions_gen = client.sessions.v1.iter_all(
         actor_id=actor_id,
         start_time=start,
+        type=type,
         end_time=end,
         has_alerts=not no_alerts,
         risk_indicators=risk_indicators.split(",") if risk_indicators else None,
