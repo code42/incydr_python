@@ -75,7 +75,7 @@ def sessions():
 @click.option(
     "--type",
     default=None,
-    help="Limit search to sessions of this type. Acceptable types are STANDARD or ACCOUNT_TAKE_OVER"
+    help="Limit search to sessions of this type. Acceptable types are STANDARD or ACCOUNT_TAKE_OVER",
 )
 @click.option(
     "--no-alerts",
