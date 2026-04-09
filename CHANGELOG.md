@@ -15,6 +15,7 @@
 - Added the `sdk.file-events.v2.search_groups` method to get approximate aggregate file event counts by a given grouping term.
 - Added the `GroupingEventQuery` class, used to make these queries.
 - Added the cli command `incydr file-events search-groups` to get approximate aggregate file event counts by a given grouping term.
+- Added the `type` parameter to session search methods and commands, allowing users to filter results to STANDARD or ACCOUNT_TAKE_OVER.
 
 
 ## 2.11.0 - 2026-02-10
