@@ -13,9 +13,20 @@ from _incydr_cli.core import IncydrCommand
 from _incydr_cli.core import IncydrGroup
 from _incydr_sdk.core.client import Client
 from _incydr_sdk.enums.trusted_activities import ActivityType
+from _incydr_sdk.enums.trusted_activities import BrowserDestination
+from _incydr_sdk.enums.trusted_activities import CloudShareApps
+from _incydr_sdk.enums.trusted_activities import CloudSyncApps
+from _incydr_sdk.enums.trusted_activities import EmailServices
 from _incydr_sdk.trusted_activities.client import MissingActivityActionGroupsError
 from _incydr_sdk.trusted_activities.models import TrustedActivity
 from _incydr_sdk.utils import model_as_card
+
+high_value_option = click.option(
+    "--high-value",
+    is_flag=True,
+    default=False,
+    help="Indicate that this resource is a high-value source.",
+)
 
 
 @click.group(cls=IncydrGroup)
@@ -151,6 +162,12 @@ def add():
     help="Trust file upload events to where the tab URL or title includes this domain.",
 )
 @click.option(
+    "--file-transfer",
+    is_flag=True,
+    default=False,
+    help="Trust file upload events to this domain using file transfer tools.",
+)
+@click.option(
     "--git-push",
     is_flag=True,
     default=False,
@@ -159,7 +176,7 @@ def add():
 @click.option(
     "--cloud-sync",
     "cloud_sync_services",
-    type=click.Choice(["BOX", "GOOGLE_DRIVE", "ICLOUD", "ONE_DRIVE"]),
+    type=click.Choice([x.value for x in CloudSyncApps]),
     default=[],
     help="Specify which cloud sync service(s) to trust.",
     multiple=True,
@@ -167,7 +184,7 @@ def add():
 @click.option(
     "--cloud-share",
     "cloud_share_services",
-    type=click.Choice(["BOX", "GOOGLE_DRIVE", "ONE_DRIVE"]),
+    type=click.Choice([x.value for x in CloudShareApps]),
     default=[],
     help="Specify which cloud share service(s) to trust.",
     multiple=True,
@@ -175,21 +192,33 @@ def add():
 @click.option(
     "--email-share",
     "email_share_services",
-    type=click.Choice(["GMAIL", "MICROSOFT_365"]),
+    type=click.Choice([x.value for x in EmailServices]),
     default=[],
     help="Specify which email share service(s) to trust.",
     multiple=True,
 )
+@click.option(
+    "--browser-destination",
+    "browser_destinations",
+    type=click.Choice([x.value for x in BrowserDestination]),
+    default=[],
+    help="Specify which browser destinations to trust when users are logged in with this domain.",
+    multiple=True,
+)
+@high_value_option
 @single_format_option
 @logging_options
 def domain_(
     domain: str,
     description: str = None,
     file_upload: bool = False,
+    file_transfer: bool = False,
     git_push: bool = False,
     cloud_sync_services: str = None,
     cloud_share_services: str = None,
     email_share_services: str = None,
+    browser_destinations: str = None,
+    high_value: bool = None,
     format_: SingleFormat = None,
 ):
     """
@@ -198,19 +227,23 @@ def domain_(
     The following activities can be configured:
 
     * `--file-upload` - Trust file uploads to this domain.  Defaults to false.
+    * `--file-transfer` - Trust file uploads to this domain using file transfer tools.  Defaults to false.
     * `--git-push` - Trust git push events to this domain.  Defaults to false.
-    * `--cloud-sync-services` [`BOX|GOOGLE_DRIVE|ICLOUD|ONE_DRIVE`] - Trust cloud sync activity from the specified service(s) if the username signed into the sync app is on this domain.
+    * `--cloud-sync` [`BOX|GOOGLE_DRIVE|ICLOUD|ONE_DRIVE`] - Trust cloud sync activity from the specified service(s) if the username signed into the sync app is on this domain.
         If you want to only trust activity for a specific corporate account, add a trusted account name instead.
-    * `--cloud-share-services` [`BOX|GOOGLE_DRIVE|ONE_DRIVE`] - Trust cloud share activity from the specified service(s) if the user its shared with is on this domain.
+    * `--cloud-share` [`BOX|GOOGLE_DRIVE|ONE_DRIVE`] - Trust cloud share activity from the specified service(s) if the user its shared with is on this domain.
         You must have a cloud connector configured for your tenant to support this trusted action.
-    * `--email-share-services` [`GMAIL|MICROSOFT_365`] - Trust email share activity from the specified service(s) if the email recipient is on this domain.
+    * `--email-share` [`GMAIL|OFFICE_365|GOOGLE_DRIVE`] - Trust email share activity from the specified service(s) if the email recipient is on this domain.
         You must have an email connector configured for your tenant to support this trusted action.
+    * `--browser-destination` [`AIRTABLE|AMAZON_WEB_SERVICES|BLACKBOX|BOX|CHATGPT|CLAUDE|CONCUR|CURSOR|DROPBOX|GOOGLE_WORKSPACE|MICROSOFT_365|NOTTA|OTTER|PERPLEXITY|SLACK|YOU_DOT_COM`]
+        Trust these destinations when users log in using this configured domain.
+    * `--high-value` - Indicate that this domain is a high value source.
 
-    Multiple options can be supplied to specify cloud-share, cloud-sync, and email-share services.
+    Multiple options can be supplied to specify cloud-share, cloud-sync, email-share services, and browser-destinations.
 
     For example, the following command will create a trusted domain that trusts file-uploads to the domain and cloud sync events from `BOX` and `ICLOUD`.
 
-        trusted-activities add domain --file-upload --cloud-sync-services BOX --cloud-sync-services ICLOUD
+        trusted-activities add domain --file-upload --cloud-sync BOX --cloud-sync ICLOUD
 
     """
     client = Client()
@@ -223,6 +256,9 @@ def domain_(
             cloud_sync_services=cloud_sync_services,
             cloud_share_services=cloud_share_services,
             email_share_services=email_share_services,
+            file_transfer_tools=file_transfer,
+            browser_destinations=browser_destinations,
+            is_high_value=high_value,
         )
     except MissingActivityActionGroupsError:
         raise click.UsageError(
@@ -234,29 +270,35 @@ def domain_(
 @add.command("url-path", cls=IncydrCommand)
 @click.argument("url_path")
 @click.option("--description", default=None, help="Optional description.")
+@high_value_option
 @single_format_option
 @logging_options
 def url_path_(
     url_path: str,
     description: str = None,
+    high_value: bool = False,
     format_: SingleFormat = None,
 ):
     """
     Trust browser uploads to only part of a domain by trusting a specific `URL_PATH` (ex: `my-domain.com/path`).
     """
     client = Client()
-    activity = client.trusted_activities.v2.add_url_path(url_path, description)
+    activity = client.trusted_activities.v2.add_url_path(
+        url_path, description, is_high_value=high_value
+    )
     _output_trusted_activity(activity, format_, client.settings.use_rich)
 
 
 @add.command(cls=IncydrCommand)
 @click.argument("workspace_name")
 @click.option("--description", default=None, help="Optional description.")
+@high_value_option
 @single_format_option
 @logging_options
 def slack_workspace(
     workspace_name: str,
     description: str = None,
+    high_value: bool = False,
     format_: SingleFormat = None,
 ):
     """
@@ -264,7 +306,7 @@ def slack_workspace(
     """
     client = Client()
     activity = client.trusted_activities.v2.add_slack_workspace(
-        workspace_name, description=description
+        workspace_name, description=description, is_high_value=high_value
     )
     _output_trusted_activity(activity, format_, client.settings.use_rich)
 
@@ -284,6 +326,7 @@ def slack_workspace(
     default=False,
     help="Trust OneDrive as a cloud sync service.",
 )
+@high_value_option
 @single_format_option
 @logging_options
 def account(
@@ -291,6 +334,7 @@ def account(
     description: str = None,
     dropbox: bool = False,
     one_drive: bool = False,
+    high_value: bool = False,
     format_: SingleFormat = None,
 ):
     """
@@ -300,7 +344,11 @@ def account(
     """
     client = Client()
     activity = client.trusted_activities.v2.add_account_name(
-        account_name, description=description, dropbox=dropbox, one_drive=one_drive
+        account_name,
+        description=description,
+        dropbox=dropbox,
+        one_drive=one_drive,
+        is_high_value=high_value,
     )
     _output_trusted_activity(activity, format_, client.settings.use_rich)
 
@@ -308,11 +356,13 @@ def account(
 @add.command(cls=IncydrCommand)
 @click.argument("git_uri")
 @click.option("--description", default=None, help="Optional description.")
+@high_value_option
 @single_format_option
 @logging_options
 def git_repo(
     git_uri: str,
     description: str = None,
+    high_value: bool = False,
     format_: SingleFormat = None,
 ):
     """
@@ -320,7 +370,7 @@ def git_repo(
     """
     client = Client()
     activity = client.trusted_activities.v2.add_git_repository(
-        git_uri, description=description
+        git_uri, description=description, is_high_value=high_value
     )
     _output_trusted_activity(activity, format_, client.settings.use_rich)
 

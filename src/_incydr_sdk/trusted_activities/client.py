@@ -6,6 +6,7 @@ from requests import Response
 
 from _incydr_sdk.enums import SortDirection
 from _incydr_sdk.enums.trusted_activities import ActivityType
+from _incydr_sdk.enums.trusted_activities import BrowserDestination
 from _incydr_sdk.enums.trusted_activities import CloudShareApps
 from _incydr_sdk.enums.trusted_activities import CloudSyncApps
 from _incydr_sdk.enums.trusted_activities import EmailServices
@@ -124,6 +125,9 @@ class TrustedActivitiesV2:
         cloud_share_services: List[CloudShareApps] = None,
         email_share_services: List[EmailServices] = None,
         git_push: bool = None,
+        browser_destinations: List[BrowserDestination] = None,
+        file_transfer_tools: bool = None,
+        is_high_value: bool = None,
     ) -> TrustedActivity:
         """
         Trust activity across an entire domain.
@@ -140,9 +144,14 @@ class TrustedActivitiesV2:
             Supported cloud storage services for file sharing are `BOX`, `GOOGLE_DRIVE` and/or `ONE_DRIVE`. You must
             have a cloud connector configured for your tenant to support this trusted action.
         * **email_share_services**: `List[EmailServices]` - Activity is trusted if the email recipient is on this domain.
-            Supported email services are `GMAIL` and/or `MICROSOFT_365`.  You must have an email connector configured
+            Supported email services are `GMAIL`, `GOOGLE_DRIVE`, and `OFFICE_365`.  You must have an email connector configured
             for your tenant to support this trusted action.
         * **git_push**: `bool` - Whether to trust Git push events to this domain.
+        * **browser_destinations**: `List[BrowserDestination]` - Activity is trusted if the user is logging in to one of these
+            browser destinations using this domain. Examples include `CHATGPT`, `CLAUDE`, `AMAZON_WEB_SERVICES`. For the complete list
+            consult the documentation at https://developer.code42.com/api/#tag/Trusted-Activities/operation/createTrustResource
+        * **file_transfer_tools**: `bool` - Whether to trust uploads to this domain using file-transfer tools.
+        * **is_high_value**: `bool` - Indicates whether or not this should be a high-value source. Defaults to not sending an indication.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
         the newly created trusted activity.
@@ -157,6 +166,10 @@ class TrustedActivitiesV2:
         # GIT PUSH
         if git_push:
             activity_actions.append(ActivityAction(type=ActivityType.GIT_PUSH))
+
+        # FILE TRANSFER TOOLS
+        if file_transfer_tools:
+            activity_actions.append(ActivityAction(type=ActivityType.FILE_TRANSFER))
 
         # CLOUD SYNC SERVICES
         services = [
@@ -175,6 +188,11 @@ class TrustedActivitiesV2:
                 EmailServices,
                 ActivityType.EMAIL,
             ),  # # EMAIL_SHARE_SERVICES
+            (
+                browser_destinations,
+                BrowserDestination,
+                ActivityType.USER_ACCOUNT_UPLOAD,
+            ),  # # USER_ACCOUNT_UPLOAD
         ]
         for element in services:
             service, enum, activity_type = element
@@ -194,6 +212,7 @@ class TrustedActivitiesV2:
             type=ActivityType.DOMAIN,
             value=domain,
             description=description,
+            isHighValueSource=is_high_value,
             activityActionGroups=[
                 ActivityActionGroup(activityActions=activity_actions, name=Name.DEFAULT)
             ],
@@ -208,6 +227,7 @@ class TrustedActivitiesV2:
         self,
         url: str,
         description: str = None,
+        is_high_value: bool = None,
     ) -> TrustedActivity:
         """
         Trust browser uploads to only part of a domain by including a specific path.  For example: `github.com/company` will only trust uploads to the `company` repository.
@@ -216,6 +236,7 @@ class TrustedActivitiesV2:
 
         * **url**: `str` (required) - URL path to trust (ex: `example.com/path`).
         * **description**: `str` - Optional description of the trusted activity.
+        * **is_high_value**: `bool` - Indicates whether or not this should be a high-value source. Defaults to not sending an indication.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
         the newly created trusted activity.
@@ -225,6 +246,7 @@ class TrustedActivitiesV2:
             type=ActivityType.URL_PATH,
             value=url,
             description=description,
+            isHighValueSource=is_high_value,
             activityActionGroups=[],
         )
 
@@ -237,6 +259,7 @@ class TrustedActivitiesV2:
         self,
         workspace_name: str,
         description: str = None,
+        is_high_value: bool = None,
     ) -> TrustedActivity:
         """
         Trust activity uploaded through a Slack workspace.
@@ -245,6 +268,7 @@ class TrustedActivitiesV2:
 
         * **workspace_name**: `str` (required) - Name of the Slack workspace to trust.
         * **description**: `str` - Optional description of the trusted activity.
+        * **is_high_value**: `bool` - Indicates whether or not this should be a high-value source. Defaults to not sending an indication.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
         the newly created trusted activity.
@@ -254,6 +278,7 @@ class TrustedActivitiesV2:
             type=ActivityType.SLACK,
             value=workspace_name,
             description=description,
+            isHighValueSource=is_high_value,
             activityActionGroups=[],
         )
 
@@ -268,6 +293,7 @@ class TrustedActivitiesV2:
         description: str = None,
         dropbox: bool = False,
         one_drive: bool = False,
+        is_high_value: bool = None,
     ) -> TrustedActivity:
         """
         Trust activity for a specific corporate account for cloud sync apps installed on user devices.
@@ -278,6 +304,7 @@ class TrustedActivitiesV2:
         * **description**: `str` - Optional description of the trusted activity.
         * **dropbox**: `bool` - Whether to trust Dropbox as a cloud sync service.  Defaults to False.
         * **one_drive** `bool` - Whether to trust OneDrive as a cloud sync service.  Defaults to False.
+        * **is_high_value**: `bool` - Indicates whether or not this should be a high-value source. Defaults to not sending an indication.
 
         At least 1 activity action group (dropbox, one_drive) is required to be trusted.
 
@@ -310,6 +337,7 @@ class TrustedActivitiesV2:
             type=ActivityType.ACCOUNT_NAME,
             value=account_name,
             description=description,
+            isHighValueSource=is_high_value,
             activityActionGroups=[activity_action_group],
         )
 
@@ -322,6 +350,7 @@ class TrustedActivitiesV2:
         self,
         git_uri: str,
         description: str = None,
+        is_high_value: bool = None,
     ) -> TrustedActivity:
         """
         Trust file uploads to a git repository.
@@ -330,6 +359,7 @@ class TrustedActivitiesV2:
 
         * **git_uri**: `str` (required) - Git URI to trust (ex: `bitbucket.org:exampleent/myrepo`).
         * **description**: `str` - Optional description of the trusted activity.
+        * **is_high_value**: `bool` - Indicates whether or not this should be a high-value source. Defaults to not sending an indication.
 
         **Returns**: A [`TrustedActivity`][trustedactivity-model] object representing
         the newly created trusted activity.
@@ -344,6 +374,7 @@ class TrustedActivitiesV2:
             type=ActivityType.GIT_REPOSITORY_URI,
             value=git_uri,
             description=description,
+            isHighValueSource=is_high_value,
             activityActionGroups=[activity_action_group],
         )
 

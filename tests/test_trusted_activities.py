@@ -181,6 +181,7 @@ def test_add_domain_when_default_params_returns_expected_data(
     test_data = {
         "type": activity_type,
         "value": domain,
+        "isHighValueSource": None,
         "description": "Description",
         "activityActionGroups": activity_action_groups,
     }
@@ -238,6 +239,144 @@ def test_add_domain_when_no_trusted_actions_raises_error(httpserver_auth: HTTPSe
     assert "At least 1 action for the domain must be trusted." in str(e.value)
 
 
+def test_add_domain_when_file_transfer_tools_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
+    domain = "transfer.example.com"
+    activity_type = ActivityType.DOMAIN
+    activity_action_groups = [
+        {
+            "name": "DEFAULT",
+            "activityActions": [
+                {"type": "FILE_TRANSFER", "providers": None},
+            ],
+        }
+    ]
+
+    test_data = {
+        "type": activity_type,
+        "value": domain,
+        "isHighValueSource": None,
+        "description": "Description",
+        "activityActionGroups": activity_action_groups,
+    }
+
+    test_response = TEST_TRUSTED_ACTIVITY_1.copy()
+    test_response.update(test_data)
+    test_response.update({"type": activity_type})
+
+    httpserver_auth.expect_request(
+        uri="/v2/trusted-activities", method="POST", json=test_data
+    ).respond_with_json(test_response)
+
+    client = Client()
+    trusted_activity = client.trusted_activities.v2.add_domain(
+        domain=domain,
+        description="Description",
+        file_transfer_tools=True,
+    )
+    assert isinstance(trusted_activity, TrustedActivity)
+    assert trusted_activity.type == activity_type
+    assert trusted_activity.value == domain
+    assert (
+        json.loads(trusted_activity.json())["activityActionGroups"]
+        == activity_action_groups
+    )
+
+
+def test_add_domain_when_browser_destinations_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
+    domain = "browser.example.com"
+    activity_type = ActivityType.DOMAIN
+    activity_action_groups = [
+        {
+            "name": "DEFAULT",
+            "activityActions": [
+                {
+                    "type": "USER_ACCOUNT_UPLOAD",
+                    "providers": [
+                        {"name": "SLACK"},
+                        {"name": "CHATGPT"},
+                    ],
+                },
+            ],
+        }
+    ]
+
+    test_data = {
+        "type": activity_type,
+        "value": domain,
+        "isHighValueSource": None,
+        "description": None,
+        "activityActionGroups": activity_action_groups,
+    }
+
+    test_response = TEST_TRUSTED_ACTIVITY_1.copy()
+    test_response.update(test_data)
+    test_response.update({"type": activity_type})
+
+    httpserver_auth.expect_request(
+        uri="/v2/trusted-activities", method="POST", json=test_data
+    ).respond_with_json(test_response)
+
+    client = Client()
+    trusted_activity = client.trusted_activities.v2.add_domain(
+        domain=domain,
+        browser_destinations=["SLACK", "CHATGPT"],
+    )
+    assert isinstance(trusted_activity, TrustedActivity)
+    assert trusted_activity.type == activity_type
+    assert trusted_activity.value == domain
+    assert (
+        json.loads(trusted_activity.json())["activityActionGroups"]
+        == activity_action_groups
+    )
+
+
+def test_add_domain_when_is_high_value_returns_expected_data(
+    httpserver_auth: HTTPServer,
+):
+    domain = "highvalue.example.com"
+    activity_type = ActivityType.DOMAIN
+    activity_action_groups = [
+        {
+            "name": "DEFAULT",
+            "activityActions": [
+                {"type": "FILE_UPLOAD", "providers": None},
+            ],
+        }
+    ]
+
+    test_data = {
+        "type": activity_type,
+        "value": domain,
+        "isHighValueSource": True,
+        "description": "Description",
+        "activityActionGroups": activity_action_groups,
+    }
+
+    test_response = TEST_TRUSTED_ACTIVITY_1.copy()
+    test_response.update(test_data)
+    test_response.update({"type": activity_type})
+
+    httpserver_auth.expect_request(
+        uri="/v2/trusted-activities", method="POST", json=test_data
+    ).respond_with_json(test_response)
+
+    client = Client()
+    trusted_activity = client.trusted_activities.v2.add_domain(
+        domain=domain,
+        description="Description",
+        file_upload=True,
+        is_high_value=True,
+    )
+    assert isinstance(trusted_activity, TrustedActivity)
+    assert trusted_activity.type == activity_type
+    assert trusted_activity.value == domain
+    assert trusted_activity.is_high_value_source is True
+
+
 def test_add_url_path_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
@@ -248,6 +387,7 @@ def test_add_url_path_when_default_params_returns_expected_data(
     test_data = {
         "type": activity_type,
         "value": url,
+        "isHighValueSource": None,
         "description": "Description",
         "activityActionGroups": activity_action_groups,
     }
@@ -281,6 +421,7 @@ def test_add_slack_workspace_when_default_params_returns_expected_data(
     test_data = {
         "type": activity_type,
         "value": workspace_name,
+        "isHighValueSource": None,
         "description": "Description",
         "activityActionGroups": activity_action_groups,
     }
@@ -324,6 +465,7 @@ def test_add_account_name_when_default_params_returns_expected_data(
     test_data = {
         "type": activity_type,
         "value": account_name,
+        "isHighValueSource": None,
         "description": "Description",
         "activityActionGroups": activity_action_groups,
     }
@@ -382,6 +524,7 @@ def test_add_git_repository_when_default_params_returns_expected_data(
     test_data = {
         "type": activity_type,
         "value": git_uri,
+        "isHighValueSource": None,
         "description": "Description",
         "activityActionGroups": activity_action_groups,
     }
@@ -549,6 +692,7 @@ def test_cli_add_domain_makes_expected_call(httpserver_auth, runner):
     test_data = {
         "type": activity_type,
         "value": domain,
+        "isHighValueSource": False,
         "description": "Description",
         "activityActionGroups": activity_action_groups,
     }
@@ -601,6 +745,7 @@ def test_cli_add_url_path_makes_expected_call(httpserver_auth, runner):
     test_data = {
         "type": activity_type,
         "value": url,
+        "isHighValueSource": False,
         "description": "Description",
         "activityActionGroups": activity_action_groups,
     }
@@ -628,6 +773,7 @@ def test_cli_add_slack_workspace_makes_expected_call(httpserver_auth, runner):
     test_data = {
         "type": activity_type,
         "value": workspace_name,
+        "isHighValueSource": False,
         "description": "Description",
         "activityActionGroups": activity_action_groups,
     }
@@ -672,6 +818,7 @@ def test_cli_add_account_name_makes_expected_call(httpserver_auth, runner):
     test_data = {
         "type": activity_type,
         "value": account_name,
+        "isHighValueSource": False,
         "description": "Description",
         "activityActionGroups": activity_action_groups,
     }
@@ -715,6 +862,7 @@ def test_cli_git_repo_makes_expected_call(httpserver_auth, runner):
     test_data = {
         "type": activity_type,
         "value": git_uri,
+        "isHighValueSource": False,
         "description": "Description",
         "activityActionGroups": activity_action_groups,
     }

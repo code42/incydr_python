@@ -16,7 +16,9 @@
 - Added the `GroupingEventQuery` class, used to make these queries.
 - Added the cli command `incydr file-events search-groups` to get approximate aggregate file event counts by a given grouping term.
 - Added the `type` parameter to session search methods and commands, allowing users to filter results to STANDARD or ACCOUNT_TAKE_OVER.
-
+- Added the `is_high_value` option to trusted activity methods in the SDK, and the `--high-value` option to trusted activity methods in the CLI.
+- Added the ability to specify domain trust for browser destinations, allowing users to specify when users should be allowed to use certain destinations when logged-in using a trusted domain.
+- Added the ability to specify trust for file-transfer tools when adding a trusted domain.
 
 ## 2.11.0 - 2026-02-10
 

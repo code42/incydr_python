@@ -604,6 +604,8 @@ Devices has been replaced by [Agents](#agents)
 * **FILE_UPLOAD** = `"FILE_UPLOAD"`
 * **GIT_PUSH** = `"GIT_PUSH"`
 * **GIT_REPOSITORY_URI** = `"GIT_REPOSITORY_URI"`
+* **USER_ACCOUNT_UPLOAD** = `"USER_ACCOUNT_UPLOAD"`
+* **FILE_TRANSFER** = `"FILE_TRANSFER"`
 
 ### Cloud Sync Apps
 
@@ -631,6 +633,30 @@ Devices has been replaced by [Agents](#agents)
 
 * **GMAIL** = `"GMAIL"`
 * **OFFICE_365** = `"OFFICE_365"`
+* **GOOGLE_DRIVE** = `"GOOGLE_DRIVE"`
+
+
+### Browser Destinations
+
+::: incydr.enums.trusted_activities.BrowserDestination
+    :docstring:
+
+* **AIRTABLE** = `"AIRTABLE"`
+* **AMAZON_WEB_SERVICES** = `"AMAZON_WEB_SERVICES"`
+* **BLACKBOX** = `"BLACKBOX"`
+* **BOX** = `"BOX"`
+* **CHATGPT** = `"CHATGPT"`
+* **CLAUDE** = `"CLAUDE"`
+* **CONCUR** = `"CONCUR"`
+* **CURSOR** = `"CURSOR"`
+* **DROPBOX** = `"DROPBOX"`
+* **GOOGLE_WORKSPACE** = `"GOOGLE_WORKSPACE"`
+* **MICROSOFT_365** = `"MICROSOFT_365"`
+* **NOTTA** = `"NOTTA"`
+* **OTTER** = `"OTTER"`
+* **PERPLEXITY** = `"PERPLEXITY"`
+* **SLACK** = `"SLACK"`
+* **YOU_DOT_COM** = `"YOU_DOT_COM"`
 
 ### Principal Types
 
