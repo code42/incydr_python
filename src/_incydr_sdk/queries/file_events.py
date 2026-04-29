@@ -396,23 +396,6 @@ class BaseEventQuery(Model):
         )
         return self
 
-    @classmethod
-    def from_saved_search(cls, saved_search: SavedSearch):
-        """
-        Create an `EventQuery` object from a `SavedSearch` response.
-        """
-        query = cls()
-        if saved_search.group_clause:
-            query.group_clause = saved_search.group_clause
-        if saved_search.groups:
-            for i in saved_search.groups:
-                query.groups.append(_handle_filter_group_type(i))
-        if saved_search.srt_dir:
-            query.sort_dir = saved_search.srt_dir
-        if saved_search.srt_key:
-            query.sort_key = saved_search.srt_key
-        return query
-
 
 class EventQuery(BaseEventQuery):
     """
@@ -429,6 +412,23 @@ class EventQuery(BaseEventQuery):
     page_token: Optional[str] = Field("", alias="pgToken")
     sort_dir: str = Field("asc", alias="srtDir")
     sort_key: EventSearchTerm = Field("event.id", alias="srtKey")
+
+    @classmethod
+    def from_saved_search(cls, saved_search: SavedSearch):
+        """
+        Create an `EventQuery` object from a `SavedSearch` response.
+        """
+        query = cls()
+        if saved_search.group_clause:
+            query.group_clause = saved_search.group_clause
+        if saved_search.groups:
+            for i in saved_search.groups:
+                query.groups.append(_handle_filter_group_type(i))
+        if saved_search.srt_dir:
+            query.sort_dir = saved_search.srt_dir
+        if saved_search.srt_key:
+            query.sort_key = saved_search.srt_key
+        return query
 
 
 class GroupingEventQuery(BaseEventQuery):
@@ -458,6 +458,19 @@ class GroupingEventQuery(BaseEventQuery):
         """Sets the maximum number of groups that will be returned for this query. Defaults to 1000. Maximum possible value supported by the API is 10000."""
         self.size = size
         return self
+
+    @classmethod
+    def from_saved_search(cls, saved_search: SavedSearch):
+        """
+        Create an `EventQuery` object from a `SavedSearch` response.
+        """
+        query = cls()
+        if saved_search.group_clause:
+            query.group_clause = saved_search.group_clause
+        if saved_search.groups:
+            for i in saved_search.groups:
+                query.groups.append(_handle_filter_group_type(i))
+        return query
 
 
 def _create_date_range_filter_group(start_date, end_date, term=None):
