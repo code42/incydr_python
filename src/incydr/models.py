@@ -25,6 +25,12 @@ from _incydr_sdk.file_events.models.response import FileEventGroup
 from _incydr_sdk.file_events.models.response import FileEventsPage
 from _incydr_sdk.file_events.models.response import GroupedFileEventResponse
 from _incydr_sdk.file_events.models.response import SavedSearch
+from _incydr_sdk.risk_indicator_categories.models import RiskIndicator
+from _incydr_sdk.risk_indicator_categories.models import (
+    RiskIndicatorCategoriesResponsePage,
+)
+from _incydr_sdk.risk_indicator_categories.models import RiskIndicatorCategory
+from _incydr_sdk.risk_indicator_categories.models import RiskIndicatorSubcategory
 from _incydr_sdk.risk_profiles.models import RiskProfile
 from _incydr_sdk.risk_profiles.models import RiskProfilesPage
 from _incydr_sdk.sessions.models.response import Session
@@ -107,6 +113,10 @@ __all__ = [
     "AuditEventsPage",
     "RiskProfilesPage",
     "RiskProfile",
+    "RiskIndicator",
+    "RiskIndicatorSubcategory",
+    "RiskIndicatorCategory",
+    "RiskIndicatorCategoriesResponsePage",
 ]
 
 

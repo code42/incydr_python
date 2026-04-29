@@ -19,6 +19,8 @@
 - Added the `is_high_value` option to trusted activity methods in the SDK, and the `--high-value` option to trusted activity methods in the CLI.
 - Added the ability to specify domain trust for browser destinations, allowing users to specify when users should be allowed to use certain destinations when logged-in using a trusted domain.
 - Added the ability to specify trust for file-transfer tools when adding a trusted domain.
+- Added the `risk-indicator-categories` client to the SDK, allowing the listing of risk indicator categories, subcategories, and risk indicators.
+- Added the `risk-indicator-categories` command to the CLI, allowing the listing of risk indicator categories.
 
 ## 2.11.0 - 2026-02-10
 

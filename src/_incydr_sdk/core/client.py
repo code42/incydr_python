@@ -24,6 +24,7 @@ from _incydr_sdk.file_events.client import FileEventsClient
 from _incydr_sdk.files.client import FilesClient
 from _incydr_sdk.legal_hold.client import LegalHoldClient
 from _incydr_sdk.orgs.client import OrgsClient
+from _incydr_sdk.risk_indicator_categories.client import RiskIndicatorCategories
 from _incydr_sdk.risk_profiles.client import RiskProfiles
 from _incydr_sdk.sessions.client import SessionsClient
 from _incydr_sdk.trusted_activities.client import TrustedActivitiesClient
@@ -114,6 +115,7 @@ class Client:
         self._trusted_activities = TrustedActivitiesClient(self)
         self._users = UsersClient(self)
         self._risk_profiles = RiskProfiles(self)
+        self._risk_indicator_categories = RiskIndicatorCategories(self)
         self._watchlists = WatchlistsClient(self)
 
         if not skip_auth:
@@ -365,6 +367,17 @@ class Client:
 
         """
         return self._risk_profiles
+
+    @property
+    def risk_indicator_categories(self):
+        """
+        Property returning a [`RiskIndicatorCategories`](../risk_indicator_categories) client for interacting
+        with `/v*/risk_indicator_categories` API endpoints.
+
+        Usage:
+            >>> client.risk_indicator_categories.v1.list_categories(active=True)
+        """
+        return self._risk_indicator_categories
 
     @property
     def watchlists(self):
