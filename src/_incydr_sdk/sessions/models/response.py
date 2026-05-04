@@ -20,6 +20,7 @@ class Session(ResponseModel):
     **Fields**:
 
     * **actor_id**: `str` The ID of the actor that generated the session.
+    * **type**: `str` The type of the session.
     * **begin_time**: `datetime` The date and time when this session began.
     * **content_inspection_results**: `List[ContentInspectionResult]` The results of content inspection.
     * **context_summary**: `str` An English summary of the contextual aspects of this session is any were identified.
@@ -42,6 +43,7 @@ class Session(ResponseModel):
     """
 
     actor_id: Optional[str] = Field(None, alias="actorId")
+    type: Optional[str] = Field(None)
     begin_time: Optional[int] = Field(None, alias="beginTime")
     content_inspection_results: Optional[ContentInspectionResult] = Field(
         None, alias="contentInspectionResults"

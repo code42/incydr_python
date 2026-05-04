@@ -21,6 +21,7 @@ from _incydr_cli.cmds.file_events import file_events
 from _incydr_cli.cmds.files import files as files_client
 from _incydr_cli.cmds.legal_hold import legal_hold
 from _incydr_cli.cmds.orgs import orgs
+from _incydr_cli.cmds.risk_indicator_categories import risk_indicator_categories
 from _incydr_cli.cmds.risk_profiles import risk_profiles
 from _incydr_cli.cmds.sessions import sessions
 from _incydr_cli.cmds.trusted_activities import trusted_activities
@@ -87,6 +88,7 @@ incydr.add_command(file_events)
 incydr.add_command(files_client)
 incydr.add_command(cases)
 incydr.add_command(risk_profiles)
+incydr.add_command(risk_indicator_categories)
 incydr.add_command(sessions)
 incydr.add_command(trusted_activities)
 incydr.add_command(users)

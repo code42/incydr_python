@@ -71,6 +71,7 @@ class SessionsCriteriaRequest(BaseModel):
     actor_id: Optional[str] = None
     on_or_after: Optional[int] = None
     before: Optional[int] = None
+    type: Optional[str] = None
     has_alerts: Optional[str] = None
     risk_indicators: Optional[List[str]] = None
     state: Optional[List[SessionStates]] = None

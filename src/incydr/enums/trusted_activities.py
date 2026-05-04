@@ -1,4 +1,5 @@
 from _incydr_sdk.enums.trusted_activities import ActivityType
+from _incydr_sdk.enums.trusted_activities import BrowserDestination
 from _incydr_sdk.enums.trusted_activities import CloudShareApps
 from _incydr_sdk.enums.trusted_activities import CloudSyncApps
 from _incydr_sdk.enums.trusted_activities import EmailServices
@@ -12,4 +13,5 @@ __all__ = [
     "EmailServices",
     "PrincipalType",
     "SortKeys",
+    "BrowserDestination",
 ]

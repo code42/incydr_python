@@ -329,3 +329,26 @@ ExcludedUsersList is deprecated. Use ExcludedActorsList instead.
 
 ::: incydr.models.IncludedDirectoryGroup
     :docstring:
+
+## Risk Indicator Categories
+---
+
+### `RiskIndicator` model
+
+::: incydr.models.RiskIndicator
+    :docstring:
+
+### `RiskIndicatorSubcategory` model
+
+::: incydr.models.RiskIndicatorSubcategory
+    :docstring:
+
+### `RiskIndicatorCategory` model
+
+::: incydr.models.RiskIndicatorCategory
+    :docstring:
+
+### `RiskIndicatorCategoriesResponsePage` model
+
+::: incydr.models.RiskIndicatorCategoriesResponsePage
+    :docstring:

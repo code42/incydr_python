@@ -171,4 +171,5 @@ class CreateTrustedActivityRequest(Model):
     type: Optional[str]
     value: Optional[str]
     description: Optional[str]
+    isHighValueSource: Optional[bool]
     activityActionGroups: Optional[List[ActivityActionGroup]]
