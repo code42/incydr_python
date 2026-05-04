@@ -8,12 +8,14 @@ from _incydr_sdk.__version__ import __version__
 from _incydr_sdk.core.client import Client
 from _incydr_sdk.queries.alerts import AlertQuery
 from _incydr_sdk.queries.file_events import EventQuery
+from _incydr_sdk.queries.file_events import GroupingEventQuery
 
 __all__ = [
     "__version__",
     "Client",
     "AlertQuery",
     "EventQuery",
+    "GroupingEventQuery",
     "models",
     "exceptions",
 ]

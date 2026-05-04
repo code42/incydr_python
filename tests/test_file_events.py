@@ -18,6 +18,7 @@ from _incydr_sdk.file_events.models.response import SavedSearch
 from _incydr_sdk.file_events.models.response import SearchFilter
 from _incydr_sdk.file_events.models.response import SearchFilterGroup
 from _incydr_sdk.queries.file_events import EventQuery
+from _incydr_sdk.queries.file_events import GroupingEventQuery
 
 
 MICROSECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -781,6 +782,24 @@ TEST_BAD_EVENT_JSON = r"""{
     "totalCount": 1
 }"""
 
+TEST_GROUPING_RESPONSE = """{"groups":[{"value":"email1@example.com","docCount":302},{"value":"email2@example.com","docCount":166},{"value":"email3@example.com","docCount":73},{"value":"email4@example.com","docCount":21},{"value":"email5@example.com","docCount":14},{"value":"email6@example.com","docCount":7},{"value":"email7@example.com","docCount":1}],"problems":null}"""
+
+TEST_GROUPING_QUERY = (
+    GroupingEventQuery(start_date="P14D")
+    .equals("user.email", ["test@code42.com", "john.doe@code42.com"])
+    .equals("file.category", "SourceCode")
+    .group_by("user.email")
+)
+
+
+@pytest.fixture
+def mock_grouped_search(httpserver_auth):
+    httpserver_auth.expect_request(
+        "/v2/file-events/grouping",
+        method="POST",
+        json=json.loads(TEST_GROUPING_QUERY.json()),
+    ).respond_with_json(json.loads(TEST_GROUPING_RESPONSE))
+
 
 @pytest.fixture
 def mock_get_saved_search(httpserver_auth):
@@ -809,6 +828,14 @@ def mock_list_saved_searches(httpserver_auth):
     httpserver_auth.expect_request(
         "/v2/file-events/saved-searches", method="GET"
     ).respond_with_json(search_data)
+
+
+def test_search_groups_sends_expected_query(
+    mock_grouped_search, httpserver_auth: HTTPServer
+):
+    client = Client()
+    client.file_events.v2.search_groups(TEST_GROUPING_QUERY)
+    httpserver_auth.check()
 
 
 @pytest.mark.parametrize(
@@ -845,11 +872,11 @@ def test_search_returns_expected_data(httpserver_auth: HTTPServer):
     )
 
     client = Client()
-    query = EventQuery.construct(**TEST_DICT_QUERY)
+    query = EventQuery.model_construct(**TEST_DICT_QUERY)
     page = client.file_events.v2.search(query)
     assert isinstance(page, FileEventsPage)
-    assert page.file_events[0] == FileEventV2.parse_obj(TEST_EVENT_1)
-    assert page.file_events[1] == FileEventV2.parse_obj(TEST_EVENT_2)
+    assert page.file_events[0] == FileEventV2.model_validate(TEST_EVENT_1)
+    assert page.file_events[1] == FileEventV2.model_validate(TEST_EVENT_2)
     assert page.total_count == len(page.file_events)
 
 
@@ -1321,5 +1348,162 @@ def test_cli_list_saved_searches_makes_expected_api_call(
     httpserver_auth: HTTPServer, runner, mock_list_saved_searches
 ):
     result = runner.invoke(incydr, ["file-events", "list-saved-searches"])
+    httpserver_auth.check()
+    assert result.exit_code == 0
+
+
+def test_cli_search_groups_makes_expected_api_call(
+    httpserver_auth: HTTPServer, runner, mock_grouped_search
+):
+    query = {
+        "groupClause": "AND",
+        "groups": [
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "@timestamp",
+                        "operator": "ON_OR_AFTER",
+                        "value": "2022-06-01T00:00:00.000Z",
+                    },
+                    {
+                        "term": "@timestamp",
+                        "operator": "ON_OR_BEFORE",
+                        "value": "2022-08-10T00:00:00.000Z",
+                    },
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "event.action", "operator": "IS", "value": "file-created"}
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "user.email", "operator": "IS", "value": "foo@bar.com"}
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "file.hash.md5", "operator": "IS", "value": "foo"}
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "file.hash.sha256", "operator": "IS", "value": "bar"}
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "source.category",
+                        "operator": "IS",
+                        "value": "Coding Tools",
+                    }
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "destination.category",
+                        "operator": "IS",
+                        "value": "Web Hosting",
+                    }
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [{"term": "file.name", "operator": "IS", "value": "baz"}],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "file.directory",
+                        "operator": "IS",
+                        "value": "C://foo/bar.txt",
+                    }
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "file.category", "operator": "IS", "value": "Document"}
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {
+                        "term": "risk.indicators.name",
+                        "operator": "IS",
+                        "value": "Bitbucket upload",
+                    }
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "risk.severity", "operator": "IS", "value": "HIGH"}
+                ],
+            },
+            {
+                "filterClause": "AND",
+                "filters": [
+                    {"term": "risk.score", "operator": "GREATER_THAN", "value": 10}
+                ],
+            },
+        ],
+        "groupingTerm": "user.email",
+        "size": 10000,
+    }
+
+    httpserver_auth.expect_request(
+        "/v2/file-events/grouping", method="POST", json=query
+    ).respond_with_json(json.loads(TEST_GROUPING_RESPONSE))
+
+    result = runner.invoke(
+        incydr,
+        [
+            "file-events",
+            "search-groups",
+            "--start",
+            "2022-06-01",
+            "--end",
+            "2022-08-10",
+            "--event-action",
+            "file-created",
+            "--username",
+            "foo@bar.com",
+            "--md5",
+            "foo",
+            "--sha256",
+            "bar",
+            "--source-category",
+            "Coding Tools",
+            "--destination-category",
+            "Web Hosting",
+            "--file-name",
+            "baz",
+            "--file-directory",
+            "C://foo/bar.txt",
+            "--file-category",
+            "Document",
+            "--risk-indicator",
+            "Bitbucket upload",
+            "--risk-severity",
+            "HIGH",
+            "--risk-score",
+            "10",
+            "--group-by",
+            "user.email",
+        ],
+    )
     httpserver_auth.check()
     assert result.exit_code == 0

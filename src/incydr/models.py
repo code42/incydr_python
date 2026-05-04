@@ -21,7 +21,9 @@ from _incydr_sdk.directory_groups.models import DirectoryGroup
 from _incydr_sdk.directory_groups.models import DirectoryGroupsPage
 from _incydr_sdk.file_events.models.event import FileEventV2
 from _incydr_sdk.file_events.models.event import User
+from _incydr_sdk.file_events.models.response import FileEventGroup
 from _incydr_sdk.file_events.models.response import FileEventsPage
+from _incydr_sdk.file_events.models.response import GroupedFileEventResponse
 from _incydr_sdk.file_events.models.response import SavedSearch
 from _incydr_sdk.risk_profiles.models import RiskProfile
 from _incydr_sdk.risk_profiles.models import RiskProfilesPage
@@ -69,6 +71,8 @@ __all__ = [
     "SavedSearch",
     "FileEventsPage",
     "FileEventV2",
+    "GroupedFileEventResponse",
+    "FileEventGroup",
     "User",
     "UsersPage",
     "UserRole",

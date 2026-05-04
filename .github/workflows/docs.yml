@@ -23,6 +23,6 @@ jobs:
      - name: Install click
        run: pip install click==8.1.8
      - name: Install hatch
-       run: pip install hatch==1.14.0
+       run: pip install hatch
      - name: Build docs
        run: hatch run docs:build

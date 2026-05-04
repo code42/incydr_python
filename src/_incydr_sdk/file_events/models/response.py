@@ -218,3 +218,40 @@ class SavedSearch(ResponseModel):
         description="Search term for sorting.",
         examples=["event.id"],
     )
+
+
+class FileEventGroup(ResponseModel):
+    """A model representing a single group in a grouped response.
+
+    **Fields:**
+
+    * **value**: `str` - The value of the term for this group.
+    * **doc_count**: `int` - The approximate count of hits matching this value for your query.
+    """
+
+    value: Optional[str] = Field(
+        None, description="The value of the term for this group."
+    )
+    doc_count: Optional[int] = Field(
+        None,
+        description="The approximate count of hits matching this value for your query.",
+        alias="docCount",
+    )
+
+
+class GroupedFileEventResponse(ResponseModel):
+    """A model representing a response of grouped file events.
+
+    **Fields:**
+
+    * **groups**: `List[FileEventGroup]` - A list of file event counts by grouping term and doc count.
+    * **problems**: `List[QueryProblem]` - List of problems in the request.  A problem with a search request could be an invalid filter value, an operator that can't be used on a term, etc.
+    """
+
+    groups: Optional[List[FileEventGroup]] = Field(
+        None, description="A list of file event counts by grouping term and doc count."
+    )
+    problems: Optional[List[QueryProblem]] = Field(
+        None,
+        description="List of problems in the request.  A problem with a search request could be an invalid filter value, an operator that can't be used on a term, etc.",
+    )

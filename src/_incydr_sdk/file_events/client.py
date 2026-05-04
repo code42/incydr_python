@@ -7,8 +7,10 @@ from urllib3 import Retry
 
 from ..exceptions import IncydrException
 from .models.response import FileEventsPage
+from .models.response import GroupedFileEventResponse
 from .models.response import SavedSearch
 from _incydr_sdk.queries.file_events import EventQuery
+from _incydr_sdk.queries.file_events import GroupingEventQuery
 
 
 class InvalidQueryException(IncydrException):
@@ -73,6 +75,28 @@ class FileEventsV2:
         page = FileEventsPage.parse_response(response)
         query.page_token = page.next_pg_token
         return page
+
+    def search_groups(self, query: GroupingEventQuery) -> GroupedFileEventResponse:
+        """
+        Search for file event counts by a grouping term.
+
+        **Parameters**:
+
+        * **query**: `GroupingEventQuery` (required) - The query object to group file events by a given field.
+
+        **Returns**: A [`GroupedFileEventResponse`][groupedfileeventresponse-model] object."""
+        self._mount_retry_adapter()
+
+        try:
+            response = self._parent.session.post(
+                "/v2/file-events/grouping", json=query.dict()
+            )
+        except HTTPError as err:
+            if err.response.status_code == 400:
+                raise InvalidQueryException(query=query, exception=err)
+            raise err
+        response = GroupedFileEventResponse.parse_response(response)
+        return response
 
     def list_saved_searches(self) -> List[SavedSearch]:
         """
