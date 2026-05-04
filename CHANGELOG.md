@@ -9,7 +9,7 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
-## Unreleased
+## 2.12.0 - 2026-05-04
 
 ### Added
 - Added the `sdk.file-events.v2.search_groups` method to get approximate aggregate file event counts by a given grouping term.
