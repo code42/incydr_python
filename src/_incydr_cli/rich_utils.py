@@ -350,7 +350,7 @@ def _print_options_panel(
 
         # Column for a metavar, if we have one
         metavar = Text(style=STYLE_METAVAR, overflow="fold")
-        metavar_str = param.make_metavar()
+        metavar_str = param.make_metavar(ctx=ctx)
 
         # Do it ourselves if this is a positional argument
         if (
