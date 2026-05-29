@@ -9,6 +9,14 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## Unreleased
+
+### Added
+- Added support for python 3.14
+
+### Removed
+- Removed support for python 3.9
+
 ## 2.12.0 - 2026-05-04
 
 ### Added
