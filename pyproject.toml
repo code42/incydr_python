@@ -93,7 +93,7 @@ dependencies = [
   "pytest-cov",
   "pytest-mock",
   "pytest-httpserver",
-  "click===8.1.8",
+  "click>=8.2",
   "chardet",
   "python-dateutil",
 ]
