@@ -81,3 +81,4 @@ class MessagingMethod(_Enum):
     EMAIL = "Email"
     SLACK = "Slack"
     TEAMS = "Teams"
+    THIRDPARTYINTEGRATION = "ThirdPartyIntegration"
