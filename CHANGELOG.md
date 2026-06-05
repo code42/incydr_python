@@ -9,7 +9,7 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
-## Unreleased
+## 2.12.1 - 2026-06-05
 
 ### Fixed
 - A bug where fetching alert rules could fail if third-party messaging was configured on a rule.
