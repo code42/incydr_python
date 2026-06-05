@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+### Fixed
+- A bug where fetching alert rules could fail if third-party messaging was configured on a rule.
+
 ### Added
 - Added support for python 3.14
 
