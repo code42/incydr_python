@@ -65,6 +65,7 @@ class Alert(Model):
     alert_id: Optional[str] = Field(alias="alertId")
     lesson_id: Optional[str] = Field(alias="lessonId")
     rule_id: Optional[str] = Field(alias="ruleId")
+    rule_name: Optional[str] = Field(None, alias="ruleName")
 
 
 class SessionsCriteriaRequest(BaseModel):

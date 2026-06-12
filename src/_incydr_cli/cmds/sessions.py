@@ -196,6 +196,7 @@ def search(
                 "context_summary",
                 "exfiltration_summary",
                 "actor_id",
+                "actor_name",
                 "low_events",
                 "moderate_events",
                 "high_events",
