@@ -30,6 +30,7 @@ END_TIMESTAMP = 1734652800000  # in ms
 
 TEST_SESSION = {
     "actorId": TEST_SESSION_ID,
+    "actorName": "test_actor_name",
     "type": "STANDARD",
     "beginTime": POSIX_TS,
     "contentInspectionResults": {"detectedOnAlerts": ["PII"]},
@@ -66,7 +67,12 @@ TEST_SESSION = {
     ],
     "tenantId": "string",
     "triggeredAlerts": [
-        {"alertId": "alert-id", "lessonId": "lesson-id", "ruleId": "rule-id"}
+        {
+            "alertId": "alert-id",
+            "lessonId": "lesson-id",
+            "ruleId": "rule-id",
+            "ruleName": "rule name",
+        }
     ],
     "userId": "string",
 }
