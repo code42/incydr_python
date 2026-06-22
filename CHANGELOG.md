@@ -9,7 +9,7 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
-## Unreleased
+## 2.12.2 - 2026-06-22
 
 ### Added
 - Support for the `actorName` and `ruleName` fields on the Session response object.
