@@ -1,0 +1,47 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "prHourlyLimit": 0,
+  "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "enabled": false,
+      "matchPackageNames": [
+        "*"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "description": "Block major version updates globally"
+    },
+    {
+      "description": "PR priority: major updates",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "prPriority": 10
+    },
+    {
+      "description": "PR priority: minor updates",
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "prPriority": 5
+    },
+    {
+      "description": "Group patch and minor updates into \"non-major dependencies\"",
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "groupName": "non-major dependencies",
+      "groupSlug": "non-major",
+      "prPriority": 0
+    }
+  ],
+  "branchPrefix": "renovate/",
+  "onboarding": false,
+  "requireConfig": "required"
+}
