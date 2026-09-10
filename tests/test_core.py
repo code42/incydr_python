@@ -1,8 +1,10 @@
 from io import StringIO
+from unittest.mock import MagicMock
 
 import pytest
 from pydantic import Field
 from pytest_httpserver import HTTPServer
+from requests.exceptions import HTTPError
 
 from .conftest import TEST_HOST
 from .conftest import TEST_TOKEN
@@ -10,6 +12,7 @@ from _incydr_sdk.core.auth import RefreshTokenAuth
 from _incydr_sdk.core.models import CSVModel
 from _incydr_sdk.core.models import Model
 from _incydr_sdk.core.settings import IncydrSettings
+from _incydr_sdk.core.utils import IncydrRequestRetryStrategy
 from _incydr_sdk.exceptions import AuthMissingError
 from incydr import Client
 
@@ -243,3 +246,97 @@ def test_client_prefers_refresh_token_auth_when_both_auth_methods_provided(
 
     c = Client()
     assert isinstance(c._session.auth, RefreshTokenAuth)
+
+
+def test_settings_retry_on_rate_limit_defaults_to_true(monkeypatch):
+    monkeypatch.setenv("incydr_url", TEST_HOST)
+    monkeypatch.setenv("incydr_api_client_id", "env_id")
+    monkeypatch.setenv("incydr_api_client_secret", "env_secret")
+
+    settings = IncydrSettings()
+    assert settings.retry_on_rate_limit is True
+
+
+def test_client_mounts_rate_limit_retry_adapter_by_default(
+    httpserver_auth: HTTPServer,
+):
+    client = Client()
+    adapter = client.session.get_adapter(TEST_HOST)
+
+    assert isinstance(adapter.max_retries, IncydrRequestRetryStrategy)
+    assert adapter.max_retries.status == 3
+    assert adapter.max_retries.total is None
+    assert adapter.max_retries.connect is False
+    assert adapter.max_retries.read is False
+    assert not adapter.max_retries.redirect
+    assert not adapter.max_retries.other
+    assert 429 in adapter.max_retries.status_forcelist
+    assert adapter.max_retries._logger is client.settings.logger
+
+
+def test_client_does_not_mount_rate_limit_retry_adapter_when_disabled(
+    httpserver_auth: HTTPServer,
+):
+    client = Client(retry_on_rate_limit=False)
+    adapter = client.session.get_adapter(TEST_HOST)
+
+    assert not isinstance(adapter.max_retries, IncydrRequestRetryStrategy)
+    assert adapter.max_retries.total == 0
+
+
+def test_client_retries_get_request_on_429(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_ordered_request(
+        "/v1/users/user-1", method="GET"
+    ).respond_with_data("", status=429, headers={"Retry-After": "0"})
+    httpserver_auth.expect_ordered_request(
+        "/v1/users/user-1", method="GET"
+    ).respond_with_json({"userId": "user-1"})
+
+    client = Client()
+    response = client.session.get("/v1/users/user-1")
+
+    assert response.status_code == 200
+    assert response.json() == {"userId": "user-1"}
+    httpserver_auth.check()
+
+
+def test_client_does_not_retry_post_request_on_429(httpserver_auth: HTTPServer):
+    httpserver_auth.expect_request("/v1/cases", method="POST").respond_with_data(
+        "", status=429, headers={"Retry-After": "0"}
+    )
+
+    client = Client()
+    with pytest.raises(HTTPError) as err:
+        client.session.post("/v1/cases", json={"name": "test"})
+
+    assert err.value.response.status_code == 429
+    httpserver_auth.check()
+
+
+def test_client_logs_when_retrying_on_429(httpserver_auth: HTTPServer, mocker):
+    httpserver_auth.expect_ordered_request(
+        "/v1/users/user-1", method="GET"
+    ).respond_with_data("", status=429, headers={"Retry-After": "0"})
+    httpserver_auth.expect_ordered_request(
+        "/v1/users/user-1", method="GET"
+    ).respond_with_json({"userId": "user-1"})
+
+    client = Client()
+    mock_warning = mocker.patch.object(client.settings.logger, "warning")
+    client.session.get("/v1/users/user-1")
+
+    mock_warning.assert_called_with("Rate limit hit, retrying after: 0 seconds.")
+
+
+def test_incydr_request_retry_strategy_new_preserves_logger():
+    mock_logger = MagicMock()
+    retry = IncydrRequestRetryStrategy(
+        logger=mock_logger, status=3, status_forcelist=[429]
+    )
+
+    cloned = retry.new()
+
+    assert isinstance(cloned, IncydrRequestRetryStrategy)
+    assert cloned._logger is mock_logger
+    assert cloned.status == 3
+    assert 429 in cloned.status_forcelist

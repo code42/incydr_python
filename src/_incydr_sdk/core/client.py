@@ -3,6 +3,7 @@ import json
 import logging
 from collections import deque
 
+from requests.adapters import HTTPAdapter
 from requests_toolbelt import user_agent
 from requests_toolbelt.sessions import BaseUrlSession
 
@@ -16,6 +17,7 @@ from _incydr_sdk.cases.client import CasesClient
 from _incydr_sdk.core.auth import APIClientAuth
 from _incydr_sdk.core.auth import RefreshTokenAuth
 from _incydr_sdk.core.settings import IncydrSettings
+from _incydr_sdk.core.utils import IncydrRequestRetryStrategy
 from _incydr_sdk.customer.client import CustomerClient
 from _incydr_sdk.departments.client import DepartmentsClient
 from _incydr_sdk.devices.client import DevicesClient
@@ -96,6 +98,25 @@ class Client:
             response.raise_for_status()
 
         self._session.hooks["response"] = [response_hook]
+
+        if self._settings.retry_on_rate_limit:
+            rate_limit_retry_strategy = IncydrRequestRetryStrategy(
+                logger=self._settings.logger,
+                total=None,
+                status=3,  # retry up to 3 times
+                connect=False,
+                read=False,
+                redirect=False,
+                other=False,  # We do not want to retry on non-status causes.
+                backoff_factor=5,  # if `retry-after` header isn't present, use 5 second exponential backoff
+                status_forcelist=[
+                    429
+                ],  # this only handles 429 errors. Does not retry 5xx.
+            )
+            rate_limit_retry_adapter = HTTPAdapter(
+                max_retries=rate_limit_retry_strategy
+            )
+            self._session.mount(self._session.base_url, rate_limit_retry_adapter)
 
         self._actors = ActorsClient(self)
         self._agents = AgentsClient(self)
