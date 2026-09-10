@@ -7,6 +7,7 @@ from unittest import mock
 import pytest
 from pydantic import ValidationError
 from pytest_httpserver import HTTPServer
+from requests.exceptions import RetryError
 
 from _incydr_cli.cmds.options.output_options import TableFormat
 from _incydr_cli.cursor import CursorStore
@@ -1013,6 +1014,22 @@ def test_search_logs_when_retrying_on_429(httpserver_auth: HTTPServer, mocker):
     client.file_events.v2.search(EventQuery.model_construct(**TEST_DICT_QUERY))
 
     mock_warning.assert_called_with("Rate limit hit, retrying after: 0 seconds.")
+
+
+def test_search_raises_retry_error_when_429_retries_exhausted(
+    httpserver_auth: HTTPServer,
+):
+    # status=3 allows 3 retries after the initial request, so 4 total 429 responses.
+    for _ in range(4):
+        httpserver_auth.expect_ordered_request(
+            "/v2/file-events", method="POST"
+        ).respond_with_data("", status=429, headers={"Retry-After": "0"})
+
+    client = Client()
+    with pytest.raises(RetryError):
+        client.file_events.v2.search(EventQuery.model_construct(**TEST_DICT_QUERY))
+
+    httpserver_auth.check()
 
 
 # ************************************************ CLI ************************************************

@@ -5,6 +5,8 @@ import pytest
 from pydantic import Field
 from pytest_httpserver import HTTPServer
 from requests.exceptions import HTTPError
+from requests.exceptions import RetryError
+from urllib3.util.retry import RequestHistory
 
 from .conftest import TEST_HOST
 from .conftest import TEST_TOKEN
@@ -328,6 +330,22 @@ def test_client_logs_when_retrying_on_429(httpserver_auth: HTTPServer, mocker):
     mock_warning.assert_called_with("Rate limit hit, retrying after: 0 seconds.")
 
 
+def test_client_raises_retry_error_when_429_retries_exhausted(
+    httpserver_auth: HTTPServer,
+):
+    # status=3 allows 3 retries after the initial request, so 4 total 429 responses.
+    for _ in range(4):
+        httpserver_auth.expect_ordered_request(
+            "/v1/users/user-1", method="GET"
+        ).respond_with_data("", status=429, headers={"Retry-After": "0"})
+
+    client = Client()
+    with pytest.raises(RetryError):
+        client.session.get("/v1/users/user-1")
+
+    httpserver_auth.check()
+
+
 def test_incydr_request_retry_strategy_new_preserves_logger():
     mock_logger = MagicMock()
     retry = IncydrRequestRetryStrategy(
@@ -340,3 +358,58 @@ def test_incydr_request_retry_strategy_new_preserves_logger():
     assert cloned._logger is mock_logger
     assert cloned.status == 3
     assert 429 in cloned.status_forcelist
+
+
+def test_incydr_request_retry_strategy_does_not_log_zero_backoff():
+    mock_logger = MagicMock()
+    history = (
+        RequestHistory(
+            method="GET",
+            url="/",
+            error=None,
+            status=429,
+            redirect_location=None,
+        ),
+    )
+    retry = IncydrRequestRetryStrategy(
+        logger=mock_logger,
+        status=3,
+        status_forcelist=[429],
+        backoff_factor=5,
+        history=history,
+    )
+
+    assert retry.get_backoff_time() == 0
+    mock_logger.warning.assert_not_called()
+
+
+def test_incydr_request_retry_strategy_logs_positive_backoff():
+    mock_logger = MagicMock()
+    history = (
+        RequestHistory(
+            method="GET",
+            url="/",
+            error=None,
+            status=429,
+            redirect_location=None,
+        ),
+        RequestHistory(
+            method="GET",
+            url="/",
+            error=None,
+            status=429,
+            redirect_location=None,
+        ),
+    )
+    retry = IncydrRequestRetryStrategy(
+        logger=mock_logger,
+        status=3,
+        status_forcelist=[429],
+        backoff_factor=5,
+        history=history,
+    )
+
+    assert retry.get_backoff_time() == 10.0
+    mock_logger.warning.assert_called_once_with(
+        "Rate limit hit, retrying after: 10.0 seconds."
+    )

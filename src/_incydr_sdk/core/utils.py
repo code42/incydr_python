@@ -1,5 +1,6 @@
 import logging
 import re
+from typing import Optional
 
 from requests import Response
 from urllib3 import Retry
@@ -18,7 +19,7 @@ class IncydrRequestRetryStrategy(Retry):
     request might look like it's hanging when we are retrying due to 429.
     """
 
-    _logger: logging.Logger = None
+    _logger: Optional[logging.Logger] = None
 
     def __init__(self, *args, logger: logging.Logger = None, **kwargs):
         self._logger = logger
@@ -37,7 +38,7 @@ class IncydrRequestRetryStrategy(Retry):
 
     def get_backoff_time(self):
         backoff_time = super().get_backoff_time()
-        if self._logger is not None:
+        if self._logger is not None and backoff_time > 0:
             self._logger.warning(
                 f"Rate limit hit, retrying after: {backoff_time} seconds."
             )
