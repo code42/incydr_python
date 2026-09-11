@@ -9,6 +9,11 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## Unreleased
+
+### 2.12.3 - 2026-09-11
+- The `retry_on_rate_limit` setting, which controls whether the SDK will retry 429 responses. Defaults to on, retrying most 429 responses up to 3 times. Set this to False on SDK initialization if you wish to manually handle retrying 429 responses. When enabled, if retries are exhausted, requests.exceptions.RetryError will be raised.
+
 ## 2.12.2 - 2026-06-22
 
 ### Added

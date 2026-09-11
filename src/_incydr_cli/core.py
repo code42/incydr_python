@@ -3,6 +3,7 @@ import re
 
 import click
 from requests import HTTPError
+from requests.exceptions import RetryError
 
 from _incydr_cli.exceptions import IncydrCLIException
 from _incydr_cli.exceptions import LoggedCLIError
@@ -95,7 +96,7 @@ class ExceptionHandlingGroup(IncydrGroup):
             raise IncydrCLIException(err.args[0])
         except click.ClickException:
             raise
-        except HTTPError as err:
+        except (HTTPError, RetryError) as err:
             # log error with traceback and print error code with brief error message to console
             settings._log_verbose_error(self._original_args, err.request)
             raise LoggedCLIError(err.args[0])

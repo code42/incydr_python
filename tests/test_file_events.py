@@ -7,11 +7,13 @@ from unittest import mock
 import pytest
 from pydantic import ValidationError
 from pytest_httpserver import HTTPServer
+from requests.exceptions import RetryError
 
 from _incydr_cli.cmds.options.output_options import TableFormat
 from _incydr_cli.cursor import CursorStore
 from _incydr_cli.main import incydr
 from _incydr_sdk.core.client import Client
+from _incydr_sdk.core.utils import IncydrRequestRetryStrategy
 from _incydr_sdk.file_events.models.event import FileEventV2
 from _incydr_sdk.file_events.models.response import FileEventsPage
 from _incydr_sdk.file_events.models.response import SavedSearch
@@ -19,6 +21,7 @@ from _incydr_sdk.file_events.models.response import SearchFilter
 from _incydr_sdk.file_events.models.response import SearchFilterGroup
 from _incydr_sdk.queries.file_events import EventQuery
 from _incydr_sdk.queries.file_events import GroupingEventQuery
+from tests.conftest import TEST_HOST
 
 
 MICROSECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -915,6 +918,118 @@ def test_search_raises_exception_when_bad_event_json(httpserver_auth: HTTPServer
     query = EventQuery.construct(**TEST_DICT_QUERY)
     with pytest.raises(ValidationError):
         client.file_events.v2.search(query)
+
+
+def test_search_mounts_ffs_retry_adapter_on_file_events_path(
+    httpserver_auth: HTTPServer,
+):
+    event_data = {
+        "fileEvents": [],
+        "nextPgToken": None,
+        "problems": None,
+        "totalCount": 0,
+    }
+    httpserver_auth.expect_request("/v2/file-events", method="POST").respond_with_json(
+        event_data
+    )
+
+    client = Client()
+    client.file_events.v2.search(EventQuery.model_construct(**TEST_DICT_QUERY))
+
+    ffs_adapter = client.session.get_adapter(f"{TEST_HOST}/v2/file-events")
+    base_adapter = client.session.get_adapter(TEST_HOST)
+
+    assert isinstance(ffs_adapter.max_retries, IncydrRequestRetryStrategy)
+    assert set(ffs_adapter.max_retries.allowed_methods) == {"GET", "POST"}
+    assert ffs_adapter.max_retries.status == 3
+    assert ffs_adapter.max_retries.total is None
+    assert ffs_adapter.max_retries.connect is False
+    assert ffs_adapter.max_retries.read is False
+    assert 429 in ffs_adapter.max_retries.status_forcelist
+    assert ffs_adapter is not base_adapter
+    assert isinstance(base_adapter.max_retries, IncydrRequestRetryStrategy)
+    assert "POST" not in base_adapter.max_retries.allowed_methods
+
+
+def test_search_does_not_mount_ffs_retry_adapter_when_retry_disabled(
+    httpserver_auth: HTTPServer,
+):
+    event_data = {
+        "fileEvents": [],
+        "nextPgToken": None,
+        "problems": None,
+        "totalCount": 0,
+    }
+    httpserver_auth.expect_request("/v2/file-events", method="POST").respond_with_json(
+        event_data
+    )
+
+    client = Client(retry_on_rate_limit=False)
+    client.file_events.v2.search(EventQuery.model_construct(**TEST_DICT_QUERY))
+
+    assert client.file_events.v2._retry_adapter_mounted is False
+    adapter = client.session.get_adapter(f"{TEST_HOST}/v2/file-events")
+    assert not isinstance(adapter.max_retries, IncydrRequestRetryStrategy)
+    assert adapter.max_retries.total == 0
+
+
+def test_search_retries_post_request_on_429(httpserver_auth: HTTPServer):
+    event_data = {
+        "fileEvents": [TEST_EVENT_1],
+        "nextPgToken": None,
+        "problems": None,
+        "totalCount": 1,
+    }
+    httpserver_auth.expect_ordered_request(
+        "/v2/file-events", method="POST"
+    ).respond_with_data("", status=429, headers={"Retry-After": "0"})
+    httpserver_auth.expect_ordered_request(
+        "/v2/file-events", method="POST"
+    ).respond_with_json(event_data)
+
+    client = Client()
+    page = client.file_events.v2.search(EventQuery.model_construct(**TEST_DICT_QUERY))
+
+    assert isinstance(page, FileEventsPage)
+    assert page.total_count == 1
+    httpserver_auth.check()
+
+
+def test_search_logs_when_retrying_on_429(httpserver_auth: HTTPServer, mocker):
+    event_data = {
+        "fileEvents": [],
+        "nextPgToken": None,
+        "problems": None,
+        "totalCount": 0,
+    }
+    httpserver_auth.expect_ordered_request(
+        "/v2/file-events", method="POST"
+    ).respond_with_data("", status=429, headers={"Retry-After": "0"})
+    httpserver_auth.expect_ordered_request(
+        "/v2/file-events", method="POST"
+    ).respond_with_json(event_data)
+
+    client = Client()
+    mock_warning = mocker.patch.object(client.settings.logger, "warning")
+    client.file_events.v2.search(EventQuery.model_construct(**TEST_DICT_QUERY))
+
+    mock_warning.assert_called_with("Rate limit hit, retrying after: 0 seconds.")
+
+
+def test_search_raises_retry_error_when_429_retries_exhausted(
+    httpserver_auth: HTTPServer,
+):
+    # status=3 allows 3 retries after the initial request, so 4 total 429 responses.
+    for _ in range(4):
+        httpserver_auth.expect_ordered_request(
+            "/v2/file-events", method="POST"
+        ).respond_with_data("", status=429, headers={"Retry-After": "0"})
+
+    client = Client()
+    with pytest.raises(RetryError):
+        client.file_events.v2.search(EventQuery.model_construct(**TEST_DICT_QUERY))
+
+    httpserver_auth.check()
 
 
 # ************************************************ CLI ************************************************

@@ -74,6 +74,7 @@ class IncydrSettings(BaseSettings):
     * **api_client_id**: `str` The API Client Identifier for authentication. env_var=`INCYDR_API_CLIENT_ID`
     * **api_client_secret**: `str` The API Client Secret for authentication. env_var=`INCYDR_API_CLIENT_SECRET`
     * **url**: `str` The URL of your Code42 API gateway instance. env_var=`INCYDR_URL`
+    * **retry_on_rate_limit**: `bool` Whether or not to automatically retry when we get a 429 response. Defaults to `True`. env_var=`INCYDR_RETRY_ON_RATE_LIMIT`
     * **page_size**: `int` The default page size for all paginated requests. Defaults to 100. env_var=`INCYDR_PAGE_SIZE`
     * **max_response_history**: `int` The maximum number of responses the `incydr.Client.response_history` list will
         store. Defaults to 5. env_var=`INCYDR_MAX_RESPONSE_HISTORY`
@@ -91,6 +92,7 @@ class IncydrSettings(BaseSettings):
     api_client_id: Optional[str] = Field(default=None)
     api_client_secret: Optional[SecretStr] = Field(default=None)
     url: str
+    retry_on_rate_limit: bool = Field(default=True)
     page_size: int = Field(default=100)
     max_response_history: int = Field(default=5)
     use_rich: bool = Field(default=True)

@@ -3,12 +3,12 @@ from typing import List
 from pydantic import parse_obj_as
 from requests import HTTPError
 from requests.adapters import HTTPAdapter
-from urllib3 import Retry
 
 from ..exceptions import IncydrException
 from .models.response import FileEventsPage
 from .models.response import GroupedFileEventResponse
 from .models.response import SavedSearch
+from _incydr_sdk.core.utils import IncydrRequestRetryStrategy
 from _incydr_sdk.queries.file_events import EventQuery
 from _incydr_sdk.queries.file_events import GroupingEventQuery
 
@@ -128,16 +128,26 @@ class FileEventsV2:
 
     def _mount_retry_adapter(self):
         """Sets custom Retry strategy for FFS url requests to gracefully handle being rate-limited on FFS queries."""
-        if not self._retry_adapter_mounted:
-            retry_strategy = FFSQueryRetryStrategy(
+        if (
+            not self._retry_adapter_mounted
+            and self._parent.settings.retry_on_rate_limit
+        ):
+            retry_strategy = IncydrRequestRetryStrategy(
+                logger=self._parent.settings.logger,
+                total=None,
                 status=3,  # retry up to 3 times
+                connect=False,
+                read=False,
+                redirect=False,
+                other=False,  # We do not want to retry on non-status causes.
                 backoff_factor=5,  # if `retry-after` header isn't present, use 5 second exponential backoff
                 allowed_methods=[
-                    "POST"
-                ],  # POST isn't a default allowed method due to it usually modifying resources
+                    "GET",
+                    "POST",
+                ],  # POST isn't a default allowed method due to it usually modifying resources.
                 status_forcelist=[
                     429
-                ],  # this only handles 429 errors, it won't retry on 5xx
+                ],  # this only handles 429 errors. Does not retry 5xx.
             )
             file_event_adapter = HTTPAdapter(
                 pool_connections=200,
@@ -145,7 +155,9 @@ class FileEventsV2:
                 pool_block=True,
                 max_retries=retry_strategy,
             )
-            self._parent.session.mount(self._parent.settings.url, file_event_adapter)
+            self._parent.session.mount(
+                f"{self._parent.session.base_url}/v2/file-events", file_event_adapter
+            )
             self._retry_adapter_mounted = True
 
 
@@ -159,27 +171,3 @@ class FileEventsClient:
         if self._v2 is None:
             self._v2 = FileEventsV2(self._parent)
         return self._v2
-
-
-class FFSQueryRetryStrategy(Retry):
-    """The forensic search service helpfully responds with a 'retry-after' header, telling us how long until the rate
-    limiter is reset. We subclass :class:`urllib3.Retry` just to add a bit of logging so the user can tell why the
-    request might look like it's hanging.
-    """
-
-    # TODO: Handle debug logging
-
-    def get_retry_after(self, response):
-        retry_after = super().get_retry_after(response)
-        # if retry_after is not None:
-        #     debug.logger.info(
-        #         f"Forensic search rate limit hit, retrying after: {int(retry_after)} seconds."
-        #     )
-        return retry_after
-
-    def get_backoff_time(self):
-        backoff_time = super().get_backoff_time()
-        # debug.logger.info(
-        #     f"Forensic search rate limit hit, retrying after: {backoff_time} seconds."
-        # )
-        return backoff_time
