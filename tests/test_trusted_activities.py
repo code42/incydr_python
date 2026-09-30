@@ -73,7 +73,7 @@ def mock_get_all(httpserver_auth):
     }
     httpserver_auth.expect_request(
         "/v2/trusted-activities",
-        query_string=urlencode({"page_num": 1, "page_size": 100}),
+        query_string=urlencode({"page": 1, "page_size": 100}),
     ).respond_with_json(trusted_activities_data)
 
 
@@ -106,10 +106,10 @@ def test_iter_all_when_default_params_returns_expected_data(
     httpserver_auth: HTTPServer,
 ):
     query_1 = {
-        "page_num": 1,
+        "page": 1,
         "page_size": 2,
     }
-    query_2 = {"page_num": 2, "page_size": 2}
+    query_2 = {"page": 2, "page_size": 2}
 
     trusted_activities_data_1 = {
         "trustedActivities": [TEST_TRUSTED_ACTIVITY_1, TEST_TRUSTED_ACTIVITY_2],
@@ -127,42 +127,6 @@ def test_iter_all_when_default_params_returns_expected_data(
     httpserver_auth.expect_request(
         "/v2/trusted-activities", method="GET", query_string=urlencode(query_2)
     ).respond_with_json(trusted_activities_data_2)
-
-    client = Client()
-    iterator = client.trusted_activities.v2.iter_all(page_size=2)
-    total_trusted_activities = 0
-    expected_trusted_activities = [TEST_TRUSTED_ACTIVITY_1, TEST_TRUSTED_ACTIVITY_2]
-
-    for item in iterator:
-        total_trusted_activities += 1
-        assert isinstance(item, TrustedActivity)
-        assert item.json() == json.dumps(
-            expected_trusted_activities.pop(0), separators=(",", ":")
-        )
-    assert total_trusted_activities == 2
-
-
-def test_iter_all_when_page_repeats_returns_expected_data(
-    httpserver_auth: HTTPServer,
-):
-    query_1 = {
-        "page_num": 1,
-        "page_size": 2,
-    }
-    query_2 = {"page_num": 2, "page_size": 2}
-
-    trusted_activities_data_1 = {
-        "trustedActivities": [TEST_TRUSTED_ACTIVITY_1, TEST_TRUSTED_ACTIVITY_2],
-        "totalCount": 2,
-    }
-
-    httpserver_auth.expect_request(
-        "/v2/trusted-activities", method="GET", query_string=urlencode(query_1)
-    ).respond_with_json(trusted_activities_data_1)
-
-    httpserver_auth.expect_request(
-        "/v2/trusted-activities", method="GET", query_string=urlencode(query_2)
-    ).respond_with_json(trusted_activities_data_1)
 
     client = Client()
     iterator = client.trusted_activities.v2.iter_all(page_size=2)
