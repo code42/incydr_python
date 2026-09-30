@@ -9,7 +9,7 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
-## 2.12.4 - 2026-09-29
+## 2.12.4 - 2026-09-30
 - Fixed an issue where listing trusted activities in some cases would loop infinitely.
 
 ## 2.12.3 - 2026-09-11
