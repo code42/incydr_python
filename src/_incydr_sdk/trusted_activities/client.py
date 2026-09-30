@@ -77,7 +77,7 @@ class TrustedActivitiesV2:
 
         page_size = page_size or self._parent.settings.page_size
         data = QueryTrustedActivitiesRequest(
-            page_num=page_num,
+            page=page_num,
             page_size=page_size,
             activity_type=activity_type,
             sort_key=sort_key,
@@ -104,7 +104,6 @@ class TrustedActivitiesV2:
         """
 
         page_size = page_size or self._parent.settings.page_size
-        last_page_ids = set()
         for page_num in count(1):
             page = self.get_page(
                 page_num=page_num,
@@ -113,14 +112,8 @@ class TrustedActivitiesV2:
                 sort_key=sort_key,
                 sort_direction=sort_direction,
             )
-            results_to_yield = [
-                x for x in page.trusted_activities if x.activity_id not in last_page_ids
-            ]
-            yield from results_to_yield
-            last_page_ids = {x.activity_id for x in page.trusted_activities}
-            if (len(page.trusted_activities) < page_size) or (
-                len(results_to_yield) < page_size
-            ):
+            yield from page.trusted_activities
+            if len(page.trusted_activities) < page_size:
                 break
 
     def add_domain(

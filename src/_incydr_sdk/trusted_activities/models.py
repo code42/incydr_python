@@ -160,7 +160,7 @@ class TrustedActivitiesPage(ResponseModel):
 
 
 class QueryTrustedActivitiesRequest(Model):
-    page_num: Optional[int]
+    page: Optional[int]
     page_size: Optional[int]
     activity_type: Optional[str]
     sort_key: Optional[str]
