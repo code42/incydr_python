@@ -9,6 +9,9 @@
  how a consumer would use the library or CLI tool (e.g. adding unit tests, updating documentation, etc) are not captured
  here.
 
+## 2.12.7 - 2026-11-02
+- Fixed an issue where some event queries would not serialize correctly.
+
 ## 2.12.6 - 2026-10-23
 
 ### Security

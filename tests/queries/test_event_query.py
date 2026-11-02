@@ -321,6 +321,13 @@ def test_event_query_from_saved_search_creates_expected_filter_groups():
     assert isinstance(q.groups[2], FilterGroupV2)
 
 
+def test_event_query_from_saved_search_serializes_both_filter_group_types():
+    q = EventQuery().from_saved_search(TEST_SAVED_SEARCH)
+    dumped = q.model_dump()
+    for i in range(len(q.groups)):
+        assert q.groups[i].model_dump() == dumped["groups"][i]
+
+
 def test_event_query_is_any_creates_correct_filter():
     q = EventQuery().is_any("term", ["value1", "value2"])
     expected = FilterGroup(
