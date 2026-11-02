@@ -112,7 +112,7 @@ class BaseEventQuery(Model):
     """
 
     group_clause: str = Field("AND", alias="groupClause")
-    groups: Optional[List[FilterGroup]]
+    groups: Optional[List[Union[FilterGroupV2, FilterGroup]]]
     model_config = ConfigDict(
         validate_assignment=True,
         use_enum_values=True,
